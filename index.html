@@ -672,7 +672,7 @@
         <a href="#/posisi" data-route="posisi">Posisi &amp; Batasan</a>
       </nav>
       <a class="btn-primary side-cta" href="#analisis">Mulai Analisis</a>
-      <div class="side-foot">Beta Terbuka · v0.12.0-beta<br />Seluruh analisis berjalan lokal di peramban ini — teks Anda tidak dikirim ke mana pun.</div>
+      <div class="side-foot">Beta Terbuka · v0.13.0-beta<br />Seluruh analisis berjalan lokal di peramban ini — teks Anda tidak dikirim ke mana pun.</div>
     </aside>
     <div class="wrap page">
       <header class="hero" data-view="home">
@@ -1224,12 +1224,16 @@
           <a href="#/posisi">Posisi &amp; Batasan</a>
         </nav>
         <p class="copy">© 2026 Saksara — Dikembangkan oleh Ciptanala Devs</p>
-        <p class="version-line">Versi <strong>v0.12.0-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
+        <p class="version-line">Versi <strong>v0.13.0-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
       </div>
     </footer>
 
     <dialog class="changelog" id="changelog-modal" aria-labelledby="changelog-title">
       <h2 id="changelog-title">Catatan Rilis — Saksara</h2>
+      <h3>v0.13.0-beta — 20 November 2026</h3>
+      <ul>
+        <li><strong>Benchmark Center:</strong> halaman transparansi baru yang menerbitkan evaluasi mesin apa adanya — audit dataset terverifikasi (0 duplikat, 0 pelanggaran group-split, 0 tumpang-tindih), evaluasi langsung set regresi 18 sampel oleh mesin produksi di peramban Anda, hasil evaluasi Ensemble Heuristik v3 atas 4.146 dokumen VeritasAI-ID v0 (termasuk recall 3,0% pada GPT-4o — kelemahan lintas-generator yang ditampilkan terbuka), perbandingan heuristik/classifier/gabungan, definisi metrik lengkap, dan ekspor CSV/JSON lokal. Akurasi bukan jaminan untuk satu dokumen; tidak ada kesimpulan kepengarangan dari skor.</li>
+      </ul>
       <h3>v0.12.0-beta — 20 November 2026</h3>
       <ul>
         <li><strong>Compare Writing:</strong> halaman baru untuk membandingkan dua dokumen — perbedaan kata/kalimat/paragraf (ditambah, dihapus, berubah, berpindah urutan), persentase kemiripan tekstual (koefisien Dice), dan perbandingan karakteristik Writing Forensic berdampingan, dalam tiga mode: Analitis, Berdampingan, dan Inline, plus ekspor laporan PDF lokal. Sepenuhnya deskriptif dan berjalan lokal: kemiripan bukan bukti kepengarangan, perubahan karakteristik bukan bukti AI, dan halaman ini tidak menjalankan Detector.</li>
