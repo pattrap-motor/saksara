@@ -192,6 +192,10 @@
       .clf-status{ font-size:13.5px; margin:10px 0 0; font-weight:700; color:var(--ink);
         background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:8px 12px; display:inline-block; }
       .score-card .engine-line{ font-family:"IBM Plex Mono", monospace; font-size:12.5px; }
+      .score-card .sent-summary{ margin-top:16px; border-top:1px solid rgba(255,255,255,.22); padding-top:14px; }
+      .score-card .sent-summary .ss-cap{ font-size:12.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--gold); }
+      .score-card .sent-summary .ss-line{ font-size:14.5px; margin:6px 0 0; line-height:1.55; opacity:.95; }
+      .score-card .sent-summary .ss-line b{ font-family:"IBM Plex Mono", monospace; font-weight:600; }
       /* ---------- laporan PDF & simpan ---------- */
       .pdf-panel{ margin-top:18px; background:var(--surface); border:1px solid var(--line); border-radius:var(--r-lg); padding:20px 26px; box-shadow:var(--shadow); }
       .pdf-head{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; }
@@ -422,6 +426,10 @@
             <div class="meter-scale"><span>0% manusiawi</span><span>35%</span><span>65%</span><span>100% mirip AI</span></div>
             <p class="note" id="score-note"></p>
             <p class="note engine-line" id="engine-line">Mesin skor: Ensemble Heuristik v3</p>
+            <div class="sent-summary" id="sent-summary" style="display:none;">
+              <div class="ss-cap">Ringkasan per kalimat</div>
+              <p class="ss-line" id="sent-summary-line"></p>
+            </div>
           </div>
           <div class="signals">
             <h3>Rincian per sinyal</h3>
@@ -799,10 +807,15 @@ Secara keseluruhan, modul ini memberikan pemahaman yang mendalam tentang peran d
         final = final + 0.08 * md.score * (1 - final);
         final = final + 0.22 * Math.min(densityScore, rep.score) * (1 - final);
         final = final + 0.17 * Math.min(md.score, densityScore) * (1 - final);
+        // Ringkasan per kalimat (gaya Grammarly): jumlah kalimat yang skor per
+        // kalimatnya >= 0,50. Metrik tampilan tambahan dari skor per kalimat
+        // yang sudah ada — tidak mengubah skor, vonis, atau ambang apa pun.
+        var flagCount = 0;
+        for(var sfi = 0; sfi < per.length; sfi++){ if(per[sfi].score >= 0.5) flagCount++; }
         return { final: final, burst: burst, vocab: vocab, phraseGlobal: phraseGlobal, phraseAvg: phraseAvg, density: density, totalHits: totalHits, stylo: stylo,
           markdown: md.score, md: md, symmetry: sym.score, sym: sym, repetition: rep.score, rep: rep,
           paraScore: paraScore, cv: cv, avgTTR: avgTTR, overallTTR: overallTTR, hapax: hapax,
-          mean: mean, words: n, sents: sents, lens: lens, per: per, paraSents: paraSents, globalSig: globalSig, wAvg: wAvg };
+          mean: mean, words: n, sents: sents, lens: lens, per: per, paraSents: paraSents, globalSig: globalSig, wAvg: wAvg, flagCount: flagCount };
       }
 
       var $ = function(id){ return document.getElementById(id); };
@@ -1623,6 +1636,14 @@ Secara keseluruhan, modul ini memberikan pemahaman yang mendalam tentang peran d
         $("st-kalimat").textContent = res.sents.length;
         $("st-rata").textContent = res.mean.toFixed(1);
         $("st-ttr").textContent = res.overallTTR.toFixed(2);
+        // ringkasan per kalimat (gaya Grammarly): proporsi kalimat terindikasi
+        var ssBox = $("sent-summary");
+        if(res.sents.length){
+          $("sent-summary-line").innerHTML = "<b>" + res.flagCount + " dari " + res.sents.length + " kalimat (" + pct(res.flagCount / res.sents.length) + "%)</b> memiliki skor per kalimat ≥ 50% (terindikasi)";
+          ssBox.style.display = "";
+        } else {
+          ssBox.style.display = "none";
+        }
         // banner teks pendek di laporan
         var rb = $("banner-report");
         if(res.words < 300){
@@ -1838,6 +1859,9 @@ Secara keseluruhan, modul ini memberikan pemahaman yang mendalam tentang peran d
           write("Jumlah kata: " + res.words + " | Jumlah kalimat: " + res.sents.length +
                 " | Rata-rata kata per kalimat: " + res.mean.toFixed(1) +
                 " | Type-token ratio (TTR): " + res.overallTTR.toFixed(2), 10.5);
+          if(res.sents.length){
+            write("Ringkasan per kalimat: " + res.flagCount + " dari " + res.sents.length + " kalimat (" + pct(res.flagCount / res.sents.length) + "%) memiliki skor per kalimat >= 50% (terindikasi).", 10.5);
+          }
           if(res.words < 300) write("Catatan reliabilitas: teks ini hanya " + res.words + " kata (di bawah +/-300 kata) — hasil kurang dapat dipegang; gunakan sebagai petunjuk awal, bukan kesimpulan.", 10, "italic");
           y += 4;
           write("Mesin & rumus skor", 12, "bold", 1);
