@@ -1684,7 +1684,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         var md = markdownSignal(text);
         var sym = symmetrySignal(paras, paraSents);
         var rep = repetitionSignal(allWords);
-        var globalSig = 0.16 * burst + 0.04 * vocab + 0.24 * phraseGlobal + 0.05 * stylo + 0.09 * md.score + 0.20 * sym.score + 0.22 * rep.score;
+        var globalSig = 0.17 * burst + 0.04 * vocab + 0.24 * phraseGlobal + 0.05 * stylo + 0.09 * md.score + 0.20 * sym.score + 0.22 * rep.score;
         var final = 0.47 * wAvg + 0.53 * globalSig;
         // Dorongan bukti gabungan: satu sinyal lemah bisa kebetulan, tetapi kepadatan frasa
         // formulaik yang tinggi BERSAMA pengulangan pola templat (atau bersama sisa markdown
