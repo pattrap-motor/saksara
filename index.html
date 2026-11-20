@@ -8,6 +8,20 @@
     <meta name="author" content="Ciptanala Devs" />
     <meta name="theme-color" content="#0F2140" />
     <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Saksara" />
+    <meta property="og:title" content="Saksara — Deteksi Teks AI untuk Siapa Saja" />
+    <meta property="og:description" content="Saksara — deteksi indikasi teks AI untuk siapa saja, dengan laporan per kalimat dan analisis yang berjalan sepenuhnya di peramban." />
+    <meta property="og:url" content="https://saksara.vercel.app/" />
+    <meta property="og:image" content="https://saksara.vercel.app/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Saksara — Deteksi Teks AI untuk Siapa Saja (Beta Terbuka)" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Saksara — Deteksi Teks AI untuk Siapa Saja" />
+    <meta name="twitter:description" content="Saksara — deteksi indikasi teks AI untuk siapa saja, dengan laporan per kalimat dan analisis yang berjalan sepenuhnya di peramban." />
+    <meta name="twitter:image" content="https://saksara.vercel.app/og-image.png" />
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='11' fill='%2316294D'/%3E%3Cpath d='M24 10 L36 14 V24 C36 31 31 36 24 39 C17 36 12 31 12 24 V14 Z' fill='none' stroke='white' stroke-width='2.4'/%3E%3Cpath d='M17.5 24.5 L22 29 L31 19.5' fill='none' stroke='%23C9A227' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
     <title>Saksara — Deteksi Teks AI untuk Siapa Saja</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -228,6 +242,12 @@
       .telemetry p{ margin:0; font-size:13.5px; color:var(--muted); line-height:1.6; }
       .telemetry-btns{ display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; }
       .telemetry .telemetry-status{ margin-top:10px; font-weight:600; color:var(--ink); }
+      /* ---------- umpan balik (formulir eksternal) ---------- */
+      .feedback{ margin-top:14px; background:var(--surface); border:1px solid var(--line); border-radius:var(--r-lg); padding:18px 26px; }
+      .feedback p{ margin:0; font-size:13.5px; color:var(--muted); line-height:1.6; }
+      .feedback .feedback-note{ margin-top:8px; font-size:12.5px; }
+      .feedback-btn{ display:inline-block; margin-top:12px; padding:10px 18px; border:1.5px solid var(--gold); border-radius:999px; color:var(--gold-ink); font-weight:700; font-size:14px; text-decoration:none; }
+      .feedback-btn:hover{ background:var(--gold); color:#0F2140; }
       .score-card .engine-line{ font-family:"IBM Plex Mono", monospace; font-size:12.5px; }
       .score-card .sent-summary{ margin-top:16px; border-top:1px solid rgba(255,255,255,.22); padding-top:14px; }
       .score-card .sent-summary .ss-cap{ font-size:12.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--gold); }
@@ -328,6 +348,15 @@
       .footer-links a{ color:#E8EDF5; text-decoration:none; font-size:13.5px; font-weight:600; }
       .footer-links a:hover{ color:var(--gold); }
       footer.site-footer .copy{ font-size:12.5px; color:#8FA1BC; margin:0; }
+      footer.site-footer .version-line{ font-size:12.5px; color:#8FA1BC; margin:6px 0 0; }
+      .changelog-link{ background:none; border:none; padding:0; font:inherit; color:#C9A227; cursor:pointer; text-decoration:underline; text-underline-offset:3px; }
+      .changelog-link:hover{ color:#E3C566; }
+      dialog.changelog{ border:1px solid #2A4470; border-radius:14px; background:#0F2140; color:#E8EDF5; max-width:min(560px, 92vw); padding:26px 28px; box-shadow:0 24px 60px rgba(0,0,0,.45); }
+      dialog.changelog::backdrop{ background:rgba(4,10,22,.66); }
+      dialog.changelog h2{ margin:0 0 4px; font-size:20px; }
+      dialog.changelog h3{ margin:18px 0 6px; font-size:14.5px; color:#C9A227; }
+      dialog.changelog ul{ margin:0; padding-left:18px; font-size:13.5px; line-height:1.55; color:#C7D2E4; }
+      dialog.changelog .dlg-close{ margin-top:20px; background:#C9A227; color:#0F2140; border:none; border-radius:9px; padding:9px 18px; font-weight:700; cursor:pointer; }
       /* ---------- focus & motion ---------- */
       button:focus-visible, .sent:focus-visible, a:focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
       @media (max-width:860px){
@@ -353,7 +382,7 @@
     </style>
   </head>
   <body>
-    <div class="topbar" id="atas">Prototipe riset<span class="dot">·</span>Skrining awal tulisan Bahasa Indonesia<span class="dot">·</span>Bukan alat vonis</div>
+    <div class="topbar" id="atas">Beta Terbuka<span class="dot">·</span>Skrining awal tulisan Bahasa Indonesia<span class="dot">·</span>Bukan alat vonis</div>
     <nav class="site-nav" aria-label="Navigasi utama">
       <div class="wrap nav-inner">
         <a class="nav-brand" href="#atas" aria-label="Saksara — kembali ke atas">
@@ -375,7 +404,7 @@
         <div class="hero-eyebrow">
           <svg class="brand-logo" width="30" height="30" viewBox="0 0 48 48" role="img" aria-label="Logo Saksara — perisai dengan tanda centang" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="11" fill="#16294D"/><path d="M24 10 L36 14 V24 C36 31 31 36 24 39 C17 36 12 31 12 24 V14 Z" fill="none" stroke="#ffffff" stroke-width="2.4"/><path d="M17.5 24.5 L22 29 L31 19.5" fill="none" stroke="#C9A227" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
           <span class="tagline">Deteksi Teks AI untuk Siapa Saja</span>
-          <span class="proto-badge">Prototipe</span>
+          <span class="proto-badge">Beta Terbuka</span>
         </div>
         <h1 class="hero-title">Indikasi AI yang <em>terukur</em>, metode yang <em>terbuka</em>, privasi yang <em>utuh</em>.</h1>
         <p class="lede">Tempel teks atau unggah berkas .txt, .docx, atau .pdf, lalu lihat skor indikasi AI-nya beserta kalimat-kalimat yang paling mencurigakan — lengkap dengan laporan per kalimat. Seluruh analisis — heuristik maupun classifier — berjalan sepenuhnya di peramban ini; teks dan berkas Anda tidak dikirim ke mana pun.</p>
@@ -565,6 +594,12 @@
           </div>
           <p class="telemetry-status" id="telemetry-status" role="status" aria-live="polite"></p>
         </div>
+
+        <div class="feedback" id="feedback">
+          <p>Menemukan bug, berkas tidak terbaca, atau punya masukan lain di luar soal skor?</p>
+          <a class="feedback-btn" href="https://forms.gle/GmtjuWKRAqMp1Jby7" target="_blank" rel="noopener">Laporkan Ketidakakuratan / Beri Masukan</a>
+          <p class="feedback-note">Formulir sukarela yang terbuka di tab baru. Formulir itu <strong>tidak otomatis mengirim teks Anda</strong> — ceritakan pengalaman Anda saja, dan jangan menempel teks lengkap yang Anda analisis.</p>
+        </div>
       </section>
 
       <section class="batch" id="batch" aria-labelledby="batch-judul">
@@ -622,7 +657,7 @@
           <svg width="22" height="22" viewBox="0 0 48 48" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="11" fill="#16294D"/><path d="M24 10 L36 14 V24 C36 31 31 36 24 39 C17 36 12 31 12 24 V14 Z" fill="none" stroke="#ffffff" stroke-width="2.4"/><path d="M17.5 24.5 L22 29 L31 19.5" fill="none" stroke="#C9A227" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
           <span>Saksara</span>
         </div>
-        <p>Saksara — Prototipe deteksi teks AI untuk siapa saja. Skor adalah indikasi statistik, bukan bukti.</p>
+        <p>Saksara — Beta Terbuka deteksi teks AI untuk siapa saja. Skor adalah indikasi statistik, bukan bukti.</p>
         <p>Mesin skor saat ini adalah Ensemble Heuristik v3 — pemeriksaan 7 sinyal yang berjalan sepenuhnya di peramban dan disetel untuk pola tulisan Bahasa Indonesia, termasuk tulisan formal yang generik; classifier terlatih tersedia sebagai lapis tambahan yang juga berjalan sepenuhnya di peramban (model bahasa multibahasa, ±280 MB, hanya diunduh bila Anda mengaktifkannya dari panel classifier, lalu tersimpan di peramban dan bisa dihapus dari panel yang sama; teks tidak dikirim ke mana pun) — model itu kuat pada teks AI formal tetapi juga bisa menilai tulisan manusia yang sangat formal sebagai mirip AI, sehingga ia hanya menjadi penguat dan lapis pertama tetap penemu indikasi awal serta penyeimbang utamanya.</p>
         <nav class="footer-links" aria-label="Tautan bawah">
           <a href="#analisis">Analisis</a>
@@ -632,8 +667,34 @@
           <a href="#posisi">Posisi &amp; Batasan</a>
         </nav>
         <p class="copy">© 2026 Saksara — Dikembangkan oleh Ciptanala Devs</p>
+        <p class="version-line">Versi <strong>v0.9-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
       </div>
     </footer>
+
+    <dialog class="changelog" id="changelog-modal" aria-labelledby="changelog-title">
+      <h2 id="changelog-title">Catatan Rilis — Saksara</h2>
+      <h3>v0.9-beta — 20 November 2026 · Beta Terbuka</h3>
+      <ul>
+        <li>Status naik dari Prototipe menjadi <strong>Beta Terbuka</strong>.</li>
+        <li>Penguat AI kini <strong>opt-in</strong>: model (±280 MB) hanya diunduh bila Anda menekan tombol aktifkan, dengan indikator progres dan tombol hapus cache.</li>
+        <li>Akselerasi <strong>WebGPU</strong> dengan cadangan WASM otomatis — hasil skor tidak berubah.</li>
+        <li>Pilihan <strong>"Abaikan bagian baku"</strong>: daftar pustaka, kata pengantar, kutipan panjang, dan baris tabel dapat dikecualikan dari penilaian.</li>
+        <li>Mode <strong>Periksa Banyak Berkas</strong> dengan tabel ringkasan dan unduhan CSV.</li>
+        <li>Baris perbandingan dengan analisis sebelumnya pada sesi yang sama.</li>
+        <li>Dapat dipasang sebagai aplikasi (<strong>PWA</strong>) dan tetap bekerja luring untuk cangkang halamannya.</li>
+        <li>Tombol <strong>kalibrasi anonim</strong> di bawah laporan: kirim angka statistik hasil (tanpa teks) bila skor terasa meleset.</li>
+        <li>Contoh bawaan "Tulisan Formal Generik" dihapus; set kalibrasi kini 4 contoh.</li>
+      </ul>
+      <h3>Fondasi (fase Prototipe)</h3>
+      <ul>
+        <li><strong>Ensemble Heuristik v3</strong> — 7 sinyal statistik dengan skor per kalimat dan laporan sorotan.</li>
+        <li>Classifier bahasa multibahasa yang berjalan sepenuhnya lokal di peramban, sebagai penguat yang tidak pernah menuduh sendirian.</li>
+        <li>Unggah berkas <strong>.txt / .docx / .pdf</strong> dengan ekstraksi teks lokal.</li>
+        <li><strong>Laporan PDF</strong> dengan ringkasan per kalimat.</li>
+        <li>Simpan hasil analisis (angka saja — teks tidak pernah ikut).</li>
+      </ul>
+      <button class="dlg-close" id="changelog-close" type="button">Tutup</button>
+    </dialog>
 
     <script>
       "use strict";
@@ -2159,7 +2220,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           doc.setTextColor(22, 41, 77);
           write("Saksara", 18, "bold", 0);
           doc.setTextColor(90, 90, 90);
-          write("Deteksi Teks AI untuk Siapa Saja — PROTOTIPE", 9.5, "normal", 2);
+          write("Deteksi Teks AI untuk Siapa Saja — BETA TERBUKA", 9.5, "normal", 2);
           doc.setTextColor(0, 0, 0);
           write("Laporan Hasil Pemeriksaan Teks", 14, "bold", 2);
           rule();
@@ -2237,7 +2298,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
             write(parts.join(" "), 10.5, "normal", 5);
           });
           // --- kaki halaman di semua halaman ---
-          var footerText = "Catatan: laporan ini adalah analisis indikasi AI per kalimat berdasarkan pola statistik — BUKAN laporan kecocokan plagiarisme terhadap basis data. Skor adalah indikasi, bukan bukti. Saksara adalah prototipe; gunakan sebagai bahan pemeriksaan, bukan vonis. Dikembangkan oleh Ciptanala Devs.";
+          var footerText = "Catatan: laporan ini adalah analisis indikasi AI per kalimat berdasarkan pola statistik — BUKAN laporan kecocokan plagiarisme terhadap basis data. Skor adalah indikasi, bukan bukti. Saksara adalah versi beta terbuka; gunakan sebagai bahan pemeriksaan, bukan vonis. Dikembangkan oleh Ciptanala Devs.";
           var total = doc.getNumberOfPages();
           for(var pg = 1; pg <= total; pg++){
             doc.setPage(pg);
@@ -2675,6 +2736,19 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         navigator.serviceWorker.register("/sw.js").catch(function(){ /* situs tetap berfungsi tanpa SW */ });
       });
     }
+    // Modal Catatan Rilis (footer).
+    (function(){
+      var dlg = document.getElementById("changelog-modal");
+      var open = document.getElementById("btn-changelog");
+      var close = document.getElementById("changelog-close");
+      if(!dlg || !open) return;
+      open.addEventListener("click", function(){
+        if(typeof dlg.showModal === "function") dlg.showModal();
+        else dlg.setAttribute("open", "");
+      });
+      if(close) close.addEventListener("click", function(){ dlg.close(); });
+      dlg.addEventListener("click", function(ev){ if(ev.target === dlg) dlg.close(); });
+    })();
   </script>
   </body>
 </html>
