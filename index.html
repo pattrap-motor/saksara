@@ -559,6 +559,32 @@
       #input-teks{ min-height:280px; }
       @media (max-width:640px){ #input-teks{ min-height:200px; } }
       @media (prefers-reduced-motion: reduce){ .qa-card{ transition:none; } }
+      /* ---------- Phase 3 (v0.11.0-beta): Writing Forensic ---------- */
+      .wf-cards{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin:14px 0 2px; }
+      .wf-card{ background:var(--surface); border:1px solid var(--line); border-radius:var(--r-md); padding:12px 14px; box-shadow:var(--shadow-sm); }
+      .wf-card .n{ font-size:24px; font-weight:800; line-height:1.1; }
+      .wf-card .t{ font-size:12.5px; color:var(--muted); margin-top:2px; line-height:1.45; }
+      .wf-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+      @media (max-width:860px){ .wf-grid{ grid-template-columns:1fr; } }
+      .wf-panel{ background:var(--surface); border:1px solid var(--line); border-radius:var(--r-lg); padding:18px; box-shadow:var(--shadow-sm); margin-top:12px; }
+      .wf-panel h3{ margin:0 0 8px; font-size:16.5px; }
+      .wf-panel p{ font-size:14px; line-height:1.6; }
+      .wf-note{ font-size:13px; color:var(--muted); line-height:1.55; }
+      .wf-bar-row{ display:grid; grid-template-columns:58px 1fr 96px; align-items:center; gap:10px; font-size:13px; margin:5px 0; }
+      .wf-bar{ background:var(--bar-track); border-radius:6px; height:14px; overflow:hidden; }
+      .wf-bar-fill{ background:linear-gradient(90deg,var(--navy2),var(--navy)); height:100%; border-radius:6px; }
+      .wf-table{ width:100%; border-collapse:collapse; font-size:13.5px; }
+      .wf-table td, .wf-table th{ padding:5px 8px; border-bottom:1px solid var(--line-soft); text-align:left; }
+      .wf-table td:last-child, .wf-table th:last-child{ text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+      .wf-hl-text{ font-size:14.5px; line-height:1.75; white-space:pre-wrap; word-break:break-word; }
+      mark.wf-w{ background:var(--gold-soft); color:inherit; border-radius:3px; padding:0 1px; }
+      mark.wf-p{ background:var(--yel-bg); color:inherit; border-radius:3px; padding:0 1px; }
+      .wf-legend{ display:flex; gap:14px; flex-wrap:wrap; font-size:12.5px; color:var(--muted); margin-bottom:8px; }
+      .wf-legend .sw{ display:inline-block; width:12px; height:12px; border-radius:3px; vertical-align:-1px; margin-right:5px; }
+      .wf-suggest{ margin:6px 0 0; padding-left:20px; }
+      .wf-suggest li{ margin:5px 0; font-size:14px; line-height:1.6; }
+      #wf-input{ min-height:220px; }
+      .wf-toolbar{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:10px; }
     </style>
   </head>
   <body>
@@ -572,6 +598,7 @@
         <div class="nav-links">
           <a href="#/home" data-route="home">Beranda</a>
           <a href="#/detector" data-route="detector">Detector</a>
+          <a href="#/forensik" data-route="forensik">Writing Forensic</a>
           <a href="#/cara-kerja" data-route="cara-kerja">Cara Kerja</a>
           <a href="#/metode" data-route="metode">Metode</a>
           <a href="#/posisi" data-route="posisi">Posisi &amp; Batasan</a>
@@ -587,6 +614,7 @@
       <nav class="side-nav" aria-label="Menu utama">
         <a href="#/home" data-route="home">Beranda</a>
         <a href="#/detector" data-route="detector">Detector</a>
+        <a href="#/forensik" data-route="forensik">Writing Forensic</a>
         <a href="#/cara-kerja" data-route="cara-kerja">Cara Kerja</a>
         <a href="#/metode" data-route="metode">Metode</a>
         <a href="#/posisi" data-route="posisi">Posisi &amp; Batasan</a>
@@ -883,6 +911,63 @@
         </div>
       </section>
 
+      <section class="forensik" id="forensik" data-view="forensik" hidden aria-labelledby="wf-judul">
+        <div class="kicker">Writing Forensic</div>
+        <h2 id="wf-judul">Analisis karakteristik tulisan</h2>
+        <p class="sub">Ukur karakteristik gaya sebuah teks — keragaman kosakata, ritme kalimat, kompleksitas struktur, konsistensi paragraf, kata transisi, dan pengulangan — dihitung sepenuhnya di peramban ini. Modul ini <strong>bukan detektor AI</strong>: hasilnya adalah statistik deskriptif untuk penyuntingan dan pembelajaran menulis, <strong>bukan bukti siapa penulisnya</strong>, dan tidak memengaruhi skor Detector.</p>
+        <div class="panel" id="wf-panel-input">
+          <label for="wf-input" style="font-weight:700; display:block; margin-bottom:8px;">Teks yang dianalisis karakteristiknya</label>
+          <textarea id="wf-input" placeholder="Tempel teks di sini… (disarankan minimal ±300 kata agar statistiknya dapat dipegang)"></textarea>
+          <div class="wf-toolbar">
+            <span class="counters"><b id="wf-cnt-kata">0</b> kata · <b id="wf-cnt-kalimat">0</b> kalimat · <b id="wf-cnt-paragraf">0</b> paragraf</span>
+            <span class="upload-wrap"><span class="upload-visual" aria-hidden="true">Unggah .txt / .docx / .pdf</span><input type="file" id="wf-file" accept=".txt,.docx,.pdf,.doc,text/plain,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-label="Unggah berkas .txt, .docx, atau .pdf" /></span>
+            <button type="button" id="wf-clear">Bersihkan</button>
+            <button type="button" class="primary" id="wf-btn">Analisis Karakteristik</button>
+          </div>
+          <div class="file-status" id="wf-file-status" role="status" aria-live="polite"></div>
+          <div class="banner" id="wf-error" role="alert"></div>
+          <div class="examples">
+            <div class="lbl">Contoh uji — klik untuk mengisi &amp; menganalisis langsung</div>
+            <div class="row">
+              <button type="button" id="wf-ex1">Contoh: Gaya Personal<span class="exp">Narasi pengalaman — ritme dan kosakata bervariasi</span></button>
+              <button type="button" id="wf-ex2">Contoh: Gaya Formal Seragam<span class="exp">Esai generik — ritme seragam, banyak pengulangan &amp; transisi</span></button>
+            </div>
+          </div>
+          <p class="det-note">Teks tidak dikirim ke server dan tidak disimpan — analisis berhenti di peramban ini, sama seperti Detector.</p>
+        </div>
+
+        <div id="wf-results" hidden>
+          <div class="banner" id="wf-short" role="status"></div>
+          <div class="wf-cards" id="wf-cards"></div>
+          <div class="wf-panel"><h3>Ringkasan</h3><div id="wf-summary"></div></div>
+          <div class="wf-panel"><h3>Distribusi panjang kalimat</h3><div id="wf-chart"></div><p class="wf-note">Kantong = jumlah kata per kalimat. Grafik ini menunjukkan bentuk ritme teks: menumpuk di satu kantong berarti ritme seragam; menyebar berarti ritme bervariasi. Keduanya sekadar deskripsi — bukan penilaian baik-buruk.</p></div>
+          <div class="wf-grid">
+            <div class="wf-panel"><h3>Keragaman kosakata</h3><div id="wf-lex"></div></div>
+            <div class="wf-panel"><h3>Kompleksitas struktur kalimat</h3><div id="wf-cplx"></div></div>
+          </div>
+          <div class="wf-grid">
+            <div class="wf-panel"><h3>Konsistensi paragraf</h3><div id="wf-para"></div></div>
+            <div class="wf-panel"><h3>Kata transisi</h3><div id="wf-trans"></div></div>
+          </div>
+          <div class="wf-panel"><h3>Pengulangan kata &amp; frasa</h3><div id="wf-rep"></div></div>
+          <div class="wf-panel"><h3>Konsistensi gaya antarparagraf</h3><div id="wf-cons"></div></div>
+          <div class="wf-panel"><h3>Sorotan pengulangan pada teks</h3>
+            <div class="wf-legend"><span><span class="sw" style="background:var(--yel-bg); border:1px solid var(--line);"></span>Frasa 4 kata yang berulang</span><span><span class="sw" style="background:var(--gold-soft); border:1px solid var(--line);"></span>Kata isi yang sering muncul</span></div>
+            <div class="wf-hl-text" id="wf-hl"></div>
+            <p class="wf-note" id="wf-hl-note"></p>
+          </div>
+          <div class="wf-panel"><h3>Saran penyuntingan</h3><div id="wf-suggest"></div><p class="wf-note">Saran dihasilkan aturan ambang sederhana dari angka di atas (nilai pemicunya selalu ditampilkan). Saran bersifat teknis — memecah kalimat, memvariasikan kata, menata transisi — dan tidak mengubah makna; terapkan hanya bila sesuai dengan maksud tulisan Anda.</p></div>
+        </div>
+
+        <div class="wf-panel" id="wf-metode">
+          <h3>Metode &amp; keterbatasan</h3>
+          <p><strong>Cara menghitung.</strong> Kata adalah rangkaian huruf/angka/apostrof (huruf kecil), kalimat dipisah pada tanda . ! ? …, dan paragraf dipisah pada baris kosong — persis fungsi yang dipakai Detector. Keragaman kosakata dilaporkan sebagai TTR (kata unik ÷ total kata), TTR jendela (rata-rata TTR per jendela 50 kata, agar teks panjang tidak otomatis terlihat "miskin"), kata hapax (muncul sekali), dan indeks Guiraud (unik ÷ √total). Kompleksitas memakai proksi sederhana: koma per kalimat dan penanda subordinasi (karena, sehingga, ketika, jika, bahwa, …). Pengulangan menghitung kata isi (di luar kata fungsi seperti "yang", "dan", "di"), rangkaian 4 kata yang muncul ≥2 kali, dan awalan kalimat yang berulang. Konsistensi antarparagraf membandingkan rata-rata panjang kalimat, TTR, dan kepadatan transisi tiap paragraf; paragraf ditandai menyimpang bila rata-rata panjang kalimatnya berjarak ≥1,75 simpangan baku dari rata-rata antarparagraf (butuh ≥4 paragraf).</p>
+          <p><strong>Keterbatasan Bahasa Indonesia.</strong> Tanpa pemotongan imbuhan (stemming): "lari", "berlari", dan "pelari" dihitung sebagai kata berbeda, sehingga keragaman cenderung terlihat lebih tinggi daripada makna sebenarnya. Pemisah kalimat berbasis tanda baca dapat keliru pada singkatan seperti "Dr." atau "Rp.", dan tanda baca yang tidak beraturan mengaburkan statistik kalimat. Angka dihitung sebagai kata.</p>
+          <p><strong>Peringatan teks pendek.</strong> Di bawah ±300 kata, semua statistik di halaman ini mudah berayun oleh beberapa kalimat saja — perlakukan sebagai gambaran kasar, bukan pengukuran yang dapat dipegang.</p>
+          <p><strong>Bukan bukti kepengarangan.</strong> Angka-angka ini menggambarkan karakteristik teks, bukan asal-usulnya. Keragaman kosakata yang rendah <strong>bukan</strong> bukti AI — teks formulir, laporan baku, dan tulisan pemula pun bisa beragam rendah; teks AI pun bisa beragam tinggi. Paragraf yang "menyimpang" dapat muncul karena perbedaan topik atau struktur (pendahuluan vs daftar), bukan karena beda penulis. Gunakan halaman ini untuk menyunting dan belajar menulis — bukan untuk menuduh.</p>
+        </div>
+      </section>
+
       <section class="posisi" id="posisi" data-view="posisi" hidden aria-labelledby="posisi-judul">
         <div class="kicker">Tentang</div>
         <h2 id="posisi-judul">Posisi &amp; batasan</h2>
@@ -940,6 +1025,7 @@
         <nav class="footer-links" aria-label="Tautan bawah">
           <a href="#/home">Beranda</a>
           <a href="#/detector">Detector</a>
+          <a href="#/forensik">Writing Forensic</a>
           <a href="#analisis">Analisis</a>
           <a href="#/cara-kerja">Cara Kerja</a>
           <a href="#/metode">Metode</a>
@@ -3831,8 +3917,8 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
     // Router tampilan per halaman (satu berkas): #/home, #/detector, #/cara-kerja, #/metode, #/posisi.
     // Tautan lama (#analisis, #clf-panel, #benchmark, …) tetap didukung lewat peta LEGACY.
     (function(){
-      var TITLES = { home: "Saksara — Gratis Deteksi Tulisan AI", detector: "Detector — Saksara", "cara-kerja": "Cara Kerja — Saksara", metode: "Metode — Saksara", posisi: "Posisi & Batasan — Saksara" };
-      var ROUTES = { "": "home", "/": "home", "/home": "home", "/detector": "detector", "/cara-kerja": "cara-kerja", "/metode": "metode", "/posisi": "posisi" };
+      var TITLES = { home: "Saksara — Gratis Deteksi Tulisan AI", detector: "Detector — Saksara", forensik: "Writing Forensic — Saksara", "cara-kerja": "Cara Kerja — Saksara", metode: "Metode — Saksara", posisi: "Posisi & Batasan — Saksara" };
+      var ROUTES = { "": "home", "/": "home", "/home": "home", "/detector": "detector", "/forensik": "forensik", "/cara-kerja": "cara-kerja", "/metode": "metode", "/posisi": "posisi" };
       var LEGACY = { "analisis": ["detector", "analisis"], "panel-analisis": ["detector", "panel-analisis"], "clf-panel": ["detector", "clf-panel"], "report": ["detector", "report"], "batch": ["detector", "batch"], "cara-kerja": ["cara-kerja", null], "benchmark": ["metode", "benchmark"], "posisi": ["posisi", null], "atas": ["home", null] };
       function show(view, anchor){
         var blocks = document.querySelectorAll("[data-view]");
