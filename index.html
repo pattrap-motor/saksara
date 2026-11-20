@@ -407,6 +407,71 @@
         .strip-stat .n{ font-size:28px; }
         .examples button{ flex:1 1 100%; }
       }
+      /* ---------- penyegaran visual v0.9.10 (lapisan di atas gaya dasar) ---------- */
+      /* Latar atmosferik: cahaya navy & emas lembut di puncak halaman */
+      body{
+        background-image:
+          radial-gradient(1100px 480px at 88% -140px, rgba(201,162,39,.14), rgba(201,162,39,0) 60%),
+          radial-gradient(900px 520px at -12% -100px, rgba(27,52,97,.13), rgba(27,52,97,0) 55%);
+        background-repeat:no-repeat;
+        background-attachment:fixed;
+      }
+      @media (prefers-color-scheme: dark){
+        body{
+          background-image:
+            radial-gradient(1100px 480px at 88% -140px, rgba(201,162,39,.10), rgba(201,162,39,0) 60%),
+            radial-gradient(900px 520px at -12% -100px, rgba(110,140,210,.12), rgba(110,140,210,0) 55%);
+        }
+      }
+      .topbar{ border-bottom:1px solid rgba(201,162,39,.55); }
+      /* Panggung hero: pola titik halus yang memudar + cahaya emas */
+      header.hero{ position:relative; }
+      header.hero::before{ content:""; position:absolute; inset:-14px -8px 0; pointer-events:none;
+        background-image:radial-gradient(rgba(15,33,64,.10) 1.1px, transparent 1.2px);
+        background-size:22px 22px;
+        -webkit-mask-image:linear-gradient(to bottom, #000 30%, transparent 88%);
+        mask-image:linear-gradient(to bottom, #000 30%, transparent 88%); }
+      header.hero::after{ content:""; position:absolute; top:-70px; right:-40px; width:340px; height:340px;
+        border-radius:50%; pointer-events:none; filter:blur(10px);
+        background:radial-gradient(circle, rgba(201,162,39,.20), rgba(201,162,39,0) 65%); }
+      @media (prefers-color-scheme: dark){
+        header.hero::before{ background-image:radial-gradient(rgba(233,237,244,.13) 1.1px, transparent 1.2px); }
+      }
+      header.hero > *{ position:relative; z-index:1; }
+      .hero-title{ text-wrap:balance; }
+      .hero-title em{ background:linear-gradient(to top, var(--gold-soft) 26%, transparent 26%); padding:0 2px; }
+      /* Perpindahan tampilan terasa hidup */
+      @keyframes viewIn{ from{ opacity:0; transform:translateY(9px); } to{ opacity:1; transform:none; } }
+      [data-view]:not([hidden]){ animation:viewIn .38s ease both; }
+      /* Kartu-kartu terangkat halus saat disentuh kursor */
+      .strip-stat, .step, .posisi-card, .stat, .chip{ transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+      .strip-stat:hover, .step:hover, .posisi-card:hover, .stat:hover{ transform:translateY(-2px); box-shadow:var(--shadow); border-color:var(--gold); }
+      .chip:hover{ transform:translateY(-1px); }
+      /* Kartu skor: cahaya emas dari sudut + angka lebih berwibawa */
+      .score-card{ position:relative; overflow:hidden; }
+      .score-card::before{ content:""; position:absolute; inset:0; pointer-events:none;
+        background:radial-gradient(430px 210px at 88% -10px, rgba(201,162,39,.30), rgba(201,162,39,0) 62%); }
+      .score-card > *{ position:relative; }
+      .score-num{ text-shadow:0 3px 22px rgba(0,0,0,.35); }
+      .meter{ box-shadow:inset 0 1px 3px rgba(0,0,0,.28); }
+      .meter .pin{ box-shadow:0 0 0 2px rgba(0,0,0,.25), 0 0 10px rgba(255,255,255,.55); }
+      /* Tombol utama: gradasi lebih hidup */
+      .btn-primary{ background:linear-gradient(160deg, #274B85 0%, var(--navy2) 45%, var(--navy) 100%); }
+      .nav-cta{ background:linear-gradient(180deg, #E3C766, var(--gold)); }
+      .nav-cta:hover{ background:linear-gradient(180deg, #EDD27E, #D4AF37); }
+      textarea{ box-shadow:inset 0 1px 4px rgba(15,33,64,.06); }
+      /* Kaki halaman: garis emas penutup */
+      footer.site-footer{ border-top:3px solid var(--gold); }
+      dialog.changelog::backdrop{ background:rgba(4,10,22,.66); -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px); }
+      /* Bilah gulir ramping selaras merek */
+      html{ scrollbar-width:thin; scrollbar-color:#B9A34E var(--bg); }
+      ::-webkit-scrollbar{ width:10px; height:10px; }
+      ::-webkit-scrollbar-thumb{ background:#B9A34E; border-radius:8px; border:2px solid var(--bg); }
+      ::-webkit-scrollbar-track{ background:var(--bg); }
+      @media (prefers-reduced-motion: reduce){
+        [data-view]:not([hidden]){ animation:none; }
+        .strip-stat:hover, .step:hover, .posisi-card:hover, .stat:hover, .chip:hover{ transform:none; }
+      }
       /* ---------- focus & motion ---------- */
       button:focus-visible, .sent:focus-visible, a:focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
       @media (max-width:860px){
@@ -744,12 +809,16 @@
           <a href="#/posisi">Posisi &amp; Batasan</a>
         </nav>
         <p class="copy">© 2026 Saksara — Dikembangkan oleh Ciptanala Devs</p>
-        <p class="version-line">Versi <strong>v0.9.9-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
+        <p class="version-line">Versi <strong>v0.9.10-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
       </div>
     </footer>
 
     <dialog class="changelog" id="changelog-modal" aria-labelledby="changelog-title">
       <h2 id="changelog-title">Catatan Rilis — Saksara</h2>
+      <h3>v0.9.10-beta — 20 November 2026</h3>
+      <ul>
+        <li><strong>Penyegaran tampilan:</strong> latar halaman kini bercahaya lembut navy–emas dengan pola titik halus di panggung utama, kartu-kartu terangkat saat disentuh kursor, kartu skor bercahaya emas dari sudutnya, perpindahan halaman terasa hidup, dan bilah gulir ramping selaras merek. Tidak ada perubahan cara kerja — semua fungsi dan skor persis sama.</li>
+      </ul>
       <h3>v0.9.9-beta — 20 November 2026</h3>
       <ul>
         <li><strong>Classifier jauh lebih ringan di HP:</strong> pada perangkat seluler/hemat, penilaian classifier kini dibatasi <strong>30 segmen yang disebar merata dari seluruh dokumen</strong> (desktop tetap 100 segmen, kini juga tersebar merata — bukan hanya bagian awal), inferensi WASM dapat memakai <strong>beberapa inti prosesor sekaligus</strong> (multi-utas, bila peramban mengizinkan), dan selama penilaian berjalan tersedia tombol <strong>"Batalkan Penilaian Classifier"</strong> — skor heuristik tetap tampil penuh bila dibatalkan. Batas segmen yang terpakai diumumkan terbuka di laporan dan PDF.</li>
