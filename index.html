@@ -683,6 +683,12 @@
       .gloss-grid .g{ border:1px solid var(--line); border-radius:12px; padding:12px 14px; background:var(--surface); }
       .gloss-grid .g h4{ margin:0 0 4px; font-size:15px; }
       .gloss-grid .g p{ margin:0; font-size:13.5px; line-height:1.55; color:var(--muted); }
+
+      .p7-steps{ display:flex; flex-wrap:wrap; gap:8px; list-style:none; margin:0 0 14px; padding:0; }
+      .p7-steps li{ border:1px solid var(--line); background:var(--surface2); border-radius:999px; padding:5px 13px; font-size:13px; font-weight:600; color:var(--muted); }
+      .p7-steps li strong{ color:var(--navy); }
+      .qc-panel{ border:1px solid var(--line); border-radius:16px; background:var(--surface); box-shadow:var(--shadow-sm); padding:20px; }
+      .qc-panel textarea{ width:100%; font:inherit; border:1px solid var(--line); border-radius:12px; padding:12px 14px; background:var(--surface); color:var(--text); }
     </style>
   </head>
   <body>
@@ -745,17 +751,24 @@
         </div>
         <div class="trust-chips" aria-label="Jaminan metode">
           <span class="chip"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0284C7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>100% diproses di peramban Anda</span>
-          <span class="chip"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0284C7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3 8l9 5 9-5-9-5Z"/><path d="M3 13l9 5 9-5"/></svg>7 sinyal heuristik + classifier multibahasa</span>
+          <span class="chip"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0284C7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3 8l9 5 9-5-9-5Z"/><path d="M3 13l9 5 9-5"/></svg>Metode terbuka — bukan kotak hitam</span>
           <span class="chip"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0284C7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>Cara kerja dijelaskan terbuka</span>
           <span class="chip"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0284C7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18"/><path d="M5 7l7-4 7 4"/><path d="M3 13l2-6 2 6a3.5 3.5 0 0 1-4 0Z"/><path d="M17 13l2-6 2 6a3.5 3.5 0 0 1-4 0Z"/><path d="M8 21h8"/></svg>Indikasi statistik — bukan vonis</span>
         </div>
-        <div class="stats-strip" aria-label="Angka kunci dari benchmark internal">
-          <div class="strip-stat"><div class="n">7</div><div class="t">sinyal heuristik — cara kerjanya dijelaskan terbuka di halaman ini</div></div>
-          <div class="strip-stat"><div class="n">0/9</div><div class="t">sampel tulisan manusia yang terindikasi pada benchmark internal Bahasa Indonesia</div></div>
-          <div class="strip-stat"><div class="n">18</div><div class="t">teks Bahasa Indonesia pada benchmark internal awal (n kecil, diakui terbuka)</div></div>
-          <div class="strip-stat"><div class="n">0</div><div class="t">teks yang dikirim ke server — seluruh analisis berjalan di peramban Anda</div></div>
-        </div>
       </header>
+
+      <section class="dash-quick" data-view="home" aria-labelledby="p7-qc-judul">
+        <div class="qc-panel">
+          <h2 class="dash-h" id="p7-qc-judul" style="margin-top:0;">Coba langsung — periksa tulisan Anda</h2>
+          <label for="p7-quick-text" style="font-weight:700; display:block; margin-bottom:6px;">Tempel tulisan di sini</label>
+          <textarea id="p7-quick-text" rows="5" placeholder="Tempel teks tugas, esai, atau artikel Anda di sini… (disarankan ±300 kata atau lebih agar hasilnya dapat dipegang)"></textarea>
+          <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; align-items:center;">
+            <button type="button" class="btn-primary" id="p7-quick-go">Periksa Tulisan</button>
+            <span class="upload-wrap"><span class="upload-visual" aria-hidden="true">atau unggah .txt / .docx / .pdf</span><input type="file" id="p7-quick-file" accept=".txt,.docx,.pdf,.doc,text/plain,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-label="Unggah berkas untuk diperiksa" /></span>
+          </div>
+          <p class="file-note">Tulisan Anda diproses di peramban ini dan tidak dikirim ke server mana pun. Menekan Periksa Tulisan membawa Anda ke halaman pemeriksaan lengkap beserta hasilnya.</p>
+        </div>
+      </section>
 
       <section class="dash-quick" data-view="home" aria-labelledby="dash-cepat-judul">
         <div class="kicker">Akses Cepat</div>
@@ -799,6 +812,14 @@
           <div class="feat-card"><h3>Privasi utuh</h3><p>Tanpa akun, tanpa unggahan teks. Satu-satunya unduhan adalah berkas model — itu pun hanya bila Anda mengaktifkannya; penyimpanan lokal hanya untuk fitur Riwayat yang opt-in dan nonaktif secara bawaan.</p><a href="#/posisi">Baca posisi privasi</a></div>
           <div class="feat-card"><h3>Donasi &amp; kalibrasi</h3><p>Bantu deteksi Bahasa Indonesia membaik: kirim statistik analisis (tanpa teks) atau donasikan teks berlabel — selalu atas persetujuan Anda.</p><a href="#report">Lihat di laporan</a></div>
         </div>
+        <h3 class="dash-h" style="font-size:19px; margin-top:26px;">Angka dari pengujian kami</h3>
+        <p class="wf-note">Ringkasan kecil dari pengujian internal — cerita lengkapnya, termasuk kelemahannya, ada di halaman Pengujian &amp; Transparansi.</p>
+        <div class="stats-strip" aria-label="Angka kunci dari benchmark internal">
+          <div class="strip-stat"><div class="n">7</div><div class="t">sinyal heuristik — cara kerjanya dijelaskan terbuka di halaman ini</div></div>
+          <div class="strip-stat"><div class="n">0/9</div><div class="t">sampel tulisan manusia yang terindikasi pada benchmark internal Bahasa Indonesia</div></div>
+          <div class="strip-stat"><div class="n">18</div><div class="t">teks Bahasa Indonesia pada benchmark internal awal (n kecil, diakui terbuka)</div></div>
+          <div class="strip-stat"><div class="n">0</div><div class="t">teks yang dikirim ke server — seluruh analisis berjalan di peramban Anda</div></div>
+        </div>
       </section>
 
       <section class="method" id="cara-kerja" data-view="cara-kerja" hidden aria-labelledby="metode-judul">
@@ -821,6 +842,7 @@
         <div class="kicker">Analisis</div>
         <h2 id="analisis-judul">Periksa tulisan Anda</h2>
         <div class="mode-toggle" role="group" aria-label="Tingkat tampilan"><span>Tampilan:</span><button type="button" class="mt-btn" data-mode="simple" aria-pressed="true">Sederhana</button><button type="button" class="mt-btn" data-mode="deep" aria-pressed="false">Mendalam</button><span class="mt-note">Mode Mendalam menampilkan seluruh angka &amp; rincian teknis.</span></div>
+        <ol class="p7-steps" aria-label="Langkah pemeriksaan"><li><strong>1.</strong> Masukkan tulisan</li><li><strong>2.</strong> Tekan Periksa Tulisan</li><li><strong>3.</strong> Pahami hasilnya</li></ol>
         <p class="sub">Tempel teks di bawah ini, unggah berkas .txt, .docx, atau .pdf (klik tombol Unggah, atau seret &amp; letakkan berkas ke panel ini), atau coba salah satu contoh uji.</p>
         <div class="panel" id="panel-analisis">
           <label for="input-teks" style="font-weight:700; display:block; margin-bottom:8px;">Teks yang diperiksa</label>
@@ -1010,6 +1032,7 @@
       <section class="batch" id="batch" data-view="detector" hidden aria-labelledby="batch-judul">
         <div class="kicker">Berkas Banyak</div>
         <h2 id="batch-judul">Periksa banyak dokumen</h2>
+          <ol class="p7-steps" aria-label="Langkah pemeriksaan banyak dokumen"><li><strong>1.</strong> Pilih dokumen</li><li><strong>2.</strong> Tekan Periksa Semua Berkas</li><li><strong>3.</strong> Lihat hasil</li><li><strong>4.</strong> Unduh laporan</li></ol>
         <p class="sub">Pilih beberapa berkas .txt, .docx, atau .pdf untuk dinilai sekaligus dan diringkas dalam satu tabel. Setiap berkas dinilai dengan Ensemble Heuristik v3; bila Penguat AI (classifier) sudah aktif, penguat bersyarat yang sama ikut diterapkan — bila belum aktif, skornya murni heuristik. Hasil batch tampil di sini saja: ia tidak mengubah laporan utama di atas dan tidak disimpan ke arsip hasil.</p>
         <div class="panel">
           <label for="batch-input" style="font-weight:700; display:block; margin-bottom:8px;">Berkas yang diperiksa</label>
@@ -1134,10 +1157,11 @@
           <div class="wf-cards" id="cmp-cards" style="margin-top:18px;"></div>
           <div class="banner" id="cmp-surface" role="note"></div>
           <div class="cmp-tabs" role="group" aria-label="Mode tampilan perbandingan">
-            <button type="button" class="cmp-tab" id="cmp-tab-an" aria-pressed="true">Analitis</button>
-            <button type="button" class="cmp-tab" id="cmp-tab-sbs" aria-pressed="false">Berdampingan</button>
-            <button type="button" class="cmp-tab" id="cmp-tab-in" aria-pressed="false">Inline</button>
+            <button type="button" class="cmp-tab" id="cmp-tab-an" aria-pressed="true">Ringkasan perubahan</button>
+            <button type="button" class="cmp-tab" id="cmp-tab-sbs" aria-pressed="false">Lihat berdampingan</button>
+            <button type="button" class="cmp-tab" id="cmp-tab-in" aria-pressed="false">Lihat perubahan langsung</button>
           </div>
+          <p class="wf-note">Cara membaca hasil: <strong>＋ kata ditambah</strong> di tulisan B · <strong>− kata dihapus</strong> dari tulisan A · <strong>≈ kata berubah</strong> · bagian yang berwarna adalah yang berbeda. <strong>Kemiripan tekstual</strong> = persentase isi yang sama persis antara kedua tulisan.</p>
           <div id="cmp-view-an">
             <div class="wf-panel">
               <h3>Ringkasan perubahan tekstual</h3>
@@ -1190,6 +1214,7 @@
         <h2 id="bn-judul">Pengujian &amp; transparansi</h2>
         <p class="wf-lede">Halaman ini menerbitkan hasil evaluasi Saksara apa adanya — termasuk kelemahannya. Setiap angka dihitung dari data yang tercantum provenansnya, dengan definisi metrik yang terbuka. <strong>Akurasi bukan jaminan untuk satu dokumen</strong>: angka agregat tidak dapat memutuskan asal-usul sebuah teks, dan tidak ada kesimpulan kepengarangan yang ditarik dari skor mana pun di halaman ini.</p>
         <div class="mode-toggle" role="group" aria-label="Tingkat tampilan"><span>Tampilan:</span><button type="button" class="mt-btn" data-mode="simple" aria-pressed="true">Sederhana</button><button type="button" class="mt-btn" data-mode="deep" aria-pressed="false">Mendalam</button><span class="mt-note">Mode Mendalam menampilkan seluruh angka &amp; rincian teknis.</span></div>
+        <p class="wf-note">Di halaman ini, <strong>Tampilan Sederhana = Ringkasan untuk umum</strong> dan <strong>Tampilan Mendalam = Detail Peneliti</strong> — semua angka, tabel, dataset, dan metodologi tetap tersedia di Mode Mendalam.</p>
         <div class="wf-cards" id="bn-cards"></div>
         <div class="wf-panel">
           <h3>Seberapa bisa dipercaya hasil Saksara? — penjelasan sederhana</h3>
@@ -1246,7 +1271,7 @@
       <section class="ocr" id="ocr" data-view="ocr" hidden aria-labelledby="ocr-judul">
         <p class="wf-kicker">OCR Dokumen</p>
         <h2 id="ocr-judul">Ekstrak teks dari gambar &amp; PDF pindai</h2>
-        <p class="wf-lede">OCR (pengenalan karakter optik) membaca halaman sebagai <strong>gambar</strong> dan menebak teksnya — jalan pintas untuk PDF hasil pindai atau berkas yang lapisan teksnya tidak terbaca. Ia <strong>tidak memperbaiki ekstraktor teks</strong> Saksara: ekstraksi teks biasa tetap jalur utama di semua halaman, dan temuan B-01 (PDF dengan font CID tanpa peta ToUnicode) tetap terbuka — OCR hanya dapat menolong bila halaman *tampil* benar di layar. Hasil OCR selalu dapat keliru; periksa dan sunting sebelum dipakai.</p>
+        <p class="wf-lede">OCR (pengenalan karakter optik) membaca halaman sebagai <strong>gambar</strong> dan menebak teksnya — jalan pintas untuk PDF hasil pindai atau berkas yang lapisan teksnya tidak terbaca. Ia <strong>tidak memperbaiki ekstraktor teks</strong> Saksara: ekstraksi teks biasa tetap jalur utama di semua halaman, dan temuan B-01 (PDF dengan font CID tanpa peta ToUnicode) tetap terbuka — OCR hanya dapat menolong bila halaman *tampil* benar di layar. Hasil OCR selalu dapat keliru; periksa dan sunting sebelum dipakai. Cocok untuk: tugas yang difoto, dokumen hasil pindai, dan PDF yang teksnya tidak terbaca.</p>
         <div class="wf-panel" id="ocr-consent">
           <h3>Aktifkan OCR (unduhan satu kali, perlu persetujuan Anda)</h3>
           <p class="wf-note">Tidak ada yang diunduh sebelum Anda menekan tombol di bawah. Yang akan diambil peramban dari CDN publik, lalu disimpan di cache peramban untuk kunjungan berikutnya:</p>
@@ -1302,6 +1327,10 @@
         <p class="wf-kicker">Riwayat Analisis</p>
         <h2 id="hist-judul">Riwayat saya</h2>
         <p class="wf-lede">Riwayat bersifat <strong>ikut-serta (opt-in)</strong>: secara bawaan fitur ini nonaktif dan tidak ada basis data yang dibuat. Mengaktifkannya adalah keputusan Anda, dapat dimatikan dan dihapus kapan pun, dan seluruh isinya tinggal di IndexedDB peramban ini — tidak pernah dikirim ke server.</p>
+        <div class="wf-panel">
+          <h3>Singkatnya: dua hal yang bisa disimpan — keduanya pilihan Anda</h3>
+          <p><strong>1. Ringkasan hasil saja</strong> — skor dan hitungan, tanpa teks Anda. <strong>2. Ringkasan + teks dokumen</strong> — supaya hasil lama bisa dibuka dan dibaca penuh lagi. Keduanya persetujuan terpisah, hanya tersimpan di perangkat ini, tidak pernah dikirim ke server, dan bisa dihapus kapan saja dari halaman ini.</p>
+        </div>
         <div class="wf-panel" id="hist-consent">
           <h3>Persetujuan penyimpanan</h3>
           <p class="wf-note">Dua persetujuan yang terpisah. Persetujuan pertama hanya menyimpan <strong>metadata hasil</strong> (jenis analisis, waktu, judul singkat, ringkasan angka) — bukan isi dokumen. Menyimpan <strong>teks dokumen</strong> memerlukan persetujuan kedua yang terpisah; teks dipotong pada 200.000 karakter dan ditandai. Dua penanda persetujuan kecil disimpan di localStorage agar pilihan Anda diingat; isi riwayatnya sendiri berada di IndexedDB.</p>
@@ -1360,6 +1389,7 @@
       <section class="method" id="metode" data-view="metode" hidden aria-labelledby="metode-pengukuran-judul">
         <div class="kicker">Metode</div>
         <h2 id="metode-pengukuran-judul">Metode &amp; pengukuran</h2>
+        <p class="wf-note">Halaman ini adalah dokumentasi teknis lengkap — ditujukan bagi peninjau dan peneliti. Pengguna umum cukup membaca <a href="#/cara-kerja">Cara Menggunakan Saksara</a>; tidak ada kewajiban membaca halaman ini untuk memakai Saksara.</p>
         <p class="sub">Halaman ini merangkum bagaimana skor Saksara dibangun dan seberapa jauh kinerjanya sudah terukur — disampaikan apa adanya, termasuk batas-batasnya.</p>
         <div class="steps">
           <div class="step"><span class="num">LAPIS 1</span><h3>Ensemble Heuristik v3</h3><p>Tujuh sinyal statistik — burstiness, keragaman kosakata, frasa khas AI, stilometri, sisa markdown, simetri paragraf, dan pengulangan frasa — dihitung untuk seluruh dokumen dan untuk setiap kalimat, lalu digabungkan dengan bobot tetap menjadi satu skor. Lapis ini selalu menjadi penemu indikasi awal dan sumber penanda warna per kalimat; rincian tiap sinyal ada di halaman Cara Kerja.</p></div>
@@ -1382,20 +1412,18 @@
           <span>Saksara</span>
         </div>
         <p>Saksara — Beta Terbuka deteksi teks AI untuk siapa saja. Skor adalah indikasi statistik, bukan bukti.</p>
-        <p>Mesin skor saat ini adalah Ensemble Heuristik v3 — pemeriksaan 7 sinyal yang berjalan sepenuhnya di peramban dan disetel untuk pola tulisan Bahasa Indonesia, termasuk tulisan formal yang generik; classifier terlatih tersedia sebagai lapis tambahan yang juga berjalan sepenuhnya di peramban (model bahasa multibahasa, ±280 MB, hanya diunduh bila Anda mengaktifkannya dari panel classifier, lalu tersimpan di peramban dan bisa dihapus dari panel yang sama; teks tidak dikirim ke mana pun) — model itu kuat pada teks AI formal tetapi juga bisa menilai tulisan manusia yang sangat formal sebagai mirip AI, sehingga ia hanya menjadi penguat dan lapis pertama tetap penemu indikasi awal serta penyeimbang utamanya.</p>
+        <p>Cara kerja singkat: Saksara memeriksa pola tulisan sepenuhnya di peramban ini — teks Anda tidak dikirim ke mana pun. Bila Anda mau, ada pemeriksa kedua (model ±280 MB) yang hanya diunduh atas persetujuan Anda dan hanya memperkuat indikasi; ia bisa terlalu curiga pada tulisan manusia yang sangat formal, jadi pola utama dan pembaca manusia tetap penentu akhirnya.</p>
         <nav class="footer-links" aria-label="Tautan bawah">
           <a href="#/home">Beranda</a>
-          <a href="#/detector">Detector</a>
-          <a href="#/forensik">Writing Forensic</a>
-          <a href="#/compare">Bandingkan</a>
-          <a href="#/benchmark">Benchmark</a>
-          <a href="#/ocr">OCR</a>
-          <a href="#/history">Riwayat</a>
-          <a href="#analisis">Analisis</a>
-          <a href="#/cara-kerja">Cara Kerja</a>
-          <a href="#/metode">Metode</a>
-          <a href="#benchmark">Benchmark</a>
-          <a href="#/posisi">Posisi &amp; Batasan</a>
+          <a href="#/detector">Periksa Tulisan</a>
+          <a href="#/forensik">Kenali Gaya Tulisan</a>
+          <a href="#/compare">Bandingkan Tulisan</a>
+          <a href="#batch">Periksa Banyak Dokumen</a>
+          <a href="#/ocr">Baca Teks dari Gambar</a>
+          <a href="#/history">Riwayat Saya</a>
+          <a href="#/cara-kerja">Cara Menggunakan Saksara</a>
+          <a href="#/benchmark">Pengujian &amp; Transparansi</a>
+          <a href="#/posisi">Privasi &amp; Batasan</a>
         </nav>
         <p class="copy">© 2026 Saksara — Dikembangkan oleh Ciptanala Devs</p>
         <p class="version-line">Versi <strong>v0.15.0-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
@@ -1404,6 +1432,13 @@
 
     <dialog class="changelog" id="changelog-modal" aria-labelledby="changelog-title">
       <h2 id="changelog-title">Catatan Rilis — Saksara</h2>
+      <h3>v0.15.0-beta — 21 November 2026</h3>
+      <ul>
+        <li><strong>Tampilan yang lebih ramah:</strong> menu dan judul kini berbahasa sehari-hari (Periksa Tulisan, Kenali Gaya Tulisan, Baca Teks dari Gambar, Riwayat Saya), Beranda membuka dengan "Pahami tulisan Anda. Jadikan lebih baik." plus kotak periksa langsung, dan setiap hasil kini diawali kesimpulan berbahasa manusia beserta saran.</li>
+        <li><strong>Dua tingkat tampilan:</strong> Tampilan Sederhana (bawaan) menampilkan kesimpulan, penjelasan, dan saran; Tampilan Mendalam menampilkan seluruh angka, sinyal, dan metodologi. Tidak ada informasi yang dihapus.</li>
+        <li><strong>Penjelasan awam untuk pengujian:</strong> halaman Pengujian &amp; Transparansi kini menjelaskan akurasi, presisi, recall, salah tuduh, dan tabel benar–salah dengan bahasa sederhana — angka lengkapnya tidak berubah.</li>
+        <li>Mesin skor, ambang, dan baseline tidak berubah: skor yang Anda terima sama seperti versi sebelumnya.</li>
+      </ul>
       <h3>v0.14.0-beta — 20 November 2026</h3>
       <ul>
         <li><strong>OCR Dokumen:</strong> halaman baru untuk membaca gambar dan PDF pindai secara lokal (Tesseract.js, Bahasa Indonesia + Inggris). Model ±10,6 MB hanya diunduh bila Anda menyetujui; PDF yang tidak terbaca di Detector/Forensic/Bandingkan kini menawarkan jalan pintas ke OCR. OCR membaca halaman sebagai gambar dan tidak memperbaiki ekstraktor teks.</li>
@@ -6120,6 +6155,37 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         return "<div class=\"fr-card\"><h4>" + esc(c[0]) + "</h4><div class=\"fr-v\">" + esc(c[1]) + "</div><p>" + esc(c[2]) + "</p><p class=\"fr-s\">" + esc(c[3]) + "</p></div>";
       }).join("");
     }
+
+    var p7QuickText = null, p7QuickFile = null;
+    function p7GoDetector(){
+      if(p7QuickText !== null){
+        var ta = $("input-teks");
+        if(ta){ ta.value = p7QuickText; ta.dispatchEvent(new Event("input", { bubbles: true })); }
+        p7QuickText = null;
+        var b = $("btn-analisis"); if(b) b.click();
+      } else if(p7QuickFile){
+        var f = p7QuickFile; p7QuickFile = null; handleFile(f);
+      }
+    }
+    function p7NavDetector(){
+      if((window.location.hash || "") === "#/detector"){ p7GoDetector(); }
+      else { window.location.hash = "#/detector"; setTimeout(p7GoDetector, 350); }
+    }
+    var p7qg = $("p7-quick-go");
+    if(p7qg) p7qg.addEventListener("click", function(){
+      var v = ($("p7-quick-text").value || "").trim();
+      if(!v){ window.location.hash = "#/detector"; return; }
+      p7QuickText = $("p7-quick-text").value;
+      p7NavDetector();
+    });
+    var p7qf = $("p7-quick-file");
+    if(p7qf) p7qf.addEventListener("change", function(e){
+      var f = e.target.files && e.target.files[0];
+      e.target.value = "";
+      if(!f) return;
+      p7QuickFile = f;
+      p7NavDetector();
+    });
     document.addEventListener("click", function(e){
       var t = e.target;
       var b = (t && t.closest) ? t.closest(".mt-btn") : null;
