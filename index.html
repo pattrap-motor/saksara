@@ -711,12 +711,16 @@
           <a href="#/posisi">Posisi &amp; Batasan</a>
         </nav>
         <p class="copy">© 2026 Saksara — Dikembangkan oleh Ciptanala Devs</p>
-        <p class="version-line">Versi <strong>v0.9.6-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
+        <p class="version-line">Versi <strong>v0.9.7-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
       </div>
     </footer>
 
     <dialog class="changelog" id="changelog-modal" aria-labelledby="changelog-title">
       <h2 id="changelog-title">Catatan Rilis — Saksara</h2>
+      <h3>v0.9.7-beta — 20 November 2026</h3>
+      <ul>
+        <li><strong>Isi daftar-daftar tidak lagi ikut dinilai:</strong> seluruh entri <strong>DAFTAR ISI, DAFTAR GAMBAR, dan DAFTAR TABEL</strong> (judul entri + nomor halaman) serta seluruh entri <strong>DAFTAR PUSTAKA</strong> kini <strong>selalu dikeluarkan otomatis dari penilaian</strong>, langsung dari kode — melengkapi pengeluaran judul & kepala bab pada rilis sebelumnya. Jumlah kata yang dikeluarkan diumumkan di laporan dan tercetak di PDF.</li>
+      </ul>
       <h3>v0.9.6-beta — 20 November 2026</h3>
       <ul>
         <li><strong>Judul & kepala bab tidak lagi ikut dinilai:</strong> baris judul dokumen, kepala "BAB I/II/…", dan kepala subbab bernomor (mis. "1.1 Latar Belakang") kini <strong>selalu dikeluarkan otomatis dari penilaian</strong> — langsung dari kode, tanpa perlu mencentang apa pun — karena baris-baris itu bukan prosa. Yang dinilai hanya isi tulisan; jumlah baris yang dikeluarkan diumumkan di laporan dan tercetak di PDF.</li>
@@ -2004,6 +2008,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
            teks tersaring yang sama dengan heuristik. */
         lastExclusion = null;
         lastHeadingsRemoved = null;
+        lastSectionsRemoved = null;
         var exclBox = $("opt-exclude");
         if(exclBox && exclBox.checked){
           var excl = excludeStandardParts(text);
@@ -2011,6 +2016,14 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
             text = excl.text;
             lastExclusion = excl;
           }
+        }
+        /* Isi daftar isi/gambar/tabel/pustaka: SELALU dikeluarkan (dari
+           kode, tanpa kotak centang) — berjalan setelah zona eksklusi agar
+           tidak mengganggu jangkar pemotongannya. */
+        var secs = stripListSections(text);
+        if(secs.words > 0 && wordsOf(secs.text).length > 0){
+          text = secs.text;
+          lastSectionsRemoved = secs;
         }
         /* Judul & kepala bab/subbab: SELALU dikeluarkan (dari kode, tanpa
            kotak centang) — berjalan SETELAH zona eksklusi agar judul bagian
@@ -2118,17 +2131,15 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           cb.innerHTML = "";
         }
         // catatan penyaringan — hanya tampil bila penyaringan benar-benar
-        // membuang sesuatu; tidak pernah diam-diam (lihat excludeStandardParts
-        // dan stripStructuralHeadings).
+        // membuang sesuatu; tidak pernah diam-diam (lihat excludeStandardParts,
+        // stripListSections, dan stripStructuralHeadings).
         var eb = $("banner-eksklusi");
-        if(lastHeadingsRemoved && lastExclusion){
-          eb.innerHTML = "<strong>Sebagian teks tidak ikut dinilai:</strong> judul dan kepala bab/subbab selalu dikeluarkan (" + lastHeadingsRemoved.lines + " baris, ±" + fmtNumID(lastHeadingsRemoved.words) + " kata); bagian baku juga dikecualikan (±" + fmtNumID(lastExclusion.excludedWords) + " kata — daftar pustaka, kata pengantar, kutipan, baris tabel, sesuai yang ditemukan). Yang dinilai hanya isi prosa.";
-          eb.classList.add("show");
-        } else if(lastHeadingsRemoved){
-          eb.innerHTML = "<strong>Judul & kepala bab dikeluarkan:</strong> " + lastHeadingsRemoved.lines + " baris judul/kepala bab/subbab (±" + fmtNumID(lastHeadingsRemoved.words) + " kata) tidak ikut dinilai — yang dinilai hanya isi prosa.";
-          eb.classList.add("show");
-        } else if(lastExclusion){
-          eb.innerHTML = "<strong>Bagian baku dikecualikan:</strong> ±" + fmtNumID(lastExclusion.excludedWords) + " kata tidak dianalisis (daftar pustaka, kata pengantar, kutipan, baris tabel — sesuai yang ditemukan).";
+        var ebParts = [];
+        if(lastHeadingsRemoved) ebParts.push("judul dan kepala bab/subbab (" + lastHeadingsRemoved.lines + " baris, ±" + fmtNumID(lastHeadingsRemoved.words) + " kata)");
+        if(lastSectionsRemoved) ebParts.push("isi " + lastSectionsRemoved.sections.join(", ").toLowerCase() + " (±" + fmtNumID(lastSectionsRemoved.words) + " kata)");
+        if(lastExclusion) ebParts.push("bagian baku — daftar pustaka, kata pengantar, kutipan, baris tabel (±" + fmtNumID(lastExclusion.excludedWords) + " kata)");
+        if(ebParts.length){
+          eb.innerHTML = "<strong>Sebagian teks tidak ikut dinilai:</strong> " + ebParts.join("; ") + ". Yang dinilai hanya isi prosa.";
           eb.classList.add("show");
         } else {
           eb.classList.remove("show");
@@ -2346,6 +2357,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           if(res.words < 300) write("Catatan reliabilitas: teks ini hanya " + res.words + " kata (di bawah +/-300 kata) — hasil kurang dapat dipegang; gunakan sebagai petunjuk awal, bukan kesimpulan.", 10, "italic");
           if(lastExclusion) write("Catatan: Bagian baku dikecualikan: ±" + lastExclusion.excludedWords + " kata tidak dianalisis (daftar pustaka, kata pengantar, kutipan, baris tabel — sesuai yang ditemukan).", 10, "italic");
           if(lastHeadingsRemoved) write("Catatan: Judul dan kepala bab/subbab dikeluarkan dari penilaian: " + lastHeadingsRemoved.lines + " baris (±" + lastHeadingsRemoved.words + " kata) tidak dianalisis - yang dinilai hanya isi prosa.", 10, "italic");
+          if(lastSectionsRemoved) write("Catatan: Isi " + lastSectionsRemoved.sections.join(", ") + " dikeluarkan dari penilaian: ±" + lastSectionsRemoved.words + " kata tidak dianalisis.", 10, "italic");
           y += 4;
           write("Mesin & rumus skor", 12, "bold", 1);
           write("Skor Ensemble Heuristik v3: " + pct(res.final) + "%", 10.5);
@@ -2443,6 +2455,69 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
          (banner-eksklusi) dan laporan PDF — tidak pernah diam-diam. */
       var lastExclusion = null; /* { excludedWords, parts } milik laporan yang tampil, atau null */
       var lastHeadingsRemoved = null; /* { lines, words } penyaringan judul/kepala bab pada laporan yang tampil, atau null */
+      var lastSectionsRemoved = null; /* { sections, words } penyaringan isi daftar isi/gambar/tabel/pustaka pada laporan yang tampil, atau null */
+      /* ---------- Isi daftar isi/gambar/tabel/pustaka: SELALU dikeluarkan ----------
+         Baris-baris entri daftar isi, daftar gambar, dan daftar tabel (judul
+         entri + nomor halaman) serta seluruh entri daftar pustaka bukanlah
+         prosa dan tidak boleh ikut dinilai. Berjalan selalu, dari kode, tanpa
+         kotak centang. Daftar isi/gambar/tabel dipotong dari baris judulnya
+         sampai baris prosa pertama (baris panjang atau berakhir tanda akhir
+         kalimat); daftar pustaka dipotong sampai akhir dokumen (berhenti
+         sebelum LAMPIRAN bila ada). Pengaman: baris judul seksi harus pendek
+         (maks 5 kata) dan tanpa tanda kalimat, jadi kalimat prosa yang
+         menyebut "daftar isi" tidak pernah memicu pemotongan. Hasilnya
+         diumumkan di laporan (banner) dan laporan PDF. */
+      function stripListSections(text){
+        var lines = String(text || "").split("\n");
+        function sectionKind(line){
+          var t = String(line || "").trim().replace(/:+$/, "");
+          if(t.length > 40 || wordsOf(t).length > 5 || /[.!?;,]/.test(t)) return null;
+          if(/^daftar\s+isi\b/i.test(t) || /^table\s+of\s+contents\b/i.test(t)) return "Daftar isi";
+          if(/^daftar\s+gambar\b/i.test(t)) return "Daftar gambar";
+          if(/^daftar\s+tabel\b/i.test(t)) return "Daftar tabel";
+          if(/^daftar\s+pustaka\b/i.test(t) || /^referensi\b/i.test(t) || /^bibliografi\b/i.test(t) || /^bibliography\b/i.test(t) || /^references\b/i.test(t)) return "Daftar pustaka";
+          return null;
+        }
+        function isBareSectionHeading(line){
+          /* Judul seksi daftar yang berdiri sendiri (tanpa titik penuntun /
+             nomor halaman) menandai awal seksi berikutnya, bukan entri —
+             sedangkan baris "DAFTAR PUSTAKA ............ 11" di dalam daftar
+             isi adalah entri dan tetap terpotong bersama daftar induknya. */
+          var t = String(line || "").trim();
+          if(!sectionKind(t)) return false;
+          if(/…/.test(t) || /\.{3,}/.test(t) || /\d\s*$/.test(t)) return false;
+          return true;
+        }
+        function isEntryLine(line){
+          var t = String(line || "").trim();
+          if(!t) return true; /* baris kosong di dalam daftar ikut terpotong */
+          if(/…/.test(t) || /\.{3,}/.test(t)) return true; /* titik-titik penuntun */
+          if(/\d\s*$/.test(t) && wordsOf(t).length <= 14) return true; /* berakhir nomor halaman */
+          if(t.length <= 90 && wordsOf(t).length <= 10 && !/[.!?;,]$/.test(t)) return true; /* entri pendek tanpa nomor */
+          return false;
+        }
+        var out = [], removedWords = 0, found = [], i = 0;
+        while(i < lines.length){
+          var kind = sectionKind(lines[i]);
+          if(!kind){ out.push(lines[i]); i++; continue; }
+          var cut = wordsOf(lines[i]).length, j = i + 1;
+          if(kind === "Daftar pustaka"){
+            while(j < lines.length){
+              var lt = lines[j].trim();
+              if(/^lampiran\b/i.test(lt) && isHeadingLikeLine(lt)) break;
+              cut += wordsOf(lines[j]).length; j++;
+            }
+          } else {
+            var nCut = 0;
+            while(j < lines.length && nCut <= 400 && isEntryLine(lines[j]) && !isBareSectionHeading(lines[j])){
+              cut += wordsOf(lines[j]).length; j++; nCut++;
+            }
+          }
+          if(cut > 0){ removedWords += cut; if(found.indexOf(kind) < 0) found.push(kind); }
+          i = j;
+        }
+        return { text: out.join("\n"), words: removedWords, sections: found };
+      }
       /* ---------- Judul & kepala bab/subbab: SELALU dikeluarkan ----------
          Baris judul dokumen, kepala "BAB I/II/…", dan kepala subbab bernomor
          ("1.1 Latar Belakang") bukanlah prosa — bila ikut dinilai, ritme dan
@@ -2788,6 +2863,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         return "RENDAH";
       }
       async function scoreBatchText(text){
+        text = stripListSections(text).text;
         text = stripStructuralHeadings(text).text;
         var capped = capAnalysisText(text);
         var res = analyze(capped.text);
