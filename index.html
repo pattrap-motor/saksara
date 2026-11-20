@@ -154,7 +154,7 @@
       textarea{ width:100%; min-height:250px; resize:vertical; border:1px solid var(--line); border-radius:12px;
         background:var(--bg); color:var(--ink); font-family:inherit; font-size:15.5px; line-height:1.65; padding:15px 17px;
         transition:border-color .15s ease, box-shadow .15s ease; }
-      textarea:focus{ outline:none; border-color:var(--gold); box-shadow:0 0 0 3px var(--gold-soft); }
+      textarea:focus{ outline:none; border-color:var(--gold-ink); box-shadow:0 0 0 3px var(--gold-soft); }
       .toolbar{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:14px; }
       .counters{ font-family:"IBM Plex Mono", monospace; font-size:13px; color:var(--muted); margin-right:auto; }
       .counters b{ color:var(--ink); }
@@ -172,7 +172,7 @@
         font-size:14.5px; font-weight:600; border-radius:10px; padding:9px 16px; min-height:42px;
         border:1px solid var(--line); background:var(--surface2); color:var(--ink); }
       .upload-wrap:hover .upload-visual{ filter:brightness(1.04); }
-      .upload-wrap:focus-within .upload-visual{ outline:2px solid var(--gold); outline-offset:1px; }
+      .upload-wrap:focus-within .upload-visual{ outline:2px solid var(--gold-ink); outline-offset:1px; }
       .upload-wrap.is-busy{ opacity:.55; }
       /* Input TIDAK di-opacity:0 — elemennya sendiri ber-opacity penuh & benar-benar ter-render;
          yang dibuat transparan hanya cat bawaannya (tombol & teks nama berkas bawaan peramban),
@@ -229,7 +229,7 @@
       details.deep > summary::-webkit-details-marker{ display:none; }
       details.deep > summary::after{ content:"▾"; margin-left:auto; color:var(--gold-ink); font-size:13px; transition:transform .2s ease; }
       details.deep[open] > summary::after{ transform:rotate(180deg); }
-      details.deep > summary:focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
+      details.deep > summary:focus-visible{ outline:2px solid var(--gold-ink); outline-offset:2px; }
       details.deep .steps{ padding:2px 16px 0; }
       details.deep .formula{ margin:0 18px; }
       details.deep .posisi-grid{ padding:2px 16px 8px; }
@@ -487,14 +487,14 @@
       details.clf-more > summary::-webkit-details-marker{ display:none; }
       details.clf-more > summary::after{ content:" ▾"; }
       details.clf-more[open] > summary::after{ content:" ▴"; }
-      details.clf-more > summary:focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
+      details.clf-more > summary:focus-visible{ outline:2px solid var(--gold-ink); outline-offset:2px; }
       details.clf-more p{ font-size:13.5px; color:var(--muted); margin:8px 0 0; line-height:1.65; }
       @media (prefers-reduced-motion: reduce){
         [data-view]:not([hidden]){ animation:none; }
         .strip-stat:hover, .step:hover, .posisi-card:hover, .stat:hover, .chip:hover{ transform:none; }
       }
       /* ---------- focus & motion ---------- */
-      button:focus-visible, .sent:focus-visible, a:focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
+      button:focus-visible, .sent:focus-visible, a:focus-visible{ outline:2px solid var(--gold-ink); outline-offset:2px; }
       @media (max-width:860px){
         .steps{ grid-template-columns:1fr 1fr; }
         .report-grid{ grid-template-columns:1fr; }
@@ -530,7 +530,7 @@
       .side-nav a{ display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:var(--r-sm); color:var(--ink); text-decoration:none; font-weight:600; font-size:14.5px; }
       .side-nav a:hover{ background:var(--surface2); }
       .side-nav a.active{ background:var(--gold-soft); color:var(--gold-ink); }
-      .side-nav a:focus-visible, .side-brand:focus-visible, .side-cta:focus-visible, .qa-card:focus-visible{ outline:3px solid var(--gold); outline-offset:2px; }
+      .side-nav a:focus-visible, .side-brand:focus-visible, .side-cta:focus-visible, .qa-card:focus-visible{ outline:3px solid var(--gold-ink); outline-offset:2px; }
       .side-cta{ margin-top:14px; text-align:center; }
       .side-foot{ margin-top:auto; font-size:12px; color:var(--muted); border-top:1px solid var(--line-soft); padding-top:12px; line-height:1.6; }
       .dash-h{ font-size:clamp(22px,3vw,28px); margin:2px 0 14px; }
@@ -671,7 +671,7 @@
       .human-card h3{ margin:0 0 6px; font-size:19px; }
       .human-card p{ margin:0 0 6px; line-height:1.55; }
       .human-card .human-tip{ color:var(--gold-ink); }
-      .human-card .human-note{ font-size:13px; color:var(--muted); margin-bottom:0; }
+      .human-card .human-note{ font-size:13.5px; color:var(--muted); margin-bottom:0; }
       .fr-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:10px; margin:0 0 14px; }
       .fr-card{ border:1px solid var(--line); border-radius:12px; padding:12px 14px; background:var(--surface); }
       .fr-card h4{ margin:0 0 4px; font-size:15px; }
@@ -744,7 +744,7 @@
           <span class="proto-badge">Beta Terbuka</span>
         </div>
         <h1 class="hero-title">Pahami tulisan Anda. <em>Jadikan lebih baik.</em></h1>
-        <p class="lede">Tempel teks atau unggah berkas .txt, .docx, atau .pdf — Saksara menunjukkan bagian mana yang terasa seperti tulisan AI, kalimat mana yang paling mencurigakan, dan apa yang bisa Anda perbaiki. Semuanya berjalan di peramban ini; teks dan berkas Anda tidak dikirim ke mana pun. Hasilnya adalah <strong>indikasi untuk bahan pertimbangan, bukan vonis</strong>.</p>
+        <p class="lede">Tempel teks atau unggah berkas .txt, .docx, atau .pdf — Saksara menunjukkan bagian mana yang berindikasi pola AI, kalimat mana yang paling terindikasi, dan apa yang bisa Anda perbaiki. Semuanya berjalan di peramban ini; teks dan berkas Anda tidak dikirim ke mana pun. Hasilnya adalah <strong>indikasi untuk bahan pertimbangan, bukan vonis</strong>.</p>
         <div class="hero-cta">
           <a class="btn-primary" href="#analisis">Mulai Memeriksa</a>
           <a class="btn-ghost" href="#/cara-kerja">Cara Menggunakan</a>
@@ -761,7 +761,7 @@
         <div class="qc-panel">
           <h2 class="dash-h" id="p7-qc-judul" style="margin-top:0;">Coba langsung — periksa tulisan Anda</h2>
           <label for="p7-quick-text" style="font-weight:700; display:block; margin-bottom:6px;">Tempel tulisan di sini</label>
-          <textarea id="p7-quick-text" rows="5" placeholder="Tempel teks tugas, esai, atau artikel Anda di sini… (disarankan ±300 kata atau lebih agar hasilnya dapat dipegang)"></textarea>
+          <textarea id="p7-quick-text" rows="5" aria-label="Teks yang ingin diperiksa" placeholder="Tempel teks tugas, esai, atau artikel Anda di sini… (disarankan ±300 kata atau lebih agar hasilnya dapat dipegang)"></textarea>
           <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; align-items:center;">
             <button type="button" class="btn-primary" id="p7-quick-go">Periksa Tulisan</button>
             <span class="upload-wrap"><span class="upload-visual" aria-hidden="true">atau unggah .txt / .docx / .pdf</span><input type="file" id="p7-quick-file" accept=".txt,.docx,.pdf,.doc,text/plain,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-label="Unggah berkas untuk diperiksa" /></span>
@@ -774,7 +774,7 @@
         <div class="kicker">Akses Cepat</div>
         <h2 class="dash-h" id="dash-cepat-judul">Mau memeriksa apa hari ini?</h2>
         <div class="qa-grid">
-          <a class="qa-card" href="#/detector"><span class="qa-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg></span><span class="qa-t">Periksa Tulisan</span><span class="qa-d">Tempel teks atau unggah berkas — lihat bagian mana yang terasa seperti AI, kalimat demi kalimat.</span><span class="qa-go">Mulai memeriksa →</span></a>
+          <a class="qa-card" href="#/detector"><span class="qa-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg></span><span class="qa-t">Periksa Tulisan</span><span class="qa-d">Tempel teks atau unggah berkas — lihat bagian mana yang berindikasi pola AI, kalimat demi kalimat.</span><span class="qa-go">Mulai memeriksa →</span></a>
           <a class="qa-card" href="#batch"><span class="qa-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3 8l9 5 9-5-9-5Z"/><path d="M3 13l9 5 9-5"/></svg></span><span class="qa-t">Periksa Banyak Dokumen</span><span class="qa-d">Punya banyak berkas? Antrekan sampai 50 berkas sekaligus dan unduh rekap hasilnya.</span><span class="qa-go">Antrekan berkas →</span></a>
           <a class="qa-card" href="#/forensik"><span class="qa-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l2.5-6 4 12L16 12h5"/></svg></span><span class="qa-t">Kenali Gaya Tulisan</span><span class="qa-d">Lihat ciri khas tulisan Anda — keragaman kata, ritme kalimat, konsistensi — tanpa menuduh siapa penulisnya.</span><span class="qa-go">Kenali gaya saya →</span></a>
           <a class="qa-card" href="#/compare"><span class="qa-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3v18M16 3v18M3 8h5M3 16h5M16 8h5M16 16h5"/></svg></span><span class="qa-t">Bandingkan Tulisan</span><span class="qa-d">Bandingkan dua versi tulisan dan lihat persis bagian yang sama, berubah, ditambah, atau dihapus.</span><span class="qa-go">Bandingkan →</span></a>
@@ -901,7 +901,7 @@
             <div class="score-num"><span id="score-num">0</span><small>%</small></div>
             <span class="verdict" id="verdict">—</span>
             <div class="meter"><div class="pin" id="meter-pin" style="left:0%"></div></div>
-            <div class="meter-scale"><span>0% manusiawi</span><span>35%</span><span>65%</span><span>100% mirip AI</span></div>
+            <div class="meter-scale"><span>0% rendah</span><span>35%</span><span>65%</span><span>100% tinggi</span></div>
             <p class="note" id="score-note"></p>
             <p class="note engine-line" id="engine-line">Mesin skor: Ensemble Heuristik v3</p>
             <p class="note compare-line" id="compare-line" style="display:none;"></p>
@@ -966,8 +966,8 @@
           <summary class="hl-summary"><h3>Teks dengan penanda per kalimat</h3><span class="hl-toggle" aria-hidden="true"></span></summary>
           <div class="legend">
             <span><span class="sw r"></span>Merah — skor kalimat ≥ 65% (sangat mirip pola AI)</span>
-            <span><span class="sw y"></span>Kuning — 35–65% (meragukan)</span>
-            <span><span class="sw g"></span>Hijau — &lt; 35% (cenderung manusiawi)</span>
+            <span><span class="sw y"></span>Kuning — 35–65% (indikasi AI sedang)</span>
+            <span><span class="sw g"></span>Hijau — &lt; 35% (indikasi AI rendah)</span>
             <span>Klik kalimat mana pun untuk melihat bukti penandaannya beserta saran perbaikan.</span>
           </div>
           <div class="hl-tools" role="group" aria-label="Filter penanda kalimat">
@@ -2785,7 +2785,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           if(r.score >= CLF_WATCH){
             lastWatchSignal = { heur: res.final, clf: r.score };
             var bw = $("banner-waspada");
-            bw.innerHTML = "<strong>Sinyal waspada — disarankan ditinjau manual.</strong> Mengapa waspada? Kedua lapis pemeriksa tidak sepakat pada teks ini: lapis pertama (Ensemble Heuristik v3) menilai pola tulisan cenderung manusiawi (" + pct(res.final) + "%), tetapi lapis kedua (classifier) memberi probabilitas AI yang sangat tinggi (" + pct(r.score) + "%). Ketidaksepakatan seperti ini dapat muncul pada teks AI yang disunting atau diparafrase dengan baik, tetapi juga pada tulisan manusia yang sangat formal dan teratur — karena itu skor akhir tidak diubah dan sinyal ini bukan vonis. Gunakan sinyal ini sebagai alasan untuk meninjau isi teks secara manual dan, bila perlu, mengklarifikasi langsung kepada penulisnya.";
+            bw.innerHTML = "<strong>Sinyal waspada — disarankan ditinjau manual.</strong> Mengapa waspada? Kedua lapis pemeriksa tidak sepakat pada teks ini: lapis pertama (Ensemble Heuristik v3) menilai indikasi pola AI pada tulisan ini rendah (" + pct(res.final) + "%), tetapi lapis kedua (classifier) memberi probabilitas AI yang sangat tinggi (" + pct(r.score) + "%). Ketidaksepakatan seperti ini dapat muncul pada teks AI yang disunting atau diparafrase dengan baik, tetapi juga pada tulisan manusia yang sangat formal dan teratur — karena itu skor akhir tidak diubah dan sinyal ini bukan vonis. Gunakan sinyal ini sebagai alasan untuk meninjau isi teks secara manual dan, bila perlu, mengklarifikasi langsung kepada penulisnya.";
             bw.classList.add("show");
           }
         }
@@ -2803,10 +2803,10 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         var suffix = blended ? " Skor akhir ini adalah skor Ensemble Heuristik v3 yang diperkuat classifier terlatih (penguat bersyarat: classifier hanya menaikkan skor bila heuristik sudah menemukan indikasi awal ≥35%)." : "";
         if(score < 0.35){
           verdict.textContent = "Indikasi AI rendah";
-          note.textContent = "Pola tulisan cenderung manusiawi: ritme kalimat bervariasi dan frasa formulaik sedikit. Tetap baca isinya — skor rendah bukan jaminan keaslian." + suffix;
+          note.textContent = "Indikasi pola AI rendah: ritme kalimat bervariasi dan frasa formulaik sedikit. Tetap baca isinya — skor rendah bukan jaminan keaslian." + suffix;
         } else if(score <= 0.65){
           verdict.textContent = "Campuran — perlu pemeriksaan lebih lanjut";
-          note.textContent = "Sebagian pola mirip AI, sebagian manusiawi. Ini zona abu-abu: bisa jadi teks AI yang diparafrase, atau tulisan manusia yang sangat rapi. Periksa lebih lanjut sebelum menyimpulkan." + suffix;
+          note.textContent = "Sebagian pola menyerupai teks AI, sebagian lain tidak menunjukkan pola tersebut. Ini zona abu-abu: bisa jadi teks AI yang diparafrase, atau tulisan manusia yang sangat rapi. Periksa lebih lanjut sebelum menyimpulkan." + suffix;
         } else {
           verdict.textContent = "Indikasi AI tinggi";
           note.textContent = "Pola tulisan sangat mirip keluaran AI: ritme seragam dan/atau banyak frasa formulaik. Jadikan ini alasan untuk mengklarifikasi ke penulisnya, bukan vonis langsung." + suffix;
@@ -3087,7 +3087,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           suggestHtml = "<div class=\"sd-suggest\"><div class=\"sd-sec\">Saran perbaikan untuk kalimat ini</div><ul>" +
             tips.map(function(t){ return "<li>" + t + "</li>"; }).join("") + "</ul></div>";
         } else if(band === "g"){
-          suggestHtml = "<div class=\"sd-suggest\"><div class=\"sd-sec\">Catatan</div><p>Kalimat ini cenderung manusiawi: pilihan kata dan ritmenya spesifik, tidak mengikuti templat. Pertahankan gaya penulisan seperti ini — rincian konkret dan ritme yang hidup adalah kekuatan tulisan Anda.</p></div>";
+          suggestHtml = "<div class=\"sd-suggest\"><div class=\"sd-sec\">Catatan</div><p>Kalimat ini berindikasi AI rendah: pilihan kata dan ritmenya spesifik, tidak mengikuti templat. Pertahankan gaya penulisan seperti ini — rincian konkret dan ritme yang hidup adalah kekuatan tulisan Anda.</p></div>";
         } else {
           suggestHtml = "<div class=\"sd-suggest\"><div class=\"sd-sec\">Catatan</div><p>Tidak ada satu bukti tunggal yang kuat pada kalimat ini; skornya terutama mengikuti pola umum dokumen. Bila kalimat ini tulisan Anda sendiri, menambahkan rincian konkret biasanya membantu menurunkannya.</p></div>";
         }
@@ -6110,16 +6110,16 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       var card = $("human-card"); if(!card) return;
       var title, explain, tip;
       if(score < 0.35){
-        title = "Tulisan ini terasa seperti ditulis manusia";
-        explain = "Pola kalimat, pilihan kata, dan ritme tulisan ini beragam — seperti tulisan manusia pada umumnya. Pemeriksa tidak menemukan pola khas teks AI yang berarti di dalamnya.";
-        tip = "Yang bisa Anda lakukan: tidak ada yang perlu dikhawatirkan dari sisi pola. Tetap baca isinya seperti biasa — skor rendah bukan jaminan keaslian, hanya ketiadaan indikasi.";
+        title = "Indikasi pola AI rendah pada tulisan ini";
+        explain = "Pemeriksa menemukan sedikit pola yang biasanya muncul pada teks AI: pola kalimat, pilihan kata, dan ritme tulisan ini beragam dan tidak menunjukkan pola khas teks AI yang berarti. Artinya, keyakinan analisis terhadap adanya pola AI pada teks ini rendah — hasil ini menyatakan indikasi yang ditemukan, bukan siapa penulisnya.";
+        tip = "Yang bisa Anda lakukan: dari sisi pola, tidak ada indikasi kuat yang perlu dikhawatirkan. Tetap baca isinya seperti biasa — skor rendah bukan jaminan keaslian, hanya menunjukkan indikasi AI yang ditemukan memang sedikit.";
       } else if(score <= 0.65){
-        title = "Sebagian tulisan ini terasa seperti AI — layak diperiksa";
-        explain = "Sebagian pola tulisan ini mirip teks AI — misalnya kalimat yang sangat seragam atau frasa yang umum dipakai AI — tetapi sebagian lain terasa manusiawi. Tulisan manusia yang sangat formal dan rapi juga bisa masuk kelompok ini.";
+        title = "Indikasi pola AI sedang — sebagian pola menyerupai teks AI";
+        explain = "Sebagian pola tulisan ini menyerupai pola yang sering muncul pada teks AI — misalnya kalimat yang sangat seragam atau frasa yang umum dipakai AI — sementara sebagian pola lain tidak menunjukkan ciri tersebut. Tulisan manusia yang sangat formal dan rapi juga bisa menghasilkan indikasi seperti ini, sehingga keyakinan analisis pada tingkat ini memang terbatas.";
         tip = "Yang bisa Anda lakukan: periksa kalimat-kalimat yang ditandai di bawah. Bila ini tulisan Anda, menambahkan contoh nyata dan memvariasikan panjang kalimat biasanya membuatnya terasa lebih hidup.";
       } else {
-        title = "Tulisan ini banyak terasa seperti AI";
-        explain = "Banyak pola dalam tulisan ini mirip keluaran AI: ritme kalimat yang seragam dan/atau frasa formulaik yang berulang. Ini alasan yang kuat untuk meninjau isinya — bukan bukti siapa penulisnya.";
+        title = "Indikasi pola AI kuat pada tulisan ini";
+        explain = "Analisis menemukan banyak pola yang menyerupai keluaran AI: ritme kalimat yang seragam dan/atau frasa formulaik yang berulang. Indikasi yang kuat seperti ini adalah alasan yang baik untuk meninjau isinya lebih lanjut — tetapi tetap bukan bukti siapa penulisnya.";
         tip = "Yang bisa Anda lakukan: tinjau kalimat yang ditandai, tulis ulang bagian yang bukan gaya Anda dengan kata-kata sendiri, dan tambahkan pengalaman atau contoh konkret bila ini karya Anda.";
       }
       if(lastWatchSignal){
