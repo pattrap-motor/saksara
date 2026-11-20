@@ -1,0 +1,34 @@
+# Saksara — regression gate (Phase 1)
+#
+# Runs on every push and every pull request. The gate extracts the heuristic
+# engine (Ensemble Heuristik v3) from index.html and verifies its output
+# against the Phase 0 golden baseline (benchmark/baseline-phase0.json), then
+# runs the full benchmark report and the feature harness. A red run means the
+# engine's scores moved or a feature contract broke — do not merge or publish
+# until it is green again. (Vercel deploys production from `main`; keeping
+# this gate green on every branch is what keeps `main` safe to merge.)
+name: regression-gate
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Regression gate (engine vs Phase 0 baseline)
+        run: node benchmark/check-regression.cjs
+      - name: Benchmark report (18 samples + calibration)
+        run: node benchmark/run-benchmark.cjs
+      - name: Feature harness (preprocessing, batch parity, telemetry contract)
+        run: node feature-harness.cjs
+      - name: Serverless functions (syntax)
+        run: |
+          node --check api/simpan-hasil.js
+          node --check api/kalibrasi.js
+          node --check api/donasi.js
