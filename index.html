@@ -765,7 +765,7 @@
           <div class="feat-card"><h3>Classifier lokal (Lapis 2)</h3><p>Model multibahasa ±280 MB berjalan di peramban sebagai penguat bersyarat — tidak ada server yang menilai teks Anda.</p><a href="#clf-panel">Aktifkan di Detector</a></div>
           <div class="feat-card"><h3>Laporan per kalimat</h3><p>Kalimat terindikasi ditandai warna, lengkap dengan bukti dan saran perbaikan — plus laporan PDF bergaya Turnitin dan tombol Salin Ringkasan.</p><a href="#/detector">Coba sekarang</a></div>
           <div class="feat-card"><h3>Mode batch + CSV</h3><p>Periksa puluhan berkas tugas dalam satu antrean dan unduh tabel rekapnya sebagai CSV.</p><a href="#batch">Buka mode batch</a></div>
-          <div class="feat-card"><h3>Privasi utuh</h3><p>Tanpa akun, tanpa unggahan teks, tanpa localStorage. Satu-satunya unduhan adalah berkas model — itu pun hanya bila Anda mengaktifkannya.</p><a href="#/posisi">Baca posisi privasi</a></div>
+          <div class="feat-card"><h3>Privasi utuh</h3><p>Tanpa akun, tanpa unggahan teks. Satu-satunya unduhan adalah berkas model — itu pun hanya bila Anda mengaktifkannya; penyimpanan lokal hanya untuk fitur Riwayat yang opt-in dan nonaktif secara bawaan.</p><a href="#/posisi">Baca posisi privasi</a></div>
           <div class="feat-card"><h3>Donasi &amp; kalibrasi</h3><p>Bantu deteksi Bahasa Indonesia membaik: kirim statistik analisis (tanpa teks) atau donasikan teks berlabel — selalu atas persetujuan Anda.</p><a href="#report">Lihat di laporan</a></div>
         </div>
       </section>
@@ -5145,7 +5145,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       "<tr><td>Weighted F1 (dukungan kelas)</td><td>" + bnPct(m.weightedF1) + "</td></tr>";
   }
   function bnCmHtml(m){
-    return "<div class=\"bn-cm\" role=\"img\" aria-label=\"Confusion matrix: TP " + m.TP + ", FN " + m.FN + ", FP " + m.FP + ", TN " + m.TN + "\">" +
+    return "<div class=\"bn-cm\" role=\"group\" aria-label=\"Matriks kebingungan (confusion matrix): TP " + m.TP + " (AI yang terindikasi, benar), FN " + m.FN + " (AI yang lolos, terlewat), FP " + m.FP + " (manusia yang terindikasi, salah tuduh), TN " + m.TN + " (manusia yang lolos, benar)\">" +
       "<div class=\"bn-h\"></div><div class=\"bn-h\">Prediksi: terindikasi AI</div><div class=\"bn-h\">Prediksi: manusia</div>" +
       "<div class=\"bn-h\">Aktual: AI</div>" +
       "<div class=\"bn-cell tp\"><div class=\"bn-n\">" + m.TP + "</div><div class=\"bn-t\">TP — AI yang terindikasi (benar)</div></div>" +

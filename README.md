@@ -112,9 +112,18 @@ pemilik situs).
 - Endpoint hasil & kalibrasi tidak menerima isi teks; klien memang tidak
   mengirimkannya. Endpoint donasi satu-satunya yang menerima teks, dan itu
   pun hanya dengan label + persetujuan eksplisit pengirim.
-- Situs tidak memakai `localStorage`/`sessionStorage`/`IndexedDB`;
-  penyimpanan peramban hanya Cache API untuk model classifier (opt-in,
-  dapat dihapus pengguna) dan shell PWA.
+- Analisis itu sendiri tidak menyimpan apa pun di peramban. Penyimpanan
+  peramban hanya dipakai untuk dua hal: (1) Cache API bagi model classifier
+  (opt-in, dapat dihapus pengguna) dan shell PWA; (2) fitur **Riwayat
+  Analisis**, yang **opt-in dan nonaktif secara bawaan** — basis datanya
+  bahkan tidak dibuat sebelum pengguna mengaktifkannya. Bila diaktifkan,
+  dua penanda persetujuan kecil disimpan di `localStorage` dan entri
+  riwayat disimpan di `IndexedDB` pada perangkat pengguna sendiri.
+  Persetujuan untuk **metadata** hasil dan persetujuan untuk menyimpan
+  **isi teks dokumen** adalah dua persetujuan yang **terpisah**; teks
+  hanya disimpan bila persetujuan kedua diberikan (dipotong pada 200.000
+  karakter). Riwayat dapat dibuka, diunduh per entri (JSON), dan dihapus
+  per entri atau seluruhnya, dan isinya tidak pernah dikirim ke server.
 - Model classifier diunduh dari Hugging Face (`saksara/ai-text-detector-onnx`)
   oleh peramban pengunjung; Google Drive tidak dipakai untuk menyajikan model.
 
