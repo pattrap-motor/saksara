@@ -22,7 +22,9 @@ function json(res, status, obj) {
 }
 
 async function getAccessToken() {
-  const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN } = process.env;
+  const GOOGLE_CLIENT_ID = (process.env.GOOGLE_CLIENT_ID || '').trim();
+  const GOOGLE_CLIENT_SECRET = (process.env.GOOGLE_CLIENT_SECRET || '').trim();
+  const GOOGLE_REFRESH_TOKEN = (process.env.GOOGLE_REFRESH_TOKEN || '').trim();
   if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET || !GOOGLE_REFRESH_TOKEN) {
     throw new Error('Konfigurasi Google belum lengkap di server');
   }
@@ -38,6 +40,9 @@ async function getAccessToken() {
   });
   const data = await r.json().catch(() => ({}));
   if (!r.ok || !data.access_token) {
+    // Catat alasan ASLI dari Google (tanpa membocorkan kredensial apa pun)
+    // agar kegagalan token bisa didiagnosis dari log Vercel.
+    console.error('Token Google ditolak', r.status, JSON.stringify(data).slice(0, 300));
     throw new Error('Gagal memperoleh akses ke Google Drive');
   }
   return data.access_token;
@@ -57,7 +62,7 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return json(res, 405, { ok: false, error: 'Metode tidak diizinkan' });
   }
-  const sheetId = process.env.HASIL_SHEET_ID;
+  const sheetId = (process.env.HASIL_SHEET_ID || '').trim();
   if (!sheetId) {
     return json(res, 500, { ok: false, error: 'Konfigurasi server belum lengkap (HASIL_SHEET_ID)' });
   }
