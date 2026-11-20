@@ -711,12 +711,16 @@
           <a href="#/posisi">Posisi &amp; Batasan</a>
         </nav>
         <p class="copy">© 2026 Saksara — Dikembangkan oleh Ciptanala Devs</p>
-        <p class="version-line">Versi <strong>v0.9.5-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
+        <p class="version-line">Versi <strong>v0.9.6-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
       </div>
     </footer>
 
     <dialog class="changelog" id="changelog-modal" aria-labelledby="changelog-title">
       <h2 id="changelog-title">Catatan Rilis — Saksara</h2>
+      <h3>v0.9.6-beta — 20 November 2026</h3>
+      <ul>
+        <li><strong>Judul & kepala bab tidak lagi ikut dinilai:</strong> baris judul dokumen, kepala "BAB I/II/…", dan kepala subbab bernomor (mis. "1.1 Latar Belakang") kini <strong>selalu dikeluarkan otomatis dari penilaian</strong> — langsung dari kode, tanpa perlu mencentang apa pun — karena baris-baris itu bukan prosa. Yang dinilai hanya isi tulisan; jumlah baris yang dikeluarkan diumumkan di laporan dan tercetak di PDF.</li>
+      </ul>
       <h3>v0.9.5-beta — 20 November 2026</h3>
       <ul>
         <li><strong>Sinyal waspada</strong> baru di laporan: bila lapis pertama menilai rendah (&lt;35%) tetapi classifier memberi probabilitas AI sangat tinggi (≥85%), kini tampil peringatan mencolok <strong>beserta penjelasan alasannya</strong> dan saran tinjauan manual — skor akhir tidak berubah dan sinyal ini bukan vonis. Peringatan yang sama tercetak di laporan PDF.</li>
@@ -1999,6 +2003,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
            perilaku identik byte dengan sebelumnya. Classifier menerima
            teks tersaring yang sama dengan heuristik. */
         lastExclusion = null;
+        lastHeadingsRemoved = null;
         var exclBox = $("opt-exclude");
         if(exclBox && exclBox.checked){
           var excl = excludeStandardParts(text);
@@ -2006,6 +2011,15 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
             text = excl.text;
             lastExclusion = excl;
           }
+        }
+        /* Judul & kepala bab/subbab: SELALU dikeluarkan (dari kode, tanpa
+           kotak centang) — berjalan SETELAH zona eksklusi agar judul bagian
+           baku tetap menjadi jangkar pemotongan zona di atas. Classifier
+           menerima teks yang sama dengan heuristik. */
+        var heads = stripStructuralHeadings(text);
+        if(heads.lines > 0 && wordsOf(heads.text).length > 0){
+          text = heads.text;
+          lastHeadingsRemoved = heads;
         }
         /* Batas cakupan: hanya 100.000 kata pertama yang dianalisis (teks di
            kotak teks tetap utuh). lastText, lastResult, classifier, dan
@@ -2103,10 +2117,17 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           cb.classList.remove("show");
           cb.innerHTML = "";
         }
-        // catatan zona eksklusi — hanya tampil bila penyaringan benar-benar
-        // membuang sesuatu; tidak pernah diam-diam (lihat excludeStandardParts).
+        // catatan penyaringan — hanya tampil bila penyaringan benar-benar
+        // membuang sesuatu; tidak pernah diam-diam (lihat excludeStandardParts
+        // dan stripStructuralHeadings).
         var eb = $("banner-eksklusi");
-        if(lastExclusion){
+        if(lastHeadingsRemoved && lastExclusion){
+          eb.innerHTML = "<strong>Sebagian teks tidak ikut dinilai:</strong> judul dan kepala bab/subbab selalu dikeluarkan (" + lastHeadingsRemoved.lines + " baris, ±" + fmtNumID(lastHeadingsRemoved.words) + " kata); bagian baku juga dikecualikan (±" + fmtNumID(lastExclusion.excludedWords) + " kata — daftar pustaka, kata pengantar, kutipan, baris tabel, sesuai yang ditemukan). Yang dinilai hanya isi prosa.";
+          eb.classList.add("show");
+        } else if(lastHeadingsRemoved){
+          eb.innerHTML = "<strong>Judul & kepala bab dikeluarkan:</strong> " + lastHeadingsRemoved.lines + " baris judul/kepala bab/subbab (±" + fmtNumID(lastHeadingsRemoved.words) + " kata) tidak ikut dinilai — yang dinilai hanya isi prosa.";
+          eb.classList.add("show");
+        } else if(lastExclusion){
           eb.innerHTML = "<strong>Bagian baku dikecualikan:</strong> ±" + fmtNumID(lastExclusion.excludedWords) + " kata tidak dianalisis (daftar pustaka, kata pengantar, kutipan, baris tabel — sesuai yang ditemukan).";
           eb.classList.add("show");
         } else {
@@ -2324,6 +2345,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           }
           if(res.words < 300) write("Catatan reliabilitas: teks ini hanya " + res.words + " kata (di bawah +/-300 kata) — hasil kurang dapat dipegang; gunakan sebagai petunjuk awal, bukan kesimpulan.", 10, "italic");
           if(lastExclusion) write("Catatan: Bagian baku dikecualikan: ±" + lastExclusion.excludedWords + " kata tidak dianalisis (daftar pustaka, kata pengantar, kutipan, baris tabel — sesuai yang ditemukan).", 10, "italic");
+          if(lastHeadingsRemoved) write("Catatan: Judul dan kepala bab/subbab dikeluarkan dari penilaian: " + lastHeadingsRemoved.lines + " baris (±" + lastHeadingsRemoved.words + " kata) tidak dianalisis - yang dinilai hanya isi prosa.", 10, "italic");
           y += 4;
           write("Mesin & rumus skor", 12, "bold", 1);
           write("Skor Ensemble Heuristik v3: " + pct(res.final) + "%", 10.5);
@@ -2420,6 +2442,77 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
          bagian yang ditemukan. Pengumuman ke pengguna ada di laporan
          (banner-eksklusi) dan laporan PDF — tidak pernah diam-diam. */
       var lastExclusion = null; /* { excludedWords, parts } milik laporan yang tampil, atau null */
+      var lastHeadingsRemoved = null; /* { lines, words } penyaringan judul/kepala bab pada laporan yang tampil, atau null */
+      /* ---------- Judul & kepala bab/subbab: SELALU dikeluarkan ----------
+         Baris judul dokumen, kepala "BAB I/II/…", dan kepala subbab bernomor
+         ("1.1 Latar Belakang") bukanlah prosa — bila ikut dinilai, ritme dan
+         kosakata mereka mengotori skor. Penyaringan ini berjalan dari kode,
+         selalu, tanpa kotak centang; yang dibuang hanya BARIS kepalanya,
+         isi prosa tidak disentuh. Hasilnya diumumkan di laporan
+         (banner-eksklusi) dan laporan PDF — tidak pernah diam-diam.
+         Pengaman: baris kalimat biasa tidak boleh ikut terbuang — kepala
+         bab tidak memuat tanda akhir kalimat, pendek, dan untuk nomor satu
+         tingkat judulnya harus berbentuk Judul (Title Case); daftar bernomor
+         dalam isi (kalimat perintah berhuruf kecil) lolos. */
+      function isTitleCasePhrase(s){
+        var small = { "dan": 1, "di": 1, "ke": 1, "dari": 1, "yang": 1, "untuk": 1, "dalam": 1, "pada": 1, "atau": 1, "sebagai": 1, "dengan": 1, "the": 1, "of": 1, "and": 1, "in": 1, "on": 1 };
+        var ws = String(s || "").trim().split(/\s+/);
+        for(var i = 0; i < ws.length; i++){
+          var w = ws[i];
+          if(!w) continue;
+          if(small[w.toLowerCase()]) continue;
+          if(/^[A-ZÀ-Þ0-9]/.test(w)) continue;
+          return false;
+        }
+        return true;
+      }
+      function stripStructuralHeadings(text){
+        var src = String(text || "");
+        var lines = src.split("\n");
+        function isStructuralHeading(line){
+          var t = String(line || "").trim();
+          if(!t) return false;
+          // (1) kepala BAB: "BAB I", "BAB 1 PENDAHULUAN" — tanpa tanda kalimat
+          if(/^bab\s+([ivxlcdm]{1,6}|\d{1,3})\b/i.test(t) && t.length <= 90 && wordsOf(t).length <= 10 && !/[.!?]/.test(t)) return true;
+          // (2) kepala bernomor: "1.1 Latar Belakang", "2.3.1 Metode Penelitian"
+          var m = t.match(/^(\d+(?:\.\d+){0,3})\.?\s+(\S.*)$/);
+          if(m && t.length <= 80 && wordsOf(t).length <= 10 && !/[.!?,;:]/.test(m[2])){
+            if(m[1].indexOf(".") >= 0) return true; // bertingkat: hampir pasti kepala subbab
+            if(isTitleCasePhrase(m[2])) return true; // satu tingkat: hanya bila berbentuk judul
+          }
+          // (3) kata kunci kepala bab / huruf besar dominan (pola zona eksklusi)
+          return isHeadingLikeLine(t);
+        }
+        var removedLines = 0, removedWords = 0, startIdx = 0;
+        // Blok judul di awal dokumen: sampai 4 baris pendek tanpa tanda baca
+        // kalimat berturut-turut, dan sesudahnya masih ada isi sungguhan.
+        if(lines.length >= 3){
+          var block = [];
+          for(var i = 0; i < lines.length && block.length < 4; i++){
+            var lt = lines[i].trim();
+            if(!lt){ if(block.length) break; continue; }
+            var colonAt = lt.indexOf(":");
+            var punctFree = !/[.!?;,]/.test(lt) && (colonAt < 0 || colonAt <= 14); // "Oleh: …", "NIM: …" tetap baris judul
+            if(lt.length <= 90 && wordsOf(lt).length <= 12 && punctFree) block.push(i);
+            else break;
+          }
+          if(block.length){
+            var restWords = 0;
+            for(var r = block[block.length - 1] + 1; r < lines.length; r++) restWords += wordsOf(lines[r]).length;
+            if(restWords >= 40){
+              block.forEach(function(bi){ removedLines++; removedWords += wordsOf(lines[bi]).length; });
+              startIdx = block[block.length - 1] + 1;
+            }
+          }
+        }
+        var kept = [];
+        for(var n = startIdx; n < lines.length; n++){
+          var ln = lines[n];
+          if(ln.trim() && isStructuralHeading(ln)){ removedLines++; removedWords += wordsOf(ln).length; continue; }
+          kept.push(ln);
+        }
+        return { text: kept.join("\n"), lines: removedLines, words: removedWords };
+      }
       function isHeadingLikeLine(line){
         var t = String(line || "").trim();
         if(!t || t.length > 60) return false;
@@ -2695,6 +2788,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         return "RENDAH";
       }
       async function scoreBatchText(text){
+        text = stripStructuralHeadings(text).text;
         var capped = capAnalysisText(text);
         var res = analyze(capped.text);
         var finalScore = res.final;
