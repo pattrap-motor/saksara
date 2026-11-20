@@ -474,6 +474,21 @@
       .score-card .cap{ opacity:.92; text-shadow:0 1px 3px rgba(6,40,90,.35); }
       .score-card .note{ text-shadow:0 1px 2px rgba(6,40,90,.30); }
       .meter-scale{ opacity:.95; text-shadow:0 1px 2px rgba(6,40,90,.40); }
+      /* ---------- filter penanda kalimat & akordeon classifier (v0.9.13) ---------- */
+      .hl-tools{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:2px 0 12px; }
+      .hl-tools .ft{ font-size:12.5px; font-weight:700; color:var(--muted); margin-right:2px; }
+      .hl-tools button{ min-height:34px; padding:6px 13px; font-size:13px; border-radius:999px; }
+      .hl-tools button.on{ background:var(--navy); color:#fff; border-color:var(--navy); }
+      .hl-text .sent{ transition:opacity .2s ease, background-color .2s ease; }
+      .hl-text[data-filter="r"] .sent:not(.r), .hl-text[data-filter="y"] .sent:not(.y), .hl-text[data-filter="ry"] .sent.g{ opacity:.25; }
+      .pdf-actions{ display:flex; gap:8px; flex-wrap:wrap; }
+      details.clf-more{ margin-top:10px; }
+      details.clf-more > summary{ cursor:pointer; font-size:13.5px; font-weight:700; color:var(--gold-ink); list-style:none; display:inline-block; }
+      details.clf-more > summary::-webkit-details-marker{ display:none; }
+      details.clf-more > summary::after{ content:" ▾"; }
+      details.clf-more[open] > summary::after{ content:" ▴"; }
+      details.clf-more > summary:focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
+      details.clf-more p{ font-size:13.5px; color:var(--muted); margin:8px 0 0; line-height:1.65; }
       @media (prefers-reduced-motion: reduce){
         [data-view]:not([hidden]){ animation:none; }
         .strip-stat:hover, .step:hover, .posisi-card:hover, .stat:hover, .chip:hover{ transform:none; }
@@ -585,7 +600,8 @@
                 <button type="button" id="btn-clf">Aktifkan Penguat AI (±280 MB)</button>
               </div>
             </div>
-            <p class="clf-desc">Lapis kedua setelah pemeriksaan pola: sebuah <strong>model bahasa multibahasa</strong> yang sudah dilatih untuk membedakan teks manusia dan teks AI, berjalan <strong>sepenuhnya di peramban ini</strong> — tidak ada server yang menilai teks Anda. Berkas modelnya cukup besar (±280 MB) dan <strong>hanya diunduh bila Anda mengaktifkannya</strong> lewat tombol di panel ini — halaman ini <strong>tidak mengunduh apa pun secara otomatis</strong> saat dibuka, agar kuota data dan ruang penyimpanan Anda tetap hemat. Sekali diunduh, model <strong>tersimpan di peramban</strong> untuk kunjungan berikutnya (pengaktifan berikutnya tanpa unduhan), dan bisa dihapus kapan saja lewat tombol “Hapus cache model”. Satu-satunya lalu lintas jaringan hanyalah unduhan berkas model itu; teks yang dianalisis <strong>tidak pernah dikirim ke mana pun</strong>. Selagi model dimuat, halaman tetap berfungsi penuh dengan lapis pertama. Peran model ini adalah <strong>penguat</strong>: ia hanya boleh menaikkan skor bila lapis pertama sudah menemukan indikasi awal — bila tidak, skornya tidak dipakai sama sekali, karena model ini <strong>tidak pernah menuduh sendirian</strong>. Pada dokumen yang sangat panjang, model menilai paling banyak 100 segmen teks yang disebar merata dari seluruh dokumen (30 segmen pada perangkat seluler/hemat). Penanda warna per kalimat tetap berasal dari lapis pertama. <strong>Keterbatasannya, apa adanya:</strong> pada pengujian kami, model ini sangat yakin pada teks AI formal — tetapi sebagian tulisan manusia yang sangat formal dan bergaya ensiklopedis juga dinilainya mirip AI, dan teks AI yang ditulis ulang (parafrase) dengan rapi bisa lolos darinya. Karena bias itulah ia ditempatkan hanya sebagai penguat di belakang lapis pertama.</p>
+            <p class="clf-desc">Lapis kedua setelah pemeriksaan pola: sebuah <strong>model bahasa multibahasa</strong> yang sudah dilatih untuk membedakan teks manusia dan teks AI, berjalan <strong>sepenuhnya di peramban ini</strong> — tidak ada server yang menilai teks Anda. Berkas modelnya cukup besar (±280 MB) dan <strong>hanya diunduh bila Anda mengaktifkannya</strong> lewat tombol di panel ini.</p>
+            <details class="clf-more"><summary>Baca detail teknis &amp; batasan</summary><p>Halaman ini <strong>tidak mengunduh apa pun secara otomatis</strong> saat dibuka, agar kuota data dan ruang penyimpanan Anda tetap hemat. Sekali diunduh, model <strong>tersimpan di peramban</strong> untuk kunjungan berikutnya (pengaktifan berikutnya tanpa unduhan), dan bisa dihapus kapan saja lewat tombol “Hapus cache model”. Satu-satunya lalu lintas jaringan hanyalah unduhan berkas model itu; teks yang dianalisis <strong>tidak pernah dikirim ke mana pun</strong>. Selagi model dimuat, halaman tetap berfungsi penuh dengan lapis pertama. Peran model ini adalah <strong>penguat</strong>: ia hanya boleh menaikkan skor bila lapis pertama sudah menemukan indikasi awal — bila tidak, skornya tidak dipakai sama sekali, karena model ini <strong>tidak pernah menuduh sendirian</strong>. Pada dokumen yang sangat panjang, model menilai paling banyak 100 segmen teks yang disebar merata dari seluruh dokumen (30 segmen pada perangkat seluler/hemat). Penanda warna per kalimat tetap berasal dari lapis pertama. <strong>Keterbatasannya, apa adanya:</strong> pada pengujian kami, model ini sangat yakin pada teks AI formal — tetapi sebagian tulisan manusia yang sangat formal dan bergaya ensiklopedis juga dinilainya mirip AI, dan teks AI yang ditulis ulang (parafrase) dengan rapi bisa lolos darinya. Karena bias itulah ia ditempatkan hanya sebagai penguat di belakang lapis pertama.</p></details>
             <p class="clf-mobile-note">Di HP, classifier berjalan memakai prosesor perangkat dan bisa terasa lambat — penilaian di perangkat seluler dibatasi 30 segmen yang disebar merata dari seluruh dokumen agar tetap ringan, dan Anda dapat membatalkannya kapan saja (skor heuristik tetap tampil). Untuk dokumen sangat panjang, desktop terasa jauh lebih cepat.</p>
             <div class="clf-progress" id="clf-progress" style="display:none;"><div class="clf-progress-fill" id="clf-progress-fill"></div></div>
             <p class="clf-status" id="clf-status" role="status" aria-live="polite">Status classifier: Penguat AI belum diaktifkan — skor saat ini 100% Ensemble Heuristik v3.</p>
@@ -688,6 +704,14 @@
             <span><span class="sw g"></span>Hijau — &lt; 35% (cenderung manusiawi)</span>
             <span>Klik kalimat mana pun untuk melihat bukti penandaannya beserta saran perbaikan.</span>
           </div>
+          <div class="hl-tools" role="group" aria-label="Filter penanda kalimat">
+            <span class="ft">Tampilkan:</span>
+            <button type="button" class="hl-filter on" data-f="all">Semua</button>
+            <button type="button" class="hl-filter" data-f="ry">Terindikasi saja</button>
+            <button type="button" class="hl-filter" data-f="r">Merah saja</button>
+            <button type="button" class="hl-filter" data-f="y">Kuning saja</button>
+            <button type="button" id="btn-lompat">Lompat ke kalimat terindikasi ↓</button>
+          </div>
           <div class="hl-text" id="hl-text"></div>
           <div class="sent-detail" id="sent-detail"></div>
         </details>
@@ -700,7 +724,10 @@
         <div class="pdf-panel">
           <div class="pdf-head">
             <h3>Laporan PDF</h3>
-            <button type="button" id="btn-pdf">Unduh Laporan PDF</button>
+            <span class="pdf-actions">
+              <button type="button" id="btn-salin">Salin Ringkasan</button>
+              <button type="button" id="btn-pdf">Unduh Laporan PDF</button>
+            </span>
           </div>
           <p class="pdf-note">Unduh hasil pemeriksaan ini sebagai berkas PDF bergaya laporan Turnitin: panel skor berwarna, bagian khusus hasil classifier (Lapis 2), rincian ketujuh sinyal dengan warna berbeda per sinyal, keterangan warna, teks lengkap dengan kalimat terindikasi diberi latar warna (frasa khas AI tampil ungu tebal, pola berulang cokelat bergaris bawah), serta skor dan alasan untuk setiap kalimat. PDF dibuat langsung di peramban Anda; pustaka jsPDF dimuat dari CDN hanya saat tombol ini ditekan. Isinya adalah analisis <strong>indikasi AI per kalimat</strong>, bukan laporan kecocokan plagiarisme terhadap basis data. <span id="pdf-status" role="status" aria-live="polite"></span></p>
         </div>
@@ -815,12 +842,18 @@
           <a href="#/posisi">Posisi &amp; Batasan</a>
         </nav>
         <p class="copy">© 2026 Saksara — Dikembangkan oleh Ciptanala Devs</p>
-        <p class="version-line">Versi <strong>v0.9.12-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
+        <p class="version-line">Versi <strong>v0.9.13-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
       </div>
     </footer>
 
     <dialog class="changelog" id="changelog-modal" aria-labelledby="changelog-title">
       <h2 id="changelog-title">Catatan Rilis — Saksara</h2>
+      <h3>v0.9.13-beta — 20 November 2026</h3>
+      <ul>
+        <li><strong>Tombol "Salin Ringkasan"</strong> di panel laporan: menyalin ringkasan teks hasil analisis (skor, putusan, jumlah kata, skor kedua lapis, dan rincian 7 sinyal) untuk ditempel ke catatan, surel, atau LMS.</li>
+        <li><strong>Filter penanda kalimat:</strong> pada panel teks bertanda kini ada penyaring Semua / Terindikasi saja / Merah saja / Kuning saja (kalimat lain diredupkan) dan tombol "Lompat ke kalimat terindikasi" yang berpindah dari satu kalimat terindikasi ke berikutnya.</li>
+        <li><strong>Panel classifier lebih ringkas:</strong> penjelasan panjangnya kini dilipat ke dalam akordeon "Baca detail teknis &amp; batasan" — panel tampil bersih, detail tetap satu ketukan jauhnya.</li>
+      </ul>
       <h3>v0.9.12-beta — 20 November 2026</h3>
       <ul>
         <li><strong>Penguatan keterbacaan tema cerah:</strong> tulisan kecil di kaki halaman kini lebih terang, dan teks-teks kecil di atas gradasi biru (strip atas, keterangan kartu skor, label skala meter) diberi bayangan halus agar tetap jelas terbaca di layar HP maupun di bawah cahaya terang.</li>
@@ -2930,6 +2963,67 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       }
 
       $("btn-pdf").addEventListener("click", function(){ downloadPdfReport(); });
+      /* ---------- filter & lompat penanda kalimat (v0.9.13) ---------- */
+      (function(){
+        var hlText = $("hl-text"); if(!hlText) return;
+        var btns = document.querySelectorAll(".hl-filter");
+        function setFilter(f){
+          if(f === "all") hlText.removeAttribute("data-filter"); else hlText.setAttribute("data-filter", f);
+          for(var i = 0; i < btns.length; i++) btns[i].classList.toggle("on", btns[i].getAttribute("data-f") === f);
+        }
+        for(var i = 0; i < btns.length; i++){
+          (function(b){ b.addEventListener("click", function(){ setFilter(b.getAttribute("data-f")); }); })(btns[i]);
+        }
+        var jumpIdx = -1;
+        var jumpBtn = $("btn-lompat");
+        if(jumpBtn) jumpBtn.addEventListener("click", function(){
+          var targets = hlText.querySelectorAll(".sent.r, .sent.y");
+          if(!targets.length) return;
+          jumpIdx = (jumpIdx + 1) % targets.length;
+          var el = targets[jumpIdx];
+          el.scrollIntoView({ block: "center", behavior: "smooth" });
+          el.click();
+        });
+      })();
+      /* ---------- salin ringkasan hasil (v0.9.13) ---------- */
+      (function(){
+        var btn = $("btn-salin"); if(!btn) return;
+        btn.addEventListener("click", function(){
+          if(!lastResult) return;
+          var lines = [];
+          lines.push("SAKSARA — Ringkasan Hasil Analisis");
+          lines.push("Waktu: " + new Date().toLocaleString("id-ID"));
+          var scoreTxt = $("score-num") ? $("score-num").textContent.trim() : "";
+          var verdictTxt = $("verdict") ? $("verdict").textContent.trim() : "";
+          lines.push("Skor indikasi AI: " + scoreTxt + " (" + verdictTxt + ")");
+          lines.push("Jumlah kata: " + ($("st-kata") ? $("st-kata").textContent.trim() : String(lastResult.words)));
+          lines.push("Lapis 1 — Ensemble Heuristik v3: " + Math.round(lastResult.final * 100) + "%");
+          if(lastClfScore !== null && lastClfScore !== undefined){
+            lines.push("Lapis 2 — Classifier: " + Math.round(lastClfScore * 100) + "%" + (lastClfApplied ? " (diterapkan sebagai penguat bersyarat)" : " (tidak diterapkan — gerbang heuristik belum terbuka)"));
+          } else {
+            lines.push("Lapis 2 — Classifier: tidak diaktifkan");
+          }
+          if(lastWatchSignal) lines.push("SINYAL WASPADA: heuristik rendah tetapi classifier sangat yakin — periksa manual.");
+          lines.push("Rincian 7 sinyal:");
+          var sigs = document.querySelectorAll(".signals .sig");
+          for(var i = 0; i < sigs.length; i++){
+            var n = sigs[i].querySelector(".sig-name"), p = sigs[i].querySelector(".sig-pct");
+            if(n && p) lines.push("- " + n.textContent.trim() + ": " + p.textContent.trim());
+          }
+          lines.push("Catatan: skor ini indikasi statistik, bukan bukti. https://saksara.vercel.app");
+          var text = lines.join("\n");
+          function done(){ btn.textContent = "Tersalin ✓"; setTimeout(function(){ btn.textContent = "Salin Ringkasan"; }, 2200); }
+          function fallback(){
+            var ta = document.createElement("textarea");
+            ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+            document.body.appendChild(ta); ta.select();
+            try { if(document.execCommand("copy")) done(); } catch(e){ /* abaikan */ }
+            document.body.removeChild(ta);
+          }
+          if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fallback);
+          else fallback();
+        });
+      })();
 
       /* ---------- Zona eksklusi: bagian baku yang tidak ikut dinilai ----------
          Menyaring SALINAN teks (kotak teks tidak pernah diubah) dari bagian
