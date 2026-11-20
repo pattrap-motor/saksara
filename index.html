@@ -693,6 +693,7 @@
             <button type="button" id="btn-bersihkan">Bersihkan</button>
             <button type="button" class="primary" id="btn-analisis">Analisis teks</button>
           </div>
+          <p class="det-note">Skor yang dihasilkan adalah <strong>indikasi statistik</strong> dari pola teks — <strong>bukan bukti mutlak kepengarangan</strong>. Gunakan sebagai bahan pemeriksaan dan klarifikasi, bukan vonis.</p>
           <div class="clf-panel" id="clf-panel">
             <div class="clf-head">
               <div class="clf-title">Mesin Classifier — model terlatih, berjalan lokal di peramban</div>
@@ -946,12 +947,16 @@
           <a href="#/posisi">Posisi &amp; Batasan</a>
         </nav>
         <p class="copy">© 2026 Saksara — Dikembangkan oleh Ciptanala Devs</p>
-        <p class="version-line">Versi <strong>v0.9.14-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
+        <p class="version-line">Versi <strong>v0.10.0-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
       </div>
     </footer>
 
     <dialog class="changelog" id="changelog-modal" aria-labelledby="changelog-title">
       <h2 id="changelog-title">Catatan Rilis — Saksara</h2>
+      <h3>v0.10.0-beta — 20 November 2026</h3>
+      <ul>
+        <li><strong>Dashboard &amp; halaman Detector:</strong> tampilan kini berbentuk dasbor SaaS — sidebar navigasi di desktop, halaman Detector tersendiri untuk analisis + laporan + batch, kartu akses cepat di Beranda, panel "Aktivitas sesi ini" (ringkasan analisis sesi berjalan, tanpa penyimpanan apa pun), dan panel status perangkat. Mesin, skor, dan kalibrasi <strong>tidak berubah sama sekali</strong> — pembaruan ini murni tampilan dan navigasi.</li>
+      </ul>
       <h3>v0.9.14-beta — 20 November 2026</h3>
       <ul>
         <li><strong>Paragraf "Batas &amp; cakupan" dilipat:</strong> di bawah panel classifier kini tampil satu baris ringkas (Maks. 20 MB / 100.000 kata · disarankan min. ±300 kata); penjelasan lengkapnya pindah ke akordeon "Baca batas &amp; cakupan lengkap". Area analisis jadi jauh lebih ringkas, terutama di ponsel.</li>
