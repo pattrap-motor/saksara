@@ -244,6 +244,15 @@
       .telemetry p{ margin:0; font-size:13.5px; color:var(--muted); line-height:1.6; }
       .telemetry-btns{ display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; }
       .telemetry .telemetry-status{ margin-top:10px; font-weight:600; color:var(--ink); }
+      /* ---------- donasi teks (sukarela, DENGAN teks — persetujuan eksplisit) ---------- */
+      .donasi{ margin-top:14px; background:var(--surface); border:1px solid var(--line); border-radius:var(--r-lg); padding:18px 26px; }
+      .donasi h3{ font-size:16.5px; margin:0 0 8px; }
+      .donasi p{ margin:0; font-size:13.5px; color:var(--muted); line-height:1.6; }
+      .donasi-opts{ display:flex; flex-direction:column; gap:8px; margin-top:12px; font-size:14px; }
+      .donasi-opts label{ display:flex; gap:9px; align-items:flex-start; cursor:pointer; line-height:1.5; }
+      .donasi-opts input{ margin-top:3px; accent-color:var(--gold); flex:none; }
+      .donasi-btn{ margin-top:14px; }
+      .donasi .donasi-status{ margin-top:10px; font-weight:600; color:var(--ink); }
       /* ---------- umpan balik (formulir eksternal) ---------- */
       .feedback{ margin-top:14px; background:var(--surface); border:1px solid var(--line); border-radius:var(--r-lg); padding:18px 26px; }
       .feedback p{ margin:0; font-size:13.5px; color:var(--muted); line-height:1.6; }
@@ -593,6 +602,20 @@
           <p class="telemetry-status" id="telemetry-status" role="status" aria-live="polite"></p>
         </div>
 
+        <div class="donasi" id="donasi">
+          <h3>Bantu Model Belajar</h3>
+          <p>Analisis di atas 100% lokal — teks Anda tidak ke mana-mana. Hanya jika Anda menekan tombol sumbang, teks ini dikirim dan disimpan untuk melatih model deteksi Saksara berikutnya. Jangan sumbangkan teks yang memuat data pribadi orang lain. Teks maks ±45.000 karakter.</p>
+          <div class="donasi-opts" role="radiogroup" aria-label="Label teks yang disumbangkan">
+            <label><input type="radio" name="donasi-label" value="manusia" /> Teks ini tulisan manusia</label>
+            <label><input type="radio" name="donasi-label" value="ai" /> Teks ini hasil AI</label>
+          </div>
+          <div class="donasi-opts">
+            <label><input type="checkbox" id="donasi-consent" /> Saya setuju teks ini disimpan dan dipakai untuk melatih model.</label>
+          </div>
+          <button type="button" class="donasi-btn" id="btn-donasi">Sumbangkan Teks</button>
+          <p class="donasi-status" id="donasi-status" role="status" aria-live="polite"></p>
+        </div>
+
         <div class="feedback" id="feedback">
           <p>Menemukan bug, berkas tidak terbaca, atau punya masukan lain di luar soal skor?</p>
           <a class="feedback-btn" href="https://forms.gle/GmtjuWKRAqMp1Jby7" target="_blank" rel="noopener">Laporkan Ketidakakuratan / Beri Masukan</a>
@@ -675,12 +698,17 @@
           <a href="#/posisi">Posisi &amp; Batasan</a>
         </nav>
         <p class="copy">© 2026 Saksara — Dikembangkan oleh Ciptanala Devs</p>
-        <p class="version-line">Versi <strong>v0.9.1-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
+        <p class="version-line">Versi <strong>v0.9.2-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
       </div>
     </footer>
 
     <dialog class="changelog" id="changelog-modal" aria-labelledby="changelog-title">
       <h2 id="changelog-title">Catatan Rilis — Saksara</h2>
+      <h3>v0.9.2-beta — 20 November 2026</h3>
+      <ul>
+        <li>Fitur <strong>"Bantu Model Belajar"</strong>: setelah laporan keluar, Anda dapat menyumbangkan teks yang baru diperiksa — beserta labelnya (tulisan manusia / hasil AI) — untuk melatih model <strong>Saksara Core</strong> berikutnya.</li>
+        <li>Donasi bersifat <strong>sukarela dan butuh persetujuan eksplisit</strong>; tanpa itu, analisis tetap 100% lokal dan teks tidak ke mana-mana, seperti sebelumnya.</li>
+      </ul>
       <h3>v0.9.1-beta — 20 November 2026</h3>
       <ul>
         <li>Navigasi kini <strong>per halaman</strong>: Beranda, Cara Kerja, Metode, dan Posisi &amp; Batasan.</li>
@@ -1961,6 +1989,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           indicatedPct: res.sents.length ? pct(res.flagCount / res.sents.length) : 0, words: res.words };
         renderCompareLine();
         resetTelemetry();
+        resetDonasi();
         // Mode bawaan: skor 100% heuristik v3 — identik dengan sebelum classifier ada.
         applyScore(res.final, false);
         $("engine-line").textContent = "Mesin skor: Ensemble Heuristik v3" + (clfState === "ready" ? " — classifier sedang dihitung…" : (clfState === "loading" ? " (sementara — classifier sedang dimuat; penguatan menyusul otomatis begitu siap)" : " (100% heuristik)"));
@@ -2539,6 +2568,73 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       $("tel-manusia").addEventListener("click", function(){ sendTelemetry("manusia"); });
       $("tel-ai").addEventListener("click", function(){ sendTelemetry("ai"); });
       $("tel-ragu").addEventListener("click", function(){ sendTelemetry("ragu"); });
+
+      /* ---------- Donasi teks (sukarela, DENGAN teks — pengecualian eksplisit) ----------
+         Berbeda dari telemetri di atas: inilah SATU-SATUNYA jalur halaman ini
+         yang mengirim isi teks ke server — dan hanya bila pengunjung memilih
+         label, mencentang persetujuan, lalu menekan tombol sumbang. Teks yang
+         dikirim adalah teks yang dinilai laporan ini (lastText — sudah
+         termasuk penyaringan zona eksklusi dan batas cakupan, BUKAN isi
+         kotak teks yang mungkin sudah diubah sesudahnya), dipotong maks
+         45.000 karakter. Skor mengikuti angka laporan saat tombol ditekan:
+         skor akhir yang tampil, skor heuristik, dan skor classifier (atau
+         null) — semantik yang sama seperti payload telemetri. */
+      var donasiSentFor = null;
+      function resetDonasi(){
+        donasiSentFor = null;
+        var st = $("donasi-status");
+        if(st) st.textContent = "";
+        var btn = $("btn-donasi");
+        if(btn) btn.disabled = false;
+        var consent = $("donasi-consent");
+        if(consent) consent.checked = false;
+        var radios = document.querySelectorAll('input[name="donasi-label"]');
+        for(var i = 0; i < radios.length; i++) radios[i].checked = false;
+      }
+      function sendDonasi(){
+        if(!lastResult || !lastText) return;
+        if(donasiSentFor === lastResult) return;
+        var st = $("donasi-status");
+        var label = null;
+        var radios = document.querySelectorAll('input[name="donasi-label"]');
+        for(var i = 0; i < radios.length; i++){ if(radios[i].checked) label = radios[i].value; }
+        if(!label){ if(st) st.textContent = "Pilih dulu label teksnya."; return; }
+        var consent = $("donasi-consent");
+        if(!consent || !consent.checked){
+          if(st) st.textContent = "Centang dulu persetujuannya — tanpa itu teks tidak dikirim.";
+          return;
+        }
+        var text = lastText.slice(0, 45000);
+        if(text.length < 200){
+          if(st) st.textContent = "Teks ini terlalu pendek untuk disumbangkan (min. 200 karakter).";
+          return;
+        }
+        var scoreEl = $("score-num");
+        var shown = scoreEl ? parseFloat(String(scoreEl.textContent).replace(",", ".")) : NaN;
+        var payload = {
+          label: label,
+          consent: true,
+          text: text,
+          words: lastResult.words,
+          final: isNaN(shown) ? lastResult.final : shown / 100,
+          heur: lastResult.final,
+          clf: (lastClfScore === undefined ? null : lastClfScore)
+        };
+        var btn = $("btn-donasi");
+        if(btn) btn.disabled = true;
+        if(st) st.textContent = "Mengirim…";
+        fetch("/api/donasi", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
+          .then(function(r){
+            if(!r.ok) throw new Error("HTTP " + r.status);
+            donasiSentFor = lastResult;
+            if(st) st.textContent = "Terima kasih — teks tersimpan untuk pelatihan.";
+          })
+          .catch(function(){
+            if(st) st.textContent = "Gagal mengirim sumbangan — periksa koneksi, lalu coba lagi.";
+            if(btn) btn.disabled = false;
+          });
+      }
+      $("btn-donasi").addEventListener("click", sendDonasi);
 
       /* ---------- Periksa Banyak Berkas (batch) ----------
          Memakai ulang ekstraktor + batas kata + analyze() yang sama dengan
