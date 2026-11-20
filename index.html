@@ -1010,6 +1010,7 @@
             <span class="upload-wrap"><span class="upload-visual" aria-hidden="true">Unggah .txt / .docx / .pdf</span><input type="file" id="wf-file" accept=".txt,.docx,.pdf,.doc,text/plain,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-label="Unggah berkas .txt, .docx, atau .pdf" /></span>
             <button type="button" id="wf-clear">Bersihkan</button>
             <button type="button" class="primary" id="wf-btn">Analisis Karakteristik</button>
+            <button type="button" id="wf-pdf">Unduh PDF</button>
           </div>
           <div class="file-status" id="wf-file-status" role="status" aria-live="polite"></div>
           <div class="banner" id="wf-error" role="alert"></div>
@@ -1219,7 +1220,7 @@
           </div>
           <div id="ocr-pages-wrap" hidden>
             <p class="wf-note" id="ocr-page-info"></p>
-            <div class="wf-toolbar">
+            <div class="wf-toolbar" id="ocr-page-controls">
               <label><input type="checkbox" id="ocr-page-all" checked /> Semua halaman</label>
               <label for="ocr-page-list">atau halaman tertentu:</label>
               <input type="text" id="ocr-page-list" placeholder="mis. 1,3,5" size="12" />
@@ -2088,10 +2089,16 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           text = String(text || "");
           var wordCount = wordsOf(text).length;
           if(kind === "pdf" && (wordCount < 30 || looksGarbled(text))){
-            showFileStatus("<strong>Teks dari PDF ini tidak terbaca</strong> — kemungkinan PDF hasil pindai/gambar (butuh OCR) atau font-nya tidak standar. Silakan salin-tempel teksnya langsung ke kotak di atas.", "err");
+            ocrPendingFile = f;
+            showFileStatus("<strong>Teks dari PDF ini tidak terbaca</strong> — kemungkinan PDF hasil pindai/gambar (butuh OCR) atau font-nya tidak standar. Silakan salin-tempel teksnya langsung ke kotak di atas, atau coba baca sebagai gambar: <button type=\"button\" class=\"btn-ghost\" data-ocr-open=\"1\">Buka di OCR</button>", "err");
             return;
           }
           if(!text.trim() || wordCount === 0){
+            if(kind === "pdf"){
+              ocrPendingFile = f;
+              showFileStatus("<strong>Tidak ada teks yang bisa dibaca dari berkas ini.</strong> Bila PDF ini hasil pindai/gambar, OCR dapat membacanya sebagai gambar: <button type=\"button\" class=\"btn-ghost\" data-ocr-open=\"1\">Buka di OCR</button>", "err");
+              return;
+            }
             showFileStatus("<strong>Tidak ada teks yang bisa dibaca dari berkas ini.</strong> Coba berkas lain, atau salin-tempel teksnya langsung ke kotak di atas.", "err");
             return;
           }
@@ -2697,6 +2704,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         var finalPct = pct(score);
         $("score-num").textContent = finalPct;
         dashTrackScore(finalPct);
+        histSaveDetector(finalPct, !!blended);
         $("meter-pin").style.left = finalPct + "%";
         var verdict = $("verdict"), note = $("score-note");
         var suffix = blended ? " Skor akhir ini adalah skor Ensemble Heuristik v3 yang diperkuat classifier terlatih (penguat bersyarat: classifier hanya menaikkan skor bila heuristik sudah menemukan indikasi awal ≥35%)." : "";
@@ -4018,36 +4026,56 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         html += "</tbody></table>";
         box.innerHTML = html;
       }
-      async function processBatch(){
+      async function processBatch(fromRetry){
         if(batchBusy) return;
-        var input = $("batch-input");
-        var files = (input && input.files) ? Array.prototype.slice.call(input.files) : [];
-        if(!files.length){ setBatchProgress("Pilih berkas terlebih dahulu."); return; }
+        if(!batchQueue.length) buildBatchQueue();
+        var hasTodo = batchQueue.some(function(q){ return q.status === "wait" || q.status === "cancel" || (fromRetry && q.status === "err"); });
+        if(!hasTodo){ setBatchProgress("Tidak ada berkas yang menunggu diproses. Pilih berkas terlebih dahulu."); return; }
+        if(!fromRetry){ batchRows = []; }
         batchBusy = true;
+        batchCancel = false;
         $("btn-batch").disabled = true;
-        batchRows = [];
+        $("btn-batch-cancel").style.display = "";
         renderBatchTable();
-        for(var i = 0; i < files.length; i++){
-          var f = files[i];
-          setBatchProgress("Memproses berkas " + (i + 1) + " dari " + files.length + ": " + f.name + "…");
+        for(var i = 0; i < batchQueue.length; i++){
+          var q = batchQueue[i];
+          if(q.status !== "wait" && q.status !== "cancel" && !(fromRetry && q.status === "err")) continue;
+          if(batchCancel){ if(q.status !== "err") q.status = "cancel"; renderBatchQueue(); continue; }
+          q.status = "run";
+          renderBatchQueue();
+          setBatchProgress("Memproses berkas " + (i + 1) + " dari " + batchQueue.length + ": " + q.name + "…");
           // Beri peramban kesempatan menggambar garis kemajuan antarberkas.
           await new Promise(function(r){ setTimeout(r, 0); });
           try{
-            var text = await extractBatchFileText(f);
+            var text = await extractBatchFileText(q.file);
             var wc = wordsOf(text).length;
             if(!text.trim() || wc === 0) throw new Error("Tidak ada teks yang bisa dibaca dari berkas ini.");
-            if((f.name || "").toLowerCase().endsWith(".pdf") && (wc < 30 || looksGarbled(text))) throw new Error("Teks dari PDF ini tidak terbaca — kemungkinan PDF hasil pindai/gambar (butuh OCR).");
+            if((q.name || "").toLowerCase().endsWith(".pdf") && (wc < 30 || looksGarbled(text))) throw new Error("Teks dari PDF ini tidak terbaca — kemungkinan PDF hasil pindai/gambar (butuh OCR).");
             var scored = await scoreBatchText(text);
-            batchRows.push({ name: f.name, words: scored.words, score: scored.score, indicatedPct: scored.indicatedPct, error: null });
+            q.status = "ok";
+            q.reason = "";
+            batchRows.push({ name: q.name, words: scored.words, score: scored.score, indicatedPct: scored.indicatedPct, error: null });
           }catch(e){
-            batchRows.push({ name: f.name, words: null, score: null, indicatedPct: null, error: (e && e.message) ? e.message : String(e) });
+            q.status = "err";
+            q.reason = (e && e.message) ? e.message : String(e);
+            batchRows.push({ name: q.name, words: null, score: null, indicatedPct: null, error: q.reason });
           }
+          renderBatchQueue();
           renderBatchTable();
         }
-        setBatchProgress("Selesai — " + files.length + " berkas diproses.");
-        noteDashBatch(files.length);
+        var doneCount = batchQueue.filter(function(x){ return x.status === "ok" || x.status === "err"; }).length;
+        setBatchProgress(batchCancel ? "Dibatalkan — " + doneCount + " berkas sempat diproses." : "Selesai — " + batchQueue.length + " berkas dalam antrean diproses.");
+        renderBatchSummary();
+        noteDashBatch(batchQueue.length);
+        histSave("batch", batchQueue.length + " berkas", p6BatchSummary(batchRows), null);
         batchBusy = false;
         $("btn-batch").disabled = false;
+        $("btn-batch-cancel").style.display = "none";
+        $("btn-batch-retry").style.display = batchQueue.some(function(x){ return x.status === "err"; }) ? "" : "none";
+        var hasRows = batchRows.length > 0;
+        $("btn-batch-csv").style.display = hasRows ? "" : "none";
+        $("btn-batch-json").style.display = hasRows ? "" : "none";
+        $("btn-batch-pdf").style.display = hasRows ? "" : "none";
       }
       function downloadBatchCsv(){
         if(!batchRows.length) return;
@@ -4476,6 +4504,8 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           if(notes.length){ sb.innerHTML = notes.join(" "); sb.classList.add("show"); }
           else { sb.innerHTML = ""; sb.classList.remove("show"); }
           wfRender(st, cap.text);
+          wfLastRun = { st: st, text: cap.text };
+          histSave("forensik", histTitleOf(cap.text), { words: st.words, ttrPct: (st.lex && typeof st.lex.ttr === "number") ? Math.round(st.lex.ttr * 1000) / 10 : null, sentences: st.sent ? st.sent.count : null }, cap.text);
           res.scrollIntoView({ behavior: "smooth", block: "start" });
         } finally {
           btn.disabled = false;
@@ -4505,7 +4535,8 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         text = String(text || "");
         var wc = wordsOf(text).length;
         if(kind === "pdf" && (wc < 30 || looksGarbled(text))){
-          wfFileStatus("<strong>Teks dari PDF ini tidak terbaca</strong> — kemungkinan PDF hasil pindai/gambar (butuh OCR) atau font-nya tidak standar. Salin-tempel teksnya langsung ke kotak di atas.", "err");
+          ocrPendingFile = f;
+          wfFileStatus("<strong>Teks dari PDF ini tidak terbaca</strong> — kemungkinan PDF hasil pindai/gambar (butuh OCR) atau font-nya tidak standar. Salin-tempel teksnya langsung ke kotak di atas, atau <button type=\"button\" class=\"btn-ghost\" data-ocr-open=\"1\">Buka di OCR</button>", "err");
           return;
         }
         if(!text.trim() || wc === 0){
@@ -4856,6 +4887,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           var R = cmpDiff(capA.text, capB.text);
           var fa = wfAnalyze(capA.text), fb = wfAnalyze(capB.text);
           cmpLast = { R: R, fa: fa, fb: fb, cappedA: capA.capped, cappedB: capB.capped, totalA: capA.totalWords, totalB: capB.totalWords };
+          histSave("compare", histTitleOf(cmpTaA.value), { similarityPct: Math.round(R.similarity * 1000) / 10, wordsA: capA.totalWords, wordsB: capB.totalWords }, null);
           $("cmp-results").hidden = false;
           cmpRender(R, fa, fb);
           cmpSetMode("an");
@@ -4889,7 +4921,8 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         text = String(text || "");
         var wc = wordsOf(text).length;
         if(kind === "pdf" && (wc < 30 || looksGarbled(text))){
-          cmpFileStatus(side, "<strong>Teks dari PDF ini tidak terbaca</strong> — kemungkinan PDF hasil pindai/gambar (butuh OCR) atau font-nya tidak standar. Salin-tempel teksnya langsung.", "err");
+          ocrPendingFile = f;
+          cmpFileStatus(side, "<strong>Teks dari PDF ini tidak terbaca</strong> — kemungkinan PDF hasil pindai/gambar (butuh OCR) atau font-nya tidak standar. Salin-tempel teksnya langsung, atau <button type=\"button\" class=\"btn-ghost\" data-ocr-open=\"1\">Buka di OCR</button>", "err");
           return;
         }
         if(!text.trim() || wc === 0){ cmpFileStatus(side, "<strong>Tidak ada teks yang bisa dibaca dari berkas ini.</strong>", "err"); return; }
@@ -5277,6 +5310,690 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
   });
   window.addEventListener("hashchange", function(){ if((location.hash || "").indexOf("benchmark") >= 0) bnInit(); });
   if((location.hash || "").indexOf("benchmark") >= 0) bnInit();
+
+
+    /* ==================================================================
+       Phase 6 (v0.14.0-beta): Productivity — OCR, Riwayat, Batch 2.0,
+       Report 2.0. Tidak menyentuh mesin deteksi. Seluruh fitur di blok
+       ini opt-in atau lokal; tidak ada unggahan apa pun.
+       ================================================================== */
+
+    /* PROD-CORE-START — fungsi murni (diuji prod-test.cjs) */
+    var P6_BATCH_MAX_FILES = 50;
+    var P6_BATCH_MAX_FILE = 20 * 1024 * 1024; /* samakan dengan MAX_FILE_BYTES */
+    var P6_BATCH_MAX_TOTAL = 100 * 1024 * 1024;
+    var P6_TEXT_MAX = 200000;
+    function p6ValidateBatch(metas){
+      var accepted = [], rejected = [], total = 0;
+      for(var i = 0; i < metas.length; i++){
+        var m = metas[i];
+        if(i >= P6_BATCH_MAX_FILES){ rejected.push({ name: m.name, reason: "Melebihi batas " + P6_BATCH_MAX_FILES + " berkas per batch." }); continue; }
+        if(typeof m.size === "number" && m.size > P6_BATCH_MAX_FILE){ rejected.push({ name: m.name, reason: "Berkas melebihi batas 20 MB per berkas." }); continue; }
+        if(typeof m.size === "number" && total + m.size > P6_BATCH_MAX_TOTAL){ rejected.push({ name: m.name, reason: "Total batch melebihi batas 100 MB." }); continue; }
+        total += (typeof m.size === "number" ? m.size : 0);
+        accepted.push({ name: m.name, size: m.size });
+      }
+      return { accepted: accepted, rejected: rejected, totalBytes: total };
+    }
+    function p6OcrAggregate(pages){
+      var tw = 0, cw = 0, low = [], empty = [];
+      pages.forEach(function(p, i){
+        var w = p.words || 0;
+        tw += w; cw += (p.confidence || 0) * w;
+        if(w === 0) empty.push(i + 1);
+        else if(p.confidence < 60) low.push(i + 1);
+      });
+      return { meanConfidence: tw > 0 ? Math.round((cw / tw) * 10) / 10 : 0, totalWords: tw, lowPages: low, emptyPages: empty };
+    }
+    function p6SanitizeEntry(entry, storeText){
+      var e = { ts: entry.ts, kind: entry.kind, title: entry.title, summary: entry.summary, text: null, textTruncated: false };
+      if(storeText && typeof entry.text === "string" && entry.text){
+        if(entry.text.length > P6_TEXT_MAX){ e.text = entry.text.slice(0, P6_TEXT_MAX); e.textTruncated = true; }
+        else e.text = entry.text;
+      }
+      return e;
+    }
+    function p6BatchSummary(rows){
+      var ok = [], err = 0, bands = { RENDAH: 0, SEDANG: 0, TINGGI: 0 };
+      rows.forEach(function(r){
+        if(r.error){ err++; return; }
+        ok.push(r.score);
+        if(r.score < 0.35) bands.RENDAH++;
+        else if(r.score <= 0.65) bands.SEDANG++;
+        else bands.TINGGI++;
+      });
+      ok.sort(function(a, b){ return a - b; });
+      var mean = ok.length ? ok.reduce(function(a, b){ return a + b; }, 0) / ok.length : null;
+      var median = ok.length ? (ok.length % 2 ? ok[(ok.length - 1) / 2] : (ok[ok.length / 2 - 1] + ok[ok.length / 2]) / 2) : null;
+      return { total: rows.length, ok: ok.length, err: err, mean: mean, median: median, bands: bands };
+    }
+    /* PROD-CORE-END */
+
+    function histTitleOf(text){
+      var t = String(text || "").replace(/\s+/g, " ").trim();
+      return t ? t.slice(0, 60) : "(tanpa judul)";
+    }
+    function p6FmtBytes(n){
+      if(typeof n !== "number") return "—";
+      if(n >= 1048576) return (n / 1048576).toFixed(1).replace(".", ",") + " MB";
+      if(n >= 1024) return Math.round(n / 1024) + " KB";
+      return n + " B";
+    }
+    function p6LoadScript(url){
+      return new Promise(function(resolve, reject){
+        var s = document.createElement("script");
+        s.src = url; s.async = true;
+        s.onload = function(){ resolve(); };
+        s.onerror = function(){ reject(new Error("Gagal memuat " + url)); };
+        document.head.appendChild(s);
+      });
+    }
+
+    /* ---------------- Riwayat (IndexedDB, opt-in) ---------------- */
+    var HIST_LS_ON = "saksara-history-enabled", HIST_LS_TEXT = "saksara-history-text";
+    function histEnabled(){ try { return localStorage.getItem(HIST_LS_ON) === "1"; } catch(e){ return false; } }
+    function histTextAllowed(){ try { return localStorage.getItem(HIST_LS_TEXT) === "1"; } catch(e){ return false; } }
+    var histDbPromise = null;
+    function histDb(){
+      if(histDbPromise) return histDbPromise;
+      histDbPromise = new Promise(function(resolve, reject){
+        var req = indexedDB.open("saksara-history", 1);
+        req.onupgradeneeded = function(){
+          var db = req.result;
+          if(!db.objectStoreNames.contains("entries")) db.createObjectStore("entries", { keyPath: "id", autoIncrement: true });
+        };
+        req.onsuccess = function(){ resolve(req.result); };
+        req.onerror = function(){ histDbPromise = null; reject(req.error); };
+      });
+      return histDbPromise;
+    }
+    function histSave(kind, title, summary, text){
+      if(!histEnabled()) return;
+      var entry = p6SanitizeEntry({ ts: Date.now(), kind: kind, title: title, summary: summary, text: text }, histTextAllowed());
+      histDb().then(function(db){
+        var tx = db.transaction("entries", "readwrite");
+        tx.objectStore("entries").add(entry);
+      }).catch(function(){ /* riwayat gagal diam-diam: analisis tidak boleh terganggu */ });
+    }
+    var histDetTimer = null, histDetPending = null;
+    function histSaveDetector(finalPct, blended){
+      if(!histEnabled()) return;
+      histDetPending = { scorePct: finalPct, blended: blended, text: lastText };
+      if(histDetTimer) clearTimeout(histDetTimer);
+      histDetTimer = setTimeout(function(){
+        var p = histDetPending; histDetPending = null;
+        if(!p || !p.text) return;
+        histSave("detector", histTitleOf(p.text), { scorePct: p.scorePct, blended: p.blended, words: wordsOf(p.text).length }, p.text);
+      }, 2500);
+    }
+    function histAll(){
+      return histDb().then(function(db){
+        return new Promise(function(resolve, reject){
+          var out = [];
+          var req = db.transaction("entries", "readonly").objectStore("entries").openCursor(null, "prev");
+          req.onsuccess = function(){
+            var c = req.result;
+            if(c){ out.push(Object.assign({ id: c.key }, c.value)); c.continue(); }
+            else resolve(out);
+          };
+          req.onerror = function(){ reject(req.error); };
+        });
+      });
+    }
+    function histDeleteOne(id){
+      return histDb().then(function(db){
+        return new Promise(function(resolve){
+          var tx = db.transaction("entries", "readwrite");
+          tx.objectStore("entries").delete(id);
+          tx.oncomplete = function(){ resolve(); };
+          tx.onerror = function(){ resolve(); };
+        });
+      });
+    }
+    function histWipe(){
+      return histDb().then(function(db){
+        return new Promise(function(resolve){
+          var tx = db.transaction("entries", "readwrite");
+          tx.objectStore("entries").clear();
+          tx.oncomplete = function(){ resolve(); };
+          tx.onerror = function(){ resolve(); };
+        });
+      });
+    }
+    var HIST_KIND_LABEL = { detector: "Detector", forensik: "Writing Forensic", compare: "Bandingkan", batch: "Batch" };
+    function histSummaryLine(e){
+      var s = e.summary || {}, parts = [];
+      if(e.kind === "detector") parts.push("Skor " + s.scorePct + "%" + (s.blended ? " (diperkuat classifier)" : "") + " · " + fmtNumID(s.words || 0) + " kata");
+      else if(e.kind === "forensik") parts.push(fmtNumID(s.words || 0) + " kata" + (s.ttrPct != null ? " · TTR " + String(s.ttrPct).replace(".", ",") + "%" : ""));
+      else if(e.kind === "compare") parts.push("Kemiripan " + String(s.similarityPct).replace(".", ",") + "% · " + fmtNumID(s.wordsA || 0) + " vs " + fmtNumID(s.wordsB || 0) + " kata");
+      else if(e.kind === "batch") parts.push((s.ok || 0) + " berhasil, " + (s.err || 0) + " gagal dari " + (s.total || 0) + " berkas");
+      if(e.text) parts.push("teks tersimpan" + (e.textTruncated ? " (terpotong)" : ""));
+      else parts.push("tanpa teks");
+      return parts.join(" · ");
+    }
+    function histRenderState(){
+      var on = histEnabled(), tx = histTextAllowed();
+      var c1 = $("hist-c1"), c2 = $("hist-c2");
+      if(c1) c1.checked = on;
+      if(c2) c2.checked = tx;
+      var st = $("hist-state");
+      if(st) st.textContent = on ? ("Riwayat AKTIF — " + (tx ? "metadata + teks disimpan." : "hanya metadata yang disimpan.")) : "Riwayat NONAKTIF — tidak ada yang disimpan.";
+      if(navigator.storage && navigator.storage.estimate){
+        navigator.storage.estimate().then(function(est){
+          var u = $("hist-usage");
+          if(u && typeof est.usage === "number") u.textContent = "Perkiraan pemakaian penyimpanan situs ini di peramban: " + p6FmtBytes(est.usage) + " (termasuk cache model, bukan hanya riwayat).";
+        }).catch(function(){});
+      }
+      p6DashStorage();
+    }
+    function histRenderList(){
+      var box = $("hist-list"), status = $("hist-list-status");
+      if(!box) return;
+      if(!histEnabled()){ box.innerHTML = "<p class=\"wf-note\">Riwayat nonaktif. Aktifkan lewat persetujuan di atas untuk mulai menyimpan hasil analisis di perangkat ini.</p>"; if(status) status.textContent = ""; return; }
+      histAll().then(function(entries){
+        if(status) status.textContent = entries.length + " entri.";
+        if(!entries.length){ box.innerHTML = "<p class=\"wf-note\">Belum ada entri. Jalankan analisis apa pun — hasilnya akan tersimpan di sini selama riwayat aktif.</p>"; return; }
+        box.innerHTML = entries.map(function(e){
+          var d = new Date(e.ts);
+          return "<div class=\"hist-row\" data-hist-id=\"" + e.id + "\">" +
+            "<div class=\"hist-head\"><span><span class=\"p6-chip run\">" + escapeHtml(HIST_KIND_LABEL[e.kind] || e.kind) + "</span> <span class=\"hist-title\">" + escapeHtml(e.title) + "</span></span>" +
+            "<span class=\"bq-meta\">" + escapeHtml(d.toLocaleString("id-ID")) + "</span></div>" +
+            "<div class=\"hist-sum\">" + escapeHtml(histSummaryLine(e)) + "</div>" +
+            "<div class=\"hist-btns\"><button type=\"button\" class=\"btn-ghost\" data-hist-act=\"open\">Buka</button>" +
+            "<button type=\"button\" class=\"btn-ghost\" data-hist-act=\"dl\">Unduh JSON</button>" +
+            "<button type=\"button\" class=\"btn-ghost\" data-hist-act=\"del\">Hapus</button></div>" +
+            "<div class=\"hist-detail\" hidden></div></div>";
+        }).join("");
+        box._entries = entries;
+      }).catch(function(){
+        box.innerHTML = "<p class=\"wf-note\">Daftar riwayat tidak dapat dibaca (IndexedDB tidak tersedia?).</p>";
+      });
+    }
+    function histRenderAll(){ histRenderState(); histRenderList(); }
+    function p6DashStorage(){
+      var on = histEnabled();
+      var a = $("dash-hist-state"); if(a) a.textContent = on ? "aktif" : "nonaktif";
+      var b = $("dash-storage-state");
+      if(b) b.textContent = on ? (histTextAllowed() ? "Riwayat aktif — metadata & teks, atas persetujuan Anda" : "Riwayat aktif — hanya metadata, atas persetujuan Anda") : "Tidak ada teks yang disimpan";
+    }
+    (function initHistory(){
+      var en = $("hist-enable");
+      if(en) en.addEventListener("click", function(){
+        var c1 = $("hist-c1").checked, c2 = $("hist-c2").checked;
+        try {
+          if(c1){ localStorage.setItem(HIST_LS_ON, "1"); if(c2) localStorage.setItem(HIST_LS_TEXT, "1"); else localStorage.removeItem(HIST_LS_TEXT); }
+          else { localStorage.removeItem(HIST_LS_ON); localStorage.removeItem(HIST_LS_TEXT); }
+        } catch(e){}
+        if(c1) histDb().catch(function(){});
+        histRenderAll();
+      });
+      var dis = $("hist-disable");
+      if(dis) dis.addEventListener("click", function(){
+        if(!confirm("Nonaktifkan riwayat? Penanda persetujuan akan dihapus dari perangkat ini.")) return;
+        var wipe = confirm("Hapus juga seluruh data riwayat yang sudah tersimpan?\\n\\nOK = nonaktifkan DAN hapus data.\\nBatal = nonaktifkan saja, data lama tetap tersimpan (tetapi tidak ditambah).");
+        try { localStorage.removeItem(HIST_LS_ON); localStorage.removeItem(HIST_LS_TEXT); } catch(e){}
+        if(wipe){ histWipe().then(function(){ histRenderAll(); }).catch(function(){ histRenderAll(); }); }
+        else histRenderAll();
+      });
+      var ref = $("hist-refresh"); if(ref) ref.addEventListener("click", histRenderList);
+      var delAll = $("hist-del-all");
+      if(delAll) delAll.addEventListener("click", function(){
+        if(!histEnabled()) return;
+        if(!confirm("Hapus SELURUH entri riwayat di perangkat ini? Tindakan ini tidak dapat dibatalkan.")) return;
+        histWipe().then(histRenderList).catch(function(){});
+      });
+      var cc = $("hist-clear-cache");
+      if(cc) cc.addEventListener("click", function(){
+        var st = $("hist-cache-status");
+        if(!window.caches){ if(st) st.textContent = "Cache API tidak tersedia di peramban ini."; return; }
+        caches.delete("saksara-clf-v1").then(function(had){
+          if(st) st.textContent = had ? "Cache model classifier dihapus. Model akan diunduh ulang bila Anda mengaktifkannya lagi." : "Tidak ada cache model classifier yang tersimpan.";
+          if(typeof dashClfRefresh === "function") dashClfRefresh();
+        }).catch(function(){ if(st) st.textContent = "Penghapusan cache gagal."; });
+      });
+      var list = $("hist-list");
+      if(list) list.addEventListener("click", function(ev){
+        var btn = ev.target && ev.target.closest ? ev.target.closest("[data-hist-act]") : null;
+        if(!btn) return;
+        var row = btn.closest("[data-hist-id]");
+        var id = Number(row.getAttribute("data-hist-id"));
+        var entries = list._entries || [];
+        var e = null;
+        entries.forEach(function(x){ if(x.id === id) e = x; });
+        if(!e) return;
+        var act = btn.getAttribute("data-hist-act");
+        if(act === "del"){
+          if(!confirm("Hapus entri ini?")) return;
+          histDeleteOne(id).then(histRenderList).catch(function(){});
+        } else if(act === "dl"){
+          var blob = new Blob([JSON.stringify(e, null, 2)], { type: "application/json" });
+          var a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = "saksara-riwayat-" + e.id + ".json";
+          document.body.appendChild(a); a.click();
+          setTimeout(function(){ URL.revokeObjectURL(a.href); if(a.remove) a.remove(); }, 400);
+        } else if(act === "open"){
+          var det = row.querySelector(".hist-detail");
+          if(!det.hidden){ det.hidden = true; btn.textContent = "Buka"; return; }
+          var html = "<p class=\"wf-note\">Ringkasan: " + escapeHtml(histSummaryLine(e)) + "</p>";
+          if(e.text){
+            html += "<pre>" + escapeHtml(e.text.slice(0, 4000)) + (e.text.length > 4000 ? "\\n… (pratinjau dipotong; unduh JSON untuk teks lengkap yang tersimpan)" : "") + "</pre>";
+            if(e.kind === "detector") html += "<div class=\"hist-btns\"><button type=\"button\" class=\"btn-primary\" data-hist-load=\"" + e.id + "\">Muat teks ini ke Detector</button></div>";
+          } else {
+            html += "<p class=\"wf-note\">Teks dokumen tidak disimpan untuk entri ini (persetujuan teks tidak aktif saat analisis berjalan) — yang tersimpan hanya metadata di atas.</p>";
+          }
+          det.innerHTML = html;
+          det.hidden = false;
+          btn.textContent = "Tutup";
+          var loadBtn = det.querySelector("[data-hist-load]");
+          if(loadBtn) loadBtn.addEventListener("click", function(){
+            $("input-teks").value = e.text;
+            if(typeof updateCounters === "function") updateCounters();
+            window.location.hash = "#/detector";
+            if(typeof runAnalysis === "function") runAnalysis();
+          });
+        }
+      });
+      p6DashStorage();
+      if((window.location.hash || "").indexOf("/history") >= 0) histRenderAll();
+    })();
+
+    /* ---------------- Batch 2.0: antrean, ringkasan, ekspor ---------------- */
+    var batchQueue = [];
+    var batchCancel = false;
+    function buildBatchQueue(){
+      var input = $("batch-input");
+      var files = (input && input.files) ? Array.prototype.slice.call(input.files) : [];
+      var v = p6ValidateBatch(files.map(function(f){ return { name: f.name, size: f.size }; }));
+      var rejectedByName = {};
+      v.rejected.forEach(function(r){ rejectedByName[r.name] = r.reason; });
+      batchQueue = files.map(function(f){
+        if(rejectedByName[f.name]) return { file: f, name: f.name, size: f.size, status: "invalid", reason: rejectedByName[f.name] };
+        return { file: f, name: f.name, size: f.size, status: "wait", reason: "" };
+      });
+      var note = $("batch-queue-note");
+      if(note){
+        if(!files.length) note.textContent = "";
+        else if(v.rejected.length) note.textContent = v.rejected.length + " berkas ditolak dari antrean: " + v.rejected.map(function(r){ return r.name + " (" + r.reason + ")"; }).join("; ");
+        else note.textContent = files.length + " berkas dalam antrean (" + p6FmtBytes(v.totalBytes) + " total).";
+      }
+      renderBatchQueue();
+    }
+    var BQ_LABEL = { wait: ["Menunggu", ""], invalid: ["Tidak valid", "err"], run: ["Memproses", "run"], ok: ["Selesai", "ok"], err: ["Gagal", "err"], cancel: ["Dibatalkan", ""] };
+    function renderBatchQueue(){
+      var box = $("batch-queue");
+      if(!box) return;
+      if(!batchQueue.length){ box.innerHTML = ""; return; }
+      box.innerHTML = batchQueue.map(function(q, i){
+        var lb = BQ_LABEL[q.status] || [q.status, ""];
+        var right = "<span class=\"p6-chip " + lb[1] + "\">" + lb[0] + "</span>";
+        if(q.status === "wait" && !batchBusy) right += " <button type=\"button\" class=\"btn-ghost\" data-bq-del=\"" + i + "\">Hapus</button>";
+        var meta = p6FmtBytes(q.size) + (q.reason ? " — " + escapeHtml(q.reason) : "");
+        return "<div class=\"bq-row\"><span><span class=\"bq-name\">" + escapeHtml(q.name) + "</span><br /><span class=\"bq-meta\">" + meta + "</span></span><span>" + right + "</span></div>";
+      }).join("");
+    }
+    function renderBatchSummary(){
+      var box = $("batch-summary");
+      if(!box) return;
+      if(!batchRows.length){ box.innerHTML = ""; return; }
+      var s = p6BatchSummary(batchRows);
+      var meanTxt = s.mean == null ? "—" : (Math.round(s.mean * 1000) / 10).toString().replace(".", ",") + "%";
+      var medTxt = s.median == null ? "—" : (Math.round(s.median * 1000) / 10).toString().replace(".", ",") + "%";
+      box.innerHTML = "<div class=\"wf-cards\">" +
+        "<div class=\"wf-stat\"><b>" + s.ok + "/" + s.total + "</b><span>berkas berhasil dinilai</span></div>" +
+        "<div class=\"wf-stat\"><b>" + meanTxt + "</b><span>rata-rata skor</span></div>" +
+        "<div class=\"wf-stat\"><b>" + medTxt + "</b><span>median skor</span></div>" +
+        "<div class=\"wf-stat\"><b>" + s.bands.RENDAH + " / " + s.bands.SEDANG + " / " + s.bands.TINGGI + "</b><span>berkas RENDAH / SEDANG / TINGGI</span></div>" +
+        "</div>" + (s.err ? "<p class=\"wf-note\">" + s.err + " berkas gagal — alasannya tercantum pada tabel; gunakan \\\"Coba Lagi yang Gagal\\\" untuk memproses ulang hanya berkas tersebut.</p>" : "");
+    }
+    (function initBatch6(){
+      var input = $("batch-input");
+      if(input) input.addEventListener("change", buildBatchQueue);
+      var q = $("batch-queue");
+      if(q) q.addEventListener("click", function(ev){
+        var b = ev.target && ev.target.closest ? ev.target.closest("[data-bq-del]") : null;
+        if(!b) return;
+        batchQueue.splice(Number(b.getAttribute("data-bq-del")), 1);
+        renderBatchQueue();
+      });
+      var cancel = $("btn-batch-cancel");
+      if(cancel) cancel.addEventListener("click", function(){ batchCancel = true; setBatchProgress("Membatalkan — berkas yang sedang berjalan diselesaikan, sisanya dilewati…"); });
+      var retry = $("btn-batch-retry");
+      if(retry) retry.addEventListener("click", function(){
+        batchRows = batchRows.filter(function(r){ return !r.error; });
+        renderBatchTable();
+        processBatch(true);
+      });
+      var jb = $("btn-batch-json");
+      if(jb) jb.addEventListener("click", function(){
+        if(!batchRows.length) return;
+        var payload = { generatedAt: new Date().toISOString(), engine: "Ensemble Heuristik v3 (+ classifier bila aktif)", summary: p6BatchSummary(batchRows), rows: batchRows };
+        var blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+        var a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "saksara-batch.json";
+        document.body.appendChild(a); a.click();
+        setTimeout(function(){ URL.revokeObjectURL(a.href); if(a.remove) a.remove(); }, 400);
+      });
+      var pb = $("btn-batch-pdf");
+      if(pb) pb.addEventListener("click", downloadBatchPdf);
+    })();
+
+    /* ---------------- Report 2.0: kit bersama ---------------- */
+    function p6PdfKit(jsPDF, title){
+      var doc = new jsPDF({ unit: "mm", format: "a4" });
+      var W = 210, M = 16, y = 18, lh = 5.6;
+      function line(txt, size, bold){
+        doc.setFont("helvetica", bold ? "bold" : "normal");
+        doc.setFontSize(size || 10.5);
+        doc.setTextColor(0);
+        var parts = doc.splitTextToSize(pdfSafe(txt), W - 2 * M);
+        parts.forEach(function(p){
+          if(y > 278){ doc.addPage(); y = 18; }
+          doc.text(p, M, y);
+          y += lh;
+        });
+      }
+      function gap(h){ y += (h || 3); }
+      function head(){
+        doc.setFont("helvetica", "bold"); doc.setFontSize(16); doc.setTextColor(29, 95, 209);
+        doc.text("Saksara", M, y); y += 8;
+        doc.setTextColor(0);
+        line(title, 13, true);
+        line("Dibuat lokal di peramban · " + new Date().toLocaleString("id-ID") + " · saksara.vercel.app", 9.5);
+        gap(1);
+        doc.setDrawColor(160); doc.line(M, y, W - M, y); gap(5);
+      }
+      function stamp(){
+        var n = doc.getNumberOfPages();
+        for(var i = 1; i <= n; i++){
+          doc.setPage(i);
+          doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(120);
+          doc.text(pdfSafe("Saksara — laporan dibuat lokal di peramban ini. Skor adalah indikasi statistik, bukan bukti kepengarangan."), M, 290);
+          doc.text(i + " / " + n, W - M, 290, { align: "right" });
+        }
+        doc.setTextColor(0);
+      }
+      return { doc: doc, line: line, gap: gap, head: head, stamp: stamp,
+               getY: function(){ return y; }, setY: function(v){ y = v; }, M: M, W: W };
+    }
+    async function downloadBatchPdf(){
+      if(!batchRows.length) return;
+      var btn = $("btn-batch-pdf");
+      btn.disabled = true;
+      try {
+        var jsPDF = await loadJsPdf();
+        var k = p6PdfKit(jsPDF, "Laporan Ringkasan Batch — Saksara");
+        k.head();
+        var s = p6BatchSummary(batchRows);
+        k.line("Ringkasan", 12, true);
+        k.line("Berkas dinilai: " + s.ok + " dari " + s.total + " (" + s.err + " gagal). Rata-rata skor: " + (s.mean == null ? "—" : (Math.round(s.mean * 1000) / 10) + "%") + " · Median: " + (s.median == null ? "—" : (Math.round(s.median * 1000) / 10) + "%") + ". Distribusi pita: RENDAH " + s.bands.RENDAH + " · SEDANG " + s.bands.SEDANG + " · TINGGI " + s.bands.TINGGI + ".");
+        k.gap(2);
+        k.line("Per berkas", 12, true);
+        batchRows.forEach(function(r){
+          if(r.error) k.line("• " + r.name + " — GAGAL: " + r.error, 10);
+          else k.line("• " + r.name + " — " + fmtNumID(r.words) + " kata · skor " + pct(r.score) + "% · " + bandLabelID(r.score) + " · kalimat terindikasi " + r.indicatedPct + "%", 10);
+        });
+        k.gap(2);
+        k.line("Metodologi & keterbatasan", 12, true);
+        k.line("Setiap berkas dinilai dengan Ensemble Heuristik v3 yang sama dengan Detector (tujuh sinyal statistik); bila Penguat AI (classifier) sedang aktif di peramban, penguat bersyarat yang sama ikut diterapkan. Berkas diproses berurutan, sepenuhnya lokal. Skor adalah indikasi statistik atas pola tulisan — bukan bukti kepengarangan, bukan dasar vonis akademik. Teks pendek (di bawah ±300 kata) kurang dapat dipegang; parafrase AI dapat lolos dari kedua lapis.");
+        k.stamp();
+        k.doc.save("saksara-batch.pdf");
+      } catch(e){
+        setBatchProgress("Laporan PDF gagal dibuat: " + (e && e.message ? e.message : e));
+      }
+      btn.disabled = false;
+    }
+    var wfLastRun = null;
+    async function downloadWfPdf(){
+      var st = $("wf-file-status");
+      if(!wfLastRun){ if(st) st.textContent = "Jalankan Analisis Karakteristik terlebih dahulu, lalu unduh laporannya."; return; }
+      var btn = $("wf-pdf");
+      btn.disabled = true;
+      try {
+        var jsPDF = await loadJsPdf();
+        var k = p6PdfKit(jsPDF, "Laporan Writing Forensic — Saksara");
+        k.head();
+        var S = wfLastRun.st;
+        k.line("Ringkasan dokumen", 12, true);
+        k.line(fmtNumID(S.words) + " kata · " + fmtNumID(S.sents) + " kalimat · " + fmtNumID(S.paras) + " paragraf · " + fmtNumID(S.unique) + " kata unik.");
+        k.gap(2);
+        k.line("Metrik karakteristik", 12, true);
+        var rows = document.querySelectorAll("#wf-results table tbody tr");
+        if(rows.length){
+          rows.forEach(function(tr){
+            var tds = tr.querySelectorAll("td");
+            if(tds.length >= 2) k.line("• " + tds[0].textContent.trim() + ": " + tds[1].textContent.trim(), 10);
+          });
+        } else {
+          k.line("• TTR: " + (S.lex ? (Math.round(S.lex.ttr * 1000) / 10) + "%" : "—") + " · Kata transisi: " + (S.transPer100 != null ? S.transPer100 + " per 100 kata" : "—"), 10);
+        }
+        k.gap(2);
+        k.line("Saran penyuntingan", 12, true);
+        var lis = document.querySelectorAll("#wf-suggest li");
+        if(lis.length) lis.forEach(function(li){ k.line("• " + li.textContent.trim(), 10); });
+        else k.line("Tidak ada saran yang terpicu pada ambang aturan saat ini.", 10);
+        k.gap(2);
+        k.line("Metodologi & keterbatasan", 12, true);
+        k.line("Writing Forensic menghitung statistik deskriptif tulisan (keragaman kosakata, distribusi panjang kalimat, konsistensi paragraf, kata transisi, pengulangan) sepenuhnya di peramban. Modul ini BUKAN detektor AI: angka-angkanya bukan bukti siapa penulisnya dan tidak memengaruhi skor Detector. Keragaman rendah atau ritme seragam dapat muncul pada tulisan manusia yang formal; teks di bawah ±300 kata menghasilkan statistik yang mudah berayun.");
+        k.stamp();
+        k.doc.save("saksara-forensik.pdf");
+      } catch(e){
+        if(st) st.textContent = "Laporan PDF gagal dibuat: " + (e && e.message ? e.message : e);
+      }
+      btn.disabled = false;
+    }
+    (function initWfPdf(){
+      var b = $("wf-pdf");
+      if(b) b.addEventListener("click", downloadWfPdf);
+    })();
+
+    /* ---------------- OCR (Tesseract.js + pdf.js, opt-in) ---------------- */
+    var ocrPendingFile = null;
+    var ocrState = { ready: false, enabling: false, worker: null, file: null, isPdf: false, pdfDoc: null, pageCount: 0, imgCanvas: null, busy: false, cancel: false };
+    var OCR_TESS_JS = "https://cdn.jsdelivr.net/npm/tesseract.js@5.0.5/dist/tesseract.min.js";
+    var OCR_TESS_WORKER = "https://cdn.jsdelivr.net/npm/tesseract.js@5.0.5/dist/worker.min.js";
+    var OCR_TESS_CORE = "https://cdn.jsdelivr.net/npm/tesseract.js-core@5.0.0";
+    var OCR_TESS_LANG = "https://tessdata.projectnaptha.com/4.0.0_fast";
+    var OCR_PDFJS = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
+    var OCR_PDFJS_WORKER = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    function ocrStatus(msg){ var el = $("ocr-enable-status"); if(el) el.textContent = msg; }
+    function ocrProgress(msg, frac){
+      var p = $("ocr-progress"); if(p) p.textContent = msg;
+      var f = $("ocr-bar-fill"); if(f && typeof frac === "number") f.style.width = Math.round(frac * 100) + "%";
+    }
+    async function ocrEnsureWorker(){
+      if(ocrState.worker) return ocrState.worker;
+      ocrState.worker = await Tesseract.createWorker("ind+eng", 1, {
+        workerPath: OCR_TESS_WORKER, corePath: OCR_TESS_CORE, langPath: OCR_TESS_LANG,
+        logger: function(m){
+          if(ocrState.busy && m.status === "recognizing text"){
+            var base = ocrState._pageBase || 0, total = ocrState._pageTotal || 1;
+            ocrProgress("Mengenali halaman " + (base + 1) + " dari " + total + " — " + Math.round(m.progress * 100) + "%", (base + m.progress) / total);
+          }
+        }
+      });
+      return ocrState.worker;
+    }
+    async function ocrEnable(){
+      if(ocrState.ready || ocrState.enabling) return;
+      ocrState.enabling = true;
+      var btn = $("ocr-enable"); if(btn) btn.disabled = true;
+      try {
+        ocrStatus("Mengunduh pustaka OCR…");
+        if(!window.Tesseract) await p6LoadScript(OCR_TESS_JS);
+        if(!window.pdfjsLib){
+          await p6LoadScript(OCR_PDFJS);
+          window.pdfjsLib.GlobalWorkerOptions.workerSrc = OCR_PDFJS_WORKER;
+        }
+        ocrStatus("Mengunduh model bahasa (Indonesia + Inggris) & menyiapkan mesin…");
+        await ocrEnsureWorker();
+        ocrState.ready = true;
+        ocrStatus("OCR aktif — unduhan tersimpan di cache peramban; pengenalan berjalan lokal.");
+        $("ocr-work").hidden = false;
+        if(ocrPendingFile){ var f = ocrPendingFile; ocrPendingFile = null; ocrSetFile(f); }
+      } catch(e){
+        ocrStatus("Pengaktifan gagal: " + (e && e.message ? e.message : e) + " — periksa koneksi internet lalu coba lagi.");
+        if(btn) btn.disabled = false;
+      }
+      ocrState.enabling = false;
+    }
+    async function ocrSetFile(f){
+      var st = $("ocr-file-status");
+      ocrState.file = f; ocrState.pdfDoc = null; ocrState.isPdf = false; ocrState.pageCount = 0; ocrState.imgCanvas = null;
+      $("ocr-pages-wrap").hidden = true;
+      if(!f){ if(st) st.textContent = ""; return; }
+      if(typeof f.size === "number" && f.size > MAX_FILE_BYTES){ if(st) st.textContent = "Berkas terlalu besar — batas 20 MB."; ocrState.file = null; return; }
+      var lower = (f.name || "").toLowerCase();
+      try {
+        if(lower.endsWith(".pdf")){
+          var buf = await f.arrayBuffer();
+          var doc = await window.pdfjsLib.getDocument({ data: buf }).promise;
+          ocrState.isPdf = true; ocrState.pdfDoc = doc; ocrState.pageCount = doc.numPages;
+          $("ocr-pages-wrap").hidden = false;
+          $("ocr-page-controls").hidden = false;
+          $("ocr-page-info").textContent = "PDF berisi " + doc.numPages + " halaman. Maksimum 20 halaman diproses per giliran. Pratinjau = halaman pertama yang dipilih.";
+          if(st) st.textContent = "Berkas dimuat: " + f.name + " (" + doc.numPages + " halaman).";
+          await ocrRenderPreview();
+        } else {
+          var bmp = await createImageBitmap(f);
+          var cv = document.createElement("canvas");
+          var scale = Math.min(1, 1600 / bmp.width);
+          cv.width = Math.round(bmp.width * scale); cv.height = Math.round(bmp.height * scale);
+          cv.getContext("2d").drawImage(bmp, 0, 0, cv.width, cv.height);
+          ocrState.imgCanvas = cv;
+          $("ocr-pages-wrap").hidden = false;
+          $("ocr-page-controls").hidden = true;
+          $("ocr-page-info").textContent = "Satu gambar (" + bmp.width + " × " + bmp.height + " px).";
+          var pv = $("ocr-preview");
+          pv.width = cv.width; pv.height = cv.height;
+          pv.getContext("2d").drawImage(cv, 0, 0);
+          if(st) st.textContent = "Berkas dimuat: " + f.name + ".";
+        }
+      } catch(e){
+        if(st) st.textContent = "Berkas tidak dapat dibuka: " + (e && e.message ? e.message : e);
+        ocrState.file = null;
+      }
+    }
+    function ocrSelectedPages(){
+      if(!ocrState.isPdf) return [1];
+      var all = $("ocr-page-all").checked;
+      var raw = ($("ocr-page-list").value || "").trim();
+      var pages = [];
+      if(all || !raw){
+        for(var i = 1; i <= ocrState.pageCount; i++) pages.push(i);
+      } else {
+        raw.split(",").forEach(function(x){
+          var n = parseInt(x, 10);
+          if(n >= 1 && n <= ocrState.pageCount && pages.indexOf(n) < 0) pages.push(n);
+        });
+        pages.sort(function(a, b){ return a - b; });
+      }
+      return pages.slice(0, 20);
+    }
+    async function ocrRenderPreview(){
+      if(!ocrState.isPdf || !ocrState.pdfDoc) return;
+      var pages = ocrSelectedPages();
+      if(!pages.length) return;
+      var page = await ocrState.pdfDoc.getPage(pages[0]);
+      var viewport = page.getViewport({ scale: 1.4 });
+      var pv = $("ocr-preview");
+      pv.width = viewport.width; pv.height = viewport.height;
+      await page.render({ canvasContext: pv.getContext("2d"), viewport: viewport }).promise;
+    }
+    async function ocrRun(){
+      if(ocrState.busy) return;
+      if(!ocrState.ready){ ocrStatus("Aktifkan OCR terlebih dahulu."); return; }
+      if(!ocrState.file){ $("ocr-file-status").textContent = "Pilih berkas terlebih dahulu."; return; }
+      ocrState.busy = true; ocrState.cancel = false;
+      $("ocr-run").disabled = true; $("ocr-cancel").disabled = false;
+      var confEl = $("ocr-conf"); if(confEl) confEl.textContent = "";
+      try {
+        var worker = await ocrEnsureWorker();
+        var results = [];
+        if(ocrState.isPdf){
+          var pages = ocrSelectedPages();
+          ocrState._pageTotal = pages.length;
+          for(var i = 0; i < pages.length; i++){
+            if(ocrState.cancel) break;
+            ocrState._pageBase = i;
+            ocrProgress("Merender halaman " + pages[i] + "…", i / pages.length);
+            var page = await ocrState.pdfDoc.getPage(pages[i]);
+            var viewport = page.getViewport({ scale: 2 });
+            var cv = document.createElement("canvas");
+            cv.width = viewport.width; cv.height = viewport.height;
+            await page.render({ canvasContext: cv.getContext("2d"), viewport: viewport }).promise;
+            var out = await worker.recognize(cv);
+            results.push({ page: pages[i], text: out.data.text || "", confidence: out.data.confidence || 0, words: wordsOf(out.data.text || "").length });
+          }
+        } else {
+          ocrState._pageTotal = 1; ocrState._pageBase = 0;
+          var out1 = await worker.recognize(ocrState.file);
+          results.push({ page: 1, text: out1.data.text || "", confidence: out1.data.confidence || 0, words: wordsOf(out1.data.text || "").length });
+        }
+        var agg = p6OcrAggregate(results);
+        $("ocr-out").value = results.map(function(r){ return r.text.trim(); }).filter(Boolean).join("\n\n");
+        var msg = "Selesai: " + results.length + " halaman, " + fmtNumID(agg.totalWords) + " kata terbaca, kepercayaan rata-rata " + String(agg.meanConfidence).replace(".", ",") + "%.";
+        if(agg.emptyPages.length) msg += " Halaman tanpa kata terbaca: " + agg.emptyPages.join(", ") + ".";
+        if(agg.lowPages.length) msg += " PERINGATAN: kepercayaan rendah (< 60%) pada halaman " + agg.lowPages.join(", ") + " — hasilnya mungkin banyak kesalahan; periksa dengan saksama.";
+        if(ocrState.cancel) msg = "Dibatalkan. " + msg;
+        if(confEl) confEl.textContent = msg;
+        ocrProgress(ocrState.cancel ? "OCR dibatalkan." : "OCR selesai.", 1);
+      } catch(e){
+        if(confEl) confEl.textContent = "OCR gagal: " + (e && e.message ? e.message : e);
+        ocrProgress("OCR gagal.", 0);
+      }
+      ocrState.busy = false;
+      $("ocr-run").disabled = false; $("ocr-cancel").disabled = true;
+    }
+    (function initOcr(){
+      var en = $("ocr-enable"); if(en) en.addEventListener("click", ocrEnable);
+      var fi = $("ocr-file"); if(fi) fi.addEventListener("change", function(){ if(fi.files && fi.files[0]) ocrSetFile(fi.files[0]); });
+      var run = $("ocr-run"); if(run) run.addEventListener("click", ocrRun);
+      var cancel = $("ocr-cancel");
+      if(cancel) cancel.addEventListener("click", function(){
+        ocrState.cancel = true;
+        if(ocrState.worker){ ocrState.worker.terminate(); ocrState.worker = null; }
+        ocrProgress("Membatalkan…", 0);
+      });
+      var pa = $("ocr-page-all"); if(pa) pa.addEventListener("change", ocrRenderPreview);
+      var pl = $("ocr-page-list"); if(pl) pl.addEventListener("change", ocrRenderPreview);
+      var cp = $("ocr-copy");
+      if(cp) cp.addEventListener("click", function(){
+        var t = $("ocr-out").value;
+        if(navigator.clipboard && t) navigator.clipboard.writeText(t);
+      });
+      var dl = $("ocr-dl");
+      if(dl) dl.addEventListener("click", function(){
+        var blob = new Blob([$("ocr-out").value], { type: "text/plain;charset=utf-8" });
+        var a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "saksara-ocr.txt";
+        document.body.appendChild(a); a.click();
+        setTimeout(function(){ URL.revokeObjectURL(a.href); if(a.remove) a.remove(); }, 400);
+      });
+      var td = $("ocr-to-detector");
+      if(td) td.addEventListener("click", function(){
+        var t = $("ocr-out").value;
+        if(!t.trim()){ $("ocr-conf").textContent = "Hasil OCR masih kosong."; return; }
+        $("input-teks").value = t;
+        if(typeof updateCounters === "function") updateCounters();
+        window.location.hash = "#/detector";
+        if(typeof runAnalysis === "function") runAnalysis();
+      });
+      document.addEventListener("click", function(ev){
+        var b = ev.target && ev.target.closest ? ev.target.closest("[data-ocr-open]") : null;
+        if(!b) return;
+        window.location.hash = "#/ocr";
+        if(ocrState.ready && ocrPendingFile){ var f = ocrPendingFile; ocrPendingFile = null; ocrSetFile(f); }
+        else if(!ocrState.ready){ ocrStatus("Berkas Anda sudah disiapkan — aktifkan OCR dengan tombol di atas, berkas akan dimuat otomatis sesudahnya."); }
+      });
+    })();
+    window.addEventListener("hashchange", function(){
+      var h = window.location.hash || "";
+      if(h.indexOf("/history") >= 0) histRenderAll();
+      if(h.indexOf("/ocr") >= 0 && ocrState.ready && ocrPendingFile){ var f = ocrPendingFile; ocrPendingFile = null; ocrSetFile(f); }
+    });
 
     // Router tampilan per halaman (satu berkas): #/home, #/detector, #/cara-kerja, #/metode, #/posisi.
     // Tautan lama (#analisis, #clf-panel, #benchmark, …) tetap didukung lewat peta LEGACY.
