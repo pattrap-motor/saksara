@@ -260,7 +260,7 @@
         <div class="steps">
           <div class="step"><span class="num">SINYAL 1</span><h3>Burstiness</h3><p>Variasi panjang kalimat. Manusia mencampur kalimat 4 kata dan 30 kata; AI cenderung seragam. Diukur dari koefisien variasi (simpangan baku ÷ rata-rata) panjang kalimat.</p></div>
           <div class="step"><span class="num">SINYAL 2</span><h3>Keragaman kosakata</h3><p>Rasio kata unik (type-token ratio) pada jendela bergerak 50 kata, ditambah rasio kata yang hanya muncul sekali (hapax). Kosakata yang itu-itu saja menaikkan skor.</p></div>
-          <div class="step"><span class="num">SINYAL 3</span><h3>Frasa khas AI</h3><p>Kamus diperluas: frasa formulaik Bahasa Indonesia &amp; Inggris, frasa khas LLM modern seperti Gemini (“berikut adalah”, “merupakan salah satu”, “dalam konteks ini”), dan frasa refleksi/birokrasi generik (“menjaga integritas”, “memberikan kontribusi nyata”). Dinilai per kalimat dan — sebagai bukti tingkat dokumen — dari kepadatannya per 100 kata.</p></div>
+          <div class="step"><span class="num">SINYAL 3</span><h3>Frasa khas AI</h3><p>Kamus diperluas: frasa formulaik Bahasa Indonesia &amp; Inggris, frasa khas LLM modern (“berikut adalah”, “merupakan salah satu”, “dalam konteks ini”), dan frasa refleksi/birokrasi generik (“menjaga integritas”, “memberikan kontribusi nyata”). Dinilai per kalimat dan — sebagai bukti tingkat dokumen — dari kepadatannya per 100 kata.</p></div>
           <div class="step"><span class="num">SINYAL 4</span><h3>Stilometri</h3><p>Sidik jari gaya: awalan kalimat yang berulang, panjang paragraf yang terlalu seragam, dan rata-rata kalimat yang betah di rentang khas AI (15–25 kata).</p></div>
           <div class="step"><span class="num">SINYAL 5</span><h3>Sisa Markdown</h3><p>Sisa format mentah dari salinan keluaran AI: tebal <code>**…**</code>, judul <code>##</code>, garis <code>---</code>, kutip <code>&gt;</code>, dan daftar yang terlalu rapi. Teks tugas manusia normal hampir tidak pernah memuat sintaks seperti ini.</p></div>
           <div class="step"><span class="num">SINYAL 6</span><h3>Simetri Paragraf</h3><p>Paragraf-paragraf yang panjang dan jumlah kalimatnya seragam satu sama lain, apalagi diawali pembuka generik (“Selain itu,”, “Selanjutnya,”, “Kesimpulannya,”) — struktur khas teks hasil generate.</p></div>
@@ -299,8 +299,8 @@
               <button type="button" id="ex1">Contoh: Tulisan Manusia<span class="exp">Esai pengalaman magang — diharapkan: indikasi rendah</span></button>
               <button type="button" id="ex2">Contoh: Murni AI<span class="exp">Esai generik teknologi — diharapkan: indikasi tinggi</span></button>
               <button type="button" id="ex3">Contoh: AI Diparafrase<span class="exp">Topik sama, ditulis ulang — diharapkan: pita tengah</span></button>
-              <button type="button" id="ex4">Contoh: Gaya Gemini<span class="exp">AI modern, ritme bervariasi + sisa markdown — diharapkan: indikasi tinggi</span></button>
-              <button type="button" id="ex5">Contoh: Refleksi Generik<span class="exp">Refleksi birokrasi generik, gaya berkas yang dulu lolos — diharapkan: indikasi tinggi</span></button>
+              <button type="button" id="ex4">Contoh: AI Modern<span class="exp">AI modern, ritme bervariasi + sisa markdown — diharapkan: indikasi tinggi</span></button>
+              <button type="button" id="ex5">Contoh: Refleksi Generik<span class="exp">Refleksi birokrasi generik — diharapkan: indikasi tinggi</span></button>
             </div>
           </div>
         </div>
