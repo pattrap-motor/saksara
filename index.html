@@ -394,7 +394,7 @@
               <div class="clf-title">Mesin Classifier — model terlatih, berjalan lokal di peramban</div>
               <button type="button" id="btn-clf">Muat Mesin Classifier</button>
             </div>
-            <p class="clf-desc">Lapis kedua di luar heuristik: model klasifikasi teks AI <strong>multibahasa</strong> (XLM-RoBERTa, di-fine-tune pada korpus HC3) yang <strong>kami konversi sendiri ke format ONNX</strong> dan kami hos di Hugging Face kami (jatjit/veritasai-xlmr-hc3-onnx). Model berjalan <strong>sepenuhnya di peramban ini</strong> memakai onnxruntime-web (tokenizer: transformers.js) — tidak ada server yang menilai teks Anda. Model terkuantisasi (±280 MB termasuk tokenizer) <strong>diunduh sekali secara otomatis di latar belakang</strong> dari Hugging Face saat halaman dibuka, lalu <strong>tersimpan di cache peramban</strong> untuk kunjungan berikutnya; unduhan berkas model itulah satu-satunya lalu lintas jaringan — teks yang dianalisis <strong>tidak pernah dikirim ke mana pun</strong>. Halaman berfungsi penuh dengan heuristik v3 selagi model dimuat. Perannya <strong>penguat bersyarat</strong>, bukan pencampur rata: bila heuristik v3 sudah menemukan indikasi awal (skor ≥ 35%), skor akhir = <strong>heuristik + (1 − heuristik) × classifier × 0,5</strong>; bila heuristik di bawah 35%, classifier <strong>tidak menaikkan skor sama sekali</strong> — ia tidak pernah menuduh sendirian. Penanda warna per kalimat tetap dari heuristik v3. <strong>Keterbatasan, disampaikan apa adanya (terukur pada benchmark Bahasa Indonesia kami):</strong> model ini mengangkat setiap sampel teks AI formal ke probabilitas AI ≈100% — tetapi keempat teks manusia formal bergaya ensiklopedis pada benchmark kami (artikel Wikipedia) juga dinilainya tinggi, dengan skor 0,68–1,00 (dua di antaranya ≈100%), dan teks AI yang diparafrase berat tetap lolos di matanya (≈0%). Justru karena bias “formal = AI” itulah ia digerbang sebagai penguat saja: tulisan manusia formal yang dinilai rendah oleh heuristik tidak akan pernah didongkraknya.</p>
+            <p class="clf-desc">Lapis kedua di luar heuristik: model klasifikasi teks AI <strong>multibahasa</strong> (XLM-RoBERTa, di-fine-tune pada korpus HC3) yang <strong>kami konversi sendiri ke format ONNX</strong> dan kami hos di Hugging Face kami (jatjit/veritasai-xlmr-hc3-onnx). Model berjalan <strong>sepenuhnya di peramban ini</strong> memakai onnxruntime-web (tokenizer: transformers.js) — tidak ada server yang menilai teks Anda. Model terkuantisasi (±280 MB termasuk tokenizer) <strong>diunduh sekali secara otomatis di latar belakang</strong> dari Hugging Face saat halaman dibuka, lalu <strong>tersimpan di cache peramban</strong> untuk kunjungan berikutnya; unduhan berkas model itulah satu-satunya lalu lintas jaringan — teks yang dianalisis <strong>tidak pernah dikirim ke mana pun</strong>. Halaman berfungsi penuh dengan heuristik v3 selagi model dimuat. Perannya <strong>penguat bersyarat</strong>, bukan pencampur rata: bila heuristik v3 sudah menemukan indikasi awal (skor ≥ 35%), skor akhir = <strong>heuristik + (1 − heuristik) × classifier × 0,5</strong>; bila heuristik di bawah 35%, classifier <strong>tidak menaikkan skor sama sekali</strong> — ia tidak pernah menuduh sendirian. Pada dokumen yang sangat panjang, classifier menilai paling banyak 100 segmen pertama teks (±120 ribu karakter). Penanda warna per kalimat tetap dari heuristik v3. <strong>Keterbatasan, disampaikan apa adanya (terukur pada benchmark Bahasa Indonesia kami):</strong> model ini mengangkat setiap sampel teks AI formal ke probabilitas AI ≈100% — tetapi keempat teks manusia formal bergaya ensiklopedis pada benchmark kami (artikel Wikipedia) juga dinilainya tinggi, dengan skor 0,68–1,00 (dua di antaranya ≈100%), dan teks AI yang diparafrase berat tetap lolos di matanya (≈0%). Justru karena bias “formal = AI” itulah ia digerbang sebagai penguat saja: tulisan manusia formal yang dinilai rendah oleh heuristik tidak akan pernah didongkraknya.</p>
             <p class="clf-status" id="clf-status" role="status" aria-live="polite">Status classifier: model akan diunduh di latar belakang — skor saat ini 100% Ensemble Heuristik v3.</p>
           </div>
           <p class="file-note"><strong>Batas &amp; cakupan:</strong> ukuran berkas yang diunggah dibatasi maksimum 20 MB, dan analisis mencakup hingga 100.000 kata pertama dari teks — bila dokumen lebih panjang dari itu, yang dianalisis adalah 100.000 kata pertamanya dan laporan menampilkan catatan pemotongan tersebut secara terbuka (berapa kata total dokumen dan berapa yang dianalisis). Di dalam batas itu, seluruh teks yang terbaca dari berkas akan dianalisis. Dari DOCX dibaca isi utama, tabel, kotak teks, catatan kaki/akhir, komentar, serta header dan footer; dari PDF dibaca lapisan teks dari semua halaman. Agar hasil dapat dipegang, teks disarankan minimal ±300 kata. PDF hasil pindai (gambar) tidak punya lapisan teks sehingga belum bisa dibaca — tempel teksnya langsung. Format .doc lama juga belum didukung; simpan ulang sebagai .docx dari Word/Google Docs. Mesin analisis saat ini adalah <strong>Ensemble Heuristik v3</strong> dengan 7 sinyal — termasuk sisa markdown, simetri paragraf, dan pengulangan frasa — yang dikalibrasi ulang agar dokumen refleksi generik hasil generate AI (kepadatan frasa birokrasi tinggi + pola kata yang dipakai ulang di seluruh dokumen) tertangkap di pita indikasi tinggi, bukan lolos di pita rendah. <strong>Classifier lokal:</strong> model classifier multibahasa (XLM-RoBERTa yang di-fine-tune pada korpus HC3, kami konversi sendiri ke ONNX) diunduh sekali ke peramban ini (±280 MB, lalu tersimpan di cache peramban) dan menilai teks sepenuhnya di perangkat ini — pada mode apa pun, tidak ada teks yang meninggalkan peramban ini. Pada benchmark kami model ini sangat kuat pada teks AI formal Bahasa Indonesia, tetapi juga menandai sebagian tulisan manusia formal/ensiklopedis sebagai AI — karena itu ia hanya dipakai sebagai penguat bersyarat di atas heuristik v3 (tidak pernah menaikkan skor bila heuristik di bawah 35%), dan AI parafrase tetap bisa lolos dari keduanya. Bacalah skor classifier bersama rincian heuristik v3 yang memang dibangun untuk Bahasa Indonesia. Apa pun mesinnya, skor tetap indikasi statistik, bukan bukti.</p>
@@ -1329,6 +1329,7 @@ Secara keseluruhan, modul ini memberikan pemahaman yang mendalam tentang peran d
       var CLF_FILE_SIZES = { "model_quantized.onnx": 438536, "model_quantized.onnx_data-000": 79922689, "model_quantized.onnx_data-001": 6489760, "model_quantized.onnx_data-002": 79999488, "model_quantized.onnx_data-003": 79999488, "model_quantized.onnx_data-004": 32002560 };
       var CLF_TOTAL_BYTES = 0; /* 278.852.521 B — jumlah keenam berkas di atas */
       for(var clfSizeKey in CLF_FILE_SIZES){ CLF_TOTAL_BYTES += CLF_FILE_SIZES[clfSizeKey]; }
+      var MAX_CLF_CHUNKS = 100; /* classifier menilai maks. 100 segmen pertama teks (±120 rb karakter); diumumkan terbuka bila terpicu */
       var clfState = "off"; /* off | loading | ready | error */
       var clfOrt = null;       /* modul onnxruntime-web */
       var clfSession = null;   /* ort.InferenceSession */
@@ -1339,6 +1340,7 @@ Secara keseluruhan, modul ini memberikan pemahaman yang mendalam tentang peran d
       var lastText = "", analysisRunSeq = 0;
       var lastClfScore = null; /* skor classifier (0..1) pada laporan yang tampil, atau null */
       var lastClfApplied = false; /* true bila penguat bersyarat diterapkan pada laporan yang tampil (heuristik ≥ 0,35) */
+      var lastClfTruncated = false; /* true bila skor classifier hanya menilai 100 segmen pertama (dokumen sangat panjang) */
 
       function setClfStatus(msg){ var el = $("clf-status"); if(el) el.textContent = msg; }
       function setClfButton(text, disabled){
@@ -1521,11 +1523,20 @@ Secara keseluruhan, modul ini memberikan pemahaman yang mendalam tentang peran d
         var s = e0 + e1;
         return (clfAiIndex === 0 ? e0 : e1) / s;
       }
-      async function runClassifierScore(text){
+      async function runClassifierScore(text, onProgress){
         if(clfState !== "ready" || !clfSession || !clfTokenizer) return null;
         try{
           var chunks = clfChunkText(text);
           if(!chunks.length) return null;
+          // Batas segmen: dokumen raksasa yang lolos batas analisis heuristik
+          // (100 rb kata) tetap bisa berarti ±500 segmen — tanpa batas ini
+          // inferensi WASM berurutan menyandera tab ber menit-menit di CPU
+          // lambat. Classifier cukup menilai 100 segmen pertama (±120 rb
+          // karakter ≈ 20 rb kata, ±25× contoh bawaan terpanjang); rata-rata
+          // dihitung dari segmen yang dinilai, persis seperti sebelumnya, dan
+          // pemotongannya diumumkan terbuka (tanda truncated -> baris mesin).
+          var clfTruncated = chunks.length > MAX_CLF_CHUNKS;
+          if(clfTruncated) chunks = chunks.slice(0, MAX_CLF_CHUNKS);
           var all = [];
           for(var i = 0; i < chunks.length; i++){
             // Umpan manual persis seperti pembuktian: tokenisasi tanpa tensor,
@@ -1544,10 +1555,18 @@ Secara keseluruhan, modul ini memberikan pemahaman yang mendalam tentang peran d
             var logits = Array.from(out[clfSession.outputNames[0]].data);
             var p = clfSoftmaxAI(logits);
             if(p !== null && isFinite(p)) all.push(clamp(p));
+            if(onProgress) onProgress(i + 1, chunks.length);
+            // Jeda macrotask sungguhan sesudah SETIAP segmen: satu inferensi
+            // WASM memblokir utas utama selama hitungan detik, dan await pada
+            // promise yang terselesaikan tidak memberi peramban kesempatan
+            // menggambar — tanpa jeda ini tab tampak macet ("not responding")
+            // selama classifier menggerus segmen demi segmen. Skor tidak
+            // berubah: segmen yang dinilai dan rata-ratanya persis sama.
+            await new Promise(function(r){ setTimeout(r, 0); });
           }
           if(!all.length) return null;
           var sum = all.reduce(function(a, x){ return a + x; }, 0);
-          return { score: sum / all.length, windows: all.length };
+          return { score: sum / all.length, windows: all.length, truncated: clfTruncated };
         }catch(e){ return null; }
       }
       async function applyClassifierToReport(text, res, runId){
@@ -1556,11 +1575,15 @@ Secara keseluruhan, modul ini memberikan pemahaman yang mendalam tentang peran d
         $("pct-clf").textContent = "…";
         $("fill-clf").style.width = "0%";
         $("desc-clf").textContent = "Classifier lokal sedang menilai teks ini di peramban ini (teks dibagi per paragraf menjadi potongan-potongan ±1.200 karakter)…";
-        var r = await runClassifierScore(text);
+        var r = await runClassifierScore(text, function(done, total){
+          if(runId !== analysisRunSeq || lastResult !== res) return; /* laporan sudah digantikan analisis lain */
+          $("engine-line").textContent = "Mesin skor: Ensemble Heuristik v3 — classifier sedang dihitung… (segmen " + done + "/" + total + ")";
+        });
         if(runId !== analysisRunSeq || lastResult !== res) return; /* laporan sudah digantikan analisis lain */
         if(!r){
           lastClfScore = null;
           lastClfApplied = false;
+          lastClfTruncated = false;
           $("pct-clf").textContent = "—";
           $("fill-clf").style.width = "0%";
           $("desc-clf").textContent = "Classifier lokal tidak menghasilkan skor untuk teks ini — skor yang tampil tetap 100% Ensemble Heuristik v3.";
@@ -1568,6 +1591,8 @@ Secara keseluruhan, modul ini memberikan pemahaman yang mendalam tentang peran d
           return;
         }
         lastClfScore = r.score;
+        lastClfTruncated = !!r.truncated;
+        var clfTruncNote = r.truncated ? " (classifier menilai " + MAX_CLF_CHUNKS + " segmen pertama teks)" : "";
         $("pct-clf").textContent = pct(r.score) + "%";
         $("fill-clf").style.width = pct(r.score) + "%";
         // PENGUAT BERSYARAT — aturan gerbang persis: heuristik < 0,35 → skor
@@ -1583,12 +1608,12 @@ Secara keseluruhan, modul ini memberikan pemahaman yang mendalam tentang peran d
           var boosted = res.final + (1 - res.final) * r.score * 0.5;
           $("desc-clf").textContent = "Model " + clfModelId + " (XLM-RoBERTa multibahasa, fine-tune HC3, konversi ONNX kami) — berjalan lokal di peramban ini — menilai rata-rata " + r.windows + " jendela teks: probabilitas kelas AI " + pct(r.score) + "%. Heuristik v3 sudah menemukan indikasi awal (" + pct(res.final) + "% ≥ 35%), jadi classifier MEMPERKUAT skor akhir menjadi " + pct(boosted) + "% — rumus: heuristik + (1 − heuristik) × classifier × 0,5.";
           applyScore(boosted, true);
-          $("engine-line").textContent = "Mesin skor: Heuristik v3 + Penguat Classifier (heuristik murni: " + pct(res.final) + "%, classifier: " + pct(r.score) + "%)";
+          $("engine-line").textContent = "Mesin skor: Heuristik v3 + Penguat Classifier (heuristik murni: " + pct(res.final) + "%, classifier: " + pct(r.score) + "%)" + clfTruncNote;
         } else {
           lastClfApplied = false;
           $("desc-clf").textContent = "Model " + clfModelId + " (XLM-RoBERTa multibahasa, fine-tune HC3, konversi ONNX kami) — berjalan lokal di peramban ini — menilai rata-rata " + r.windows + " jendela teks: probabilitas kelas AI " + pct(r.score) + "%. Skor ini TIDAK menaikkan skor akhir: heuristik v3 hanya menemukan indikasi " + pct(res.final) + "% (di bawah ambang 35%), dan classifier di sini hanya boleh memperkuat indikasi yang sudah ditemukan heuristik — tidak pernah menuduh sendirian. (Terukur pada benchmark kami: model ini juga memberi skor tinggi pada sebagian tulisan manusia yang sangat formal/ensiklopedis — gerbang inilah yang menahannya.) Skor akhir tetap 100% heuristik v3.";
           applyScore(res.final, false);
-          $("engine-line").textContent = "Mesin skor: Ensemble Heuristik v3 (classifier dinilai " + pct(r.score) + "%, ditahan — heuristik di bawah ambang 35%)";
+          $("engine-line").textContent = "Mesin skor: Ensemble Heuristik v3 (classifier dinilai " + pct(r.score) + "%, ditahan — heuristik di bawah ambang 35%)" + clfTruncNote;
         }
       }
 
@@ -1665,6 +1690,7 @@ Secara keseluruhan, modul ini memberikan pemahaman yang mendalam tentang peran d
         lastText = text;
         lastClfScore = null;
         lastClfApplied = false;
+        lastClfTruncated = false;
         var runId = ++analysisRunSeq;
         // Mode bawaan: skor 100% heuristik v3 — identik dengan sebelum classifier ada.
         applyScore(res.final, false);
@@ -1954,6 +1980,7 @@ Secara keseluruhan, modul ini memberikan pemahaman yang mendalam tentang peran d
           write("Skor Ensemble Heuristik v3: " + pct(res.final) + "%", 10.5);
           if(lastClfScore !== null && lastClfScore !== undefined){
             write("Skor classifier (model " + CLF_MODEL_ID + ", berjalan lokal di peramban): " + pct(lastClfScore) + "%", 10.5);
+            if(lastClfTruncated) write("Catatan cakupan classifier: dokumen sangat panjang - classifier menilai " + MAX_CLF_CHUNKS + " segmen pertama teks (maks. +/-120 ribu karakter).", 10.5);
             if(lastClfApplied){
               write("Penguat bersyarat diterapkan (heuristik awal >= 35%): skor akhir = heuristik + (1 - heuristik) x classifier x 0,5.", 10.5);
             } else {
