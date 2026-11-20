@@ -6,7 +6,7 @@
     <meta name="color-scheme" content="light dark" />
     <meta name="description" content="Saksara — deteksi indikasi teks AI untuk siapa saja, dengan laporan per kalimat dan analisis yang berjalan sepenuhnya di peramban." />
     <meta name="author" content="Ciptanala Devs" />
-    <meta name="theme-color" content="#0F2140" />
+    <meta name="theme-color" content="#1D5FD1" />
     <link rel="manifest" href="/manifest.json" />
     <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
     <meta property="og:type" content="website" />
@@ -22,7 +22,7 @@
     <meta name="twitter:title" content="Saksara — Gratis Deteksi Tulisan AI" />
     <meta name="twitter:description" content="Saksara — deteksi indikasi teks AI untuk siapa saja, dengan laporan per kalimat dan analisis yang berjalan sepenuhnya di peramban." />
     <meta name="twitter:image" content="https://saksara.vercel.app/og-image.png" />
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='11' fill='%2316294D'/%3E%3Cpath d='M24 10 L36 14 V24 C36 31 31 36 24 39 C17 36 12 31 12 24 V14 Z' fill='none' stroke='white' stroke-width='2.4'/%3E%3Cpath d='M17.5 24.5 L22 29 L31 19.5' fill='none' stroke='%23C9A227' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='11' fill='%231D5FD1'/%3E%3Cpath d='M24 10 L36 14 V24 C36 31 31 36 24 39 C17 36 12 31 12 24 V14 Z' fill='none' stroke='white' stroke-width='2.4'/%3E%3Cpath d='M17.5 24.5 L22 29 L31 19.5' fill='none' stroke='%2338BDF8' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
     <title>Saksara — Gratis Deteksi Tulisan AI</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -31,10 +31,10 @@
       button, [role="button"], select, summary, input:not([type="checkbox"], [type="radio"]) { min-height: 2rem; }
       * { box-sizing: border-box; }
       :root{
-        --bg:#F4F5F8; --surface:#ffffff; --surface2:#EDF0F5; --ink:#17263F; --muted:#5A6B84;
-        --line:#DCE2EC; --line-soft:#E7ECF3;
-        --navy:#0F2140; --navy2:#1B3461; --navy-ink:#ffffff;
-        --gold:#C9A227; --gold-ink:#7C620E; --gold-soft:#F7ECD0; --accent:#A93226;
+        --bg:#EFF7FF; --surface:#ffffff; --surface2:#E3F0FC; --ink:#14304F; --muted:#4A6B8A;
+        --line:#CFE3F5; --line-soft:#DEEEFB;
+        --navy:#1D5FD1; --navy2:#2F9BE8; --navy-ink:#ffffff;
+        --gold:#38BDF8; --gold-ink:#0369A1; --gold-soft:#E0F2FE; --accent:#A93226;
         --red-bg:#F8D7D2; --red-ink:#7C1D12; --yel-bg:#FBEEc3; --yel-ink:#6D5410;
         --grn-bg:#D5ECD9; --grn-ink:#14532D; --warn-bg:#FDF0D5; --warn-line:#E3B94E; --warn-ink:#6D5410;
         --bar-track:#E4E9F0;
@@ -46,14 +46,14 @@
       }
       @media (prefers-color-scheme: dark){
         :root{
-          --bg:#0B1322; --surface:#152238; --surface2:#1D2D49; --ink:#E9EDF4; --muted:#9DAAC0;
-          --line:#2C3E5C; --line-soft:#24334E;
-          --navy:#0A1830; --navy2:#1B3461; --navy-ink:#ffffff;
-          --gold:#C9A227; --gold-ink:#E3C766; --gold-soft:#3A3013; --accent:#E0786A;
+          --bg:#081C30; --surface:#0F2C47; --surface2:#17395C; --ink:#EAF4FD; --muted:#A9C6DE;
+          --line:#1F4568; --line-soft:#173754;
+          --navy:#06182B; --navy2:#155E9C; --navy-ink:#ffffff;
+          --gold:#38BDF8; --gold-ink:#7DD3FC; --gold-soft:#0C3B57; --accent:#E0786A;
           --red-bg:#5A231C; --red-ink:#FFB4A6; --yel-bg:#57471A; --yel-ink:#F5D97E;
           --grn-bg:#1D4530; --grn-ink:#9FE0B4; --warn-bg:#3D3417; --warn-line:#A8832F; --warn-ink:#F5D97E;
-          --bar-track:#2A3850;
-          --nav-bg:rgba(11,19,34,.88);
+          --bar-track:#1C405F;
+          --nav-bg:rgba(8,28,48,.88);
           --shadow-sm:0 1px 2px rgba(0,0,0,.3);
           --shadow:0 1px 2px rgba(0,0,0,.3), 0 14px 34px rgba(0,0,0,.35);
           --shadow-lg:0 2px 4px rgba(0,0,0,.35), 0 24px 48px rgba(0,0,0,.45);
@@ -89,8 +89,8 @@
       .nav-links a:hover{ color:var(--ink); background:var(--surface2); }
       .nav-links a.active{ color:var(--ink); background:var(--surface2); box-shadow:inset 0 -2px 0 var(--gold); }
       [data-view][hidden]{ display:none !important; }
-      .nav-cta{ flex:none; text-decoration:none; font-size:14px; font-weight:700; color:var(--navy);
-        background:linear-gradient(180deg, #D9B83E, var(--gold)); border:1px solid #B08D1E;
+      .nav-cta{ flex:none; text-decoration:none; font-size:14px; font-weight:700; color:#07304F;
+        background:linear-gradient(180deg, #7DD3FC, var(--gold)); border:1px solid #0284C7;
         padding:9px 18px; border-radius:10px; box-shadow:var(--shadow-sm);
         transition:transform .15s ease, box-shadow .15s ease; }
       .nav-cta:hover{ transform:translateY(-1px); box-shadow:var(--shadow); }
@@ -217,7 +217,7 @@
       .clf-actions{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
       .clf-progress{ margin-top:12px; height:10px; background:var(--bar-track); border-radius:999px; overflow:hidden; }
       .clf-progress-fill{ height:100%; width:0%; border-radius:999px; background:linear-gradient(90deg, var(--navy2), var(--navy)); transition:width .3s ease; }
-      @media (prefers-color-scheme: dark){ .clf-progress-fill{ background:linear-gradient(90deg, var(--gold), #A8832F); } }
+      @media (prefers-color-scheme: dark){ .clf-progress-fill{ background:linear-gradient(90deg, var(--gold), #0284C7); } }
       /* ---------- zona eksklusi (bagian baku) ---------- */
       .opt-exclude{ display:flex; gap:9px; align-items:flex-start; margin-top:12px; font-size:13.5px; color:var(--muted); line-height:1.55; cursor:pointer; }
       .opt-exclude input{ margin-top:3px; width:16px; height:16px; flex:none; accent-color:var(--navy); }
@@ -262,7 +262,7 @@
       .feedback p{ margin:0; font-size:13.5px; color:var(--muted); line-height:1.6; }
       .feedback .feedback-note{ margin-top:8px; font-size:12.5px; }
       .feedback-btn{ display:inline-block; margin-top:12px; padding:10px 18px; border:1.5px solid var(--gold); border-radius:999px; color:var(--gold-ink); font-weight:700; font-size:14px; text-decoration:none; }
-      .feedback-btn:hover{ background:var(--gold); color:#0F2140; }
+      .feedback-btn:hover{ background:var(--gold); color:#07304F; }
       .score-card .engine-line{ font-family:"IBM Plex Mono", monospace; font-size:12.5px; }
       .score-card .sent-summary{ margin-top:16px; border-top:1px solid rgba(255,255,255,.22); padding-top:14px; }
       .score-card .sent-summary .ss-cap{ font-size:12.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--gold); }
@@ -299,7 +299,7 @@
       .sig-pct{ font-family:"IBM Plex Mono", monospace; font-weight:600; font-size:15px; }
       .sig-bar{ height:9px; background:var(--bar-track); border-radius:999px; margin:6px 0 5px; overflow:hidden; }
       .sig-fill{ height:100%; border-radius:999px; background:linear-gradient(90deg, var(--navy2), var(--navy)); width:0%; transition:width .6s ease; }
-      @media (prefers-color-scheme: dark){ .sig-fill{ background:linear-gradient(90deg, var(--gold), #A8832F); } }
+      @media (prefers-color-scheme: dark){ .sig-fill{ background:linear-gradient(90deg, var(--gold), #0284C7); } }
       .sig-desc{ font-size:13.5px; color:var(--muted); margin:0; line-height:1.6; }
       .stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-top:18px; }
       .stat{ background:var(--surface); border:1px solid var(--line); border-radius:var(--r-md); padding:15px 17px; box-shadow:var(--shadow-sm); }
@@ -372,14 +372,14 @@
       .footer-links a:hover{ color:var(--gold); }
       footer.site-footer .copy{ font-size:12.5px; color:#8FA1BC; margin:0; }
       footer.site-footer .version-line{ font-size:12.5px; color:#8FA1BC; margin:6px 0 0; }
-      .changelog-link{ background:none; border:none; padding:0; font:inherit; color:#C9A227; cursor:pointer; text-decoration:underline; text-underline-offset:3px; }
-      .changelog-link:hover{ color:#E3C566; }
-      dialog.changelog{ border:1px solid #2A4470; border-radius:14px; background:#0F2140; color:#E8EDF5; max-width:min(560px, 92vw); padding:26px 28px; box-shadow:0 24px 60px rgba(0,0,0,.45); }
+      .changelog-link{ background:none; border:none; padding:0; font:inherit; color:#38BDF8; cursor:pointer; text-decoration:underline; text-underline-offset:3px; }
+      .changelog-link:hover{ color:#BAE6FD; }
+      dialog.changelog{ border:1px solid #075985; border-radius:14px; background:#0C4A6E; color:#E8EDF5; max-width:min(560px, 92vw); padding:26px 28px; box-shadow:0 24px 60px rgba(0,0,0,.45); }
       dialog.changelog::backdrop{ background:rgba(4,10,22,.66); }
       dialog.changelog h2{ margin:0 0 4px; font-size:20px; }
-      dialog.changelog h3{ margin:18px 0 6px; font-size:14.5px; color:#C9A227; }
+      dialog.changelog h3{ margin:18px 0 6px; font-size:14.5px; color:#7DD3FC; }
       dialog.changelog ul{ margin:0; padding-left:18px; font-size:13.5px; line-height:1.55; color:#C7D2E4; }
-      dialog.changelog .dlg-close{ margin-top:20px; background:#C9A227; color:#0F2140; border:none; border-radius:9px; padding:9px 18px; font-weight:700; cursor:pointer; }
+      dialog.changelog .dlg-close{ margin-top:20px; background:#38BDF8; color:#082F49; border:none; border-radius:9px; padding:9px 18px; font-weight:700; cursor:pointer; }
       /* ---------- penyempurnaan tampilan HP ---------- */
       @media (max-width:900px){
         /* Menu tampilan (Beranda/Cara Kerja/Metode/Posisi & Batasan) TIDAK
@@ -411,7 +411,7 @@
       /* Latar atmosferik: cahaya navy & emas lembut di puncak halaman */
       body{
         background-image:
-          radial-gradient(1100px 480px at 88% -140px, rgba(201,162,39,.14), rgba(201,162,39,0) 60%),
+          radial-gradient(1100px 480px at 88% -140px, rgba(56,189,248,.16), rgba(201,162,39,0) 60%),
           radial-gradient(900px 520px at -12% -100px, rgba(27,52,97,.13), rgba(27,52,97,0) 55%);
         background-repeat:no-repeat;
         background-attachment:fixed;
@@ -419,11 +419,11 @@
       @media (prefers-color-scheme: dark){
         body{
           background-image:
-            radial-gradient(1100px 480px at 88% -140px, rgba(201,162,39,.10), rgba(201,162,39,0) 60%),
+            radial-gradient(1100px 480px at 88% -140px, rgba(56,189,248,.12), rgba(201,162,39,0) 60%),
             radial-gradient(900px 520px at -12% -100px, rgba(110,140,210,.12), rgba(110,140,210,0) 55%);
         }
       }
-      .topbar{ border-bottom:1px solid rgba(201,162,39,.55); }
+      .topbar{ border-bottom:1px solid rgba(56,189,248,.55); }
       /* Panggung hero: pola titik halus yang memudar + cahaya emas */
       header.hero{ position:relative; }
       header.hero::before{ content:""; position:absolute; inset:-14px -8px 0; pointer-events:none;
@@ -433,7 +433,7 @@
         mask-image:linear-gradient(to bottom, #000 30%, transparent 88%); }
       header.hero::after{ content:""; position:absolute; top:-70px; right:-40px; width:340px; height:340px;
         border-radius:50%; pointer-events:none; filter:blur(10px);
-        background:radial-gradient(circle, rgba(201,162,39,.20), rgba(201,162,39,0) 65%); }
+        background:radial-gradient(circle, rgba(56,189,248,.22), rgba(201,162,39,0) 65%); }
       @media (prefers-color-scheme: dark){
         header.hero::before{ background-image:radial-gradient(rgba(233,237,244,.13) 1.1px, transparent 1.2px); }
       }
@@ -450,23 +450,23 @@
       /* Kartu skor: cahaya emas dari sudut + angka lebih berwibawa */
       .score-card{ position:relative; overflow:hidden; }
       .score-card::before{ content:""; position:absolute; inset:0; pointer-events:none;
-        background:radial-gradient(430px 210px at 88% -10px, rgba(201,162,39,.30), rgba(201,162,39,0) 62%); }
+        background:radial-gradient(430px 210px at 88% -10px, rgba(125,211,252,.35), rgba(201,162,39,0) 62%); }
       .score-card > *{ position:relative; }
       .score-num{ text-shadow:0 3px 22px rgba(0,0,0,.35); }
       .meter{ box-shadow:inset 0 1px 3px rgba(0,0,0,.28); }
       .meter .pin{ box-shadow:0 0 0 2px rgba(0,0,0,.25), 0 0 10px rgba(255,255,255,.55); }
       /* Tombol utama: gradasi lebih hidup */
-      .btn-primary{ background:linear-gradient(160deg, #274B85 0%, var(--navy2) 45%, var(--navy) 100%); }
-      .nav-cta{ background:linear-gradient(180deg, #E3C766, var(--gold)); }
-      .nav-cta:hover{ background:linear-gradient(180deg, #EDD27E, #D4AF37); }
+      .btn-primary{ background:linear-gradient(160deg, #38BDF8 0%, var(--navy2) 45%, var(--navy) 100%); }
+      .nav-cta{ background:linear-gradient(180deg, #BAE6FD, var(--gold)); }
+      .nav-cta:hover{ background:linear-gradient(180deg, #E0F2FE, #7DD3FC); }
       textarea{ box-shadow:inset 0 1px 4px rgba(15,33,64,.06); }
       /* Kaki halaman: garis emas penutup */
       footer.site-footer{ border-top:3px solid var(--gold); }
       dialog.changelog::backdrop{ background:rgba(4,10,22,.66); -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px); }
       /* Bilah gulir ramping selaras merek */
-      html{ scrollbar-width:thin; scrollbar-color:#B9A34E var(--bg); }
+      html{ scrollbar-width:thin; scrollbar-color:#38BDF8 var(--bg); }
       ::-webkit-scrollbar{ width:10px; height:10px; }
-      ::-webkit-scrollbar-thumb{ background:#B9A34E; border-radius:8px; border:2px solid var(--bg); }
+      ::-webkit-scrollbar-thumb{ background:#38BDF8; border-radius:8px; border:2px solid var(--bg); }
       ::-webkit-scrollbar-track{ background:var(--bg); }
       @media (prefers-reduced-motion: reduce){
         [data-view]:not([hidden]){ animation:none; }
@@ -501,7 +501,7 @@
     <nav class="site-nav" aria-label="Navigasi utama">
       <div class="wrap nav-inner">
         <a class="nav-brand" href="#atas" aria-label="Saksara — kembali ke atas">
-          <svg width="34" height="34" viewBox="0 0 48 48" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="11" fill="#16294D"/><path d="M24 10 L36 14 V24 C36 31 31 36 24 39 C17 36 12 31 12 24 V14 Z" fill="none" stroke="#ffffff" stroke-width="2.4"/><path d="M17.5 24.5 L22 29 L31 19.5" fill="none" stroke="#C9A227" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg width="34" height="34" viewBox="0 0 48 48" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="11" fill="#1D5FD1"/><path d="M24 10 L36 14 V24 C36 31 31 36 24 39 C17 36 12 31 12 24 V14 Z" fill="none" stroke="#ffffff" stroke-width="2.4"/><path d="M17.5 24.5 L22 29 L31 19.5" fill="none" stroke="#38BDF8" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
           <span><span class="nav-wordmark">Saksara</span></span><span class="nav-tag">Gratis Deteksi Tulisan AI</span></span>
         </a>
         <div class="nav-links">
@@ -516,7 +516,7 @@
     <div class="wrap page">
       <header class="hero" data-view="home">
         <div class="hero-eyebrow">
-          <svg class="brand-logo" width="30" height="30" viewBox="0 0 48 48" role="img" aria-label="Logo Saksara — perisai dengan tanda centang" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="11" fill="#16294D"/><path d="M24 10 L36 14 V24 C36 31 31 36 24 39 C17 36 12 31 12 24 V14 Z" fill="none" stroke="#ffffff" stroke-width="2.4"/><path d="M17.5 24.5 L22 29 L31 19.5" fill="none" stroke="#C9A227" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg class="brand-logo" width="30" height="30" viewBox="0 0 48 48" role="img" aria-label="Logo Saksara — perisai dengan tanda centang" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="11" fill="#1D5FD1"/><path d="M24 10 L36 14 V24 C36 31 31 36 24 39 C17 36 12 31 12 24 V14 Z" fill="none" stroke="#ffffff" stroke-width="2.4"/><path d="M17.5 24.5 L22 29 L31 19.5" fill="none" stroke="#38BDF8" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
           <span class="tagline">Gratis Deteksi Tulisan AI</span>
           <span class="proto-badge">Beta Terbuka</span>
         </div>
@@ -527,10 +527,10 @@
           <a class="btn-ghost" href="#/cara-kerja">Lihat Cara Kerja</a>
         </div>
         <div class="trust-chips" aria-label="Jaminan metode">
-          <span class="chip"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C9A227" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>100% diproses di peramban Anda</span>
-          <span class="chip"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C9A227" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3 8l9 5 9-5-9-5Z"/><path d="M3 13l9 5 9-5"/></svg>7 sinyal heuristik + classifier multibahasa</span>
-          <span class="chip"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C9A227" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>Cara kerja dijelaskan terbuka</span>
-          <span class="chip"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C9A227" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18"/><path d="M5 7l7-4 7 4"/><path d="M3 13l2-6 2 6a3.5 3.5 0 0 1-4 0Z"/><path d="M17 13l2-6 2 6a3.5 3.5 0 0 1-4 0Z"/><path d="M8 21h8"/></svg>Indikasi statistik — bukan vonis</span>
+          <span class="chip"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0284C7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>100% diproses di peramban Anda</span>
+          <span class="chip"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0284C7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3 8l9 5 9-5-9-5Z"/><path d="M3 13l9 5 9-5"/></svg>7 sinyal heuristik + classifier multibahasa</span>
+          <span class="chip"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0284C7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>Cara kerja dijelaskan terbuka</span>
+          <span class="chip"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0284C7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18"/><path d="M5 7l7-4 7 4"/><path d="M3 13l2-6 2 6a3.5 3.5 0 0 1-4 0Z"/><path d="M17 13l2-6 2 6a3.5 3.5 0 0 1-4 0Z"/><path d="M8 21h8"/></svg>Indikasi statistik — bukan vonis</span>
         </div>
         <div class="stats-strip" aria-label="Angka kunci dari benchmark internal">
           <div class="strip-stat"><div class="n">7</div><div class="t">sinyal heuristik — cara kerjanya dijelaskan terbuka di halaman ini</div></div>
@@ -752,22 +752,22 @@
         <p class="sub">Saksara adalah pendamping skrining awal untuk tulisan Bahasa Indonesia — bisa dipakai siapa saja, untuk memeriksa tulisan apa pun: esai, artikel, laporan, dan dokumen lainnya. Metodenya dijelaskan terbuka, privasi Anda utuh, dan batas-batasnya disampaikan apa adanya. Empat hal berikut menentukan posisinya:</p>
         <div class="posisi-grid">
           <div class="posisi-card">
-            <div class="card-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7C620E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div>
+            <div class="card-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0369A1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div>
             <h3>Alat skrining awal, bukan pemeriksa plagiarisme</h3>
             <p>Saksara tidak memiliki basis data naskah atau repositori dokumen untuk membandingkan kemiripan teks, dan tidak berusaha menirunya. Kekuatan alat ini adalah kecepatan, metode yang terbuka, dan ketersediaannya untuk pemeriksaan mandiri oleh siapa pun — penulis yang ingin memeriksa tulisannya sendiri sebelum diterbitkan, editor, maupun pembaca yang ingin berhati-hati.</p>
           </div>
           <div class="posisi-card">
-            <div class="card-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7C620E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18"/><path d="M5 7l7-4 7 4"/><path d="M3 13l2-6 2 6a3.5 3.5 0 0 1-4 0Z"/><path d="M17 13l2-6 2 6a3.5 3.5 0 0 1-4 0Z"/><path d="M8 21h8"/></svg></div>
+            <div class="card-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0369A1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18"/><path d="M5 7l7-4 7 4"/><path d="M3 13l2-6 2 6a3.5 3.5 0 0 1-4 0Z"/><path d="M17 13l2-6 2 6a3.5 3.5 0 0 1-4 0Z"/><path d="M8 21h8"/></svg></div>
             <h3>Probabilistik, bukan vonis</h3>
             <p>Tidak ada detektor yang tahu pasti asal sebuah teks. Skor di sini adalah indikasi statistik dari pola tulisan: tulisan manusia bisa terindikasi, dan teks AI yang diedit bisa lolos. Gunakan hasil sebagai alasan untuk memeriksa lebih lanjut — menilai isi, proses penulisan, dan pemahaman penulisnya — bukan sebagai satu-satunya dasar keputusan.</p>
           </div>
           <div class="posisi-card">
-            <div class="card-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7C620E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
+            <div class="card-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0369A1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
             <h3>Privasi penuh &amp; tanpa kotak hitam</h3>
             <p>Seluruh analisis — pemeriksaan pola maupun model classifier — berjalan 100% di peramban Anda; teks dan berkas tidak dikirim ke mana pun. Satu-satunya unduhan dari jaringan adalah berkas model classifier itu sendiri (±280 MB) — dan ia hanya diunduh bila Anda mengaktifkannya lewat tombol di panel analisis; sesudahnya ia tersimpan di peramban Anda dan bisa dihapus kapan saja dari panel yang sama. Cara kerja dan batasan alat ini dijelaskan terbuka di halaman ini.</p>
           </div>
           <div class="posisi-card">
-            <div class="card-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7C620E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h9"/><path d="M8.5 3v2c0 3.5-2.3 6.8-4.5 8.5"/><path d="M6 8.5c1 2.3 3.3 4.8 6 6"/><path d="m12.5 21 4.5-10 4.5 10"/><path d="M14.2 17.5h5.6"/></svg></div>
+            <div class="card-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0369A1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h9"/><path d="M8.5 3v2c0 3.5-2.3 6.8-4.5 8.5"/><path d="M6 8.5c1 2.3 3.3 4.8 6 6"/><path d="m12.5 21 4.5-10 4.5 10"/><path d="M14.2 17.5h5.6"/></svg></div>
             <h3>Fokus Bahasa Indonesia</h3>
             <p>Kamus frasa, sinyal gaya, dan penyetelan mesin ini dibangun untuk tulisan Bahasa Indonesia — termasuk tulisan formal dan birokratis — konteks yang sering luput dari detektor berbahasa asing. Model classifier-nya adalah model bahasa multibahasa: terukur kuat pada teks AI formal Bahasa Indonesia, tetapi terbukti pula bisa menilai tulisan manusia yang sangat formal sebagai mirip AI; keterbatasan itu ditulis apa adanya, dan karena itu classifier hanya menjadi penguat di belakang lapis pertama, bukan penentu tunggal.</p>
           </div>
@@ -795,7 +795,7 @@
     <footer class="site-footer">
       <div class="wrap footer-inner">
         <div class="footer-brand">
-          <svg width="22" height="22" viewBox="0 0 48 48" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="11" fill="#16294D"/><path d="M24 10 L36 14 V24 C36 31 31 36 24 39 C17 36 12 31 12 24 V14 Z" fill="none" stroke="#ffffff" stroke-width="2.4"/><path d="M17.5 24.5 L22 29 L31 19.5" fill="none" stroke="#C9A227" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg width="22" height="22" viewBox="0 0 48 48" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="11" fill="#1D5FD1"/><path d="M24 10 L36 14 V24 C36 31 31 36 24 39 C17 36 12 31 12 24 V14 Z" fill="none" stroke="#ffffff" stroke-width="2.4"/><path d="M17.5 24.5 L22 29 L31 19.5" fill="none" stroke="#38BDF8" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
           <span>Saksara</span>
         </div>
         <p>Saksara — Beta Terbuka deteksi teks AI untuk siapa saja. Skor adalah indikasi statistik, bukan bukti.</p>
@@ -809,12 +809,16 @@
           <a href="#/posisi">Posisi &amp; Batasan</a>
         </nav>
         <p class="copy">© 2026 Saksara — Dikembangkan oleh Ciptanala Devs</p>
-        <p class="version-line">Versi <strong>v0.9.10-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
+        <p class="version-line">Versi <strong>v0.9.11-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
       </div>
     </footer>
 
     <dialog class="changelog" id="changelog-modal" aria-labelledby="changelog-title">
       <h2 id="changelog-title">Catatan Rilis — Saksara</h2>
+      <h3>v0.9.11-beta — 20 November 2026</h3>
+      <ul>
+        <li><strong>Tema warna baru "Langit Cerah":</strong> palet situs diganti dari navy–emas ke biru muda langit yang terang — latar putih kebiruan, gradasi biru cerah pada kartu skor, tombol, dan kaki halaman, serta aksen biru langit di seluruh ikon dan logo. Mode gelap diselaraskan menjadi malam biru. Cara kerja dan skor tidak berubah.</li>
+      </ul>
       <h3>v0.9.10-beta — 20 November 2026</h3>
       <ul>
         <li><strong>Penyegaran tampilan:</strong> latar halaman kini bercahaya lembut navy–emas dengan pola titik halus di panggung utama, kartu-kartu terangkat saat disentuh kursor, kartu skor bercahaya emas dari sudutnya, perpindahan halaman terasa hidup, dan bilah gulir ramping selaras merek. Tidak ada perubahan cara kerja — semua fungsi dan skor persis sama.</li>
@@ -3455,7 +3459,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
   <style>
     .save-panel{ margin-top:18px; border:1px solid var(--line); border-radius:12px; padding:14px 16px; background:var(--surface2); }
     .save-panel p{ margin:0 0 10px; font-size:13px; color:var(--muted); }
-    #btn-simpan-hasil{ background:#16294D; color:#fff; border:1px solid #C9A227; border-radius:10px; padding:10px 16px; font-weight:700; cursor:pointer; }
+    #btn-simpan-hasil{ background:#1D5FD1; color:#fff; border:1px solid #38BDF8; border-radius:10px; padding:10px 16px; font-weight:700; cursor:pointer; }
     #btn-simpan-hasil:disabled{ opacity:.55; cursor:default; }
     #simpan-status{ margin-left:10px; font-size:13px; }
   </style>
