@@ -6,9 +6,12 @@
 - **Kumpulan uji:** 18 teks, ±200–400 kata (lihat `README.md` untuk asal
   setiap sampel)
 - **Pita vonis situs:** RENDAH < 0,35 · SEDANG 0,35–0,65 · TINGGI ≥ 0,65
-- **Regresi 5 contoh kalibrasi bawaan:** semua tetap di pitanya
-  (MANUSIA 0,0859 · AI 0,7714 · PARAFRASE 0,3582 · GEMINI 0,6693 ·
-  REFLEKSI 0,7953)
+- **Regresi 4 contoh kalibrasi bawaan:** semua tetap di pitanya
+  (MANUSIA 0,0859 · AI 0,7714 · PARAFRASE 0,3582 · GEMINI 0,6693).
+  *Catatan 2026-11-20: contoh kalibrasi kelima, REFLEKSI (0,7953 —
+  contoh refleksi birokrasi generik), dihapus dari situs atas permintaan
+  pemilik; set kalibrasi bawaan kini 4 sampel. Angka-angka 18 teks pada
+  tabel di bawah tidak berubah.*
 
 ## Skor per sampel
 
@@ -74,8 +77,9 @@
    pengulangan 4-gram = 0 dan sisa markdown = 0, sehingga dua “dorongan
    bukti gabungan” mesin (yang mensyaratkan pengulangan pola atau markdown
    bertemu kepadatan frasa) tidak pernah menyala. Inilah yang membedakan
-   profil ini dari dokumen refleksi birokrasi (REFLEKSI 0,7953) yang memang
-   menjadi target kalibrasi mesin. Akibat praktisnya: esai AI generik yang
+   profil ini dari dokumen refleksi birokrasi (REFLEKSI 0,7953 — contoh
+   kalibrasi yang dihapus dari situs pada 2026-11-20; lihat catatan di
+   atas) yang memang menjadi target kalibrasi mesin. Akibat praktisnya: esai AI generik yang
    bersih kemungkinan besar tampil sebagai “Campuran — perlu pemeriksaan
    dosen”, bukan “Indikasi AI tinggi”. Ini **kurang tegas, tetapi bukan
    kegagalan deteksi** — tidak satu pun lolos sebagai tulisan manusia.
@@ -105,8 +109,9 @@ Alasan:
 - n per kategori hanya 4–5, dan sampel ai-formal ditulis oleh penulis yang
   sama yang akan menyetel bobotnya — menyetel ulang bobot/ambang global
   dari sampel sekecil dan seterkait itu berisiko *overfitting* dan
-  mengganggu kalibrasi REFLEKSI/GEMINI yang menjadi alasan mesin ini
-  dibangun.
+  mengganggu kalibrasi REFLEKSI (contoh yang telah dihapus dari situs
+  per 2026-11-20; lihat catatan di atas)/GEMINI yang menjadi alasan
+  mesin ini dibangun.
 - Temuan no. 3 membuktikan penyesuaian ambang tidak dapat memperbaiki
   kelemahan terbesar (parafrase) tanpa menciptakan positif palsu baru.
 
