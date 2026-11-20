@@ -397,9 +397,10 @@
             <p class="clf-desc">Lapis kedua di luar heuristik: model klasifikasi teks AI <strong>multibahasa</strong> (XLM-RoBERTa, di-fine-tune pada korpus HC3) yang <strong>kami konversi sendiri ke format ONNX</strong> dan kami hos di Hugging Face kami (jatjit/veritasai-xlmr-hc3-onnx). Model berjalan <strong>sepenuhnya di peramban ini</strong> memakai onnxruntime-web (tokenizer: transformers.js) — tidak ada server yang menilai teks Anda. Model terkuantisasi (±280 MB termasuk tokenizer) <strong>diunduh sekali secara otomatis di latar belakang</strong> dari Hugging Face saat halaman dibuka, lalu <strong>tersimpan di cache peramban</strong> untuk kunjungan berikutnya; unduhan berkas model itulah satu-satunya lalu lintas jaringan — teks yang dianalisis <strong>tidak pernah dikirim ke mana pun</strong>. Halaman berfungsi penuh dengan heuristik v3 selagi model dimuat. Perannya <strong>penguat bersyarat</strong>, bukan pencampur rata: bila heuristik v3 sudah menemukan indikasi awal (skor ≥ 35%), skor akhir = <strong>heuristik + (1 − heuristik) × classifier × 0,5</strong>; bila heuristik di bawah 35%, classifier <strong>tidak menaikkan skor sama sekali</strong> — ia tidak pernah menuduh sendirian. Penanda warna per kalimat tetap dari heuristik v3. <strong>Keterbatasan, disampaikan apa adanya (terukur pada benchmark Bahasa Indonesia kami):</strong> model ini mengangkat setiap sampel teks AI formal ke probabilitas AI ≈100% — tetapi keempat teks manusia formal bergaya ensiklopedis pada benchmark kami (artikel Wikipedia) juga dinilainya tinggi, dengan skor 0,68–1,00 (dua di antaranya ≈100%), dan teks AI yang diparafrase berat tetap lolos di matanya (≈0%). Justru karena bias “formal = AI” itulah ia digerbang sebagai penguat saja: tulisan manusia formal yang dinilai rendah oleh heuristik tidak akan pernah didongkraknya.</p>
             <p class="clf-status" id="clf-status" role="status" aria-live="polite">Status classifier: model akan diunduh di latar belakang — skor saat ini 100% Ensemble Heuristik v3.</p>
           </div>
-          <p class="file-note"><strong>Batas &amp; cakupan:</strong> tidak ada batas maksimum — seluruh teks yang terbaca dari berkas akan dianalisis, berapa pun jumlah kata atau kalimatnya. Dari DOCX dibaca isi utama, tabel, kotak teks, catatan kaki/akhir, komentar, serta header dan footer; dari PDF dibaca lapisan teks dari semua halaman. Agar hasil dapat dipegang, teks disarankan minimal ±300 kata. PDF hasil pindai (gambar) tidak punya lapisan teks sehingga belum bisa dibaca — tempel teksnya langsung. Format .doc lama juga belum didukung; simpan ulang sebagai .docx dari Word/Google Docs. Mesin analisis saat ini adalah <strong>Ensemble Heuristik v3</strong> dengan 7 sinyal — termasuk sisa markdown, simetri paragraf, dan pengulangan frasa — yang dikalibrasi ulang agar dokumen refleksi generik hasil generate AI (kepadatan frasa birokrasi tinggi + pola kata yang dipakai ulang di seluruh dokumen) tertangkap di pita indikasi tinggi, bukan lolos di pita rendah. <strong>Classifier lokal:</strong> model classifier multibahasa (XLM-RoBERTa yang di-fine-tune pada korpus HC3, kami konversi sendiri ke ONNX) diunduh sekali ke peramban ini (±280 MB, lalu tersimpan di cache peramban) dan menilai teks sepenuhnya di perangkat ini — pada mode apa pun, tidak ada teks yang meninggalkan peramban ini. Pada benchmark kami model ini sangat kuat pada teks AI formal Bahasa Indonesia, tetapi juga menandai sebagian tulisan manusia formal/ensiklopedis sebagai AI — karena itu ia hanya dipakai sebagai penguat bersyarat di atas heuristik v3 (tidak pernah menaikkan skor bila heuristik di bawah 35%), dan AI parafrase tetap bisa lolos dari keduanya. Bacalah skor classifier bersama rincian heuristik v3 yang memang dibangun untuk Bahasa Indonesia. Apa pun mesinnya, skor tetap indikasi statistik, bukan bukti.</p>
+          <p class="file-note"><strong>Batas &amp; cakupan:</strong> ukuran berkas yang diunggah dibatasi maksimum 20 MB, dan analisis mencakup hingga 100.000 kata pertama dari teks — bila dokumen lebih panjang dari itu, yang dianalisis adalah 100.000 kata pertamanya dan laporan menampilkan catatan pemotongan tersebut secara terbuka (berapa kata total dokumen dan berapa yang dianalisis). Di dalam batas itu, seluruh teks yang terbaca dari berkas akan dianalisis. Dari DOCX dibaca isi utama, tabel, kotak teks, catatan kaki/akhir, komentar, serta header dan footer; dari PDF dibaca lapisan teks dari semua halaman. Agar hasil dapat dipegang, teks disarankan minimal ±300 kata. PDF hasil pindai (gambar) tidak punya lapisan teks sehingga belum bisa dibaca — tempel teksnya langsung. Format .doc lama juga belum didukung; simpan ulang sebagai .docx dari Word/Google Docs. Mesin analisis saat ini adalah <strong>Ensemble Heuristik v3</strong> dengan 7 sinyal — termasuk sisa markdown, simetri paragraf, dan pengulangan frasa — yang dikalibrasi ulang agar dokumen refleksi generik hasil generate AI (kepadatan frasa birokrasi tinggi + pola kata yang dipakai ulang di seluruh dokumen) tertangkap di pita indikasi tinggi, bukan lolos di pita rendah. <strong>Classifier lokal:</strong> model classifier multibahasa (XLM-RoBERTa yang di-fine-tune pada korpus HC3, kami konversi sendiri ke ONNX) diunduh sekali ke peramban ini (±280 MB, lalu tersimpan di cache peramban) dan menilai teks sepenuhnya di perangkat ini — pada mode apa pun, tidak ada teks yang meninggalkan peramban ini. Pada benchmark kami model ini sangat kuat pada teks AI formal Bahasa Indonesia, tetapi juga menandai sebagian tulisan manusia formal/ensiklopedis sebagai AI — karena itu ia hanya dipakai sebagai penguat bersyarat di atas heuristik v3 (tidak pernah menaikkan skor bila heuristik di bawah 35%), dan AI parafrase tetap bisa lolos dari keduanya. Bacalah skor classifier bersama rincian heuristik v3 yang memang dibangun untuk Bahasa Indonesia. Apa pun mesinnya, skor tetap indikasi statistik, bukan bukti.</p>
           <div class="file-status" id="file-status" role="status" aria-live="polite"></div>
           <div class="banner" id="banner-pendek" role="alert"></div>
+          <div class="banner" id="banner-sibuk" role="status" aria-live="polite"></div>
           <div class="examples">
             <div class="lbl">Contoh uji — klik untuk mengisi &amp; menganalisis langsung</div>
             <div class="row">
@@ -417,6 +418,7 @@
         <div class="kicker">Laporan</div>
         <h2 id="laporan-judul">Laporan hasil</h2>
         <div class="banner" id="banner-report" style="margin:0 0 16px;"></div>
+        <div class="banner" id="banner-cakupan" style="margin:0 0 16px;" role="status"></div>
         <div class="report-grid">
           <div class="score-card">
             <div class="cap">Skor indikasi AI keseluruhan</div>
@@ -1154,7 +1156,37 @@ Secara keseluruhan, modul ini memberikan pemahaman yang mendalam tentang peran d
       window.addEventListener("dragover", function(e){ e.preventDefault(); });
       window.addEventListener("drop", function(e){ e.preventDefault(); });
 
+      /* ---------- batas ukuran berkas & cakupan analisis ----------
+         Tanpa batas, satu berkas .txt ±5 MB (±850 ribu kata) membuat analyze()
+         yang sepenuhnya sinkron memblokir utas utama sampai peramban menyatakan
+         halaman tidak merespons. Karena itu: berkas di atas 20 MB ditolak
+         SEBELUM diurai, dan analisis dibatasi pada 100.000 kata pertama
+         (dipotong tepat pada batas kata) dengan catatan yang tampil terbuka.
+         Teks di kotak teks TIDAK diubah — hanya porsi yang dianalisis yang
+         dibatasi, dan lastText/lastResult/classifier/laporan semuanya memakai
+         porsi yang sama persis. */
+      var MAX_FILE_BYTES = 20 * 1024 * 1024; /* 20 MB */
+      var MAX_ANALYZE_WORDS = 100000;
+      function fmtNumID(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
+      function capAnalysisText(text){
+        var re = /[\p{L}\p{N}']+/gu; /* pola kata yang sama dengan wordsOf() */
+        var m, count = 0, cutEnd = -1;
+        while((m = re.exec(text)) !== null){
+          count++;
+          if(count === MAX_ANALYZE_WORDS){ cutEnd = re.lastIndex; }
+          else if(count > MAX_ANALYZE_WORDS){ break; }
+        }
+        if(count <= MAX_ANALYZE_WORDS) return { text: text, totalWords: count, capped: false };
+        /* totalWords harus JUMLAH SEBENARNYA di seluruh dokumen (untuk catatan
+           yang jujur), bukan hitungan sampai titik potong — hitung penuh di sini. */
+        return { text: text.slice(0, cutEnd), totalWords: wordsOf(text).length, capped: true };
+      }
+
       function handleFile(f){
+        if(f && typeof f.size === "number" && f.size > MAX_FILE_BYTES){
+          showFileStatus("<strong>Berkas terlalu besar</strong> (" + (f.size / 1048576).toFixed(1).replace(".", ",") + " MB) — batas ukuran berkas adalah 20 MB, agar halaman tidak berhenti merespons saat membacanya. Kecilkan dokumennya (misalnya pecah menjadi beberapa bagian), atau tempel bagian teks yang ingin diperiksa langsung ke kotak di atas.", "err");
+          return;
+        }
         var lower = (f.name || "").toLowerCase();
         if(lower.endsWith(".doc") && !lower.endsWith(".docx")){
           showFileStatus("<strong>Format .doc lama tidak didukung</strong> — simpan ulang sebagai .docx dari Word/Google Docs, lalu unggah lagi. Atau salin-tempel teksnya langsung ke kotak di atas.", "err");
@@ -1190,7 +1222,11 @@ Secara keseluruhan, modul ini memberikan pemahaman yang mendalam tentang peran d
           }
           ta.value = text;
           updateCounters();
-          showFileStatus("Berkas dimuat: <span class=\"fname\">" + escapeHtml(f.name) + "</span> — " + wordCount + " kata terbaca, seluruhnya dianalisis.", "ok");
+          if(wordCount > MAX_ANALYZE_WORDS){
+            showFileStatus("Berkas dimuat: <span class=\"fname\">" + escapeHtml(f.name) + "</span> — " + fmtNumID(wordCount) + " kata terbaca; sesuai batas analisis per dokumen, yang dianalisis adalah " + fmtNumID(MAX_ANALYZE_WORDS) + " kata pertama (lihat catatan cakupan pada laporan).", "ok");
+          } else {
+            showFileStatus("Berkas dimuat: <span class=\"fname\">" + escapeHtml(f.name) + "</span> — " + wordCount + " kata terbaca, seluruhnya dianalisis.", "ok");
+          }
           runAnalysis();
         }).catch(function(err){
           if(kind === "docx"){
@@ -1575,6 +1611,24 @@ Secara keseluruhan, modul ini memberikan pemahaman yang mendalam tentang peran d
       }
 
       var lastResult = null;
+      var analysisBusy = false;
+      function setAnalysisBusy(busy){
+        analysisBusy = busy;
+        $("btn-analisis").disabled = busy;
+        $("btn-bersihkan").disabled = busy;
+        $("file-input").disabled = busy;
+        $("btn-upload").classList.toggle("is-busy", busy);
+        $("btn-upload").setAttribute("aria-disabled", busy ? "true" : "false");
+        $("btn-analisis").textContent = busy ? "Menganalisis…" : "Analisis teks";
+        var bb = $("banner-sibuk");
+        if(busy){
+          bb.innerHTML = "<strong>Menganalisis…</strong> Ensemble Heuristik v3 sedang menilai teks — mohon tunggu sebentar.";
+          bb.classList.add("show");
+        } else {
+          bb.classList.remove("show");
+          bb.innerHTML = "";
+        }
+      }
       function runAnalysis(){
         var text = ta.value;
         if(!text.trim() || wordsOf(text).length === 0){
@@ -1584,6 +1638,28 @@ Secara keseluruhan, modul ini memberikan pemahaman yang mendalam tentang peran d
           ta.focus();
           return;
         }
+        if(analysisBusy) return;
+        /* Keadaan sibuk dipasang dulu dan diberi kesempatan DILUKIS peramban
+           (requestAnimationFrame + setTimeout) sebelum analyze() yang sinkron
+           berjalan — pengguna melihat "Menganalisis…" dan kontrol yang
+           terkunci, bukan halaman yang membeku tanpa penjelasan. */
+        setAnalysisBusy(true);
+        requestAnimationFrame(function(){
+          setTimeout(function(){
+            /* Tegaskan lagi: pada jalur unggah, setFileBusy(false) bisa sempat
+               mengaktifkan kontrol kembali di antara kedua tahap ini. */
+            setAnalysisBusy(true);
+            try { runAnalysisBody(text); }
+            finally { setAnalysisBusy(false); }
+          }, 0);
+        });
+      }
+      function runAnalysisBody(text){
+        /* Batas cakupan: hanya 100.000 kata pertama yang dianalisis (teks di
+           kotak teks tetap utuh). lastText, lastResult, classifier, dan
+           laporan semuanya memakai porsi terbatas yang sama. */
+        var cap = capAnalysisText(text);
+        text = cap.text;
         var res = analyze(text);
         lastResult = res;
         lastText = text;
@@ -1651,6 +1727,16 @@ Secara keseluruhan, modul ini memberikan pemahaman yang mendalam tentang peran d
           rb.classList.add("show");
         } else {
           rb.classList.remove("show");
+        }
+        // catatan pemotongan cakupan — hanya tampil bila teks melewati batas
+        // analisis; tidak pernah diam-diam (lihat capAnalysisText).
+        var cb = $("banner-cakupan");
+        if(cap.capped){
+          cb.innerHTML = "<strong>Cakupan analisis dibatasi:</strong> teks ini berisi " + fmtNumID(cap.totalWords) + " kata; yang dianalisis adalah " + fmtNumID(MAX_ANALYZE_WORDS) + " kata pertama (batas analisis per dokumen, agar halaman tetap responsif). Skor, rincian sinyal, penanda per kalimat, dan laporan PDF di bawah ini semuanya berlaku untuk " + fmtNumID(MAX_ANALYZE_WORDS) + " kata pertama tersebut — bukan untuk sisa teks setelahnya.";
+          cb.classList.add("show");
+        } else {
+          cb.classList.remove("show");
+          cb.innerHTML = "";
         }
         // teks berwarna
         var hl = $("hl-text");
