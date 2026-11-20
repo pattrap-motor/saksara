@@ -585,6 +585,40 @@
       .wf-suggest li{ margin:5px 0; font-size:14px; line-height:1.6; }
       #wf-input{ min-height:220px; }
       .wf-toolbar{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:10px; }
+
+      /* ---------- Phase 4 (v0.12.0-beta): Compare Writing ---------- */
+      .cmp-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+      @media (max-width:900px){ .cmp-grid{ grid-template-columns:1fr; } }
+      .cmp-actions{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:14px; }
+      .cmp-tabs{ display:flex; flex-wrap:wrap; gap:8px; margin:4px 0 14px; }
+      .cmp-tab{ border:1.5px solid var(--line); background:var(--card); color:var(--ink-soft); border-radius:999px; padding:8px 16px; font:inherit; font-size:14px; font-weight:700; cursor:pointer; }
+      .cmp-tab[aria-pressed="true"]{ background:linear-gradient(120deg, var(--sky), var(--blue)); color:#fff; border-color:transparent; }
+      .d-add{ background:rgba(34,197,94,.16); }
+      .d-del{ background:rgba(239,68,68,.14); }
+      .d-chg{ background:rgba(59,130,246,.14); }
+      .d-badge{ display:inline-block; font-size:11px; font-weight:800; letter-spacing:.04em; border-radius:6px; padding:1px 7px; margin-right:7px; vertical-align:1px; border:1px solid var(--line); background:var(--card); color:var(--ink-soft); white-space:nowrap; }
+      .badge-add{ color:#15803D; border-color:rgba(34,197,94,.5); }
+      .badge-del{ color:#B91C1C; border-color:rgba(239,68,68,.5); }
+      .badge-chg{ color:#1D4ED8; border-color:rgba(59,130,246,.5); }
+      html[data-theme="dark"] .badge-add{ color:#4ADE80; }
+      html[data-theme="dark"] .badge-del{ color:#F87171; }
+      html[data-theme="dark"] .badge-chg{ color:#60A5FA; }
+      .cmp-sbs{ display:grid; grid-template-columns:1fr 1fr; gap:0 14px; }
+      @media (max-width:760px){ .cmp-sbs{ grid-template-columns:1fr; } }
+      .cmp-cell{ border:1px solid var(--line); border-radius:10px; padding:9px 12px; margin-bottom:8px; font-size:14.5px; line-height:1.65; overflow-wrap:anywhere; background:var(--card); }
+      .cmp-cell.empty{ background:transparent; border-style:dashed; color:var(--ink-mute); font-style:italic; font-size:13px; }
+      .seg-del{ background:rgba(239,68,68,.25); text-decoration:line-through; border-radius:3px; padding:0 1px; }
+      .seg-add{ background:rgba(34,197,94,.28); border-radius:3px; padding:0 1px; }
+      .cmp-inline{ font-size:15.5px; line-height:1.85; }
+      .cmp-inline .sent-add{ background:rgba(34,197,94,.12); border-radius:6px; padding:1px 3px; }
+      .cmp-inline .sent-del{ background:rgba(239,68,68,.10); border-radius:6px; padding:1px 3px; }
+      .cmp-same-note{ color:var(--ink-mute); font-size:13px; font-style:italic; margin:6px 0; }
+      .cmp-dist-row{ display:grid; grid-template-columns:74px 1fr 118px; gap:10px; align-items:center; margin:7px 0; font-size:13px; }
+      .cmp-dist-bars{ display:grid; gap:3px; }
+      .cmp-dist-fill{ display:block; height:8px; border-radius:99px; min-width:2px; }
+      .fill-a{ background:linear-gradient(90deg, var(--sky), var(--blue)); }
+      .fill-b{ background:linear-gradient(90deg, #2DD4BF, #0D9488); }
+      .cmp-legend{ display:flex; flex-wrap:wrap; gap:14px; font-size:13px; color:var(--ink-soft); margin:8px 0 2px; }
     </style>
   </head>
   <body>
@@ -599,6 +633,7 @@
           <a href="#/home" data-route="home">Beranda</a>
           <a href="#/detector" data-route="detector">Detector</a>
           <a href="#/forensik" data-route="forensik">Writing Forensic</a>
+          <a href="#/compare" data-route="compare">Bandingkan</a>
           <a href="#/cara-kerja" data-route="cara-kerja">Cara Kerja</a>
           <a href="#/metode" data-route="metode">Metode</a>
           <a href="#/posisi" data-route="posisi">Posisi &amp; Batasan</a>
@@ -615,6 +650,7 @@
         <a href="#/home" data-route="home">Beranda</a>
         <a href="#/detector" data-route="detector">Detector</a>
         <a href="#/forensik" data-route="forensik">Writing Forensic</a>
+        <a href="#/compare" data-route="compare">Bandingkan</a>
         <a href="#/cara-kerja" data-route="cara-kerja">Cara Kerja</a>
         <a href="#/metode" data-route="metode">Metode</a>
         <a href="#/posisi" data-route="posisi">Posisi &amp; Batasan</a>
@@ -968,6 +1004,99 @@
         </div>
       </section>
 
+      <section class="compare" id="compare" data-view="compare" hidden aria-labelledby="cmp-judul">
+        <p class="wf-kicker">Compare Writing</p>
+        <h2 id="cmp-judul">Bandingkan dua dokumen</h2>
+        <p class="wf-lede">Lihat persis apa yang berubah antara dua versi teks — kata, kalimat, dan paragraf yang ditambah, dihapus, berubah, atau berpindah urutan — beserta perbandingan karakteristik Writing Forensic keduanya. Perbandingan ini <strong>deskriptif</strong>: kemiripan tekstual <strong>bukan</strong> bukti penulis yang sama, dan perubahan karakteristik <strong>bukan</strong> bukti AI atau bukti mengakali deteksi. Halaman ini tidak menjalankan Detector dan tidak menampilkan skor deteksi apa pun.</p>
+        <div class="cmp-grid">
+          <div class="wf-panel cmp-panel">
+            <h3>Dokumen A</h3>
+            <label class="sr-only" for="cmp-a">Teks Dokumen A</label>
+            <textarea id="cmp-a" class="wf-ta" placeholder="Tempel teks Dokumen A di sini... (misalnya versi awal)" aria-describedby="cmp-a-cnt"></textarea>
+            <div class="wf-counters"><span><strong id="cmp-a-kata">0</strong> kata</span> · <span><strong id="cmp-a-kalimat">0</strong> kalimat</span> · <span><strong id="cmp-a-paragraf">0</strong> paragraf</span></div>
+            <div class="wf-upload-row">
+              <label class="btn-upload" for="cmp-file-a">Unggah .txt / .docx / .pdf</label>
+              <input type="file" id="cmp-file-a" class="file-hidden" accept=".txt,.docx,.pdf,text/plain" aria-label="Unggah berkas untuk Dokumen A" />
+              <button type="button" class="btn-clear" id="cmp-clear-a">Bersihkan A</button>
+            </div>
+            <div class="file-status" id="cmp-a-status" aria-live="polite"></div>
+          </div>
+          <div class="wf-panel cmp-panel">
+            <h3>Dokumen B</h3>
+            <label class="sr-only" for="cmp-b">Teks Dokumen B</label>
+            <textarea id="cmp-b" class="wf-ta" placeholder="Tempel teks Dokumen B di sini... (misalnya versi revisi)" aria-describedby="cmp-b-cnt"></textarea>
+            <div class="wf-counters"><span><strong id="cmp-b-kata">0</strong> kata</span> · <span><strong id="cmp-b-kalimat">0</strong> kalimat</span> · <span><strong id="cmp-b-paragraf">0</strong> paragraf</span></div>
+            <div class="wf-upload-row">
+              <label class="btn-upload" for="cmp-file-b">Unggah .txt / .docx / .pdf</label>
+              <input type="file" id="cmp-file-b" class="file-hidden" accept=".txt,.docx,.pdf,text/plain" aria-label="Unggah berkas untuk Dokumen B" />
+              <button type="button" class="btn-clear" id="cmp-clear-b">Bersihkan B</button>
+            </div>
+            <div class="file-status" id="cmp-b-status" aria-live="polite"></div>
+          </div>
+        </div>
+        <div class="cmp-actions">
+          <button type="button" class="btn-primary" id="cmp-btn">Bandingkan</button>
+          <button type="button" class="btn-ghost" id="cmp-swap">⇄ Tukar A ↔ B</button>
+          <button type="button" class="btn-ghost" id="cmp-clear">Bersihkan semua</button>
+          <button type="button" class="btn-ghost" id="cmp-ex">Contoh pasangan versi</button>
+        </div>
+        <p class="wf-note" style="margin-top:10px;">Contoh memuat satu teks yang sama dalam dua versi: versi asli dan versi suntingan ringan (beberapa kata diganti, satu kalimat dihapus, satu kalimat ditambah) — agar Anda dapat melihat cara kerja ketiga mode. Seluruh pemrosesan berjalan lokal di peramban ini; tidak ada teks yang dikirim atau disimpan.</p>
+        <div class="banner banner-warn" id="cmp-error" role="alert"></div>
+        <div id="cmp-results" hidden>
+          <div class="wf-cards" id="cmp-cards" style="margin-top:18px;"></div>
+          <div class="banner" id="cmp-surface" role="note"></div>
+          <div class="cmp-tabs" role="group" aria-label="Mode tampilan perbandingan">
+            <button type="button" class="cmp-tab" id="cmp-tab-an" aria-pressed="true">Analitis</button>
+            <button type="button" class="cmp-tab" id="cmp-tab-sbs" aria-pressed="false">Berdampingan</button>
+            <button type="button" class="cmp-tab" id="cmp-tab-in" aria-pressed="false">Inline</button>
+          </div>
+          <div id="cmp-view-an">
+            <div class="wf-panel">
+              <h3>Ringkasan perubahan tekstual</h3>
+              <div id="cmp-changes"></div>
+              <div class="cmp-legend"><span><span class="d-badge badge-add">＋ TAMBAH</span> kata/kalimat/paragraf baru di B</span><span><span class="d-badge badge-del">− HAPUS</span> ada di A, hilang di B</span><span><span class="d-badge badge-chg">≈ BERUBAH</span> pasangan yang berbeda isi</span></div>
+            </div>
+            <div class="wf-panel">
+              <h3>Perbandingan karakteristik (Writing Forensic)</h3>
+              <p class="wf-note">Angka dihitung dengan fungsi Writing Forensic yang sama persis. Kolom selisih bersifat deskriptif netral — naik/turunnya sebuah angka bukan penilaian baik-buruk dan bukan bukti perbedaan penulis.</p>
+              <div id="cmp-forensic"></div>
+            </div>
+            <div class="wf-panel">
+              <h3>Distribusi panjang kalimat — A vs B</h3>
+              <div class="cmp-legend"><span><span class="cmp-dist-fill fill-a" style="display:inline-block; width:26px; vertical-align:middle;"></span> Dokumen A</span><span><span class="cmp-dist-fill fill-b" style="display:inline-block; width:26px; vertical-align:middle;"></span> Dokumen B</span></div>
+              <div id="cmp-dist"></div>
+            </div>
+          </div>
+          <div id="cmp-view-sbs" hidden>
+            <div class="wf-panel">
+              <h3>Berdampingan — Dokumen A (kiri) dan B (kanan)</h3>
+              <p class="wf-note">Setiap baris adalah satu kalimat yang sejajar. Kata yang dihapus dicoret pada sisi A; kata yang ditambah disorot pada sisi B; kalimat yang berubah berbingkai biru dengan lencana ≈.</p>
+              <div class="cmp-sbs" id="cmp-sbs"></div>
+              <p class="wf-note" id="cmp-sbs-note"></p>
+            </div>
+          </div>
+          <div id="cmp-view-in" hidden>
+            <div class="wf-panel">
+              <h3>Inline — satu aliran teks</h3>
+              <p class="wf-note">Kalimat yang sama tampil polos; kalimat tambahan hijau dengan lencana ＋; kalimat terhapus merah tercoret dengan lencana −; kalimat berubah menampilkan kata yang dihapus (coret merah) dan kata yang ditambah (hijau) sebaris dengan lencana ≈.</p>
+              <div class="cmp-inline" id="cmp-inline"></div>
+              <p class="wf-note" id="cmp-inline-note"></p>
+            </div>
+          </div>
+          <div class="wf-toolbar">
+            <button type="button" class="btn-ghost" id="cmp-pdf">Unduh Laporan PDF</button>
+            <span class="wf-note" id="cmp-pdf-status" aria-live="polite"></span>
+          </div>
+        </div>
+        <div class="wf-panel" style="margin-top:16px;">
+          <h3>Metode &amp; keterbatasan</h3>
+          <p><strong>Cara menghitung.</strong> Kata dibandingkan dalam bentuk ternormalisasi (huruf kecil, tanpa tanda baca) memakai pola kata yang sama dengan seluruh situs. Penjajaran berjalan tiga tingkat: paragraf yang sama persis dicocokkan lebih dulu (paragraf yang cocok tetapi urutannya berbeda dilaporkan sebagai <em>berubah urutan</em>); sisa paragraf dipasangkan menurut posisi, lalu kalimat di dalamnya dijajarkan dengan cara yang sama; terakhir, kata di dalam pasangan kalimat yang berubah dibandingkan dengan diff LCS. Blok hapus yang bersebelahan dengan blok tambah dihitung sebagai kata <em>berubah</em> sebanyak sisi yang lebih kecil. <strong>Kemiripan tekstual</strong> adalah koefisien Dice atas kata: 2 × kata-cocok ÷ (kata-A + kata-B); paragraf yang berpindah urutan tetap terhitung cocok — urutan dilaporkan terpisah. Perbedaan kapitalisasi, tanda baca, atau spasi saja tidak menghasilkan perubahan kata; bila aliran kata kedua dokumen identik tetapi teks mentahnya berbeda, halaman ini melaporkannya sebagai perbedaan permukaan.</p>
+          <p><strong>Bukan bukti kepengarangan.</strong> Kemiripan tinggi tidak membuktikan penulis yang sama — dua penulis dapat menghasilkan teks yang sangat mirip bila topik, templat, atau sumbernya sama; kemiripan rendah juga tidak membuktikan penulis berbeda — satu penulis dapat menulis dua teks yang jauh berbeda, dan parafrase menyeluruh menghasilkan kemiripan tekstual rendah walau maknanya sama (diff ini tekstual, bukan semantik). Perubahan karakteristik antarversi adalah deskripsi statistik; halaman ini tidak menghitung skor Detector, dan selisih karakteristik tidak ditafsirkan sebagai bukti seseorang mengakali deteksi.</p>
+          <p><strong>Pengaruh panjang &amp; jenis dokumen.</strong> Pada dokumen pendek, satu-dua kata mengubah persentase secara besar — perlakukan angka sebagai gambaran, bukan vonis. Kalimat yang berpindah antarparagraf terbaca sebagai dihapus + ditambah (deteksi urutan bekerja pada tingkat paragraf). Teks tanpa tanda titik (daftar, tabel tempelan) melemahkan penjajaran kalimat. Analisis dibatasi 100.000 kata per dokumen; tampilan diff menampilkan 6.000 kata pertama per sisi, sedangkan seluruh hitungan mencakup teks yang dianalisis penuh.</p>
+          <p><strong>Privasi.</strong> Semua perbandingan berjalan lokal di peramban ini. Teks tidak dikirim ke server dan tidak disimpan otomatis.</p>
+        </div>
+      </section>
+
       <section class="posisi" id="posisi" data-view="posisi" hidden aria-labelledby="posisi-judul">
         <div class="kicker">Tentang</div>
         <h2 id="posisi-judul">Posisi &amp; batasan</h2>
@@ -1026,6 +1155,7 @@
           <a href="#/home">Beranda</a>
           <a href="#/detector">Detector</a>
           <a href="#/forensik">Writing Forensic</a>
+          <a href="#/compare">Bandingkan</a>
           <a href="#analisis">Analisis</a>
           <a href="#/cara-kerja">Cara Kerja</a>
           <a href="#/metode">Metode</a>
@@ -4279,8 +4409,8 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
     // Router tampilan per halaman (satu berkas): #/home, #/detector, #/cara-kerja, #/metode, #/posisi.
     // Tautan lama (#analisis, #clf-panel, #benchmark, …) tetap didukung lewat peta LEGACY.
     (function(){
-      var TITLES = { home: "Saksara — Gratis Deteksi Tulisan AI", detector: "Detector — Saksara", forensik: "Writing Forensic — Saksara", "cara-kerja": "Cara Kerja — Saksara", metode: "Metode — Saksara", posisi: "Posisi & Batasan — Saksara" };
-      var ROUTES = { "": "home", "/": "home", "/home": "home", "/detector": "detector", "/forensik": "forensik", "/cara-kerja": "cara-kerja", "/metode": "metode", "/posisi": "posisi" };
+      var TITLES = { home: "Saksara — Gratis Deteksi Tulisan AI", detector: "Detector — Saksara", forensik: "Writing Forensic — Saksara", compare: "Bandingkan Dokumen — Saksara", "cara-kerja": "Cara Kerja — Saksara", metode: "Metode — Saksara", posisi: "Posisi & Batasan — Saksara" };
+      var ROUTES = { "": "home", "/": "home", "/home": "home", "/detector": "detector", "/forensik": "forensik", "/compare": "compare", "/cara-kerja": "cara-kerja", "/metode": "metode", "/posisi": "posisi" };
       var LEGACY = { "analisis": ["detector", "analisis"], "panel-analisis": ["detector", "panel-analisis"], "clf-panel": ["detector", "clf-panel"], "report": ["detector", "report"], "batch": ["detector", "batch"], "cara-kerja": ["cara-kerja", null], "benchmark": ["metode", "benchmark"], "posisi": ["posisi", null], "atas": ["home", null] };
       function show(view, anchor){
         var blocks = document.querySelectorAll("[data-view]");
