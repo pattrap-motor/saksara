@@ -567,7 +567,7 @@
       <div class="wrap nav-inner">
         <a class="nav-brand" href="#atas" aria-label="Saksara — kembali ke atas">
           <svg width="34" height="34" viewBox="0 0 48 48" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="11" fill="#1D5FD1"/><path d="M24 10 L36 14 V24 C36 31 31 36 24 39 C17 36 12 31 12 24 V14 Z" fill="none" stroke="#ffffff" stroke-width="2.4"/><path d="M17.5 24.5 L22 29 L31 19.5" fill="none" stroke="#38BDF8" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <span><span class="nav-wordmark">Saksara</span></span><span class="nav-tag">Gratis Deteksi Tulisan AI</span></span>
+          <span><span class="nav-wordmark">Saksara</span></span><span class="nav-tag">Gratis Deteksi Tulisan AI</span>
         </a>
         <div class="nav-links">
           <a href="#/home" data-route="home">Beranda</a>
@@ -620,6 +620,48 @@
           <div class="strip-stat"><div class="n">0</div><div class="t">teks yang dikirim ke server — seluruh analisis berjalan di peramban Anda</div></div>
         </div>
       </header>
+
+      <section class="dash-quick" data-view="home" aria-labelledby="dash-cepat-judul">
+        <div class="kicker">Akses Cepat</div>
+        <h2 class="dash-h" id="dash-cepat-judul">Mau memeriksa apa hari ini?</h2>
+        <div class="qa-grid">
+          <a class="qa-card" href="#/detector"><span class="qa-t">Detector Teks</span><span class="qa-d">Tempel teks atau unggah berkas .txt, .docx, atau .pdf — skor indikasi AI per kalimat, sepenuhnya lokal.</span><span class="qa-go">Buka Detector →</span></a>
+          <a class="qa-card" href="#batch"><span class="qa-t">Analisis Batch</span><span class="qa-d">Periksa banyak berkas tugas sekaligus dalam satu antrean dan unduh rekapnya sebagai CSV.</span><span class="qa-go">Buka Batch →</span></a>
+          <a class="qa-card" href="#clf-panel"><span class="qa-t">Penguat Classifier</span><span class="qa-d">Aktifkan model lokal ±280 MB sebagai lapis kedua — hanya menaikkan skor, tidak pernah menuduh sendirian.</span><span class="qa-go">Buka Panel Classifier →</span></a>
+          <a class="qa-card" href="#/cara-kerja"><span class="qa-t">Cara Kerja</span><span class="qa-d">Tujuh sinyal heuristik dijelaskan terbuka, langkah demi langkah.</span><span class="qa-go">Pelajari →</span></a>
+          <a class="qa-card" href="#/metode"><span class="qa-t">Metode &amp; Benchmark</span><span class="qa-d">Rumus skor, kalibrasi, dan hasil benchmark internal Bahasa Indonesia.</span><span class="qa-go">Lihat Metode →</span></a>
+          <a class="qa-card" href="#/posisi"><span class="qa-t">Posisi &amp; Batasan</span><span class="qa-d">Apa yang boleh dan tidak boleh disimpulkan dari sebuah skor.</span><span class="qa-go">Baca Posisi Kami →</span></a>
+        </div>
+        <div class="dash-row">
+          <div class="dash-panel" aria-labelledby="dash-akt-judul">
+            <h3 id="dash-akt-judul">Aktivitas sesi ini</h3>
+            <div id="dash-activity" aria-live="polite"></div>
+          </div>
+          <div class="dash-panel" aria-labelledby="dash-status-judul">
+            <h3 id="dash-status-judul">Status di perangkat ini</h3>
+            <ul class="dash-status-list">
+              <li>Mesin heuristik: <strong>Siap</strong> — berjalan lokal, tanpa unduhan.</li>
+              <li>Classifier: <strong id="dash-clf-state">Belum diaktifkan</strong></li>
+              <li>Model di cache peramban: <strong id="dash-clf-cache">Diperiksa…</strong></li>
+              <li>Teks yang disimpan: <strong>Tidak ada</strong> — analisis tidak meninggalkan perangkat ini.</li>
+            </ul>
+            <a class="btn-ghost" href="#clf-panel">Buka Panel Classifier</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="dash-feats" data-view="home" aria-labelledby="dash-fitur-judul">
+        <div class="kicker">Ringkasan Fitur</div>
+        <h2 class="dash-h" id="dash-fitur-judul">Apa yang bisa dilakukan Saksara</h2>
+        <div class="feat-grid">
+          <div class="feat-card"><h3>7 sinyal heuristik</h3><p>Burstiness, kosakata, frasa khas AI, stilometri, sisa markdown, simetri paragraf, dan pengulangan — masing-masing dijelaskan dan ditampilkan pada setiap analisis.</p><a href="#/metode">Lihat penjelasannya</a></div>
+          <div class="feat-card"><h3>Classifier lokal (Lapis 2)</h3><p>Model multibahasa ±280 MB berjalan di peramban sebagai penguat bersyarat — tidak ada server yang menilai teks Anda.</p><a href="#clf-panel">Aktifkan di Detector</a></div>
+          <div class="feat-card"><h3>Laporan per kalimat</h3><p>Kalimat terindikasi ditandai warna, lengkap dengan bukti dan saran perbaikan — plus laporan PDF bergaya Turnitin dan tombol Salin Ringkasan.</p><a href="#/detector">Coba sekarang</a></div>
+          <div class="feat-card"><h3>Mode batch + CSV</h3><p>Periksa puluhan berkas tugas dalam satu antrean dan unduh tabel rekapnya sebagai CSV.</p><a href="#batch">Buka mode batch</a></div>
+          <div class="feat-card"><h3>Privasi utuh</h3><p>Tanpa akun, tanpa unggahan teks, tanpa localStorage. Satu-satunya unduhan adalah berkas model — itu pun hanya bila Anda mengaktifkannya.</p><a href="#/posisi">Baca posisi privasi</a></div>
+          <div class="feat-card"><h3>Donasi &amp; kalibrasi</h3><p>Bantu deteksi Bahasa Indonesia membaik: kirim statistik analisis (tanpa teks) atau donasikan teks berlabel — selalu atas persetujuan Anda.</p><a href="#report">Lihat di laporan</a></div>
+        </div>
+      </section>
 
       <section class="method" id="cara-kerja" data-view="cara-kerja" hidden aria-labelledby="metode-judul">
         <div class="kicker">Metode</div>
@@ -2237,6 +2279,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       function applyScore(score, blended){
         var finalPct = pct(score);
         $("score-num").textContent = finalPct;
+        dashTrackScore(finalPct);
         $("meter-pin").style.left = finalPct + "%";
         var verdict = $("verdict"), note = $("score-note");
         var suffix = blended ? " Skor akhir ini adalah skor Ensemble Heuristik v3 yang diperkuat classifier terlatih (penguat bersyarat: classifier hanya menaikkan skor bila heuristik sudah menemukan indikasi awal ≥35%)." : "";
@@ -3585,6 +3628,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           renderBatchTable();
         }
         setBatchProgress("Selesai — " + files.length + " berkas diproses.");
+        noteDashBatch(files.length);
         batchBusy = false;
         $("btn-batch").disabled = false;
       }
@@ -3722,7 +3766,64 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       if(close) close.addEventListener("click", function(){ dlg.close(); });
       dlg.addEventListener("click", function(ev){ if(ev.target === dlg) dlg.close(); });
     })();
-    // Router tampilan per halaman (satu berkas): #/home, #/cara-kerja, #/metode, #/posisi.
+    /* ---------- Phase 2: aktivitas dashboard (hanya memori sesi — tanpa penyimpanan) ---------- */
+    var dashRuns = 0, dashLast = null, dashBatch = null, dashCountedRun = -1;
+    function dashBandLabel(p){
+      if(p < 35) return "Indikasi AI rendah";
+      if(p <= 65) return "Campuran — perlu pemeriksaan lebih lanjut";
+      return "Indikasi AI tinggi";
+    }
+    function dashClock(){
+      try{ return new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }); }
+      catch(e){ return ""; }
+    }
+    function renderDash(){
+      var box = $("dash-activity");
+      if(box){
+        if(!dashLast && !dashBatch){
+          box.innerHTML = "<p class=\"dash-empty\">Belum ada analisis pada sesi ini. Jalankan analisis pertama Anda di <a href=\"#/detector\">Detector</a> — ringkasannya akan tampil di sini. Aktivitas ini hanya hidup selama tab ini terbuka; tidak ada yang disimpan atau dikirim ke mana pun.</p>";
+        } else {
+          var html = "";
+          if(dashLast){
+            html += "<p class=\"dash-last\"><span class=\"dash-score\">" + dashLast.pct + "%</span> — " + dashBandLabel(dashLast.pct) +
+              "<span class=\"dash-meta\">Analisis terakhir · " + dashLast.words + " kata · " + dashLast.sents + " kalimat · pukul " + dashLast.time + "</span></p>";
+          }
+          if(dashBatch){
+            html += "<p class=\"dash-last\">Batch terakhir: <strong>" + dashBatch.count + " berkas</strong> diproses.<span class=\"dash-meta\">Pukul " + dashBatch.time + "</span></p>";
+          }
+          html += "<p class=\"dash-meta\">Total analisis tunggal sesi ini: " + dashRuns + " · Hanya di memori tab ini — tidak disimpan.</p>";
+          box.innerHTML = html;
+        }
+      }
+      var cs = $("dash-clf-state");
+      if(cs){
+        cs.textContent = clfState === "ready" ? "Aktif — siap memperkuat skor" :
+          clfState === "loading" ? "Sedang dimuat…" :
+          clfState === "error" ? "Gagal dimuat (heuristik tetap bekerja penuh)" : "Belum diaktifkan";
+      }
+      var cc = $("dash-clf-cache");
+      if(cc){ cc.textContent = clfCacheExists ? "Sudah tersimpan — pengaktifan berikutnya tanpa unduhan" : "Belum tersimpan"; }
+    }
+    function dashTrackScore(finalPct){
+      if(!lastResult) return;
+      if(dashCountedRun !== analysisRunSeq){
+        dashCountedRun = analysisRunSeq;
+        dashRuns++;
+        dashLast = { pct: finalPct, words: lastResult.words, sents: lastResult.sents.length, time: dashClock() };
+      } else if(dashLast){
+        dashLast.pct = finalPct;
+      }
+      renderDash();
+    }
+    function noteDashBatch(count){
+      dashBatch = { count: count, time: dashClock() };
+      renderDash();
+    }
+    window.addEventListener("hashchange", renderDash);
+    renderDash();
+    setTimeout(renderDash, 1500);
+
+    // Router tampilan per halaman (satu berkas): #/home, #/detector, #/cara-kerja, #/metode, #/posisi.
     // Tautan lama (#analisis, #clf-panel, #benchmark, …) tetap didukung lewat peta LEGACY.
     (function(){
       var TITLES = { home: "Saksara — Gratis Deteksi Tulisan AI", detector: "Detector — Saksara", "cara-kerja": "Cara Kerja — Saksara", metode: "Metode — Saksara", posisi: "Posisi & Batasan — Saksara" };
