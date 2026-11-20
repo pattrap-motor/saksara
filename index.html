@@ -515,6 +515,50 @@
         html{ scroll-behavior:auto; }
         .btn-primary, .btn-ghost, .nav-cta, button.primary, .examples button{ transition:none; }
       }
+      /* ---------- Phase 2 (v0.10.0-beta): shell sidebar + dashboard ---------- */
+      .sidebar{ display:none; }
+      @media (min-width:1024px){
+        body{ padding-left:252px; }
+        .site-nav{ display:none; }
+        html{ scroll-padding-top:24px; }
+        .sidebar{ display:flex; flex-direction:column; gap:6px; position:fixed; left:0; top:0; bottom:0; width:252px; padding:20px 16px; background:var(--surface); border-right:1px solid var(--line); z-index:40; overflow-y:auto; }
+      }
+      .side-brand{ display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--ink); padding:4px 6px 14px; border-bottom:1px solid var(--line-soft); margin-bottom:12px; }
+      .side-brand .nav-wordmark{ font-size:20px; }
+      .side-tag{ display:block; font-size:11.5px; color:var(--muted); font-weight:600; }
+      .side-nav{ display:flex; flex-direction:column; gap:2px; }
+      .side-nav a{ display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:var(--r-sm); color:var(--ink); text-decoration:none; font-weight:600; font-size:14.5px; }
+      .side-nav a:hover{ background:var(--surface2); }
+      .side-nav a.active{ background:var(--gold-soft); color:var(--gold-ink); }
+      .side-nav a:focus-visible, .side-brand:focus-visible, .side-cta:focus-visible, .qa-card:focus-visible{ outline:3px solid var(--gold); outline-offset:2px; }
+      .side-cta{ margin-top:14px; text-align:center; }
+      .side-foot{ margin-top:auto; font-size:12px; color:var(--muted); border-top:1px solid var(--line-soft); padding-top:12px; line-height:1.6; }
+      .dash-h{ font-size:clamp(22px,3vw,28px); margin:2px 0 14px; }
+      .dash-quick, .dash-feats{ margin-top:36px; }
+      .qa-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(215px,1fr)); gap:12px; }
+      .qa-card{ display:flex; flex-direction:column; gap:4px; background:var(--surface); border:1px solid var(--line); border-radius:var(--r-md); padding:16px; text-decoration:none; color:var(--ink); box-shadow:var(--shadow-sm); transition:transform .18s ease, box-shadow .18s ease; }
+      .qa-card:hover{ transform:translateY(-2px); box-shadow:var(--shadow); }
+      .qa-t{ font-weight:800; font-size:16px; }
+      .qa-d{ font-size:13.5px; color:var(--muted); line-height:1.5; }
+      .qa-go{ margin-top:6px; font-size:13px; font-weight:700; color:var(--gold-ink); }
+      .dash-row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px; }
+      @media (max-width:760px){ .dash-row{ grid-template-columns:1fr; } }
+      .dash-panel{ background:var(--surface); border:1px solid var(--line); border-radius:var(--r-lg); padding:18px; box-shadow:var(--shadow-sm); }
+      .dash-panel h3{ margin:0 0 10px; font-size:16.5px; }
+      .dash-empty{ color:var(--muted); font-size:14px; line-height:1.6; margin:0; }
+      .dash-last{ font-size:14.5px; line-height:1.6; margin:0; }
+      .dash-score{ font-size:26px; font-weight:800; }
+      .dash-meta{ color:var(--muted); font-size:13px; display:block; margin-top:4px; }
+      .dash-status-list{ list-style:none; margin:0 0 12px; padding:0; font-size:14px; line-height:1.5; display:flex; flex-direction:column; gap:8px; }
+      .feat-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(235px,1fr)); gap:12px; }
+      .feat-card{ background:var(--surface); border:1px solid var(--line); border-radius:var(--r-md); padding:16px; box-shadow:var(--shadow-sm); }
+      .feat-card h3{ margin:0 0 6px; font-size:15.5px; }
+      .feat-card p{ margin:0 0 8px; font-size:13.5px; color:var(--muted); line-height:1.55; }
+      .feat-card a{ font-size:13px; font-weight:700; color:var(--gold-ink); }
+      .det-note{ font-size:13px; color:var(--muted); margin:10px 0 0; }
+      #input-teks{ min-height:280px; }
+      @media (max-width:640px){ #input-teks{ min-height:200px; } }
+      @media (prefers-reduced-motion: reduce){ .qa-card{ transition:none; } }
     </style>
   </head>
   <body>
@@ -527,6 +571,7 @@
         </a>
         <div class="nav-links">
           <a href="#/home" data-route="home">Beranda</a>
+          <a href="#/detector" data-route="detector">Detector</a>
           <a href="#/cara-kerja" data-route="cara-kerja">Cara Kerja</a>
           <a href="#/metode" data-route="metode">Metode</a>
           <a href="#/posisi" data-route="posisi">Posisi &amp; Batasan</a>
@@ -534,6 +579,21 @@
         <a class="nav-cta" href="#analisis">Mulai Analisis</a>
       </div>
     </nav>
+    <aside class="sidebar" aria-label="Navigasi samping">
+      <a class="side-brand" href="#/home" aria-label="Saksara — Beranda">
+        <svg width="34" height="34" viewBox="0 0 48 48" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="11" fill="#1D5FD1"/><path d="M24 10 L36 14 V24 C36 31 31 36 24 39 C17 36 12 31 12 24 V14 Z" fill="none" stroke="#ffffff" stroke-width="2.4"/><path d="M17.5 24.5 L22 29 L31 19.5" fill="none" stroke="#38BDF8" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span><span class="nav-wordmark">Saksara</span><span class="side-tag">Gratis Deteksi Tulisan AI</span></span>
+      </a>
+      <nav class="side-nav" aria-label="Menu utama">
+        <a href="#/home" data-route="home">Beranda</a>
+        <a href="#/detector" data-route="detector">Detector</a>
+        <a href="#/cara-kerja" data-route="cara-kerja">Cara Kerja</a>
+        <a href="#/metode" data-route="metode">Metode</a>
+        <a href="#/posisi" data-route="posisi">Posisi &amp; Batasan</a>
+      </nav>
+      <a class="btn-primary side-cta" href="#analisis">Mulai Analisis</a>
+      <div class="side-foot">Beta Terbuka · v0.10.0-beta<br />Seluruh analisis berjalan lokal di peramban ini — teks Anda tidak dikirim ke mana pun.</div>
+    </aside>
     <div class="wrap page">
       <header class="hero" data-view="home">
         <div class="hero-eyebrow">
@@ -577,7 +637,7 @@
         <p class="formula">Kedua lapis itu tidak dicampur sembarangan. Lapis pertama selalu menjadi penemu indikasi awal: bila ia tidak menemukan indikasi yang cukup, skor akhir berhenti di situ — lapis kedua <strong>tidak pernah menuduh sendirian</strong>. Hanya bila lapis pertama sudah menemukan indikasi awal, skor dari model boleh ikut menguatkan skor akhir. Penanda warna pada setiap kalimat selalu berasal dari lapis pertama. Bila model belum siap, laporan tampil dari lapis pertama terlebih dahulu, lalu diperbarui otomatis begitu model siap — dan pada setiap tahap, teks Anda tidak pernah dikirim ke server mana pun.</p>
       </section>
 
-      <section class="analyzer" id="analisis" data-view="home" aria-labelledby="analisis-judul">
+      <section class="analyzer" id="analisis" data-view="detector" hidden aria-labelledby="analisis-judul">
         <div class="kicker">Analisis</div>
         <h2 id="analisis-judul">Analisis teks</h2>
         <p class="sub">Tempel teks di bawah ini, unggah berkas .txt, .docx, atau .pdf (klik tombol Unggah, atau seret &amp; letakkan berkas ke panel ini), atau coba salah satu contoh uji.</p>
@@ -623,7 +683,7 @@
         </div>
       </section>
 
-      <section class="report" id="report" data-view="home" aria-labelledby="laporan-judul">
+      <section class="report" id="report" data-view="detector" hidden aria-labelledby="laporan-judul">
         <div class="kicker">Laporan</div>
         <h2 id="laporan-judul">Laporan hasil</h2>
         <div class="banner" id="banner-report" style="margin:0 0 16px;"></div>
@@ -764,7 +824,7 @@
         </div>
       </section>
 
-      <section class="batch" id="batch" data-view="home" aria-labelledby="batch-judul">
+      <section class="batch" id="batch" data-view="detector" hidden aria-labelledby="batch-judul">
         <div class="kicker">Berkas Banyak</div>
         <h2 id="batch-judul">Periksa Banyak Berkas</h2>
         <p class="sub">Pilih beberapa berkas .txt, .docx, atau .pdf untuk dinilai sekaligus dan diringkas dalam satu tabel. Setiap berkas dinilai dengan Ensemble Heuristik v3; bila Penguat AI (classifier) sudah aktif, penguat bersyarat yang sama ikut diterapkan — bila belum aktif, skornya murni heuristik. Hasil batch tampil di sini saja: ia tidak mengubah laporan utama di atas dan tidak disimpan ke arsip hasil.</p>
@@ -836,6 +896,7 @@
         <p>Mesin skor saat ini adalah Ensemble Heuristik v3 — pemeriksaan 7 sinyal yang berjalan sepenuhnya di peramban dan disetel untuk pola tulisan Bahasa Indonesia, termasuk tulisan formal yang generik; classifier terlatih tersedia sebagai lapis tambahan yang juga berjalan sepenuhnya di peramban (model bahasa multibahasa, ±280 MB, hanya diunduh bila Anda mengaktifkannya dari panel classifier, lalu tersimpan di peramban dan bisa dihapus dari panel yang sama; teks tidak dikirim ke mana pun) — model itu kuat pada teks AI formal tetapi juga bisa menilai tulisan manusia yang sangat formal sebagai mirip AI, sehingga ia hanya menjadi penguat dan lapis pertama tetap penemu indikasi awal serta penyeimbang utamanya.</p>
         <nav class="footer-links" aria-label="Tautan bawah">
           <a href="#/home">Beranda</a>
+          <a href="#/detector">Detector</a>
           <a href="#analisis">Analisis</a>
           <a href="#/cara-kerja">Cara Kerja</a>
           <a href="#/metode">Metode</a>
@@ -3664,9 +3725,9 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
     // Router tampilan per halaman (satu berkas): #/home, #/cara-kerja, #/metode, #/posisi.
     // Tautan lama (#analisis, #clf-panel, #benchmark, …) tetap didukung lewat peta LEGACY.
     (function(){
-      var TITLES = { home: "Saksara — Gratis Deteksi Tulisan AI", "cara-kerja": "Cara Kerja — Saksara", metode: "Metode — Saksara", posisi: "Posisi & Batasan — Saksara" };
-      var ROUTES = { "": "home", "/": "home", "/home": "home", "/cara-kerja": "cara-kerja", "/metode": "metode", "/posisi": "posisi" };
-      var LEGACY = { "analisis": ["home", "analisis"], "panel-analisis": ["home", "panel-analisis"], "clf-panel": ["home", "clf-panel"], "report": ["home", "report"], "batch": ["home", "batch"], "cara-kerja": ["cara-kerja", null], "benchmark": ["metode", "benchmark"], "posisi": ["posisi", null], "atas": ["home", null] };
+      var TITLES = { home: "Saksara — Gratis Deteksi Tulisan AI", detector: "Detector — Saksara", "cara-kerja": "Cara Kerja — Saksara", metode: "Metode — Saksara", posisi: "Posisi & Batasan — Saksara" };
+      var ROUTES = { "": "home", "/": "home", "/home": "home", "/detector": "detector", "/cara-kerja": "cara-kerja", "/metode": "metode", "/posisi": "posisi" };
+      var LEGACY = { "analisis": ["detector", "analisis"], "panel-analisis": ["detector", "panel-analisis"], "clf-panel": ["detector", "clf-panel"], "report": ["detector", "report"], "batch": ["detector", "batch"], "cara-kerja": ["cara-kerja", null], "benchmark": ["metode", "benchmark"], "posisi": ["posisi", null], "atas": ["home", null] };
       function show(view, anchor){
         var blocks = document.querySelectorAll("[data-view]");
         for(var i = 0; i < blocks.length; i++){ blocks[i].hidden = blocks[i].getAttribute("data-view") !== view; }
