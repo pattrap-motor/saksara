@@ -619,6 +619,20 @@
       .fill-a{ background:linear-gradient(90deg, var(--navy2), var(--navy)); }
       .fill-b{ background:linear-gradient(90deg, #2DD4BF, #0D9488); }
       .cmp-legend{ display:flex; flex-wrap:wrap; gap:14px; font-size:13px; color:var(--muted); margin:8px 0 2px; }
+
+      /* ---------- Phase 5 (v0.13.0-beta): Benchmark Center ---------- */
+      .bn-cm{ display:grid; grid-template-columns:110px 1fr 1fr; gap:8px; max-width:560px; margin:10px 0; }
+      .bn-cm .bn-h{ font-size:12.5px; font-weight:700; color:var(--muted); display:flex; align-items:center; }
+      .bn-cell{ border:1px solid var(--line); border-radius:12px; padding:12px 14px; background:var(--surface); }
+      .bn-cell .bn-n{ font-size:26px; font-weight:800; line-height:1.1; }
+      .bn-cell .bn-t{ font-size:12.5px; color:var(--muted); line-height:1.45; }
+      .bn-cell.tp{ background:var(--grn-bg); }
+      .bn-cell.tn{ background:var(--surface2); }
+      .bn-cell.fp{ background:var(--red-bg); }
+      .bn-cell.fn{ background:var(--warn-bg); }
+      .bn-pill{ display:inline-block; font-size:12px; font-weight:800; letter-spacing:.03em; border-radius:999px; padding:2px 10px; border:1px solid var(--warn-line); background:var(--warn-bg); color:var(--warn-ink); }
+      .bn-pill.ok{ border-color:rgba(34,197,94,.5); background:rgba(34,197,94,.14); color:#15803D; }
+      html[data-theme="dark"] .bn-pill.ok{ color:#4ADE80; }
     </style>
   </head>
   <body>
@@ -634,6 +648,7 @@
           <a href="#/detector" data-route="detector">Detector</a>
           <a href="#/forensik" data-route="forensik">Writing Forensic</a>
           <a href="#/compare" data-route="compare">Bandingkan</a>
+          <a href="#/benchmark" data-route="benchmark">Benchmark</a>
           <a href="#/cara-kerja" data-route="cara-kerja">Cara Kerja</a>
           <a href="#/metode" data-route="metode">Metode</a>
           <a href="#/posisi" data-route="posisi">Posisi &amp; Batasan</a>
@@ -651,6 +666,7 @@
         <a href="#/detector" data-route="detector">Detector</a>
         <a href="#/forensik" data-route="forensik">Writing Forensic</a>
         <a href="#/compare" data-route="compare">Bandingkan</a>
+        <a href="#/benchmark" data-route="benchmark">Benchmark</a>
         <a href="#/cara-kerja" data-route="cara-kerja">Cara Kerja</a>
         <a href="#/metode" data-route="metode">Metode</a>
         <a href="#/posisi" data-route="posisi">Posisi &amp; Batasan</a>
@@ -1097,6 +1113,50 @@
         </div>
       </section>
 
+      <section class="benchmark" id="benchmark" data-view="benchmark" hidden aria-labelledby="bn-judul">
+        <p class="wf-kicker">Benchmark Center</p>
+        <h2 id="bn-judul">Evaluasi &amp; transparansi mesin</h2>
+        <p class="wf-lede">Halaman ini menerbitkan hasil evaluasi Saksara apa adanya — termasuk kelemahannya. Setiap angka dihitung dari data yang tercantum provenansnya, dengan definisi metrik yang terbuka. <strong>Akurasi bukan jaminan untuk satu dokumen</strong>: angka agregat tidak dapat memutuskan asal-usul sebuah teks, dan tidak ada kesimpulan kepengarangan yang ditarik dari skor mana pun di halaman ini.</p>
+        <div class="wf-cards" id="bn-cards"></div>
+        <div class="wf-panel">
+          <h3>Inventaris &amp; audit dataset</h3>
+          <p class="wf-note">Diaudit ulang secara independen pada 20 November 2026 terhadap berkas yang benar-benar ada (skrip audit disimpan bersama kode sumber). Klaim kartu dataset yang tidak terbukti tidak akan diterbitkan di sini.</p>
+          <div id="bn-audit"></div>
+        </div>
+        <div class="wf-panel">
+          <h3>Evaluasi langsung — set regresi internal (18 sampel)</h3>
+          <p><span class="bn-pill">Uji kewarasan — bukan set uji representatif</span></p>
+          <p class="wf-note">Ke-18 teks fikstur proyek ini disematkan di halaman dan dinilai ulang oleh mesin produksi <em>saat halaman ini dibuka</em> — skornya harus sama persis dengan baseline Phase 0; bila tidak, halaman ini sendiri yang memberi tahu Anda. Sampel dipilih manual untuk gerbang rilis: kecil, tidak acak, dan tidak melisensikan klaim generalisasi apa pun.</p>
+          <div id="bn-live"></div>
+        </div>
+        <div class="wf-panel">
+          <h3>Evaluasi Ensemble Heuristik v3 — VeritasAI-ID v0</h3>
+          <p class="wf-note">Dihitung 20 November 2026 dengan skrip evaluasi yang disimpan bersama kode sumber (<em>evaluate-v0.cjs</em>), menjalankan fungsi produksi persis di atas teks penuh dokumen. Set v0 berdomain <strong>berita &amp; ensiklopedis</strong> — bukan esai/tugas — jadi hasilnya mengukur perilaku mesin pada domain itu, bukan pada genre utama produk.</p>
+          <div id="bn-v0"></div>
+        </div>
+        <div class="wf-panel">
+          <h3>Classifier (Lapis 2) &amp; gabungan — set regresi</h3>
+          <div id="bn-clf"></div>
+        </div>
+        <div class="wf-panel">
+          <h3>Distribusi kelas data evaluasi</h3>
+          <div id="bn-dist"></div>
+        </div>
+        <div class="wf-toolbar">
+          <button type="button" class="btn-ghost" id="bn-export-csv">Unduh CSV metrik</button>
+          <button type="button" class="btn-ghost" id="bn-export-json">Unduh JSON evaluasi</button>
+          <span class="wf-note" id="bn-export-status" aria-live="polite"></span>
+        </div>
+        <div class="wf-panel" style="margin-top:16px;">
+          <h3>Metodologi &amp; keterbatasan</h3>
+          <p><strong>Definisi.</strong> Kelas <strong>positif</strong> = "terindikasi AI" (skor ≥ ambang); kelas <strong>negatif</strong> = manusia. TP = AI yang terindikasi; FP = manusia yang terindikasi (kesalahan paling berisiko bagi pengguna — menuduh tulisan manusia); FN = AI yang lolos; TN = manusia yang lolos. Accuracy = (TP+TN)/n · Precision = TP/(TP+FP) · Recall = TP/(TP+FN) · F1 = rerata harmonik precision–recall · FPR = FP/(FP+TN) · FNR = FN/(FN+TP) · Specificity = TN/(TN+FP). Ambang utama 0,35 adalah batas pita RENDAH/SEDANG produksi. Bila penyebut nol, metrik ditampilkan sebagai <em>tidak terdefinisi</em> — tidak pernah dipaksa menjadi 0. Macro-average merata-ratakan metrik kedua kelas; weighted-average menimbangnya dengan dukungan kelas.</p>
+          <p><strong>Risiko dua arah.</strong> FP berarti tulisan manusia ditandai sebagai AI — karena itu Saksara menampilkan skor sebagai "indikasi statistik", tidak pernah sebagai vonis, dan halaman Detector mewajibkan peninjauan manusia. FN berarti teks AI tidak terdeteksi — pada data berita GPT-4o, FN adalah kegagalan dominan Lapis 1 (recall 3,0%); Lapis 2 ada untuk menutup sebagian celah itu, dan keduanya tetap dapat keliru.</p>
+          <p><strong>Batas generalisasi.</strong> Set regresi bukan sampel acak. VeritasAI-ID v0 hanya berisi berita/ensiklopedis 50–2.000 kata dengan AI satu generator (GPT-3.5); set eksternal GPT-4o menunjukkan performa dapat runtuh pada generator yang tidak terlihat. Tidak satu pun angka di halaman ini yang menjamin performa pada dokumen Anda — terutama dokumen pendek, parafrase, terjemahan, atau genre di luar data evaluasi.</p>
+          <p><strong>Pemisahan data.</strong> Split v0 memakai group-split berbasis cluster (0 pelanggaran terverifikasi) dan dekontaminasi 13-gram terhadap set regresi (0 tumpang-tindih terverifikasi). Train/dev tidak dievaluasi di halaman ini. Ambang produksi tidak di-tuning pada v0; namun klaim "belum pernah dilihat selama pengembangan" tidak dapat dibuktikan sempurna, jadi angka v0 berstatus indikasi terukur — bukan jaminan.</p>
+          <p><strong>Privasi &amp; lisensi.</strong> Tidak ada teks dataset yang diterbitkan ulang di halaman ini (hanya agregat); tidak ada dokumen pengguna yang dipakai untuk evaluasi; tidak ada API berbayar. Komponen dataset M4 berlisensi CC BY-NC-SA-4.0 (NonCommercial) — agregat evaluasi ini diterbitkan untuk transparansi riset.</p>
+        </div>
+      </section>
+
       <section class="posisi" id="posisi" data-view="posisi" hidden aria-labelledby="posisi-judul">
         <div class="kicker">Tentang</div>
         <h2 id="posisi-judul">Posisi &amp; batasan</h2>
@@ -1156,6 +1216,7 @@
           <a href="#/detector">Detector</a>
           <a href="#/forensik">Writing Forensic</a>
           <a href="#/compare">Bandingkan</a>
+          <a href="#/benchmark">Benchmark</a>
           <a href="#analisis">Analisis</a>
           <a href="#/cara-kerja">Cara Kerja</a>
           <a href="#/metode">Metode</a>
@@ -4867,8 +4928,8 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
     // Router tampilan per halaman (satu berkas): #/home, #/detector, #/cara-kerja, #/metode, #/posisi.
     // Tautan lama (#analisis, #clf-panel, #benchmark, …) tetap didukung lewat peta LEGACY.
     (function(){
-      var TITLES = { home: "Saksara — Gratis Deteksi Tulisan AI", detector: "Detector — Saksara", forensik: "Writing Forensic — Saksara", compare: "Bandingkan Dokumen — Saksara", "cara-kerja": "Cara Kerja — Saksara", metode: "Metode — Saksara", posisi: "Posisi & Batasan — Saksara" };
-      var ROUTES = { "": "home", "/": "home", "/home": "home", "/detector": "detector", "/forensik": "forensik", "/compare": "compare", "/cara-kerja": "cara-kerja", "/metode": "metode", "/posisi": "posisi" };
+      var TITLES = { home: "Saksara — Gratis Deteksi Tulisan AI", detector: "Detector — Saksara", forensik: "Writing Forensic — Saksara", compare: "Bandingkan Dokumen — Saksara", benchmark: "Benchmark Center — Saksara", "cara-kerja": "Cara Kerja — Saksara", metode: "Metode — Saksara", posisi: "Posisi & Batasan — Saksara" };
+      var ROUTES = { "": "home", "/": "home", "/home": "home", "/detector": "detector", "/forensik": "forensik", "/compare": "compare", "/benchmark": "benchmark", "/cara-kerja": "cara-kerja", "/metode": "metode", "/posisi": "posisi" };
       var LEGACY = { "analisis": ["detector", "analisis"], "panel-analisis": ["detector", "panel-analisis"], "clf-panel": ["detector", "clf-panel"], "report": ["detector", "report"], "batch": ["detector", "batch"], "cara-kerja": ["cara-kerja", null], "benchmark": ["metode", "benchmark"], "posisi": ["posisi", null], "atas": ["home", null] };
       function show(view, anchor){
         var blocks = document.querySelectorAll("[data-view]");
