@@ -468,6 +468,12 @@
       ::-webkit-scrollbar{ width:10px; height:10px; }
       ::-webkit-scrollbar-thumb{ background:#38BDF8; border-radius:8px; border:2px solid var(--bg); }
       ::-webkit-scrollbar-track{ background:var(--bg); }
+      /* ---------- penguatan keterbacaan tema cerah (v0.9.12) ---------- */
+      footer.site-footer .copy, footer.site-footer .version-line{ color:#D6EAFB; }
+      .topbar{ text-shadow:0 1px 2px rgba(6,40,90,.35); }
+      .score-card .cap{ opacity:.92; text-shadow:0 1px 3px rgba(6,40,90,.35); }
+      .score-card .note{ text-shadow:0 1px 2px rgba(6,40,90,.30); }
+      .meter-scale{ opacity:.95; text-shadow:0 1px 2px rgba(6,40,90,.40); }
       @media (prefers-reduced-motion: reduce){
         [data-view]:not([hidden]){ animation:none; }
         .strip-stat:hover, .step:hover, .posisi-card:hover, .stat:hover, .chip:hover{ transform:none; }
@@ -809,12 +815,16 @@
           <a href="#/posisi">Posisi &amp; Batasan</a>
         </nav>
         <p class="copy">© 2026 Saksara — Dikembangkan oleh Ciptanala Devs</p>
-        <p class="version-line">Versi <strong>v0.9.11-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
+        <p class="version-line">Versi <strong>v0.9.12-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
       </div>
     </footer>
 
     <dialog class="changelog" id="changelog-modal" aria-labelledby="changelog-title">
       <h2 id="changelog-title">Catatan Rilis — Saksara</h2>
+      <h3>v0.9.12-beta — 20 November 2026</h3>
+      <ul>
+        <li><strong>Penguatan keterbacaan tema cerah:</strong> tulisan kecil di kaki halaman kini lebih terang, dan teks-teks kecil di atas gradasi biru (strip atas, keterangan kartu skor, label skala meter) diberi bayangan halus agar tetap jelas terbaca di layar HP maupun di bawah cahaya terang.</li>
+      </ul>
       <h3>v0.9.11-beta — 20 November 2026</h3>
       <ul>
         <li><strong>Tema warna baru "Langit Cerah":</strong> palet situs diganti dari navy–emas ke biru muda langit yang terang — latar putih kebiruan, gradasi biru cerah pada kartu skor, tombol, dan kaki halaman, serta aksen biru langit di seluruh ikon dan logo. Mode gelap diselaraskan menjadi malam biru. Cara kerja dan skor tidak berubah.</li>
