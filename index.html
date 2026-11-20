@@ -3857,6 +3857,364 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       if(close) close.addEventListener("click", function(){ dlg.close(); });
       dlg.addEventListener("click", function(ev){ if(ev.target === dlg) dlg.close(); });
     })();
+    /* ================= Writing Forensic (Phase 3) =================
+       Modul statistik karakteristik tulisan. Berdiri sendiri: TIDAK memakai
+       skor detector dan TIDAK memengaruhi detector. */
+    /* WF-CORE-START — fungsi murni (tanpa DOM), dapat diekstrak & diuji terpisah. */
+    var WF_STOPWORDS = { "yang":1,"dan":1,"di":1,"ke":1,"dari":1,"untuk":1,"dengan":1,"pada":1,"dalam":1,"adalah":1,"ini":1,"itu":1,"atau":1,"juga":1,"tidak":1,"akan":1,"telah":1,"oleh":1,"sebagai":1,"karena":1,"sehingga":1,"tetapi":1,"namun":1,"agar":1,"bagi":1,"para":1,"sangat":1,"lebih":1,"dapat":1,"bisa":1,"ada":1,"saya":1,"kami":1,"kita":1,"anda":1,"dia":1,"mereka":1,"ia":1,"saat":1,"ketika":1,"jika":1,"maka":1,"seperti":1,"antara":1,"atas":1,"bawah":1,"sudah":1,"belum":1,"harus":1,"hanya":1,"saja":1,"pun":1,"bahwa":1,"tentang":1,"tanpa":1,"setelah":1,"sebelum":1,"hingga":1,"sampai":1,"selama":1,"melalui":1,"terhadap":1,"kepada":1,"bukan":1,"jangan":1,"sedang":1,"masih":1,"pernah":1,"serta":1,"maupun":1,"ataupun":1,"yaitu":1,"yakni":1,"setiap":1,"semua":1,"banyak":1,"beberapa":1,"satu":1,"dua":1,"tiga":1,"empat":1,"lima":1,"enam":1,"tujuh":1,"delapan":1,"sembilan":1,"sepuluh":1,"pertama":1,"kedua":1,"lain":1,"sama":1,"sendiri":1,"begitu":1,"demikian":1,"sebab":1,"meski":1,"meskipun":1,"walaupun":1,"bahkan":1,"justru":1,"malah":1,"hendak":1,"ingin":1,"perlu":1,"mungkin":1,"tentu":1,"pasti":1,"memang":1,"sebenarnya":1 };
+    var WF_TRANSITIONS = ["selain itu","di sisi lain","oleh karena itu","oleh sebab itu","dengan demikian","meskipun demikian","pada akhirnya","sebagai contoh","antara lain","secara umum","secara khusus","dalam hal ini","sementara itu","dapat disimpulkan","berdasarkan hal tersebut","kesimpulannya","namun","tetapi","bahkan","justru","sebaliknya","misalnya","selanjutnya","kemudian","akhirnya","pertama","kedua","ketiga","akibatnya","jadi","sementara"];
+    var WF_SUBORDINATORS = { "karena":1,"sehingga":1,"ketika":1,"jika":1,"apabila":1,"bahwa":1,"meskipun":1,"walaupun":1,"agar":1,"supaya":1,"setelah":1,"sebelum":1,"saat":1,"hingga":1,"sambil":1,"meski":1 };
+    function wfMean(a){ if(!a.length) return 0; var s=0; for(var i=0;i<a.length;i++) s+=a[i]; return s/a.length; }
+    function wfMedian(a){ if(!a.length) return 0; var b=a.slice().sort(function(x,y){ return x-y; }); var m=Math.floor(b.length/2); return b.length%2 ? b[m] : (b[m-1]+b[m])/2; }
+    function wfSd(a){ if(a.length<2) return 0; var m=wfMean(a), s=0; for(var i=0;i<a.length;i++) s+=(a[i]-m)*(a[i]-m); return Math.sqrt(s/(a.length-1)); }
+    function wfCv(a){ var m=wfMean(a); return m>0 ? wfSd(a)/m : 0; }
+    function wfFreq(tokens){ var f=Object.create(null); for(var i=0;i<tokens.length;i++) f[tokens[i]]=(f[tokens[i]]||0)+1; return f; }
+    function wfCountPhrases(tokens, phrases){
+      var matches=[], used=Object.create(null), out=Object.create(null);
+      phrases.forEach(function(p){
+        var pt=p.split(" "), n=pt.length;
+        for(var i=0;i+n<=tokens.length;i++){
+          var ok=true;
+          for(var j=0;j<n;j++){ if(tokens[i+j]!==pt[j]){ ok=false; break; } }
+          if(ok) matches.push({ p:p, start:i, end:i+n });
+        }
+      });
+      matches.sort(function(a,b){ return (b.end-b.start)-(a.end-a.start) || a.start-b.start; });
+      matches.forEach(function(m){
+        var k;
+        for(k=m.start;k<m.end;k++){ if(used[k]) return; }
+        for(k=m.start;k<m.end;k++) used[k]=1;
+        out[m.p]=(out[m.p]||0)+1;
+      });
+      return out;
+    }
+    function wfAnalyze(text){
+      var words = wordsOf(text);
+      var W = words.length;
+      if(W === 0) return { empty: true };
+      var parasRaw = splitParagraphs(text);
+      if(parasRaw.length === 0) parasRaw = [text];
+      var paraData = [], allLens = [];
+      parasRaw.forEach(function(p){
+        var sents = splitSentences(p);
+        var pw = wordsOf(p);
+        var lens = sents.map(function(s){ return wordsOf(s).length; });
+        for(var i=0;i<lens.length;i++) allLens.push(lens[i]);
+        paraData.push({ words: pw, sents: sents, lens: lens });
+      });
+      var S = allLens.length, k, w2;
+      var freq = wfFreq(words), U = Object.keys(freq).length, hapax = 0;
+      for(k in freq){ if(freq[k]===1) hapax++; }
+      var winTtr = [];
+      for(var i=0;i+50<=W;i+=50){ var wf2=Object.create(null); for(var j=i;j<i+50;j++) wf2[words[j]]=1; winTtr.push(Object.keys(wf2).length/50); }
+      var buckets = [0,0,0,0,0,0,0];
+      allLens.forEach(function(L){ buckets[L<=5?0 : L<=10?1 : L<=15?2 : L<=20?3 : L<=25?4 : L<=30?5 : 6]++; });
+      var commaCount = (text.match(/,/g) || []).length;
+      var subHits = 0, sentsWithSub = 0;
+      paraData.forEach(function(pd){ pd.sents.forEach(function(s){ var ws=wordsOf(s), has=false; ws.forEach(function(w){ if(WF_SUBORDINATORS[w]){ subHits++; has=true; } }); if(has) sentsWithSub++; }); });
+      var longSents = 0;
+      allLens.forEach(function(L){ if(L>25) longSents++; });
+      var paraWords = paraData.map(function(pd){ return pd.words.length; });
+      var paraSents = paraData.map(function(pd){ return pd.sents.length; });
+      var transCounts = wfCountPhrases(words, WF_TRANSITIONS);
+      var transTotal = 0, transList = [];
+      for(k in transCounts){ transTotal += transCounts[k]; transList.push({ p:k, c:transCounts[k] }); }
+      transList.sort(function(a,b){ return b.c-a.c || (a.p<b.p ? -1 : 1); });
+      var content = [];
+      for(w2 in freq){ if(!WF_STOPWORDS[w2] && !/^\d+$/.test(w2)) content.push({ w:w2, c:freq[w2] }); }
+      content.sort(function(a,b){ return b.c-a.c || (a.w<b.w ? -1 : 1); });
+      var grams = Object.create(null);
+      for(var g=0; g+4<=W; g++){ var key = words.slice(g, g+4).join(" "); grams[key]=(grams[key]||0)+1; }
+      var gramList = [];
+      for(k in grams){ if(grams[k]>=2) gramList.push({ g:k, c:grams[k] }); }
+      gramList.sort(function(a,b){ return b.c-a.c || (a.g<b.g ? -1 : 1); });
+      var starters = Object.create(null);
+      paraData.forEach(function(pd){ pd.sents.forEach(function(s){ var ws=wordsOf(s); if(ws.length>=2){ var st=ws[0]+" "+ws[1]; starters[st]=(starters[st]||0)+1; } }); });
+      var starterList = [];
+      for(k in starters){ if(starters[k]>=2) starterList.push({ s:k, c:starters[k] }); }
+      starterList.sort(function(a,b){ return b.c-a.c || (a.s<b.s ? -1 : 1); });
+      var styleParas = [];
+      paraData.forEach(function(pd, idx){
+        if(pd.words.length >= 15 && pd.lens.length >= 1){
+          var pf = wfFreq(pd.words), pu = Object.keys(pf).length;
+          var pt = wfCountPhrases(pd.words, WF_TRANSITIONS), ptt = 0;
+          for(var q in pt) ptt += pt[q];
+          styleParas.push({ idx: idx+1, words: pd.words.length, avgLen: wfMean(pd.lens), ttr: pd.words.length ? pu/pd.words.length : 0, trans: pd.words.length ? ptt/pd.words.length*100 : 0 });
+        }
+      });
+      var cons = { n: styleParas.length, cvLen: 0, cvTtr: 0, outliers: [] };
+      if(styleParas.length >= 2){
+        cons.cvLen = wfCv(styleParas.map(function(p){ return p.avgLen; }));
+        cons.cvTtr = wfCv(styleParas.map(function(p){ return p.ttr; }));
+      }
+      if(styleParas.length >= 4){
+        var lensArr = styleParas.map(function(p){ return p.avgLen; });
+        var mL = wfMean(lensArr), sL = wfSd(lensArr);
+        if(sL > 0) styleParas.forEach(function(p){ var z=(p.avgLen-mL)/sL; if(Math.abs(z) >= 1.75) cons.outliers.push({ idx:p.idx, avgLen:p.avgLen, mean:mL, z:z }); });
+      }
+      return {
+        empty: false, words: W, unique: U, ttr: U/W, ttrWin: winTtr.length ? wfMean(winTtr) : U/W,
+        hapax: hapax, guiraud: U/Math.sqrt(W),
+        sents: S, lensMean: wfMean(allLens), lensMedian: wfMedian(allLens), lensSd: wfSd(allLens), lensCv: wfCv(allLens),
+        buckets: buckets, bucketLabels: ["1–5","6–10","11–15","16–20","21–25","26–30",">30"],
+        commasPerSent: S ? commaCount/S : 0, subPerSent: S ? subHits/S : 0,
+        subSentPct: S ? sentsWithSub/S : 0, longSentPct: S ? longSents/S : 0,
+        paras: parasRaw.length, paraWordsMean: wfMean(paraWords), paraWordsCv: wfCv(paraWords),
+        paraWordsMin: Math.min.apply(null, paraWords), paraWordsMax: Math.max.apply(null, paraWords),
+        paraSentsMean: wfMean(paraSents),
+        paraRows: paraData.map(function(pd){ return { words: pd.words.length, sents: pd.sents.length, avgLen: wfMean(pd.lens) }; }),
+        transTotal: transTotal, transPer100: transTotal/W*100, transList: transList.slice(0,10),
+        topContent: content.slice(0,10), topGrams: gramList.slice(0,8), starters: starterList.slice(0,5),
+        styleParas: styleParas, cons: cons, shortText: W < 300
+      };
+    }
+    /* WF-CORE-END */
+
+    /* Writing Forensic — render & interaksi (DOM). */
+    function wfFmt(x, d){ return x.toFixed(d === undefined ? 1 : d).replace(".", ","); }
+    function wfPctTxt(x, d){ return wfFmt(x*100, d === undefined ? 1 : d) + "%"; }
+    function wfRhythmLabel(cv){ return cv < 0.35 ? "seragam" : (cv <= 0.6 ? "sedang" : "bervariasi"); }
+    function wfTable(rows){
+      var h = "<table class=\"wf-table\"><tbody>";
+      rows.forEach(function(r){ h += "<tr><td>" + r[0] + "</td><td>" + r[1] + "</td></tr>"; });
+      return h + "</tbody></table>";
+    }
+    function wfRender(st, displayText){
+      var cards = [
+        [fmtNumID(st.words), "total kata"],
+        [fmtNumID(st.sents), "kalimat"],
+        [fmtNumID(st.paras), "paragraf"],
+        [fmtNumID(st.unique), "kata unik"],
+        [wfPctTxt(st.ttr), "TTR — unik ÷ total"],
+        [wfPctTxt(st.ttrWin), "TTR jendela 50 kata"],
+        [wfFmt(st.lensMean), "rata-rata kata per kalimat"],
+        [wfFmt(st.transPer100, 2), "transisi per 100 kata"]
+      ];
+      $("wf-cards").innerHTML = cards.map(function(c){ return "<div class=\"wf-card\"><div class=\"n\">" + c[0] + "</div><div class=\"t\">" + c[1] + "</div></div>"; }).join("");
+
+      var maxB = Math.max.apply(null, st.buckets.concat([1]));
+      $("wf-chart").innerHTML = st.buckets.map(function(c, i){
+        var pctv = st.sents ? c/st.sents*100 : 0;
+        return "<div class=\"wf-bar-row\"><span>" + st.bucketLabels[i] + " kata</span><span class=\"wf-bar\"><span class=\"wf-bar-fill\" style=\"display:block; width:" + (c/maxB*100).toFixed(1) + "%\"></span></span><span>" + c + " kalimat (" + wfFmt(pctv) + "%)</span></div>";
+      }).join("");
+
+      $("wf-lex").innerHTML = wfTable([
+        ["TTR keseluruhan (unik ÷ total)", wfPctTxt(st.ttr)],
+        ["TTR jendela 50 kata (rata-rata)", wfPctTxt(st.ttrWin)],
+        ["Kata unik", fmtNumID(st.unique)],
+        ["Kata hapax — muncul tepat sekali", fmtNumID(st.hapax) + " (" + wfPctTxt(st.unique ? st.hapax/st.unique : 0) + " dari kata unik)"],
+        ["Indeks Guiraud (unik ÷ √total)", wfFmt(st.guiraud)]
+      ]) + "<p class=\"wf-note\">TTR selalu turun pada teks yang lebih panjang, jadi TTR jendela dan Guiraud disertakan agar perbandingan antar teks lebih adil. Tanpa stemming, kata berimbuhan dihitung berbeda — angka Bahasa Indonesia cenderung terlihat lebih tinggi. Keragaman yang rendah <strong>bukan</strong> bukti AI.</p>";
+
+      $("wf-cplx").innerHTML = wfTable([
+        ["Rata-rata kata per kalimat", wfFmt(st.lensMean)],
+        ["Median kata per kalimat", wfFmt(st.lensMedian)],
+        ["Simpangan baku panjang kalimat", wfFmt(st.lensSd)],
+        ["CV ritme (SD ÷ rata-rata)", wfFmt(st.lensCv, 2) + " — " + wfRhythmLabel(st.lensCv)],
+        ["Koma per kalimat (proksi klausa)", wfFmt(st.commasPerSent, 2)],
+        ["Penanda subordinasi per kalimat", wfFmt(st.subPerSent, 2)],
+        ["Kalimat berpenanda subordinasi", wfPctTxt(st.subSentPct)],
+        ["Kalimat panjang (&gt;25 kata)", wfPctTxt(st.longSentPct)]
+      ]) + "<p class=\"wf-note\">Label ritme memakai ambang deskriptif: CV &lt;0,35 = seragam; 0,35–0,60 = sedang; &gt;0,60 = bervariasi. Penanda subordinasi yang dihitung: karena, sehingga, ketika, jika, apabila, bahwa, meskipun, walaupun, agar, supaya, setelah, sebelum, saat, hingga, sambil, meski.</p>";
+
+      var paraRows = st.paraRows.slice(0, 30).map(function(p, i){
+        return ["Paragraf " + (i+1), p.words + " kata · " + p.sents + " kalimat · rata-rata " + wfFmt(p.avgLen) + " kata/kalimat"];
+      });
+      $("wf-para").innerHTML = wfTable([
+        ["Jumlah paragraf", fmtNumID(st.paras)],
+        ["Rata-rata kata per paragraf", wfFmt(st.paraWordsMean)],
+        ["CV panjang paragraf", wfFmt(st.paraWordsCv, 2)],
+        ["Paragraf terpendek / terpanjang", st.paraWordsMin + " / " + st.paraWordsMax + " kata"],
+        ["Rata-rata kalimat per paragraf", wfFmt(st.paraSentsMean)]
+      ]) + (st.paras > 1 ? wfTable(paraRows) : "") +
+      (st.paras > 30 ? "<p class=\"wf-note\">Rincian menampilkan 30 paragraf pertama; statistik di atas mencakup seluruh teks.</p>" : "");
+
+      if(st.transList.length){
+        $("wf-trans").innerHTML = "<p>Total <strong>" + st.transTotal + " kata transisi</strong> ditemukan (" + wfFmt(st.transPer100, 2) + " per 100 kata) dari kamus ±31 penanda:</p>" +
+          wfTable(st.transList.map(function(t){ return ["“" + escapeHtml(t.p) + "”", t.c + "×"]; }));
+      } else {
+        $("wf-trans").innerHTML = "<p>Tidak ditemukan kata transisi dari kamus (±31 penanda) pada teks ini. Alur antar kalimat bertumpu pada urutan isi, bukan penanda eksplisit.</p>";
+      }
+
+      var repHtml = "";
+      if(st.topContent.length){
+        repHtml += "<p><strong>Kata isi tersering</strong> (di luar kata fungsi):</p>" + wfTable(st.topContent.map(function(c){ return ["“" + escapeHtml(c.w) + "”", c.c + "× · " + wfPctTxt(c.c/st.words) + " dari teks"]; }));
+      }
+      if(st.topGrams.length){
+        repHtml += "<p style=\"margin-top:12px;\"><strong>Rangkaian 4 kata yang berulang</strong> (≥2 kali):</p>" + wfTable(st.topGrams.map(function(g){ return ["“" + escapeHtml(g.g) + "”", g.c + "×"]; }));
+      } else {
+        repHtml += "<p style=\"margin-top:12px;\">Tidak ada rangkaian 4 kata yang muncul ≥2 kali pada teks ini.</p>";
+      }
+      if(st.starters.length){
+        repHtml += "<p style=\"margin-top:12px;\"><strong>Awalan kalimat yang berulang</strong> (2 kata pertama):</p>" + wfTable(st.starters.map(function(s){ return ["“" + escapeHtml(s.s) + " …”", s.c + " kalimat"]; }));
+      }
+      $("wf-rep").innerHTML = repHtml;
+
+      var consHtml = "";
+      if(st.cons.n < 2){
+        consHtml = "<p>Belum cukup paragraf yang memenuhi syarat perbandingan (minimal 2 paragraf berisi ≥15 kata" + (st.cons.n < 4 ? "; penandaan paragraf menyimpang membutuhkan ≥4 paragraf" : "") + "). Teks ini memiliki " + st.cons.n + " paragraf yang memenuhi syarat.</p>";
+      } else {
+        consHtml = wfTable([
+          ["Paragraf yang dibandingkan", fmtNumID(st.cons.n) + " paragraf (≥15 kata)"],
+          ["CV rata-rata panjang kalimat antarparagraf", wfFmt(st.cons.cvLen, 2)],
+          ["CV TTR antarparagraf", wfFmt(st.cons.cvTtr, 2)]
+        ]);
+        if(st.cons.n >= 4){
+          if(st.cons.outliers.length){
+            consHtml += "<p style=\"margin-top:10px;\"><strong>Paragraf yang menyimpang</strong> (rata-rata panjang kalimat berjarak ≥1,75 simpangan baku dari rata-rata antarparagraf):</p>" + wfTable(st.cons.outliers.map(function(o){ return ["Paragraf " + o.idx, "rata-rata " + wfFmt(o.avgLen) + " kata/kalimat · rata-rata antarparagraf " + wfFmt(o.mean) + " · z = " + (o.z >= 0 ? "+" : "−") + wfFmt(Math.abs(o.z), 2)]; }));
+          } else {
+            consHtml += "<p style=\"margin-top:10px;\">Tidak ada paragraf yang menyimpang ≥1,75 simpangan baku menurut aturan ini.</p>";
+          }
+        } else {
+          consHtml += "<p class=\"wf-note\">Penandaan paragraf menyimpang membutuhkan ≥4 paragraf yang memenuhi syarat; saat ini " + st.cons.n + ".</p>";
+        }
+        consHtml += "<p class=\"wf-note\">Penyimpangan dapat disebabkan perbedaan topik atau struktur (misalnya pendahuluan vs daftar) — ini bukan bukti perbedaan penulis.</p>";
+      }
+      $("wf-cons").innerHTML = consHtml;
+
+      $("wf-summary").innerHTML = "<p>Teks ini terdiri dari <strong>" + fmtNumID(st.words) + " kata</strong> dalam <strong>" + fmtNumID(st.sents) + " kalimat</strong> dan <strong>" + fmtNumID(st.paras) + " paragraf</strong>. Panjang kalimat rata-rata " + wfFmt(st.lensMean) + " kata (median " + wfFmt(st.lensMedian) + ") dengan CV " + wfFmt(st.lensCv, 2) + " — ritme tergolong <strong>" + wfRhythmLabel(st.lensCv) + "</strong> menurut ambang deskriptif di panel kompleksitas. Keragaman kosakata: TTR " + wfPctTxt(st.ttr) + " (TTR jendela " + wfPctTxt(st.ttrWin) + ", Guiraud " + wfFmt(st.guiraud) + "). Kata transisi ditemukan " + st.transTotal + " kali (" + wfFmt(st.transPer100, 2) + " per 100 kata)" + (st.topContent.length ? "; kata isi tersering adalah “" + escapeHtml(st.topContent[0].w) + "” (" + st.topContent[0].c + "×)" : "") + (st.topGrams.length ? "; terdapat " + st.topGrams.length + " rangkaian 4 kata yang berulang" : "; tidak ada rangkaian 4 kata yang berulang") + ". Semua angka ini adalah deskripsi karakteristik teks — bukan penilaian asal-usulnya.</p>";
+
+      var sug = [];
+      if(st.lensCv < 0.35 && st.sents >= 8) sug.push("Ritme kalimat seragam (CV " + wfFmt(st.lensCv, 2) + " &lt; 0,35): pertimbangkan memecah satu-dua kalimat panjang atau menggabungkan kalimat-kalimat pendek agar ritme lebih hidup — isi tidak perlu diubah.");
+      if(st.topContent.length && st.topContent[0].c >= 8 && st.topContent[0].c/st.words >= 0.02) sug.push("Kata “" + escapeHtml(st.topContent[0].w) + "” muncul " + st.topContent[0].c + " kali (" + wfPctTxt(st.topContent[0].c/st.words) + " dari teks): bila konteksnya memungkinkan, variasikan dengan sinonim atau kata rujukan agar tidak monoton.");
+      if(st.topGrams.length) sug.push("Rangkaian “" + escapeHtml(st.topGrams[0].g) + "” berulang " + st.topGrams[0].c + " kali: pertimbangkan menulis ulang salah satu kemunculannya dengan redaksi berbeda, tanpa mengubah maksud.");
+      if(st.transPer100 > 4) sug.push("Kata transisi sangat rapat (" + wfFmt(st.transPer100, 2) + " per 100 kata): sebagian penanda di awal kalimat biasanya dapat dihilangkan tanpa mengubah makna, bila kalimatnya sudah mengalir.");
+      if(st.transTotal === 0 && st.paras >= 3) sug.push("Tidak ditemukan kata transisi eksplisit pada teks " + st.paras + " paragraf ini: menambah penanda transisi di awal beberapa paragraf dapat membantu pembaca mengikuti alur.");
+      if(st.longSentPct > 0.25 && st.sents >= 8) sug.push("Kalimat panjang (&gt;25 kata) mencapai " + wfPctTxt(st.longSentPct) + " dari seluruh kalimat: memecah kalimat-kalimat terpanjang biasanya menaikkan keterbacaan tanpa mengubah isi.");
+      if(st.paraWordsCv > 0.8 && st.paras >= 3) sug.push("Panjang paragraf sangat bervariasi (CV " + wfFmt(st.paraWordsCv, 2) + "): periksa paragraf terpanjang (" + st.paraWordsMax + " kata) — barangkali memuat dua gagasan yang lebih nyaman dipisah.");
+      if(st.starters.length && st.starters[0].c >= 4) sug.push("Awalan kalimat “" + escapeHtml(st.starters[0].s) + " …” dipakai " + st.starters[0].c + " kali: memvariasikan awalan (subjek, waktu, tempat, sebab) membuat pola kalimat terasa lebih beragam.");
+      $("wf-suggest").innerHTML = sug.length ? "<ul class=\"wf-suggest\">" + sug.map(function(s){ return "<li>" + s + "</li>"; }).join("") + "</ul>" : "<p>Tidak ada pola mencolok yang terdeteksi oleh aturan penyuntingan sederhana ini pada teks ini.</p>";
+
+      /* Sorotan: bangun dari token kata teks tampilan (maks 6.000 kata pertama). */
+      var wordSet = Object.create(null);
+      st.topContent.forEach(function(c){ if(c.c >= 4) wordSet[c.w] = 1; });
+      var re = /[\p{L}\p{N}']+/gu, m, toks = [];
+      while((m = re.exec(displayText)) !== null){ toks.push({ s: m.index, e: m.index + m[0].length, low: m[0].toLowerCase() }); if(toks.length >= 6000) break; }
+      var inPhrase = Object.create(null);
+      var gramKeys = Object.create(null);
+      st.topGrams.forEach(function(g){ gramKeys[g.g] = 1; });
+      for(var gi = 0; gi + 4 <= toks.length; gi++){
+        var key4 = toks[gi].low + " " + toks[gi+1].low + " " + toks[gi+2].low + " " + toks[gi+3].low;
+        if(gramKeys[key4]){ for(var gj = gi; gj < gi+4; gj++) inPhrase[gj] = 1; }
+      }
+      var html = "", pos = 0;
+      toks.forEach(function(t, i){
+        html += escapeHtml(displayText.slice(pos, t.s));
+        var wtxt = escapeHtml(displayText.slice(t.s, t.e));
+        if(inPhrase[i]) html += "<mark class=\"wf-p\">" + wtxt + "</mark>";
+        else if(wordSet[t.low]) html += "<mark class=\"wf-w\">" + wtxt + "</mark>";
+        else html += wtxt;
+        pos = t.e;
+      });
+      var truncated = wordsOf(displayText).length > toks.length;
+      if(!truncated) html += escapeHtml(displayText.slice(pos));
+      $("wf-hl").innerHTML = html || "<span class=\"wf-note\">Tidak ada teks untuk disorot.</span>";
+      $("wf-hl-note").textContent = truncated ? "Sorotan menampilkan 6.000 kata pertama; seluruh statistik di atas mencakup teks yang dianalisis." : (st.topGrams.length || Object.keys(wordSet).length ? "" : "Tidak ada kata isi yang muncul ≥4 kali dan tidak ada frasa berulang, jadi tidak ada yang disorot.");
+    }
+
+    var wfTa = $("wf-input");
+    function wfUpdateCounters(){
+      var t = wfTa.value;
+      $("wf-cnt-kata").textContent = fmtNumID(wordsOf(t).length);
+      $("wf-cnt-kalimat").textContent = fmtNumID(t.trim() ? splitSentences(t).length : 0);
+      $("wf-cnt-paragraf").textContent = fmtNumID(t.trim() ? splitParagraphs(t).length : 0);
+    }
+    function wfShowError(msg){
+      var b = $("wf-error");
+      if(msg){ b.innerHTML = msg; b.classList.add("show"); }
+      else { b.innerHTML = ""; b.classList.remove("show"); }
+    }
+    function wfFileStatus(html, kind){
+      var el = $("wf-file-status");
+      el.innerHTML = html;
+      el.className = "file-status show" + (kind ? " " + kind : "");
+    }
+    function wfRun(){
+      var raw = wfTa.value;
+      wfShowError("");
+      if(!raw.trim()){ wfShowError("<strong>Kotak teks masih kosong.</strong> Tempel teks, unggah berkas, atau klik salah satu contoh uji terlebih dahulu."); return; }
+      var btn = $("wf-btn");
+      btn.disabled = true;
+      btn.textContent = "Menganalisis…";
+      setTimeout(function(){
+        try {
+          var cap = capAnalysisText(raw);
+          var st = wfAnalyze(cap.text);
+          if(st.empty){ wfShowError("<strong>Tidak ada kata yang terbaca dari teks ini.</strong> Periksa kembali isinya — mungkin hanya berisi simbol atau angka acak."); return; }
+          var res = $("wf-results");
+          res.hidden = false;
+          var notes = [];
+          if(cap.capped) notes.push("Dokumen ini berisi " + fmtNumID(cap.totalWords) + " kata; sesuai batas per dokumen, yang dianalisis adalah " + fmtNumID(MAX_ANALYZE_WORDS) + " kata pertamanya.");
+          if(st.shortText) notes.push("<strong>Teks pendek (" + fmtNumID(st.words) + " kata):</strong> di bawah ±300 kata, statistik mudah berayun oleh beberapa kalimat — perlakukan hasil ini sebagai gambaran kasar.");
+          var sb = $("wf-short");
+          if(notes.length){ sb.innerHTML = notes.join(" "); sb.classList.add("show"); }
+          else { sb.innerHTML = ""; sb.classList.remove("show"); }
+          wfRender(st, cap.text);
+          res.scrollIntoView({ behavior: "smooth", block: "start" });
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "Analisis Karakteristik";
+        }
+      }, 30);
+    }
+    function wfHandleFile(f){
+      if(!f) return;
+      if(typeof f.size === "number" && f.size > MAX_FILE_BYTES){
+        wfFileStatus("<strong>Berkas terlalu besar</strong> (" + (f.size/1048576).toFixed(1).replace(".", ",") + " MB) — batas ukuran berkas adalah 20 MB. Kecilkan dokumennya, atau tempel teksnya langsung.", "err");
+        return;
+      }
+      var lower = (f.name || "").toLowerCase();
+      if(lower.endsWith(".doc") && !lower.endsWith(".docx")){
+        wfFileStatus("<strong>Format .doc lama tidak didukung</strong> — simpan ulang sebagai .docx, lalu unggah lagi.", "err");
+        return;
+      }
+      var kind = null;
+      if(lower.endsWith(".docx")) kind = "docx";
+      else if(lower.endsWith(".pdf")) kind = "pdf";
+      else if(lower.endsWith(".txt") || f.type === "text/plain") kind = "txt";
+      else { wfFileStatus("<strong>Format berkas belum didukung.</strong> Yang bisa diunggah: .txt, .docx, dan .pdf.", "err"); return; }
+      wfFileStatus("Membaca berkas <span class=\"fname\">" + escapeHtml(f.name) + "</span>…", "");
+      var p = kind === "txt" ? f.text() : f.arrayBuffer().then(kind === "docx" ? extractDocxText : extractPdfText);
+      p.then(function(text){
+        text = String(text || "");
+        var wc = wordsOf(text).length;
+        if(kind === "pdf" && (wc < 30 || looksGarbled(text))){
+          wfFileStatus("<strong>Teks dari PDF ini tidak terbaca</strong> — kemungkinan PDF hasil pindai/gambar (butuh OCR) atau font-nya tidak standar. Salin-tempel teksnya langsung ke kotak di atas.", "err");
+          return;
+        }
+        if(!text.trim() || wc === 0){
+          wfFileStatus("<strong>Tidak ada teks yang bisa dibaca dari berkas ini.</strong>", "err");
+          return;
+        }
+        wfTa.value = text;
+        wfUpdateCounters();
+        wfFileStatus("Berkas dimuat: <span class=\"fname\">" + escapeHtml(f.name) + "</span> — " + fmtNumID(wc) + " kata terbaca.", "ok");
+        wfRun();
+      }).catch(function(){
+        wfFileStatus("<strong>Berkas tidak bisa dibaca.</strong> Pastikan formatnya benar dan berkas tidak rusak, atau salin-tempel teksnya langsung.", "err");
+      });
+    }
+    if(wfTa){
+      wfTa.addEventListener("input", wfUpdateCounters);
+      $("wf-btn").addEventListener("click", wfRun);
+      $("wf-clear").addEventListener("click", function(){
+        wfTa.value = "";
+        wfUpdateCounters();
+        wfShowError("");
+        $("wf-file-status").innerHTML = "";
+        $("wf-file-status").className = "file-status";
+        $("wf-results").hidden = true;
+        wfTa.focus();
+      });
+      $("wf-file").addEventListener("change", function(ev){
+        if(ev.target.files && ev.target.files[0]) wfHandleFile(ev.target.files[0]);
+        ev.target.value = "";
+      });
+      $("wf-ex1").addEventListener("click", function(){ wfTa.value = CONTOH_MANUSIA; wfUpdateCounters(); wfRun(); });
+      $("wf-ex2").addEventListener("click", function(){ wfTa.value = CONTOH_AI; wfUpdateCounters(); wfRun(); });
+      wfUpdateCounters();
+    }
+
     /* ---------- Phase 2: aktivitas dashboard (hanya memori sesi — tanpa penyimpanan) ---------- */
     var dashRuns = 0, dashLast = null, dashBatch = null, dashCountedRun = -1;
     function dashBandLabel(p){
