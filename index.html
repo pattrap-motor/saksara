@@ -633,6 +633,27 @@
       .bn-pill{ display:inline-block; font-size:12px; font-weight:800; letter-spacing:.03em; border-radius:999px; padding:2px 10px; border:1px solid var(--warn-line); background:var(--warn-bg); color:var(--warn-ink); }
       .bn-pill.ok{ border-color:rgba(34,197,94,.5); background:rgba(34,197,94,.14); color:#15803D; }
       html[data-theme="dark"] .bn-pill.ok{ color:#4ADE80; }
+
+      /* ---------- Phase 6 (v0.14.0-beta): Productivity (OCR, Riwayat, Batch 2.0) ---------- */
+      .p6-chip{ display:inline-block; font-size:11.5px; font-weight:800; letter-spacing:.02em; border-radius:999px; padding:1px 9px; border:1px solid var(--line); background:var(--surface2); color:var(--muted); white-space:nowrap; }
+      .p6-chip.run{ border-color:rgba(47,155,232,.55); background:rgba(47,155,232,.13); color:var(--gold-ink); }
+      .p6-chip.ok{ border-color:rgba(34,197,94,.5); background:rgba(34,197,94,.13); color:#15803D; }
+      .p6-chip.err{ border-color:rgba(220,60,50,.45); background:var(--red-bg); color:var(--red-ink); }
+      html[data-theme="dark"] .p6-chip.ok{ color:#4ADE80; }
+      .hist-row{ border:1px solid var(--line); border-radius:12px; padding:12px 14px; margin-bottom:10px; background:var(--surface); }
+      .hist-row .hist-head{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; justify-content:space-between; }
+      .hist-row .hist-title{ font-weight:700; }
+      .hist-row .hist-sum{ font-size:13.5px; color:var(--muted); margin-top:4px; line-height:1.5; }
+      .hist-row .hist-btns{ display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+      .hist-detail{ margin-top:10px; border-top:1px dashed var(--line); padding-top:10px; }
+      .hist-detail pre{ white-space:pre-wrap; word-break:break-word; font:inherit; font-size:13.5px; background:var(--surface2); border-radius:10px; padding:10px 12px; max-height:260px; overflow:auto; }
+      .ocr-preview-wrap{ margin:10px 0; }
+      .ocr-preview-wrap canvas{ max-width:100%; height:auto; border:1px solid var(--line); border-radius:10px; background:#fff; }
+      .ocr-bar{ height:10px; border-radius:999px; background:var(--bar-track); overflow:hidden; margin:8px 0; }
+      .ocr-bar > div{ height:100%; width:0%; background:linear-gradient(90deg, var(--navy2), var(--navy)); transition:width .2s ease; }
+      .bq-row{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; justify-content:space-between; border:1px solid var(--line); border-radius:10px; padding:8px 12px; margin-bottom:6px; background:var(--surface); font-size:13.5px; }
+      .bq-row .bq-name{ font-weight:600; word-break:break-all; }
+      .bq-row .bq-meta{ color:var(--muted); font-size:12.5px; }
     </style>
   </head>
   <body>
@@ -649,6 +670,8 @@
           <a href="#/forensik" data-route="forensik">Writing Forensic</a>
           <a href="#/compare" data-route="compare">Bandingkan</a>
           <a href="#/benchmark" data-route="benchmark">Benchmark</a>
+          <a href="#/ocr" data-route="ocr">OCR</a>
+          <a href="#/history" data-route="history">Riwayat</a>
           <a href="#/cara-kerja" data-route="cara-kerja">Cara Kerja</a>
           <a href="#/metode" data-route="metode">Metode</a>
           <a href="#/posisi" data-route="posisi">Posisi &amp; Batasan</a>
@@ -667,6 +690,8 @@
         <a href="#/forensik" data-route="forensik">Writing Forensic</a>
         <a href="#/compare" data-route="compare">Bandingkan</a>
         <a href="#/benchmark" data-route="benchmark">Benchmark</a>
+        <a href="#/ocr" data-route="ocr">OCR</a>
+        <a href="#/history" data-route="history">Riwayat</a>
         <a href="#/cara-kerja" data-route="cara-kerja">Cara Kerja</a>
         <a href="#/metode" data-route="metode">Metode</a>
         <a href="#/posisi" data-route="posisi">Posisi &amp; Batasan</a>
@@ -706,11 +731,13 @@
         <h2 class="dash-h" id="dash-cepat-judul">Mau memeriksa apa hari ini?</h2>
         <div class="qa-grid">
           <a class="qa-card" href="#/detector"><span class="qa-t">Detector Teks</span><span class="qa-d">Tempel teks atau unggah berkas .txt, .docx, atau .pdf — skor indikasi AI per kalimat, sepenuhnya lokal.</span><span class="qa-go">Buka Detector →</span></a>
-          <a class="qa-card" href="#batch"><span class="qa-t">Analisis Batch</span><span class="qa-d">Periksa banyak berkas tugas sekaligus dalam satu antrean dan unduh rekapnya sebagai CSV.</span><span class="qa-go">Buka Batch →</span></a>
+          <a class="qa-card" href="#batch"><span class="qa-t">Analisis Batch</span><span class="qa-d">Antrekan sampai 50 berkas, proses berurutan, dan unduh rekapnya sebagai CSV, JSON, atau PDF.</span><span class="qa-go">Buka Batch →</span></a>
+          <a class="qa-card" href="#/forensik"><span class="qa-t">Writing Forensic</span><span class="qa-d">Ukur karakteristik tulisan — keragaman kosakata, ritme kalimat, konsistensi — tanpa menuduh siapa penulisnya.</span><span class="qa-go">Buka Forensic →</span></a>
+          <a class="qa-card" href="#/compare"><span class="qa-t">Bandingkan Dokumen</span><span class="qa-d">Diff dua versi dokumen per kata, kalimat, dan paragraf, plus perbandingan karakteristiknya.</span><span class="qa-go">Buka Bandingkan →</span></a>
+          <a class="qa-card" href="#/benchmark"><span class="qa-t">Benchmark Center</span><span class="qa-d">Hasil evaluasi mesin yang diaudit dan diterbitkan apa adanya — termasuk kelemahannya.</span><span class="qa-go">Lihat Benchmark →</span></a>
+          <a class="qa-card" href="#/ocr"><span class="qa-t">OCR Dokumen</span><span class="qa-d">Ekstrak teks dari gambar dan PDF pindai, lokal di peramban. Perlu unduhan model ±9,5 MB sekali, hanya bila Anda menyetujui.</span><span class="qa-go">Buka OCR →</span></a>
+          <a class="qa-card" href="#/history"><span class="qa-t">Riwayat Analisis</span><span class="qa-d">Simpan hasil analisis di perangkat ini — <strong id="dash-hist-state">nonaktif</strong> sampai Anda mengaktifkannya sendiri. Tanpa persetujuan, tidak ada yang disimpan.</span><span class="qa-go">Atur Riwayat →</span></a>
           <a class="qa-card" href="#clf-panel"><span class="qa-t">Penguat Classifier</span><span class="qa-d">Aktifkan model lokal ±280 MB sebagai lapis kedua — hanya menaikkan skor, tidak pernah menuduh sendirian.</span><span class="qa-go">Buka Panel Classifier →</span></a>
-          <a class="qa-card" href="#/cara-kerja"><span class="qa-t">Cara Kerja</span><span class="qa-d">Tujuh sinyal heuristik dijelaskan terbuka, langkah demi langkah.</span><span class="qa-go">Pelajari →</span></a>
-          <a class="qa-card" href="#/metode"><span class="qa-t">Metode &amp; Benchmark</span><span class="qa-d">Rumus skor, kalibrasi, dan hasil benchmark internal Bahasa Indonesia.</span><span class="qa-go">Lihat Metode →</span></a>
-          <a class="qa-card" href="#/posisi"><span class="qa-t">Posisi &amp; Batasan</span><span class="qa-d">Apa yang boleh dan tidak boleh disimpulkan dari sebuah skor.</span><span class="qa-go">Baca Posisi Kami →</span></a>
         </div>
         <div class="dash-row">
           <div class="dash-panel" aria-labelledby="dash-akt-judul">
@@ -723,7 +750,7 @@
               <li>Mesin heuristik: <strong>Siap</strong> — berjalan lokal, tanpa unduhan.</li>
               <li>Classifier: <strong id="dash-clf-state">Belum diaktifkan</strong></li>
               <li>Model di cache peramban: <strong id="dash-clf-cache">Diperiksa…</strong></li>
-              <li>Teks yang disimpan: <strong>Tidak ada</strong> — analisis tidak meninggalkan perangkat ini.</li>
+              <li>Penyimpanan lokal: <strong id="dash-storage-state">Tidak ada teks yang disimpan</strong> — riwayat hanya aktif bila Anda menyetujuinya di halaman Riwayat.</li>
             </ul>
             <a class="btn-ghost" href="#clf-panel">Buka Panel Classifier</a>
           </div>
@@ -954,11 +981,19 @@
         <div class="panel">
           <label for="batch-input" style="font-weight:700; display:block; margin-bottom:8px;">Berkas yang diperiksa</label>
           <input type="file" id="batch-input" multiple accept=".txt,.docx,.pdf,text/plain,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-label="Pilih banyak berkas .txt, .docx, atau .pdf" />
+          <p class="wf-note">Batas batch: maks <strong>50 berkas</strong>, per berkas maks <strong>20 MB</strong>, total maks <strong>100 MB</strong>. Berkas diproses satu per satu (sekuensial) agar memori aman; antrean dapat dibatalkan di tengah jalan dan berkas yang gagal dapat dicoba lagi.</p>
+          <div id="batch-queue"></div>
+          <p class="wf-note" id="batch-queue-note" aria-live="polite"></p>
           <div class="toolbar">
             <button type="button" class="primary" id="btn-batch">Proses Semua</button>
+            <button type="button" id="btn-batch-cancel" style="display:none;">Batalkan</button>
+            <button type="button" id="btn-batch-retry" style="display:none;">Coba Lagi yang Gagal</button>
             <button type="button" id="btn-batch-csv" style="display:none;">Unduh CSV</button>
+            <button type="button" id="btn-batch-json" style="display:none;">Unduh JSON</button>
+            <button type="button" id="btn-batch-pdf" style="display:none;">Unduh PDF Ringkasan</button>
           </div>
           <p class="batch-progress" id="batch-progress" role="status" aria-live="polite"></p>
+          <div id="batch-summary"></div>
           <div id="batch-results"></div>
         </div>
       </section>
@@ -1131,7 +1166,7 @@
         </div>
         <div class="wf-panel">
           <h3>Evaluasi Ensemble Heuristik v3 — VeritasAI-ID v0</h3>
-          <p class="wf-note">Dihitung 20 November 2026 dengan skrip evaluasi yang disimpan bersama kode sumber (<em>evaluate-v0.cjs</em>), menjalankan fungsi produksi persis di atas teks penuh dokumen. Set v0 berdomain <strong>berita &amp; ensiklopedis</strong> — bukan esai/tugas — jadi hasilnya mengukur perilaku mesin pada domain itu, bukan pada genre utama produk.</p>
+          <p class="wf-note">Dihitung 20 November 2026 dengan skrip evaluasi proyek (<em>evaluate-v0.cjs</em>), menjalankan fungsi produksi persis di atas teks penuh dokumen; agregat lengkapnya tertanam di halaman ini dan konsisten dengan hitungan confusion matrix yang ditampilkan. Set v0 berdomain <strong>berita &amp; ensiklopedis</strong> — bukan esai/tugas — jadi hasilnya mengukur perilaku mesin pada domain itu, bukan pada genre utama produk.</p>
           <div id="bn-v0"></div>
         </div>
         <div class="wf-panel">
@@ -1154,6 +1189,92 @@
           <p><strong>Batas generalisasi.</strong> Set regresi bukan sampel acak. VeritasAI-ID v0 hanya berisi berita/ensiklopedis 50–2.000 kata dengan AI satu generator (GPT-3.5); set eksternal GPT-4o menunjukkan performa dapat runtuh pada generator yang tidak terlihat. Tidak satu pun angka di halaman ini yang menjamin performa pada dokumen Anda — terutama dokumen pendek, parafrase, terjemahan, atau genre di luar data evaluasi.</p>
           <p><strong>Pemisahan data.</strong> Split v0 memakai group-split berbasis cluster (0 pelanggaran terverifikasi) dan dekontaminasi 13-gram terhadap set regresi (0 tumpang-tindih terverifikasi). Train/dev tidak dievaluasi di halaman ini. Ambang produksi tidak di-tuning pada v0; namun klaim "belum pernah dilihat selama pengembangan" tidak dapat dibuktikan sempurna, jadi angka v0 berstatus indikasi terukur — bukan jaminan.</p>
           <p><strong>Privasi &amp; lisensi.</strong> Tidak ada teks dataset yang diterbitkan ulang di halaman ini (hanya agregat); tidak ada dokumen pengguna yang dipakai untuk evaluasi; tidak ada API berbayar. Komponen dataset M4 berlisensi CC BY-NC-SA-4.0 (NonCommercial) — agregat evaluasi ini diterbitkan untuk transparansi riset.</p>
+        </div>
+      </section>
+
+      <section class="ocr" id="ocr" data-view="ocr" hidden aria-labelledby="ocr-judul">
+        <p class="wf-kicker">OCR Dokumen</p>
+        <h2 id="ocr-judul">Ekstrak teks dari gambar &amp; PDF pindai</h2>
+        <p class="wf-lede">OCR (pengenalan karakter optik) membaca halaman sebagai <strong>gambar</strong> dan menebak teksnya — jalan pintas untuk PDF hasil pindai atau berkas yang lapisan teksnya tidak terbaca. Ia <strong>tidak memperbaiki ekstraktor teks</strong> Saksara: ekstraksi teks biasa tetap jalur utama di semua halaman, dan temuan B-01 (PDF dengan font CID tanpa peta ToUnicode) tetap terbuka — OCR hanya dapat menolong bila halaman *tampil* benar di layar. Hasil OCR selalu dapat keliru; periksa dan sunting sebelum dipakai.</p>
+        <div class="wf-panel" id="ocr-consent">
+          <h3>Aktifkan OCR (unduhan satu kali, perlu persetujuan Anda)</h3>
+          <p class="wf-note">Tidak ada yang diunduh sebelum Anda menekan tombol di bawah. Yang akan diambil peramban dari CDN publik, lalu disimpan di cache peramban untuk kunjungan berikutnya:</p>
+          <table class="wf-table"><tbody>
+            <tr><td>Mesin Tesseract.js + inti WASM</td><td>±7,0 MB</td><td>cdn.jsdelivr.net</td></tr>
+            <tr><td>Data bahasa Indonesia (model fast)</td><td>±0,6 MB</td><td>tessdata.projectnaptha.com</td></tr>
+            <tr><td>Data bahasa Inggris (model fast)</td><td>±1,9 MB</td><td>tessdata.projectnaptha.com</td></tr>
+            <tr><td>pdf.js (merender halaman PDF menjadi gambar)</td><td>±1,1 MB</td><td>cdnjs.cloudflare.com</td></tr>
+          </tbody></table>
+          <p class="wf-note">Total ±10,6 MB, satu kali. Sesudah itu pengenalan berjalan <strong>sepenuhnya lokal</strong> — gambar dan hasil OCR tidak dikirim ke mana pun. Model "fast" dipilih demi ukuran; model yang lebih akurat berukuran ±4–6× lebih besar dan tidak dipakai di sini.</p>
+          <div class="wf-toolbar">
+            <button type="button" class="btn-primary" id="ocr-enable">Unduh &amp; aktifkan OCR</button>
+            <span class="wf-note" id="ocr-enable-status" aria-live="polite"></span>
+          </div>
+        </div>
+        <div class="wf-panel" id="ocr-work" hidden>
+          <h3>Berkas untuk OCR</h3>
+          <div class="wf-toolbar">
+            <span class="upload-wrap"><span class="upload-visual" aria-hidden="true">Pilih gambar / PDF</span><input type="file" id="ocr-file" accept=".png,.jpg,.jpeg,.webp,.bmp,.pdf,image/png,image/jpeg,image/webp,image/bmp,application/pdf" aria-label="Pilih gambar atau PDF untuk OCR" /></span>
+            <span class="wf-note" id="ocr-file-status" aria-live="polite"></span>
+          </div>
+          <div id="ocr-pages-wrap" hidden>
+            <p class="wf-note" id="ocr-page-info"></p>
+            <div class="wf-toolbar">
+              <label><input type="checkbox" id="ocr-page-all" checked /> Semua halaman</label>
+              <label for="ocr-page-list">atau halaman tertentu:</label>
+              <input type="text" id="ocr-page-list" placeholder="mis. 1,3,5" size="12" />
+            </div>
+            <div class="ocr-preview-wrap"><canvas id="ocr-preview" width="10" height="10"></canvas></div>
+          </div>
+          <div class="wf-toolbar">
+            <button type="button" class="btn-primary" id="ocr-run">Jalankan OCR</button>
+            <button type="button" class="btn-ghost" id="ocr-cancel" disabled>Batalkan</button>
+          </div>
+          <div class="ocr-bar" aria-hidden="true"><div id="ocr-bar-fill"></div></div>
+          <p class="wf-note" id="ocr-progress" aria-live="polite"></p>
+          <label for="ocr-out" style="font-weight:700; display:block; margin:10px 0 6px;">Hasil OCR (dapat disunting)</label>
+          <textarea id="ocr-out" class="wf-ta" placeholder="Hasil OCR akan muncul di sini…"></textarea>
+          <p class="wf-note" id="ocr-conf" aria-live="polite"></p>
+          <div class="wf-toolbar">
+            <button type="button" class="btn-ghost" id="ocr-copy">Salin hasil</button>
+            <button type="button" class="btn-ghost" id="ocr-dl">Unduh .txt</button>
+            <button type="button" class="btn-primary" id="ocr-to-detector">Analisis di Detector</button>
+          </div>
+        </div>
+        <div class="wf-panel">
+          <h3>Privasi &amp; permintaan jaringan</h3>
+          <p class="wf-note">Halaman ini jujur soal jaringan: mengaktifkan OCR mengunduh aset pada tabel di atas dari CDN-nya masing-masing, dan situs ini sendiri dimuat dari hosting Vercel. Di luar unduhan aset yang Anda picu sendiri (OCR, jsPDF untuk laporan, model classifier ±280 MB bila Anda mengaktifkannya), tidak ada permintaan lain — dan <strong>isi dokumen Anda tidak pernah termasuk</strong> dalam permintaan mana pun. OCR bukan bukti keaslian dokumen; teks hasil OCR adalah tebakan mesin atas gambar.</p>
+        </div>
+      </section>
+
+      <section class="history" id="history" data-view="history" hidden aria-labelledby="hist-judul">
+        <p class="wf-kicker">Riwayat Analisis</p>
+        <h2 id="hist-judul">Riwayat di perangkat ini</h2>
+        <p class="wf-lede">Riwayat bersifat <strong>ikut-serta (opt-in)</strong>: secara bawaan fitur ini nonaktif dan tidak ada basis data yang dibuat. Mengaktifkannya adalah keputusan Anda, dapat dimatikan dan dihapus kapan pun, dan seluruh isinya tinggal di IndexedDB peramban ini — tidak pernah dikirim ke server.</p>
+        <div class="wf-panel" id="hist-consent">
+          <h3>Persetujuan penyimpanan</h3>
+          <p class="wf-note">Dua persetujuan yang terpisah. Persetujuan pertama hanya menyimpan <strong>metadata hasil</strong> (jenis analisis, waktu, judul singkat, ringkasan angka) — bukan isi dokumen. Menyimpan <strong>teks dokumen</strong> memerlukan persetujuan kedua yang terpisah; teks dipotong pada 200.000 karakter dan ditandai. Dua penanda persetujuan kecil disimpan di localStorage agar pilihan Anda diingat; isi riwayatnya sendiri berada di IndexedDB.</p>
+          <label style="display:block; margin:8px 0;"><input type="checkbox" id="hist-c1" /> Aktifkan riwayat — simpan metadata hasil analisis di perangkat ini</label>
+          <label style="display:block; margin:8px 0;"><input type="checkbox" id="hist-c2" /> Izinkan juga menyimpan teks dokumen yang dianalisis (agar dapat dibuka kembali)</label>
+          <div class="wf-toolbar">
+            <button type="button" class="btn-primary" id="hist-enable">Simpan persetujuan</button>
+            <button type="button" class="btn-ghost" id="hist-disable">Nonaktifkan &amp; tawarkan hapus data</button>
+            <span class="wf-note" id="hist-state" aria-live="polite"></span>
+          </div>
+          <p class="wf-note" id="hist-usage"></p>
+          <div class="wf-toolbar">
+            <button type="button" class="btn-ghost" id="hist-clear-cache">Hapus cache model classifier (±280 MB)</button>
+            <span class="wf-note" id="hist-cache-status" aria-live="polite"></span>
+          </div>
+        </div>
+        <div class="wf-panel">
+          <h3>Entri riwayat</h3>
+          <div class="wf-toolbar">
+            <button type="button" class="btn-ghost" id="hist-refresh">Muat ulang daftar</button>
+            <button type="button" class="btn-ghost" id="hist-del-all">Hapus seluruh riwayat</button>
+            <span class="wf-note" id="hist-list-status" aria-live="polite"></span>
+          </div>
+          <div id="hist-list"></div>
         </div>
       </section>
 
@@ -1217,6 +1338,8 @@
           <a href="#/forensik">Writing Forensic</a>
           <a href="#/compare">Bandingkan</a>
           <a href="#/benchmark">Benchmark</a>
+          <a href="#/ocr">OCR</a>
+          <a href="#/history">Riwayat</a>
           <a href="#analisis">Analisis</a>
           <a href="#/cara-kerja">Cara Kerja</a>
           <a href="#/metode">Metode</a>
@@ -5158,8 +5281,8 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
     // Router tampilan per halaman (satu berkas): #/home, #/detector, #/cara-kerja, #/metode, #/posisi.
     // Tautan lama (#analisis, #clf-panel, #benchmark, …) tetap didukung lewat peta LEGACY.
     (function(){
-      var TITLES = { home: "Saksara — Gratis Deteksi Tulisan AI", detector: "Detector — Saksara", forensik: "Writing Forensic — Saksara", compare: "Bandingkan Dokumen — Saksara", benchmark: "Benchmark Center — Saksara", "cara-kerja": "Cara Kerja — Saksara", metode: "Metode — Saksara", posisi: "Posisi & Batasan — Saksara" };
-      var ROUTES = { "": "home", "/": "home", "/home": "home", "/detector": "detector", "/forensik": "forensik", "/compare": "compare", "/benchmark": "benchmark", "/cara-kerja": "cara-kerja", "/metode": "metode", "/posisi": "posisi" };
+      var TITLES = { home: "Saksara — Gratis Deteksi Tulisan AI", detector: "Detector — Saksara", forensik: "Writing Forensic — Saksara", compare: "Bandingkan Dokumen — Saksara", benchmark: "Benchmark Center — Saksara", ocr: "OCR — Saksara", history: "Riwayat Analisis — Saksara", "cara-kerja": "Cara Kerja — Saksara", metode: "Metode — Saksara", posisi: "Posisi & Batasan — Saksara" };
+      var ROUTES = { "": "home", "/": "home", "/home": "home", "/detector": "detector", "/forensik": "forensik", "/compare": "compare", "/benchmark": "benchmark", "/ocr": "ocr", "/history": "history", "/cara-kerja": "cara-kerja", "/metode": "metode", "/posisi": "posisi" };
       var LEGACY = { "analisis": ["detector", "analisis"], "panel-analisis": ["detector", "panel-analisis"], "clf-panel": ["detector", "clf-panel"], "report": ["detector", "report"], "batch": ["detector", "batch"], "cara-kerja": ["cara-kerja", null], "benchmark": ["metode", "benchmark-note"], "posisi": ["posisi", null], "atas": ["home", null] };
       function show(view, anchor){
         var blocks = document.querySelectorAll("[data-view]");
