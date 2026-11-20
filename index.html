@@ -208,6 +208,10 @@
       .clf-head{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; }
       .clf-title{ font-weight:700; font-size:15.5px; }
       .clf-desc{ font-size:13.5px; color:var(--muted); margin:10px 0 0; line-height:1.65; }
+      .clf-mobile-note{ display:none; }
+      @media (pointer: coarse){
+        .clf-mobile-note{ display:block; font-size:13px; line-height:1.55; color:var(--warn-ink); background:var(--warn-bg); border:1px solid var(--warn-line); border-radius:8px; padding:9px 12px; margin:10px 0 0; }
+      }
       .clf-status{ font-size:13.5px; margin:10px 0 0; font-weight:700; color:var(--ink);
         background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:8px 12px; display:inline-block; }
       .clf-actions{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
@@ -505,11 +509,13 @@
             <div class="clf-head">
               <div class="clf-title">Mesin Classifier — model terlatih, berjalan lokal di peramban</div>
               <div class="clf-actions">
+                <button type="button" id="btn-clf-cancel" style="display:none;">Batalkan Penilaian Classifier</button>
                 <button type="button" id="btn-clf-del" style="display:none;">Hapus cache model</button>
                 <button type="button" id="btn-clf">Aktifkan Penguat AI (±280 MB)</button>
               </div>
             </div>
-            <p class="clf-desc">Lapis kedua setelah pemeriksaan pola: sebuah <strong>model bahasa multibahasa</strong> yang sudah dilatih untuk membedakan teks manusia dan teks AI, berjalan <strong>sepenuhnya di peramban ini</strong> — tidak ada server yang menilai teks Anda. Berkas modelnya cukup besar (±280 MB) dan <strong>hanya diunduh bila Anda mengaktifkannya</strong> lewat tombol di panel ini — halaman ini <strong>tidak mengunduh apa pun secara otomatis</strong> saat dibuka, agar kuota data dan ruang penyimpanan Anda tetap hemat. Sekali diunduh, model <strong>tersimpan di peramban</strong> untuk kunjungan berikutnya (pengaktifan berikutnya tanpa unduhan), dan bisa dihapus kapan saja lewat tombol “Hapus cache model”. Satu-satunya lalu lintas jaringan hanyalah unduhan berkas model itu; teks yang dianalisis <strong>tidak pernah dikirim ke mana pun</strong>. Selagi model dimuat, halaman tetap berfungsi penuh dengan lapis pertama. Peran model ini adalah <strong>penguat</strong>: ia hanya boleh menaikkan skor bila lapis pertama sudah menemukan indikasi awal — bila tidak, skornya tidak dipakai sama sekali, karena model ini <strong>tidak pernah menuduh sendirian</strong>. Pada dokumen yang sangat panjang, model menilai paling banyak 100 bagian pertama teks (±120 ribu karakter). Penanda warna per kalimat tetap berasal dari lapis pertama. <strong>Keterbatasannya, apa adanya:</strong> pada pengujian kami, model ini sangat yakin pada teks AI formal — tetapi sebagian tulisan manusia yang sangat formal dan bergaya ensiklopedis juga dinilainya mirip AI, dan teks AI yang ditulis ulang (parafrase) dengan rapi bisa lolos darinya. Karena bias itulah ia ditempatkan hanya sebagai penguat di belakang lapis pertama.</p>
+            <p class="clf-desc">Lapis kedua setelah pemeriksaan pola: sebuah <strong>model bahasa multibahasa</strong> yang sudah dilatih untuk membedakan teks manusia dan teks AI, berjalan <strong>sepenuhnya di peramban ini</strong> — tidak ada server yang menilai teks Anda. Berkas modelnya cukup besar (±280 MB) dan <strong>hanya diunduh bila Anda mengaktifkannya</strong> lewat tombol di panel ini — halaman ini <strong>tidak mengunduh apa pun secara otomatis</strong> saat dibuka, agar kuota data dan ruang penyimpanan Anda tetap hemat. Sekali diunduh, model <strong>tersimpan di peramban</strong> untuk kunjungan berikutnya (pengaktifan berikutnya tanpa unduhan), dan bisa dihapus kapan saja lewat tombol “Hapus cache model”. Satu-satunya lalu lintas jaringan hanyalah unduhan berkas model itu; teks yang dianalisis <strong>tidak pernah dikirim ke mana pun</strong>. Selagi model dimuat, halaman tetap berfungsi penuh dengan lapis pertama. Peran model ini adalah <strong>penguat</strong>: ia hanya boleh menaikkan skor bila lapis pertama sudah menemukan indikasi awal — bila tidak, skornya tidak dipakai sama sekali, karena model ini <strong>tidak pernah menuduh sendirian</strong>. Pada dokumen yang sangat panjang, model menilai paling banyak 100 segmen teks yang disebar merata dari seluruh dokumen (30 segmen pada perangkat seluler/hemat). Penanda warna per kalimat tetap berasal dari lapis pertama. <strong>Keterbatasannya, apa adanya:</strong> pada pengujian kami, model ini sangat yakin pada teks AI formal — tetapi sebagian tulisan manusia yang sangat formal dan bergaya ensiklopedis juga dinilainya mirip AI, dan teks AI yang ditulis ulang (parafrase) dengan rapi bisa lolos darinya. Karena bias itulah ia ditempatkan hanya sebagai penguat di belakang lapis pertama.</p>
+            <p class="clf-mobile-note">Di HP, classifier berjalan memakai prosesor perangkat dan bisa terasa lambat — penilaian di perangkat seluler dibatasi 30 segmen yang disebar merata dari seluruh dokumen agar tetap ringan, dan Anda dapat membatalkannya kapan saja (skor heuristik tetap tampil). Untuk dokumen sangat panjang, desktop terasa jauh lebih cepat.</p>
             <div class="clf-progress" id="clf-progress" style="display:none;"><div class="clf-progress-fill" id="clf-progress-fill"></div></div>
             <p class="clf-status" id="clf-status" role="status" aria-live="polite">Status classifier: Penguat AI belum diaktifkan — skor saat ini 100% Ensemble Heuristik v3.</p>
           </div>
@@ -738,12 +744,16 @@
           <a href="#/posisi">Posisi &amp; Batasan</a>
         </nav>
         <p class="copy">© 2026 Saksara — Dikembangkan oleh Ciptanala Devs</p>
-        <p class="version-line">Versi <strong>v0.9.8-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
+        <p class="version-line">Versi <strong>v0.9.9-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
       </div>
     </footer>
 
     <dialog class="changelog" id="changelog-modal" aria-labelledby="changelog-title">
       <h2 id="changelog-title">Catatan Rilis — Saksara</h2>
+      <h3>v0.9.9-beta — 20 November 2026</h3>
+      <ul>
+        <li><strong>Classifier jauh lebih ringan di HP:</strong> pada perangkat seluler/hemat, penilaian classifier kini dibatasi <strong>30 segmen yang disebar merata dari seluruh dokumen</strong> (desktop tetap 100 segmen, kini juga tersebar merata — bukan hanya bagian awal), inferensi WASM dapat memakai <strong>beberapa inti prosesor sekaligus</strong> (multi-utas, bila peramban mengizinkan), dan selama penilaian berjalan tersedia tombol <strong>"Batalkan Penilaian Classifier"</strong> — skor heuristik tetap tampil penuh bila dibatalkan. Batas segmen yang terpakai diumumkan terbuka di laporan dan PDF.</li>
+      </ul>
       <h3>v0.9.8-beta — 20 November 2026</h3>
       <ul>
         <li><strong>Laporan PDF dirombak ala Turnitin:</strong> panel skor besar berwarna sesuai pita, teks yang diperiksa kini tampil dengan <strong>penanda warna</strong> — latar merah/kuning muda per kalimat terindikasi, frasa khas AI berwarna ungu tebal, pola kata berulang cokelat bergaris bawah — dilengkapi <strong>keterangan warna</strong>. Ketujuh sinyal Lapis 1 kini masing-masing berwarna berbeda pada batang nilainya, dan hasil <strong>pemeriksaan Lapis 2 (classifier)</strong> tampil sebagai bagian tersendiri lengkap dengan status gerbang penguat dan rumus gabungannya.</li>
@@ -1559,7 +1569,25 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       var CLF_FILE_SIZES = { "model_quantized.onnx": 438536, "model_quantized.onnx_data-000": 79922689, "model_quantized.onnx_data-001": 6489760, "model_quantized.onnx_data-002": 79999488, "model_quantized.onnx_data-003": 79999488, "model_quantized.onnx_data-004": 32002560 };
       var CLF_TOTAL_BYTES = 0; /* 278.852.521 B — jumlah keenam berkas di atas */
       for(var clfSizeKey in CLF_FILE_SIZES){ CLF_TOTAL_BYTES += CLF_FILE_SIZES[clfSizeKey]; }
-      var MAX_CLF_CHUNKS = 100; /* classifier menilai maks. 100 segmen pertama teks (±120 rb karakter); diumumkan terbuka bila terpicu */
+      var MAX_CLF_CHUNKS = 100; /* classifier menilai maks. 100 segmen (30 di perangkat seluler/hemat) yang disebar merata dari seluruh dokumen; diumumkan terbuka bila terpicu */
+      var MOBILE_CLF_CHUNKS = 30; /* batas segmen hemat untuk HP/perangkat lemah — prosesor ponsel jauh lebih lambat dari desktop */
+      var clfCancelRequested = false; /* diset tombol "Batalkan Penilaian"; diperiksa clfScorePass di antara segmen */
+      function clfChunkCap(){
+        try{
+          var coarse = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+          var cores = (typeof navigator !== "undefined" && navigator.hardwareConcurrency) || 8;
+          var mem = (typeof navigator !== "undefined" && navigator.deviceMemory) || 8;
+          if(coarse || cores <= 4 || mem <= 4) return MOBILE_CLF_CHUNKS;
+        }catch(e){ /* abaikan — pakai batas penuh */ }
+        return MAX_CLF_CHUNKS;
+      }
+      function showClfCancel(show){
+        var b = $("btn-clf-cancel");
+        if(!b) return;
+        b.style.display = show ? "" : "none";
+        b.disabled = false;
+        b.textContent = "Batalkan Penilaian Classifier";
+      }
       var clfState = "off"; /* off | loading | ready | error */
       var clfOrt = null;       /* modul onnxruntime-web */
       var clfSession = null;   /* ort.InferenceSession */
@@ -1570,7 +1598,9 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       var lastText = "", analysisRunSeq = 0;
       var lastClfScore = null; /* skor classifier (0..1) pada laporan yang tampil, atau null */
       var lastClfApplied = false; /* true bila penguat bersyarat diterapkan pada laporan yang tampil (heuristik ≥ 0,35) */
-      var lastClfTruncated = false; /* true bila skor classifier hanya menilai 100 segmen pertama (dokumen sangat panjang) */
+      var lastClfTruncated = false; /* true bila skor classifier hanya menilai sebagian segmen (dokumen sangat panjang) */
+      var lastClfSampled = false; /* true bila segmen classifier disebar merata dari seluruh dokumen (bukan hanya awal) */
+      var lastClfCapUsed = 0; /* batas segmen yang berlaku pada penilaian classifier laporan ini */
       var lastWatchSignal = null; /* {heur, clf} bila sinyal waspada tampil pada laporan ini (heuristik < 0,35 tetapi classifier >= 0,85) */
       var clfProvider = null; /* "WebGPU" | "WASM" — penyedia eksekusi sesi yang sedang aktif */
       var clfBuffers = null; /* buffer grafik + shard; disimpan agar sesi bisa dibuat ulang sebagai WASM bila inferensi WebGPU gagal di tengah penilaian */
@@ -1706,6 +1736,17 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           if(ort.env && ort.env.wasm && typeof location !== "undefined" && /^https?:$/.test(location.protocol)){
             ort.env.wasm.wasmPaths = CLF_ORT_WASM;
           }
+          // Multi-utas WASM: inferensi memakai beberapa inti prosesor sekaligus
+          // (percepatan besar di HP multicore) — hanya mungkin bila halaman
+          // terisolasi lintas-asal (header COOP/COEP pada vercel.json memberi
+          // SharedArrayBuffer). Tanpa isolasi, peramban membatasi ke 1 utas
+          // dan pengaturan ini tidak berdampak apa pun.
+          try{
+            if(ort.env && ort.env.wasm && typeof crossOriginIsolated !== "undefined" && crossOriginIsolated){
+              var th = (typeof navigator !== "undefined" && navigator.hardwareConcurrency) || 2;
+              ort.env.wasm.numThreads = Math.max(1, Math.min(4, th));
+            }
+          }catch(e){ /* abaikan — tetap 1 utas */ }
           // 2) Unduh grafik + 5 shard dengan progres AGREGAT (total ±278,9 MB);
           //    pada kunjungan berikutnya keenamnya dilayani Cache API.
           var names = [CLF_GRAPH].concat(CLF_SHARDS);
@@ -1790,6 +1831,12 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         }
       }
       $("btn-clf").addEventListener("click", function(){ loadClassifier(); });
+      $("btn-clf-cancel").addEventListener("click", function(){
+        clfCancelRequested = true;
+        var b = $("btn-clf-cancel");
+        b.disabled = true;
+        b.textContent = "Membatalkan…";
+      });
       async function deleteClfCache(){
         // Hapus seluruh cache model dari peramban dan jatuhkan sesi yang
         // aktif; panel kembali ke keadaan "belum diaktifkan". Laporan yang
@@ -1855,10 +1902,25 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         // karakter ≈ 20 rb kata, ±25× contoh bawaan terpanjang); rata-rata
         // dihitung dari segmen yang dinilai, persis seperti sebelumnya, dan
         // pemotongannya diumumkan terbuka (tanda truncated -> baris mesin).
-        var clfTruncated = chunks.length > MAX_CLF_CHUNKS;
-        if(clfTruncated) chunks = chunks.slice(0, MAX_CLF_CHUNKS);
+        var capUsed = clfChunkCap();
+        var clfTruncated = chunks.length > capUsed;
+        var sampledEvenly = false;
+        if(clfTruncated){
+          // Sebar merata ke SELURUH dokumen, bukan hanya awalnya: sampel
+          // tetap mewakili keseluruhan teks walau jumlah segmen dibatasi
+          // (di HP batasnya 30 agar penilaian tidak menyandera ponsel).
+          var picked = [];
+          var stepF = chunks.length / capUsed;
+          for(var si = 0; si < capUsed; si++) picked.push(chunks[Math.floor(si * stepF)]);
+          chunks = picked;
+          sampledEvenly = true;
+        }
         var all = [];
         for(var i = 0; i < chunks.length; i++){
+          if(clfCancelRequested){
+            clfCancelRequested = false;
+            return { cancelled: true, score: null, windows: all.length, truncated: clfTruncated, sampled: sampledEvenly, cap: capUsed };
+          }
           // Umpan manual persis seperti pembuktian: tokenisasi tanpa tensor,
           // tensor int64 [1, n] untuk setiap nama input sesi, lalu softmax.
           var enc = clfTokenizer(chunks[i], { return_tensor: false, truncation: true });
@@ -1886,7 +1948,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         }
         if(!all.length) return null;
         var sum = all.reduce(function(a, x){ return a + x; }, 0);
-        return { score: sum / all.length, windows: all.length, truncated: clfTruncated };
+        return { score: sum / all.length, windows: all.length, truncated: clfTruncated, sampled: sampledEvenly, cap: capUsed };
       }
       async function runClassifierScore(text, onProgress){
         if(clfState !== "ready" || !clfSession || !clfTokenizer) return null;
@@ -1916,6 +1978,8 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         $("pct-clf").textContent = "…";
         $("fill-clf").style.width = "0%";
         $("desc-clf").textContent = "Classifier lokal sedang menilai teks ini di peramban ini (teks dibagi per paragraf menjadi potongan-potongan ±1.200 karakter)…";
+        clfCancelRequested = false;
+        showClfCancel(true);
         var r = await runClassifierScore(text, function(done, total){
           if(runId !== analysisRunSeq || lastResult !== res) return; /* laporan sudah digantikan analisis lain */
           $("engine-line").textContent = "Mesin skor: Ensemble Heuristik v3 — classifier sedang dihitung… (segmen " + done + "/" + total + ")";
@@ -1925,15 +1989,33 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           lastClfScore = null;
           lastClfApplied = false;
           lastClfTruncated = false;
+          lastClfSampled = false;
+          lastClfCapUsed = 0;
           $("pct-clf").textContent = "—";
           $("fill-clf").style.width = "0%";
           $("desc-clf").textContent = "Classifier lokal tidak menghasilkan skor untuk teks ini — skor yang tampil tetap 100% Ensemble Heuristik v3.";
           $("engine-line").textContent = "Mesin skor: Ensemble Heuristik v3 (classifier tidak menghasilkan skor)";
+          showClfCancel(false);
+          return;
+        }
+        if(r.cancelled){
+          lastClfScore = null;
+          lastClfApplied = false;
+          lastClfTruncated = false;
+          lastClfSampled = false;
+          lastClfCapUsed = 0;
+          $("pct-clf").textContent = "—";
+          $("fill-clf").style.width = "0%";
+          $("desc-clf").textContent = "Penilaian classifier dibatalkan — skor yang tampil 100% Ensemble Heuristik v3.";
+          $("engine-line").textContent = "Mesin skor: Ensemble Heuristik v3 (penilaian classifier dibatalkan)";
+          showClfCancel(false);
           return;
         }
         lastClfScore = r.score;
         lastClfTruncated = !!r.truncated;
-        var clfTruncNote = r.truncated ? " (classifier menilai " + MAX_CLF_CHUNKS + " segmen pertama teks)" : "";
+        lastClfSampled = !!r.sampled;
+        lastClfCapUsed = r.cap || MAX_CLF_CHUNKS;
+        var clfTruncNote = r.truncated ? " (classifier menilai " + (r.cap || MAX_CLF_CHUNKS) + " segmen yang disebar merata dari seluruh dokumen)" : "";
         $("pct-clf").textContent = pct(r.score) + "%";
         $("fill-clf").style.width = pct(r.score) + "%";
         // PENGUAT BERSYARAT — aturan gerbang persis: heuristik < 0,35 → skor
@@ -1967,6 +2049,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
             bw.classList.add("show");
           }
         }
+        showClfCancel(false);
       }
 
       function applyScore(score, blended){
@@ -2510,7 +2593,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           if(lastClfScore !== null && lastClfScore !== undefined){
             write("Model: XLM-RoBERTa multibahasa (xlm-roberta-base-finetuned-HC3-mix) — berjalan sepenuhnya lokal di peramban; teks tidak dikirim ke server mana pun.", 10, "normal", 3, MUT);
             barRow("Probabilitas AI menurut classifier", lastClfScore, CLF_COLOR, 218);
-            if(lastClfTruncated) write("Catatan cakupan classifier: dokumen sangat panjang — classifier menilai " + MAX_CLF_CHUNKS + " segmen pertama teks (maks. +/-120 ribu karakter).", 10, "italic");
+            if(lastClfTruncated) write("Catatan cakupan classifier: dokumen panjang — classifier menilai " + (lastClfCapUsed || MAX_CLF_CHUNKS) + " segmen yang disebar merata dari seluruh dokumen" + (lastClfCapUsed && lastClfCapUsed < MAX_CLF_CHUNKS ? " (batas hemat perangkat: " + lastClfCapUsed + " segmen)" : "") + ".", 10, "italic");
             if(lastClfApplied){
               var blended = res.final + (1 - res.final) * lastClfScore * 0.5;
               write("Gerbang penguat TERBUKA — heuristik " + pct(res.final) + "% >= 35%, sehingga classifier ikut menaikkan skor akhir.", 10.5);
@@ -3193,7 +3276,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         var finalScore = res.final;
         if(clfState === "ready"){
           var r = await runClassifierScore(capped.text, null);
-          if(r && res.final >= 0.35){
+          if(r && typeof r.score === "number" && res.final >= 0.35){
             finalScore = res.final + (1 - res.final) * r.score * 0.5;
           }
         }
