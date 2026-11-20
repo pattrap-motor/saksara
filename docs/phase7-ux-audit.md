@@ -82,3 +82,34 @@ Basis: produksi v0.14.0-beta (main cdb1a08). Berkas identik md5 dengan produksi.
 Mesin skor & seluruh bobot/ambang/gerbang, skor per kalimat, baseline,
 API, privasi (toggle tampilan hanya di memori sesi — tanpa penyimpanan
 baru), identitas Langit Cerah, arsitektur vanilla, semua ID elemen.
+
+## Tambahan (brief lengkap, 21 Nov 2026)
+
+- **Beranda**: kotak periksa langsung (tempel teks / unggah berkas) dengan
+  serah-terima ke Detector — teks dan berkas diproses oleh jalur yang sama
+  persis dengan halaman Detector. Strip angka benchmark dipindah dari
+  hero ke bagian bawah (di bawah fitur) dengan judul "Angka dari
+  pengujian kami"; chip "7 sinyal heuristik + classifier" diganti
+  "Metode terbuka — bukan kotak hitam".
+- **Alur berlangkah**: indikator 3 langkah di Detector (Masukkan tulisan
+  → Periksa Tulisan → Pahami hasilnya) dan 4 langkah di Batch (Pilih
+  dokumen → Periksa Semua Berkas → Lihat hasil → Unduh laporan).
+- **Compare**: tab diganti nama — Ringkasan perubahan · Lihat
+  berdampingan · Lihat perubahan langsung — plus legenda cara membaca
+  (+/−/≈ dan arti kemiripan tekstual).
+- **Benchmark**: keterangan penamaan tingkat — Sederhana = Ringkasan
+  untuk umum, Mendalam = Detail Peneliti.
+- **Riwayat**: panel "Singkatnya" menjelaskan dua persetujuan terpisah
+  (ringkasan saja vs ringkasan + teks) sebelum panel persetujuan.
+- **OCR**: kalimat manfaat ("Cocok untuk: tugas yang difoto, dokumen
+  pindai, PDF tak terbaca") pada lede.
+- **Metode**: catatan pembuka bahwa halaman itu dokumentasi teknis untuk
+  peninjau/peneliti; pengguna umum cukup membaca Cara Menggunakan.
+- **Footer**: tautan diganti set ramah yang sama dengan navigasi;
+  paragraf teknis panjang ditulis ulang lebih singkat & awam (fakta
+  sama); Catatan Rilis mendapat entri v0.15.0-beta berbahasa sederhana.
+- **Simulasi pengguna awam** (peramban nyata): buka Beranda → tempel
+  teks di kotak periksa → hasil 77% + kartu kesimpulan → unggah berkas
+  dari Beranda → hasil terproses → bandingkan dua tulisan → aktifkan
+  Riwayat (centang persetujuan ringkasan) → hasil tersimpan "Skor 9% ·
+  295 kata · tanpa teks". Semua lulus, nol error konsol.
