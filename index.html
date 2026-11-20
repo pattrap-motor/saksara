@@ -120,12 +120,14 @@
       .clf-head{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; }
       .clf-title{ font-weight:700; font-size:15.5px; }
       .clf-desc{ font-size:13.5px; color:var(--muted); margin:9px 0 0; }
-      .clf-progress{ margin-top:11px; }
-      .clf-bar{ height:9px; background:var(--bar-track); border-radius:999px; overflow:hidden; }
-      .clf-fill{ height:100%; width:0%; background:var(--gold); border-radius:999px; transition:width .3s ease; }
       .clf-status{ font-size:13.5px; margin:9px 0 0; font-weight:600; }
       .score-card .engine-line{ font-family:"IBM Plex Mono", monospace; font-size:12.5px; }
-      @media (prefers-reduced-motion: reduce){ .clf-fill{ transition:none; } }
+      /* ---------- laporan PDF ---------- */
+      .pdf-panel{ margin-top:18px; background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:18px 24px; box-shadow:var(--shadow); }
+      .pdf-head{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; }
+      .pdf-head h3{ font-size:18px; margin:0; }
+      .pdf-note{ font-size:13.5px; color:var(--muted); margin:9px 0 0; }
+      #pdf-status{ font-weight:600; }
       /* ---------- report ---------- */
       section.report{ margin-top:30px; display:none; }
       section.report.show{ display:block; }
@@ -173,6 +175,41 @@
       .sent-detail.show{ display:block; }
       .sent-detail .sd-score{ font-family:"IBM Plex Mono", monospace; font-weight:600; font-size:19px; }
       .sent-detail ul{ margin:8px 0 0; padding-left:18px; color:var(--muted); }
+      .sent-detail ul li{ margin-bottom:5px; }
+      .sent-detail ul li strong{ color:var(--ink); }
+      .sd-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; font-weight:700; font-size:15px; margin-bottom:2px; }
+      .sd-band{ flex:none; font-size:11.5px; font-weight:700; letter-spacing:.05em; border-radius:999px; padding:3px 10px; }
+      .sd-band.r{ background:var(--red-bg); color:var(--red-ink); }
+      .sd-band.y{ background:var(--yel-bg); color:var(--yel-ink); }
+      .sd-band.g{ background:var(--grn-bg); color:var(--grn-ink); }
+      .sd-quote{ margin:10px 0 4px; padding:10px 14px; border-left:3px solid var(--gold); background:var(--surface);
+        border-radius:0 8px 8px 0; font-size:14.5px; line-height:1.6; color:var(--ink); }
+      .sd-sec{ font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin:14px 0 2px; }
+      .sd-suggest{ margin-top:14px; border:1px solid var(--gold); border-radius:10px; padding:4px 14px 12px; background:var(--surface); }
+      .sd-suggest .sd-sec{ color:var(--gold-ink); margin-top:10px; }
+      .sd-suggest p{ margin:6px 0 2px; color:var(--muted); }
+      .sd-suggest ul{ color:var(--muted); }
+      /* ---------- topbar & kicker ---------- */
+      .topbar{ background:var(--navy); color:#fff; font-size:12.5px; font-weight:600; letter-spacing:.04em;
+        text-align:center; padding:7px 20px; }
+      .topbar .dot{ color:var(--gold); padding:0 6px; }
+      .kicker{ font-size:11.5px; font-weight:700; letter-spacing:.13em; text-transform:uppercase; color:var(--gold-ink); margin-bottom:5px; }
+      /* ---------- posisi & batasan ---------- */
+      section.posisi{ margin-top:34px; }
+      section.posisi h2{ font-size:24px; margin-bottom:6px; }
+      section.posisi .sub{ color:var(--muted); margin:0 0 18px; max-width:760px; }
+      .posisi-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+      .posisi-card{ background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:18px 20px; box-shadow:var(--shadow); }
+      .posisi-card h3{ font-size:16.5px; margin:0 0 6px; }
+      .posisi-card p{ margin:0; font-size:14px; color:var(--muted); }
+      .posisi-note{ margin:16px 0 0; font-size:13.5px; color:var(--muted); border-left:3px solid var(--gold); padding:4px 0 4px 14px; }
+      .posisi-note code{ font-family:"IBM Plex Mono", monospace; font-size:12.5px; background:var(--surface2); padding:1px 5px; border-radius:4px; }
+      /* ---------- polish umum ---------- */
+      button{ transition:filter .15s ease, background-color .15s ease; }
+      button:focus-visible, .sent:focus-visible, a:focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
+      .score-card{ border-top:4px solid var(--gold); }
+      .sent{ transition:background-color .2s ease; }
+      @media (max-width:860px){ .posisi-grid{ grid-template-columns:1fr; } }
       /* honesty */
       .honesty{ margin-top:18px; border:1.5px solid var(--accent); border-radius:12px; padding:16px 18px; background:var(--surface); }
       .honesty h3{ font-size:16px; color:var(--accent); margin-bottom:5px; }
@@ -200,6 +237,7 @@
     </style>
   </head>
   <body>
+    <div class="topbar">Prototipe riset<span class="dot">·</span>Skrining awal tulisan akademik Bahasa Indonesia<span class="dot">·</span>Bukan alat vonis</div>
     <div class="wrap">
       <header class="hero">
         <div class="brand-row">
@@ -212,10 +250,11 @@
           </div>
           <span class="proto-badge">Prototipe</span>
         </div>
-        <p class="lede">Tempel teks tugas atau unggah berkas .txt, .docx, atau .pdf, lalu lihat skor indikasi AI-nya beserta kalimat-kalimat yang paling mencurigakan — gaya laporan seperti Turnitin. Semua analisis berjalan di peramban ini; tidak ada teks yang dikirim ke server mana pun.</p>
+        <p class="lede">Tempel teks tugas atau unggah berkas .txt, .docx, atau .pdf, lalu lihat skor indikasi AI-nya beserta kalimat-kalimat yang paling mencurigakan — gaya laporan seperti Turnitin. Analisis heuristik berjalan sepenuhnya di peramban ini; pemeriksaan classifier mendalam yang opsional mengirim teks ke server classifier VeritasAI — diproses di memori server dan tidak disimpan.</p>
       </header>
 
       <section class="method" aria-labelledby="metode-judul">
+        <div class="kicker">Metode</div>
         <h2 id="metode-judul">Cara kerja metode</h2>
         <p class="sub">Tidak ada detektor yang “tahu” sebuah teks dibuat AI. Yang diukur adalah pola statistik tulisan. Prototipe ini memakai <strong>Ensemble Heuristik v3</strong> — tujuh sinyal digabungkan: setiap kalimat dinilai, kepadatan frasa dan pengulangan pola dihitung di seluruh dokumen, lalu bukti-bukti terkuat (kepadatan frasa formulaik dan pengulangan pola templat) diberi bobot terbesar dan saling menguatkan bila muncul bersamaan:</p>
         <div class="steps">
@@ -227,10 +266,11 @@
           <div class="step"><span class="num">SINYAL 6</span><h3>Simetri Paragraf</h3><p>Paragraf-paragraf yang panjang dan jumlah kalimatnya seragam satu sama lain, apalagi diawali pembuka generik (“Selain itu,”, “Selanjutnya,”, “Kesimpulannya,”) — struktur khas teks hasil generate.</p></div>
           <div class="step"><span class="num">SINYAL 7</span><h3>Pengulangan Frasa</h3><p>Pola 4 kata yang sama muncul berulang 3 kali atau lebih di seluruh dokumen. Teks generik memakai ulang rangkaian kata yang sama berkali-kali; tulisan manusia yang konkret jarang melakukannya. Kalimat yang memuat pola berulang ikut terangkat skornya, dan sinyal ini menjadi bukti utama bersama kepadatan frasa.</p></div>
         </div>
-        <p class="formula">Skor kalimat = <code>0,52×frasa + 0,32×kedekatan panjang ke rata-rata + 0,16×awalan berulang</code> (ditambah bonus bila kalimat memuat pola 4 kata berulang atau sisa markdown) · Skor akhir = <code>0,47×rata-rata skor kalimat + 0,53×skor global 7 sinyal</code>, lalu diberi dorongan bukti gabungan bila kepadatan frasa dan pengulangan pola sama-sama tinggi, atau bila sisa markdown bertemu kepadatan frasa yang tinggi. Mesin bawaan saat ini: <strong>Ensemble Heuristik v3</strong>, dikalibrasi ulang pada profil dokumen refleksi generik hasil generate AI. Sebagai lapis tambahan tersedia <strong>classifier terlatih opsional</strong> (tombol aktivasi di panel analisis): model klasifikasi teks AI yang berjalan lokal di peramban; bila aktif, skor akhir = <code>0,65×classifier + 0,35×heuristik v3</code> dan label mesin menjadi “Classifier + Heuristik v3”. Penanda warna per kalimat selalu berasal dari heuristik v3.</p>
+        <p class="formula">Skor kalimat = <code>0,52×frasa + 0,32×kedekatan panjang ke rata-rata + 0,16×awalan berulang</code> (ditambah bonus bila kalimat memuat pola 4 kata berulang atau sisa markdown) · Skor akhir = <code>0,47×rata-rata skor kalimat + 0,53×skor global 7 sinyal</code>, lalu diberi dorongan bukti gabungan bila kepadatan frasa dan pengulangan pola sama-sama tinggi, atau bila sisa markdown bertemu kepadatan frasa yang tinggi. Mesin bawaan saat ini: <strong>Ensemble Heuristik v3</strong>, dikalibrasi ulang pada profil dokumen refleksi generik hasil generate AI. Sebagai lapis tambahan tersedia <strong>classifier terlatih opsional</strong> (tombol aktivasi di panel analisis): model klasifikasi teks AI yang berjalan di server classifier VeritasAI — teks dikirim ke server itu khusus untuk penilaian classifier, diproses di memori, dan tidak disimpan; bila aktif, skor akhir = <code>0,65×classifier + 0,35×heuristik v3</code> dan label mesin menjadi “Classifier + Heuristik v3”. Penanda warna per kalimat selalu berasal dari heuristik v3.</p>
       </section>
 
       <section class="analyzer" aria-labelledby="analisis-judul">
+        <div class="kicker">Analisis</div>
         <h2 id="analisis-judul">Analisis teks</h2>
         <p class="sub">Tempel teks tugas di bawah ini, unggah berkas .txt, .docx, atau .pdf (klik tombol Unggah, atau seret &amp; letakkan berkas ke panel ini), atau coba salah satu contoh uji.</p>
         <div class="panel" id="panel-analisis">
@@ -244,14 +284,13 @@
           </div>
           <div class="clf-panel" id="clf-panel">
             <div class="clf-head">
-              <div class="clf-title">Mesin Classifier — model terlatih (opsional)</div>
-              <button type="button" id="btn-clf">Aktifkan Mesin Classifier (unduh model sekali)</button>
+              <div class="clf-title">Mesin Classifier — model terlatih di server (opsional)</div>
+              <button type="button" id="btn-clf">Aktifkan Mesin Classifier (server)</button>
             </div>
-            <p class="clf-desc">Lapis kedua di luar heuristik: model klasifikasi teks AI (keluarga RoBERTa, di-fine-tune pada korpus HC3) yang diunduh sekali dari Hugging Face lalu berjalan <strong>sepenuhnya lokal di peramban ini</strong> — teks Anda tidak dikirim ke server mana pun, dan halaman tetap berfungsi penuh tanpa lapis ini. Bila aktif, skor akhir = <strong>0,65 × classifier + 0,35 × Ensemble Heuristik v3</strong>; penanda warna per kalimat tetap dari heuristik v3. <strong>Keterbatasan bahasa, disampaikan apa adanya:</strong> belum ada classifier deteksi AI Bahasa Indonesia yang terverifikasi dan kompatibel ONNX untuk peramban; model yang tersedia dilatih terutama pada teks Inggris/Mandarin, jadi untuk teks Bahasa Indonesia perlakukan skor classifier sebagai pendukung — heuristik v3 tetap penyeimbang utamanya dan rincian 7 sinyalnya selalu ditampilkan penuh. Di perangkat kelas bawah, unduhan model (ratusan MB) dan proses inferensinya bisa terasa lambat.</p>
-            <div class="clf-progress" id="clf-progress" hidden><div class="clf-bar"><div class="clf-fill" id="clf-fill"></div></div></div>
+            <p class="clf-desc">Lapis kedua di luar heuristik: model klasifikasi teks AI (XLM-RoBERTa, di-fine-tune pada korpus HC3) yang berjalan di <strong>server classifier VeritasAI</strong> — tidak ada lagi unduhan model ratusan MB ke peramban Anda. Bila lapis ini Anda aktifkan, teks yang dianalisis <strong>dikirim ke server classifier</strong> untuk dinilai; server memprosesnya <strong>di memori dan tidak menyimpannya</strong>. Analisis heuristik v3 sendiri tetap <strong>sepenuhnya lokal di peramban ini</strong>, dan halaman berfungsi penuh tanpa lapis classifier. Bila aktif, skor akhir = <strong>0,65 × classifier + 0,35 × Ensemble Heuristik v3</strong>; penanda warna per kalimat tetap dari heuristik v3. <strong>Keterbatasan bahasa, disampaikan apa adanya:</strong> belum ada classifier deteksi AI Bahasa Indonesia yang terverifikasi; model server ini dilatih terutama pada teks Inggris/Mandarin, jadi untuk teks Bahasa Indonesia perlakukan skor classifier sebagai pendukung — heuristik v3 tetap penyeimbang utamanya dan rincian 7 sinyalnya selalu ditampilkan penuh. Server gratis dapat tertidur bila lama tidak dipakai; pemeriksaan pertama setelah itu bisa lambat karena server sedang bangun.</p>
             <p class="clf-status" id="clf-status" role="status" aria-live="polite">Status classifier: belum aktif — skor saat ini 100% Ensemble Heuristik v3.</p>
           </div>
-          <p class="file-note"><strong>Batas &amp; cakupan:</strong> tidak ada batas maksimum — seluruh teks yang terbaca dari berkas akan dianalisis, berapa pun jumlah kata atau kalimatnya. Dari DOCX dibaca isi utama, tabel, kotak teks, catatan kaki/akhir, komentar, serta header dan footer; dari PDF dibaca lapisan teks dari semua halaman. Agar hasil dapat dipegang, teks disarankan minimal ±300 kata. PDF hasil pindai (gambar) tidak punya lapisan teks sehingga belum bisa dibaca — tempel teksnya langsung. Format .doc lama juga belum didukung; simpan ulang sebagai .docx dari Word/Google Docs. Mesin analisis saat ini adalah <strong>Ensemble Heuristik v3</strong> dengan 7 sinyal — termasuk sisa markdown, simetri paragraf, dan pengulangan frasa — yang dikalibrasi ulang agar dokumen refleksi generik hasil generate AI (kepadatan frasa birokrasi tinggi + pola kata yang dipakai ulang di seluruh dokumen) tertangkap di pita indikasi tinggi, bukan lolos di pita rendah. <strong>Classifier opsional:</strong> bila Mesin Classifier diaktifkan, model terlatih diunduh sekali dari Hugging Face (kemudian tersimpan di cache peramban) dan berjalan sepenuhnya lokal di peramban pengunjung — teks tetap tidak dikirim ke server mana pun. Model peramban yang tersedia saat ini dilatih terutama pada korpus Inggris/Mandarin (HC3), bukan Bahasa Indonesia, jadi bacalah skor classifier bersama rincian heuristik v3 yang memang dibangun untuk Bahasa Indonesia. Apa pun mesinnya, skor tetap indikasi statistik, bukan bukti.</p>
+          <p class="file-note"><strong>Batas &amp; cakupan:</strong> tidak ada batas maksimum — seluruh teks yang terbaca dari berkas akan dianalisis, berapa pun jumlah kata atau kalimatnya. Dari DOCX dibaca isi utama, tabel, kotak teks, catatan kaki/akhir, komentar, serta header dan footer; dari PDF dibaca lapisan teks dari semua halaman. Agar hasil dapat dipegang, teks disarankan minimal ±300 kata. PDF hasil pindai (gambar) tidak punya lapisan teks sehingga belum bisa dibaca — tempel teksnya langsung. Format .doc lama juga belum didukung; simpan ulang sebagai .docx dari Word/Google Docs. Mesin analisis saat ini adalah <strong>Ensemble Heuristik v3</strong> dengan 7 sinyal — termasuk sisa markdown, simetri paragraf, dan pengulangan frasa — yang dikalibrasi ulang agar dokumen refleksi generik hasil generate AI (kepadatan frasa birokrasi tinggi + pola kata yang dipakai ulang di seluruh dokumen) tertangkap di pita indikasi tinggi, bukan lolos di pita rendah. <strong>Classifier opsional:</strong> bila Mesin Classifier diaktifkan, teks yang dianalisis dikirim ke server classifier VeritasAI (model XLM-RoBERTa yang di-fine-tune pada korpus HC3) untuk dinilai — diproses di memori server dan tidak disimpan di sana; tanpa lapis itu, tidak ada teks yang meninggalkan peramban ini. Model server yang tersedia saat ini dilatih terutama pada korpus Inggris/Mandarin (HC3), bukan Bahasa Indonesia, jadi bacalah skor classifier bersama rincian heuristik v3 yang memang dibangun untuk Bahasa Indonesia. Apa pun mesinnya, skor tetap indikasi statistik, bukan bukti.</p>
           <div class="file-status" id="file-status" role="status" aria-live="polite"></div>
           <div class="banner" id="banner-pendek" role="alert"></div>
           <div class="examples">
@@ -268,6 +307,7 @@
       </section>
 
       <section class="report" id="report" aria-labelledby="laporan-judul">
+        <div class="kicker">Laporan</div>
         <h2 id="laporan-judul">Laporan hasil</h2>
         <div class="banner" id="banner-report" style="margin:0 0 16px;"></div>
         <div class="report-grid">
@@ -338,6 +378,7 @@
             <span><span class="sw r"></span>Merah — skor kalimat ≥ 65% (sangat mirip pola AI)</span>
             <span><span class="sw y"></span>Kuning — 35–65% (meragukan)</span>
             <span><span class="sw g"></span>Hijau — &lt; 35% (cenderung manusiawi)</span>
+            <span>Klik kalimat mana pun untuk melihat bukti penandaannya beserta saran perbaikan.</span>
           </div>
           <div class="hl-text" id="hl-text"></div>
           <div class="sent-detail" id="sent-detail"></div>
@@ -347,6 +388,39 @@
           <h3>Baca sebelum menyimpulkan</h3>
           <p>Skor ini indikasi statistik, bukan bukti. Teks manusia bisa terindikasi AI dan teks AI yang diparafrase bisa lolos. Gunakan sebagai bahan pemeriksaan, bukan vonis — periksa juga isi, proses penulisan, dan pemahaman mahasiswa terhadap tugasnya.</p>
         </div>
+
+        <div class="pdf-panel">
+          <div class="pdf-head">
+            <h3>Laporan PDF</h3>
+            <button type="button" id="btn-pdf">Unduh Laporan PDF</button>
+          </div>
+          <p class="pdf-note">Unduh hasil pemeriksaan ini sebagai berkas PDF: ringkasan skor &amp; vonis, rincian ketujuh sinyal, skor dan alasan untuk setiap kalimat, serta teks lengkap dengan kalimat terindikasi ditandai — gaya laporan pemeriksaan seperti Turnitin. PDF dibuat langsung di peramban Anda; pustaka jsPDF dimuat dari CDN hanya saat tombol ini ditekan. Isinya adalah analisis <strong>indikasi AI per kalimat</strong>, bukan laporan kecocokan plagiarisme terhadap basis data. <span id="pdf-status" role="status" aria-live="polite"></span></p>
+        </div>
+      </section>
+
+      <section class="posisi" aria-labelledby="posisi-judul">
+        <div class="kicker">Tentang</div>
+        <h2 id="posisi-judul">Posisi &amp; batasan</h2>
+        <p class="sub">VeritasAI adalah pendamping skrining awal untuk tulisan akademik Bahasa Indonesia — transparan metodenya, ramah privasi, dan jujur pada batasnya. Empat hal berikut menentukan posisinya:</p>
+        <div class="posisi-grid">
+          <div class="posisi-card">
+            <h3>Pendamping skrining, bukan pengganti Turnitin</h3>
+            <p>VeritasAI tidak memiliki basis data institusi, repositori naskah, atau integrasi LMS seperti Turnitin — dan tidak berusaha menirunya. Kekuatan alat ini adalah kecepatan, transparansi metode, dan ketersediaannya untuk pemeriksaan mandiri: oleh mahasiswa sebelum mengumpulkan tugas, oleh dosen pembimbing, maupun oleh editor.</p>
+          </div>
+          <div class="posisi-card">
+            <h3>Probabilistik, bukan vonis</h3>
+            <p>Tidak ada detektor yang tahu pasti asal sebuah teks. Skor di sini adalah indikasi statistik dari pola tulisan: tulisan manusia bisa terindikasi, dan teks AI yang diedit bisa lolos. Gunakan hasil sebagai alasan untuk memeriksa dan berdialog — menilai isi, proses penulisan, dan pemahaman penulisnya — bukan sebagai satu-satunya dasar keputusan.</p>
+          </div>
+          <div class="posisi-card">
+            <h3>Privasi berlapis &amp; tanpa kotak hitam</h3>
+            <p>Analisis heuristik berjalan 100% di peramban Anda; teks tidak dikirim ke mana pun. Lapis classifier bersifat opsional: hanya bila Anda mengaktifkannya, teks dikirim ke server classifier VeritasAI, diproses di memori, dan tidak disimpan. Rumus skor dan bobot setiap sinyal ditampilkan terbuka di halaman ini.</p>
+          </div>
+          <div class="posisi-card">
+            <h3>Fokus Bahasa Indonesia</h3>
+            <p>Kamus frasa, sinyal gaya, dan kalibrasi mesin ini dibangun untuk tulisan akademik dan birokrasi Bahasa Indonesia — konteks yang sering luput dari detektor asing. Model classifier server yang tersedia saat ini justru dilatih terutama pada korpus Inggris/Mandarin; keterbatasan itu ditulis apa adanya, dan heuristik lokal tetap menjadi penyeimbangnya.</p>
+          </div>
+        </div>
+        <p class="posisi-note">Kinerja terukur sejauh ini: pada benchmark internal awal (18 teks Bahasa Indonesia, n kecil — folder <code>benchmark/</code> di repositori ini), tidak ada sampel tulisan manusia yang terindikasi (0/9), semua teks AI generik tertandai (4 dari 5 di pita tengah-atas, 1 di pita tinggi), dan teks AI yang ditulis ulang secara agresif tidak tertangkap — batas yang memang diakui terbuka di halaman ini.</p>
       </section>
 
       <footer>
@@ -355,7 +429,7 @@
           <span>Veritas<span class="ai">AI</span></span>
         </div>
         <p>VeritasAI — Prototipe deteksi teks AI untuk keperluan akademik. Skor adalah indikasi statistik, bukan bukti.</p>
-        <p>Mesin skor saat ini adalah Ensemble Heuristik v3 — ensemble heuristik transparan 7 sinyal yang berjalan sepenuhnya di peramban, dikalibrasi ulang pada profil dokumen refleksi generik hasil generate AI; classifier terlatih opsional kini tersedia sebagai lapis tambahan yang berjalan lokal di peramban (model diunduh sekali dari Hugging Face) — model peramban yang tersedia saat ini belum terlatih khusus Bahasa Indonesia, sehingga heuristik v3 tetap menjadi penyeimbang utamanya.</p>
+        <p>Mesin skor saat ini adalah Ensemble Heuristik v3 — ensemble heuristik transparan 7 sinyal yang berjalan sepenuhnya di peramban, dikalibrasi ulang pada profil dokumen refleksi generik hasil generate AI; classifier terlatih opsional kini tersedia sebagai lapis tambahan yang berjalan di server classifier VeritasAI (tanpa unduhan model ke peramban; teks dikirim ke server khusus untuk penilaian classifier, diproses di memori, dan tidak disimpan) — model server yang tersedia saat ini belum terlatih khusus Bahasa Indonesia, sehingga heuristik v3 tetap menjadi penyeimbang utamanya.</p>
         <p class="copy">© 2026 VeritasAI</p>
       </footer>
     </div>
@@ -572,12 +646,25 @@ Secara keseluruhan, modul ini memberikan pemahaman yang mendalam tentang peran d
           var f = sf[starters[i]];
           var st = f <= 1 ? 0 : (f === 2 ? 0.7 : 1);
           var sw = wordsOf(s); var rg = 0;
-          for(var ri = 0; ri + 4 <= sw.length; ri++){ if((gramCount[sw.slice(ri, ri + 4).join(" ")] || 0) >= 3) rg++; }
+          // Kumpulkan juga rangkaian 4 kata berulangnya (maks 4, tanpa duplikat) sebagai
+          // bukti yang bisa ditampilkan di panel rincian kalimat & laporan PDF.
+          // Penghitungan rg tidak berubah — skor kalimat identik dengan sebelumnya.
+          var repGrams = [];
+          for(var ri = 0; ri + 4 <= sw.length; ri++){
+            var g4 = sw.slice(ri, ri + 4).join(" ");
+            var gc = gramCount[g4] || 0;
+            if(gc >= 3){
+              rg++;
+              var seenG = false;
+              for(var gk = 0; gk < repGrams.length; gk++){ if(repGrams[gk].text === g4){ seenG = true; break; } }
+              if(!seenG && repGrams.length < 4) repGrams.push({ text: g4, count: gc });
+            }
+          }
           var repSent = clamp(rg / 2);
           var sc = Math.min(0.95, 0.52 * pd.score + 0.32 * close + 0.16 * st + 0.18 * repSent);
           var mdBonus = /\*\*[^*]+\*\*/.test(s) || /^\s*([-*•]|\d+[.)])\s+/.test(s);
           if(mdBonus) sc = Math.min(0.95, sc + 0.35);
-          return { score: sc, phrase: pd.score, close: close, starter: st, repSent: repSent, mdBonus: mdBonus, hits: { hits: pd.hits, found: pd.found } };
+          return { score: sc, phrase: pd.score, close: close, starter: st, repSent: repSent, repGrams: repGrams, mdBonus: mdBonus, hits: { hits: pd.hits, found: pd.found } };
         });
         var wAvg = totalLen ? per.reduce(function(a, p, i){ return a + p.score * lens[i]; }, 0) / totalLen : 0;
         var phraseAvg = totalLen ? per.reduce(function(a, p, i){ return a + p.phrase * lens[i]; }, 0) / totalLen : 0;
@@ -1005,90 +1092,63 @@ Secara keseluruhan, modul ini memberikan pemahaman yang mendalam tentang peran d
       }
       function pct(x){ return Math.round(x * 100); }
 
-      /* ---------- Classifier terlatih (transformers.js) — lapis OPSIONAL & TERISOLASI ----------
-         Pustaka @xenova/transformers v2 dimuat dengan dynamic import() HANYA saat pengguna
-         menekan tombol aktivasi; tanpa itu halaman & heuristik v3 bekerja penuh seperti biasa.
-         Model diambil dari Hugging Face hub (env.allowLocalModels=false), varian quantized.
-         Tangga fallback: (1) XLM-RoBERTa-base fine-tune HC3 (basis multibahasa 100 bahasa);
-         (2) RoBERTa-base fine-tune HC3 versi ONNX resmi komunitas. Keduanya dilatih pada
-         korpus HC3 (Inggris/Mandarin) — BUKAN Bahasa Indonesia; keterbatasan itu ditulis
-         terbuka di halaman dan heuristik v3 tetap ditampilkan penuh sebagai penyeimbang.
+      /* ---------- Classifier terlatih (server) — lapis OPSIONAL & TERISOLASI ----------
+         Classifier TIDAK lagi diunduh ke peramban. Model yang sama seperti sebelumnya
+         (mrm8488/xlm-roberta-base-finetuned-HC3-mix, XLM-RoBERTa-base fine-tune korpus
+         HC3) kini berjalan di server classifier VeritasAI (Hugging Face Space, folder
+         hf-space/ di repo ini). Mengaktifkan classifier berarti teks yang dianalisis
+         DIKIRIM ke server itu untuk dinilai; server memprosesnya di memori dan tidak
+         menyimpannya. Heuristik v3 tetap 100% lokal di peramban, dan halaman berfungsi
+         penuh tanpa lapis ini. Model dilatih pada korpus HC3 (Inggris/Mandarin) — BUKAN
+         Bahasa Indonesia; keterbatasan itu ditulis terbuka di halaman dan heuristik v3
+         tetap ditampilkan penuh sebagai penyeimbang.
          Semua kegagalan ditangkap try/catch dan hanya mengubah status classifier. */
-      var CLF_CDN_URL = "https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2";
-      var CLF_CANDIDATES = [
-        { id: "mrm8488/xlm-roberta-base-finetuned-HC3-mix", note: "XLM-RoBERTa-base, basis multibahasa, fine-tune korpus HC3" },
-        { id: "onnx-community/chatgpt-detector-roberta-ONNX", note: "RoBERTa-base, fine-tune korpus HC3 (Inggris)" }
-      ];
+      var CLASSIFIER_API = "https://PLACEHOLDER-veritasai-classifier.hf.space";
+      var CLF_MODEL_ID = "mrm8488/xlm-roberta-base-finetuned-HC3-mix";
       var clfState = "off"; /* off | loading | ready | error */
-      var clfPipe = null, clfModelId = null, clfAiLabel = null, clfFileProgress = {};
+      var clfModelId = CLF_MODEL_ID;
       var lastText = "", analysisRunSeq = 0;
+      var lastClfScore = null; /* skor classifier (0..1) pada laporan yang tampil, atau null */
 
       function setClfStatus(msg){ var el = $("clf-status"); if(el) el.textContent = msg; }
-      function clfProgressCb(info){
-        try{
-          if(!info || !info.file) return;
-          if(info.status === "progress" && typeof info.progress === "number"){ clfFileProgress[info.file] = info.progress; }
-          else if(info.status === "done"){ clfFileProgress[info.file] = 100; }
-          else { return; }
-          var keys = Object.keys(clfFileProgress);
-          if(!keys.length) return;
-          var avg = keys.reduce(function(a, k){ return a + clfFileProgress[k]; }, 0) / keys.length;
-          $("clf-fill").style.width = Math.round(avg) + "%";
-        }catch(e){ /* kemajuan unduhan bersifat kosmetik — abaikan kesalahan */ }
-      }
-      function resolveAiLabel(pipe){
-        // Petakan kelas AI dari id2label model itu sendiri — JANGAN menebak urutan label.
-        try{
-          var cfg = pipe && pipe.model && pipe.model.config ? pipe.model.config : null;
-          var id2label = cfg && cfg.id2label ? cfg.id2label : null;
-          if(!id2label) return null;
-          var labels = Object.keys(id2label).map(function(k){ return String(id2label[k]); });
-          var ai = labels.filter(function(l){ return /(chatgpt|gpt|ai|fake|generated|machine|llm|bot)/i.test(l); });
-          if(ai.length) return ai[0];
-          var nonHuman = labels.filter(function(l){ return !/(human|real|person|orang)/i.test(l); });
-          if(labels.length === 2 && nonHuman.length === 1) return nonHuman[0];
-          return null;
-        }catch(e){ return null; }
+      function clfFetch(path, options, timeoutMs){
+        // fetch ke server classifier dengan batas waktu; server gratis bisa tertidur
+        // (cold start) sehingga batas waktunya longgar dan kegagalannya dijelaskan jujur.
+        var url = CLASSIFIER_API.replace(/\/+$/, "") + path;
+        var opts = options || {};
+        var ctrl = ("AbortController" in window) ? new AbortController() : null;
+        var timer = null;
+        if(ctrl){
+          opts.signal = ctrl.signal;
+          timer = setTimeout(function(){ ctrl.abort(); }, timeoutMs || 120000);
+        }
+        return fetch(url, opts).then(function(r){
+          if(timer) clearTimeout(timer);
+          return r;
+        }, function(e){
+          if(timer) clearTimeout(timer);
+          throw e;
+        });
       }
       async function activateClassifier(){
         if(clfState === "loading" || clfState === "ready") return;
         clfState = "loading";
         var btn = $("btn-clf");
         btn.disabled = true;
-        btn.textContent = "Mengunduh model…";
-        $("clf-progress").hidden = false;
-        $("clf-fill").style.width = "0%";
-        setClfStatus("Status classifier: mengunduh — memuat pustaka transformers.js dari CDN…");
+        btn.textContent = "Menghubungi server…";
+        setClfStatus("Status classifier: menghubungi server classifier VeritasAI… (bila server sedang tidur, bangunnya bisa makan waktu hingga ±1 menit)");
         try{
-          var mod = await import(CLF_CDN_URL);
-          if(!mod || typeof mod.pipeline !== "function") throw new Error("pustaka transformers.js tidak lengkap");
-          if(mod.env){ mod.env.allowLocalModels = false; }
-          var lastErr = null;
-          for(var ci = 0; ci < CLF_CANDIDATES.length; ci++){
-            var cand = CLF_CANDIDATES[ci];
-            try{
-              clfFileProgress = {};
-              setClfStatus("Status classifier: mengunduh model " + cand.id + " dari Hugging Face… (unduhan sekali, kemudian tersimpan di cache peramban)");
-              var pipe = await mod.pipeline("text-classification", cand.id, { quantized: true, progress_callback: clfProgressCb });
-              var aiLabel = resolveAiLabel(pipe);
-              if(!aiLabel) throw new Error("kelas AI tidak terpetakan dari id2label model");
-              clfPipe = pipe; clfModelId = cand.id; clfAiLabel = aiLabel;
-              break;
-            }catch(e){ lastErr = e; clfPipe = null; clfModelId = null; clfAiLabel = null; }
-          }
-          if(!clfPipe) throw (lastErr || new Error("semua kandidat model gagal dimuat"));
+          var r = await clfFetch("/", { method: "GET" }, 120000);
+          if(!r.ok) throw new Error("server menjawab HTTP " + r.status);
           clfState = "ready";
-          $("clf-fill").style.width = "100%";
-          btn.textContent = "Classifier aktif";
-          setClfStatus("Status classifier: aktif — " + clfModelId + " (kelas AI menurut id2label model: “" + clfAiLabel + "”). Skor analisis = 0,65 × classifier + 0,35 × heuristik v3. Model berjalan lokal di peramban; teks tidak dikirim ke server.");
+          btn.textContent = "Classifier server aktif";
+          setClfStatus("Status classifier: aktif — server " + clfModelId + ". Saat Anda menekan “Analisis teks”, teks akan dikirim ke server classifier untuk dinilai (diproses di memori, tidak disimpan), lalu skor akhir = 0,65 × classifier + 0,35 × heuristik v3. Analisis heuristik tetap lokal di peramban.");
           if(lastResult && lastText) runAnalysis();
         }catch(err){
           clfState = "error";
-          clfPipe = null; clfModelId = null; clfAiLabel = null;
           btn.disabled = false;
-          btn.textContent = "Aktifkan Mesin Classifier (unduh model sekali)";
-          $("clf-progress").hidden = true;
-          setClfStatus("Status classifier: gagal dimuat" + (err && err.message ? " (" + err.message + ")" : "") + " — halaman tetap memakai Ensemble Heuristik v3 saja. Periksa koneksi internet, lalu coba lagi.");
+          btn.textContent = "Aktifkan Mesin Classifier (server)";
+          setClfStatus("Status classifier: server tidak terjangkau" + (err && err.name === "AbortError" ? " — server sedang bangun, coba lagi sebentar" : (err && err.message ? " (" + err.message + ")" : "")) + ". Halaman tetap memakai Ensemble Heuristik v3 saja; coba lagi sebentar.");
         }
       }
       $("btn-clf").addEventListener("click", function(){ activateClassifier(); });
@@ -1113,28 +1173,31 @@ Secara keseluruhan, modul ini memberikan pemahaman yang mendalam tentang peran d
         }
         return chunks;
       }
-      function clfAiProbability(output){
-        var arr = Array.isArray(output) ? output : [output];
-        if(arr.length && Array.isArray(arr[0])) arr = arr[0];
-        if(!clfAiLabel) return null;
-        for(var i = 0; i < arr.length; i++){
-          if(arr[i] && arr[i].label === clfAiLabel && typeof arr[i].score === "number") return clamp(arr[i].score);
-        }
-        return null;
-      }
       async function runClassifierScore(text){
-        if(clfState !== "ready" || !clfPipe) return null;
+        if(clfState !== "ready") return null;
         try{
           var chunks = clfChunks(text);
           if(!chunks.length) return null;
-          var sum = 0, used = 0;
-          for(var i = 0; i < chunks.length; i++){
-            var out = await clfPipe(chunks[i], { topk: 10 });
-            var p = clfAiProbability(out);
-            if(typeof p === "number" && isFinite(p)){ sum += p; used++; }
+          // Server menerima maks 32 teks per permintaan — kirim per kelompok 16 jendela.
+          var all = [];
+          for(var b = 0; b < chunks.length; b += 16){
+            var batch = chunks.slice(b, b + 16);
+            var r = await clfFetch("/predict", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ texts: batch })
+            }, 120000);
+            if(!r.ok) return null;
+            var data = await r.json().catch(function(){ return null; });
+            if(!data || !Array.isArray(data.scores)) return null;
+            for(var i = 0; i < data.scores.length; i++){
+              var p = Number(data.scores[i]);
+              if(isFinite(p)) all.push(clamp(p));
+            }
           }
-          if(!used) return null;
-          return { score: sum / used, windows: used };
+          if(!all.length) return null;
+          var sum = all.reduce(function(a, x){ return a + x; }, 0);
+          return { score: sum / all.length, windows: all.length };
         }catch(e){ return null; }
       }
       async function applyClassifierToReport(text, res, runId){
@@ -1142,20 +1205,22 @@ Secara keseluruhan, modul ini memberikan pemahaman yang mendalam tentang peran d
         sig.style.display = "";
         $("pct-clf").textContent = "…";
         $("fill-clf").style.width = "0%";
-        $("desc-clf").textContent = "Model classifier sedang menilai teks ini secara lokal di peramban (jendela ±1.200 karakter, tumpang tindih ±200)…";
+        $("desc-clf").textContent = "Server classifier sedang menilai teks ini (jendela ±1.200 karakter, tumpang tindih ±200)… bila server baru bangun dari tidur, tahap ini bisa makan waktu hingga ±1 menit.";
         var r = await runClassifierScore(text);
         if(runId !== analysisRunSeq || lastResult !== res) return; /* laporan sudah digantikan analisis lain */
         if(!r){
+          lastClfScore = null;
           $("pct-clf").textContent = "—";
           $("fill-clf").style.width = "0%";
-          $("desc-clf").textContent = "Classifier tidak menghasilkan skor untuk teks ini; skor yang tampil tetap 100% Ensemble Heuristik v3.";
+          $("desc-clf").textContent = "Server classifier tidak menjawab untuk teks ini (mungkin sedang bangun atau tidak terjangkau) — skor yang tampil tetap 100% Ensemble Heuristik v3. Coba analisis lagi sebentar.";
           $("engine-line").textContent = "Mesin skor: Ensemble Heuristik v3 (classifier tidak menghasilkan skor)";
           return;
         }
+        lastClfScore = r.score;
         var blend = 0.65 * r.score + 0.35 * res.final;
         $("pct-clf").textContent = pct(r.score) + "%";
         $("fill-clf").style.width = pct(r.score) + "%";
-        $("desc-clf").textContent = "Model " + clfModelId + " menilai rata-rata " + r.windows + " jendela teks: probabilitas kelas AI " + pct(r.score) + "%. Model ini dilatih pada korpus HC3 (Inggris/Mandarin), bukan Bahasa Indonesia — baca bersama rincian heuristik v3 di atas.";
+        $("desc-clf").textContent = "Model " + clfModelId + " di server classifier VeritasAI menilai rata-rata " + r.windows + " jendela teks: probabilitas kelas AI " + pct(r.score) + "%. Model ini dilatih pada korpus HC3 (Inggris/Mandarin), bukan Bahasa Indonesia — baca bersama rincian heuristik v3 di atas.";
         applyScore(blend, true);
         $("engine-line").textContent = "Mesin skor: Classifier + Heuristik v3 — 0,65 × classifier + 0,35 × heuristik v3 (heuristik murni: " + pct(res.final) + "%)";
       }
@@ -1191,6 +1256,7 @@ Secara keseluruhan, modul ini memberikan pemahaman yang mendalam tentang peran d
         var res = analyze(text);
         lastResult = res;
         lastText = text;
+        lastClfScore = null;
         var runId = ++analysisRunSeq;
         // Mode bawaan: skor 100% heuristik v3 — identik dengan sebelum classifier ada.
         applyScore(res.final, false);
@@ -1281,15 +1347,64 @@ Secara keseluruhan, modul ini memberikan pemahaman yang mendalam tentang peran d
         spans.forEach(function(sp){ sp.classList.remove("active"); });
         el.classList.add("active");
         if(!lastResult) return;
-        var p = lastResult.per[i];
+        var res = lastResult;
+        var p = res.per[i];
         var d = $("sent-detail");
+        var band = bandOf(p.score);
+        var bandName = band === "r" ? "Indikasi TINGGI" : (band === "y" ? "Indikasi SEDANG" : "Indikasi RENDAH");
+        function esc(s){ return escapeHtml(String(s)); }
+        function quoted(list){ return list.map(function(x){ return "“" + esc(x) + "”"; }).join(", "); }
+        /* --- bukti spesifik pada kalimat ini --- */
         var items = "";
-        items += "<li>Frasa khas AI: " + pct(p.phrase) + "%" + (p.hits.hits ? " — ditemukan: “" + p.hits.found.join("”, “") + "”" : " — tidak ada frasa kamus") + "</li>";
-        items += "<li>Kedekatan panjang ke rata-rata dokumen: " + pct(p.close) + "% (kalimat ini " + lastResult.lens[i] + " kata; rata-rata " + lastResult.mean.toFixed(1) + " kata)</li>";
-        items += "<li>Pengulangan awalan kalimat: " + pct(p.starter) + "%</li>";
-        if(p.repSent) items += "<li>Pengulangan pola templat: kalimat ini memuat rangkaian 4 kata yang berulang ≥3 kali di seluruh dokumen — bonus indikasi diterapkan pada kalimat ini.</li>";
-        if(p.mdBonus) items += "<li>Sisa format markdown: kalimat ini memuat format mentah khas keluaran AI (tebal **…** atau butir daftar) — bonus indikasi diterapkan pada kalimat ini.</li>";
-        d.innerHTML = "Kalimat ke-" + (i + 1) + " — skor indikasi AI: <span class=\"sd-score\">" + pct(p.score) + "%</span><ul>" + items + "</ul>";
+        if(p.hits.hits){
+          items += "<li><strong>Frasa formulaik khas AI</strong> ditemukan pada kalimat ini: " + quoted(p.hits.found) + " (kontribusi sinyal frasa kalimat ini: " + pct(p.phrase) + "%).</li>";
+        } else {
+          items += "<li><strong>Frasa formulaik:</strong> tidak ada frasa dari kamus AI (klasik, LLM modern, maupun refleksi generik) pada kalimat ini.</li>";
+        }
+        if(p.repGrams && p.repGrams.length){
+          var gramTxt = p.repGrams.map(function(g){ return "“" + esc(g.text) + "” (muncul " + g.count + " kali)"; }).join(", ");
+          items += "<li><strong>Pola kata berulang:</strong> kalimat ini memuat rangkaian 4 kata yang dipakai berulang di seluruh dokumen: " + gramTxt + ". Teks generik cenderung memakai ulang rangkaian yang sama; tulisan yang konkret jarang melakukannya.</li>";
+        }
+        var cvWord = res.cv >= 0.85 ? "sangat bervariasi" : (res.cv >= 0.55 ? "bervariasi" : (res.cv >= 0.35 ? "cukup seragam" : "sangat seragam"));
+        items += "<li><strong>Ritme:</strong> kalimat ini " + res.lens[i] + " kata; rata-rata dokumen " + res.mean.toFixed(1) + " kata per kalimat, dengan ritme keseluruhan " + cvWord + " (CV " + res.cv.toFixed(2) + "). Kedekatan panjang kalimat ini ke rata-rata: " + pct(p.close) + "% — semakin dekat dan semakin seragam ritme dokumen, semakin besar kontribusinya.</li>";
+        if(p.starter > 0){
+          items += "<li><strong>Awalan berulang:</strong> dua kata pertama kalimat ini juga dipakai untuk mengawali kalimat lain di dokumen ini.</li>";
+        }
+        if(p.mdBonus){
+          items += "<li><strong>Sisa format markdown:</strong> kalimat ini memuat format mentah khas salinan keluaran AI (tebal **…** atau butir daftar mentah) — teks yang diketik langsung hampir tidak pernah memuat sintaks ini.</li>";
+        }
+        /* --- saran perbaikan: edukatif, terikat pada bukti di atas --- */
+        var tips = [];
+        if(p.hits.found.length){
+          tips.push("Ganti penghubung generik seperti " + "“" + esc(p.hits.found[0]) + "”" + " dengan transisi yang spesifik terhadap isi kalimat sebelumnya — atau tambahkan rincian konkret (nama, angka, tempat, pengalaman pribadi) yang tidak bisa dihasilkan oleh teks templat.");
+        }
+        if(p.repGrams && p.repGrams.length){
+          tips.push("Rangkaian " + "“" + esc(p.repGrams[0].text) + "”" + " dipakai berulang di dokumen ini. Variasikan redaksinya, atau ganti salah satu kemunculannya dengan penjelasan yang lebih spesifik.");
+        }
+        if(p.close >= 0.8 && res.burst >= 0.5){
+          tips.push("Panjang kalimat ini hampir sama dengan kebanyakan kalimat lain, sehingga ritme bacaan terasa datar. Coba pecah menjadi dua kalimat, atau sisipkan satu kalimat pendek yang menegaskan poin utamanya.");
+        }
+        if(p.starter > 0){
+          tips.push("Awali kalimat dari fokus yang berbeda — subjek, waktu, tempat, atau sebab — agar susunan kalimat tidak terasa seperti pola yang sama berulang.");
+        }
+        if(p.mdBonus){
+          tips.push("Hapus sisa format mentah (tebal **…** atau butir daftar) dan tulis ulang sebagai kalimat biasa, seperti teks yang diketik langsung.");
+        }
+        var suggestHtml;
+        if(tips.length){
+          suggestHtml = "<div class=\"sd-suggest\"><div class=\"sd-sec\">Saran perbaikan untuk kalimat ini</div><ul>" +
+            tips.map(function(t){ return "<li>" + t + "</li>"; }).join("") + "</ul></div>";
+        } else if(band === "g"){
+          suggestHtml = "<div class=\"sd-suggest\"><div class=\"sd-sec\">Catatan</div><p>Kalimat ini cenderung manusiawi: pilihan kata dan ritmenya spesifik, tidak mengikuti templat. Pertahankan gaya penulisan seperti ini — rincian konkret dan ritme yang hidup adalah kekuatan tulisan Anda.</p></div>";
+        } else {
+          suggestHtml = "<div class=\"sd-suggest\"><div class=\"sd-sec\">Catatan</div><p>Tidak ada satu bukti tunggal yang kuat pada kalimat ini; skornya terutama mengikuti pola umum dokumen. Bila kalimat ini tulisan Anda sendiri, menambahkan rincian konkret biasanya membantu menurunkannya.</p></div>";
+        }
+        d.innerHTML =
+          "<div class=\"sd-head\"><span>Kalimat ke-" + (i + 1) + "</span><span class=\"sd-band " + band + "\">" + bandName + "</span></div>" +
+          "<div>Skor indikasi AI kalimat ini: <span class=\"sd-score\">" + pct(p.score) + "%</span></div>" +
+          "<p class=\"sd-quote\">“" + esc(res.sents[i]) + "”</p>" +
+          "<div class=\"sd-sec\">Bukti pada kalimat ini</div><ul>" + items + "</ul>" +
+          suggestHtml;
         d.classList.add("show");
       }
 
@@ -1304,6 +1419,183 @@ Secara keseluruhan, modul ini memberikan pemahaman yang mendalam tentang peran d
       $("ex3").addEventListener("click", function(){ loadExample(CONTOH_PARAFRASE); });
       $("ex4").addEventListener("click", function(){ loadExample(CONTOH_GEMINI); });
       $("ex5").addEventListener("click", function(){ loadExample(CONTOH_REFLEKSI); });
+
+      /* ---------- Laporan PDF (jsPDF — dimuat HANYA saat tombol ditekan) ----------
+         Laporan berisi: ringkasan (skor akhir, vonis, jumlah kata/kalimat), rincian
+         mesin (heuristik v3, classifier bila dipakai, rumus gabungan), ketujuh sinyal,
+         rincian per kalimat (skor + alasan untuk yang terindikasi), dan teks lengkap
+         dengan kalimat terindikasi ditandai. Bekerja untuk teks tempel maupun berkas
+         .txt/.docx/.pdf — yang dilaporkan adalah teks hasil ekstraksi yang dianalisis.
+         Label jujur di kaki laporan: ini analisis INDIKASI AI per kalimat, BUKAN
+         laporan kecocokan plagiarisme terhadap basis data. */
+      var JSPDF_URL = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+      var jspdfPromise = null;
+      function loadJsPdf(){
+        if(window.jspdf && window.jspdf.jsPDF) return Promise.resolve(window.jspdf.jsPDF);
+        if(jspdfPromise) return jspdfPromise;
+        jspdfPromise = new Promise(function(resolve, reject){
+          var s = document.createElement("script");
+          s.src = JSPDF_URL;
+          s.async = true;
+          s.onload = function(){
+            if(window.jspdf && window.jspdf.jsPDF) resolve(window.jspdf.jsPDF);
+            else reject(new Error("pustaka jsPDF tidak lengkap"));
+          };
+          s.onerror = function(){ reject(new Error("gagal memuat pustaka jsPDF dari CDN — periksa koneksi internet")); };
+          document.head.appendChild(s);
+        });
+        return jspdfPromise;
+      }
+      function pdfSafe(s){
+        // Font standar jsPDF (helvetica) hanya aman untuk Latin-1; ganti karakter
+        // tipografis umum dan buang sisanya agar tidak ada kotak/garble di PDF.
+        return String(s == null ? "" : s)
+          .replace(/[“”„«»]/g, '"')
+          .replace(/[‘’‚]/g, "'")
+          .replace(/[—–]/g, "-")
+          .replace(/…/g, "...")
+          .replace(/±/g, "+/-")
+          .replace(/×/g, "x")
+          .replace(/≥/g, ">=")
+          .replace(/≤/g, "<=")
+          .replace(/•/g, "-")
+          .replace(/[^\x20-\x7E\xA0-\xFF]/g, "");
+      }
+      function sentenceReasons(p){
+        var rs = [];
+        if(p.hits && p.hits.found && p.hits.found.length) rs.push("memuat frasa khas AI: \"" + p.hits.found.join("\", \"") + "\"");
+        if(p.repGrams && p.repGrams.length) rs.push("memuat pola 4 kata yang berulang >= 3 kali di seluruh dokumen: \"" + p.repGrams.map(function(g){ return g.text; }).join("\", \"") + "\"");
+        else if(p.repSent > 0) rs.push("memuat pola 4 kata yang berulang >= 3 kali di seluruh dokumen");
+        if(p.mdBonus) rs.push("memuat sisa format markdown mentah khas keluaran AI");
+        if(!rs.length && p.phrase >= 0.5) rs.push("skor frasa kalimat tinggi (" + pct(p.phrase) + "%)");
+        if(!rs.length && p.close >= 0.8) rs.push("panjang kalimat sangat dekat ke rata-rata dokumen — ritme seragam (" + pct(p.close) + "%)");
+        if(!rs.length && p.starter >= 0.7) rs.push("awalan kalimat berulang seperti kalimat lain di dokumen");
+        return rs;
+      }
+      async function downloadPdfReport(){
+        var st = $("pdf-status");
+        var btn = $("btn-pdf");
+        if(!lastResult){ st.textContent = "Jalankan analisis terlebih dahulu, lalu unduh laporannya."; return; }
+        btn.disabled = true;
+        st.textContent = "Menyiapkan laporan PDF...";
+        try{
+          var JsPDF = await loadJsPdf();
+          var res = lastResult;
+          var doc = new JsPDF({ unit: "pt", format: "a4" });
+          var W = doc.internal.pageSize.getWidth();
+          var H = doc.internal.pageSize.getHeight();
+          var M = 48, y = M, maxW = W - M * 2;
+          function ensure(h){ if(y + h > H - 58){ doc.addPage(); y = M; } }
+          function write(text, size, style, gapAfter){
+            doc.setFont("helvetica", style || "normal");
+            doc.setFontSize(size);
+            var lines = doc.splitTextToSize(pdfSafe(text), maxW);
+            var lh = size * 1.5;
+            for(var i = 0; i < lines.length; i++){ ensure(lh); doc.text(lines[i], M, y); y += lh; }
+            if(gapAfter) y += gapAfter;
+          }
+          function rule(){
+            ensure(10);
+            doc.setDrawColor(180, 180, 180);
+            doc.line(M, y, W - M, y);
+            y += 14;
+          }
+          // --- kepala laporan ---
+          doc.setTextColor(22, 41, 77);
+          write("VeritasAI", 18, "bold", 0);
+          doc.setTextColor(90, 90, 90);
+          write("Deteksi Teks AI untuk Tugas & Karya Ilmiah Mahasiswa — PROTOTIPE", 9.5, "normal", 2);
+          doc.setTextColor(0, 0, 0);
+          write("Laporan Hasil Pemeriksaan Teks", 14, "bold", 2);
+          rule();
+          // --- ringkasan ---
+          var fnameEl = document.querySelector("#file-status .fname");
+          var sumber = fnameEl && fnameEl.textContent.trim() ? fnameEl.textContent.trim() : "Teks tempel";
+          var waktu = new Date().toLocaleString("id-ID", { dateStyle: "full", timeStyle: "short" });
+          write("Tanggal & waktu pemeriksaan: " + waktu, 10.5);
+          write("Sumber: " + sumber, 10.5);
+          write("Skor indikasi AI keseluruhan: " + $("score-num").textContent + "%", 12, "bold");
+          write("Vonis: " + $("verdict").textContent, 11, "bold", 2);
+          write("Jumlah kata: " + res.words + " | Jumlah kalimat: " + res.sents.length +
+                " | Rata-rata kata per kalimat: " + res.mean.toFixed(1) +
+                " | Type-token ratio (TTR): " + res.overallTTR.toFixed(2), 10.5);
+          if(res.words < 300) write("Catatan reliabilitas: teks ini hanya " + res.words + " kata (di bawah +/-300 kata) — hasil kurang dapat dipegang; gunakan sebagai petunjuk awal, bukan kesimpulan.", 10, "italic");
+          y += 4;
+          write("Mesin & rumus skor", 12, "bold", 1);
+          write("Skor Ensemble Heuristik v3: " + pct(res.final) + "%", 10.5);
+          if(lastClfScore !== null && lastClfScore !== undefined){
+            write("Skor classifier (model " + CLF_MODEL_ID + ", server classifier VeritasAI): " + pct(lastClfScore) + "%", 10.5);
+            write("Skor akhir = 0,65 x classifier + 0,35 x heuristik v3.", 10.5);
+          } else {
+            write("Skor classifier: tidak digunakan — skor akhir 100% Ensemble Heuristik v3.", 10.5);
+          }
+          y += 4;
+          // --- rincian per sinyal ---
+          write("Rincian per Sinyal (Ensemble Heuristik v3)", 12, "bold", 1);
+          var sigRows = [
+            ["Burstiness (ritme kalimat)", res.burst],
+            ["Keragaman kosakata", res.vocab],
+            ["Frasa khas AI", res.phraseGlobal],
+            ["Stilometri (gaya & struktur)", res.stylo],
+            ["Sisa Markdown", res.markdown],
+            ["Simetri Paragraf", res.symmetry],
+            ["Pengulangan Frasa", res.repetition]
+          ];
+          sigRows.forEach(function(row, i){ write((i + 1) + ". " + row[0] + ": " + pct(row[1]) + "%", 10.5); });
+          y += 4;
+          // --- rincian per kalimat ---
+          write("Rincian per Kalimat", 12, "bold", 1);
+          write("Pita skor: RENDAH < 35% (cenderung manusiawi) | SEDANG 35-65% (meragukan) | TINGGI >= 65% (sangat mirip pola AI). Kalimat pita SEDANG dan TINGGI ditandai [TERINDIKASI] beserta alasannya.", 9.5, "italic", 3);
+          res.sents.forEach(function(s, i){
+            var p = res.per[i];
+            var band = bandOf(p.score);
+            var bandName = band === "r" ? "TINGGI" : (band === "y" ? "SEDANG" : "RENDAH");
+            var head = "Kalimat " + (i + 1) + " — Skor: " + pct(p.score) + "% — Indikasi " + bandName + (band !== "g" ? " [TERINDIKASI]" : "");
+            write(head, 10.5, "bold");
+            write(s, 10.5);
+            if(band !== "g"){
+              var rs = sentenceReasons(p);
+              if(rs.length) write("Alasan: " + rs.join("; ") + ".", 9.5, "italic");
+            }
+            y += 3;
+          });
+          y += 2;
+          // --- teks lengkap dengan penanda ---
+          write("Teks Lengkap yang Diperiksa (kalimat terindikasi ditandai)", 12, "bold", 1);
+          var idx = 0;
+          res.paraSents.forEach(function(ps){
+            var parts = ps.map(function(s){
+              var i = idx++;
+              var band = bandOf(res.per[i].score);
+              if(band === "g") return s;
+              return "[TERINDIKASI " + (band === "r" ? "TINGGI" : "SEDANG") + " " + pct(res.per[i].score) + "%] " + s;
+            });
+            write(parts.join(" "), 10.5, "normal", 5);
+          });
+          // --- kaki halaman di semua halaman ---
+          var footerText = "Catatan: laporan ini adalah analisis indikasi AI per kalimat berdasarkan pola statistik — BUKAN laporan kecocokan plagiarisme terhadap basis data. Skor adalah indikasi, bukan bukti. VeritasAI adalah prototipe; gunakan sebagai bahan pemeriksaan, bukan vonis.";
+          var total = doc.getNumberOfPages();
+          for(var pg = 1; pg <= total; pg++){
+            doc.setPage(pg);
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(8);
+            doc.setTextColor(110, 110, 110);
+            var fl = doc.splitTextToSize(pdfSafe(footerText), maxW - 70);
+            for(var fi = 0; fi < fl.length; fi++) doc.text(fl[fi], M, H - 40 + fi * 10);
+            doc.text("Halaman " + pg + " dari " + total, W - M, H - 40, { align: "right" });
+          }
+          var now = new Date();
+          function pad(n){ return String(n).padStart(2, "0"); }
+          var stamp = now.getFullYear() + pad(now.getMonth() + 1) + pad(now.getDate()) + "-" + pad(now.getHours()) + pad(now.getMinutes()) + pad(now.getSeconds());
+          doc.save("Laporan-VeritasAI-" + stamp + ".pdf");
+          st.textContent = "Laporan PDF terunduh.";
+        }catch(e){
+          st.textContent = "Gagal membuat PDF: " + (e && e.message ? e.message : e);
+        }
+        btn.disabled = false;
+      }
+      $("btn-pdf").addEventListener("click", function(){ downloadPdfReport(); });
+
       updateCounters();
     </script>
   <!-- VeritasAI versi Vercel: simpan hasil analisis ke Google Drive (Google Sheet milik pemilik situs) -->
