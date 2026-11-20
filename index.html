@@ -697,7 +697,7 @@
         <a href="#/posisi" data-route="posisi">Posisi &amp; Batasan</a>
       </nav>
       <a class="btn-primary side-cta" href="#analisis">Mulai Analisis</a>
-      <div class="side-foot">Beta Terbuka · v0.13.0-beta<br />Seluruh analisis berjalan lokal di peramban ini — teks Anda tidak dikirim ke mana pun.</div>
+      <div class="side-foot">Beta Terbuka · v0.14.0-beta<br />Seluruh analisis berjalan lokal di peramban ini — teks Anda tidak dikirim ke mana pun.</div>
     </aside>
     <div class="wrap page">
       <header class="hero" data-view="home">
@@ -1348,12 +1348,19 @@
           <a href="#/posisi">Posisi &amp; Batasan</a>
         </nav>
         <p class="copy">© 2026 Saksara — Dikembangkan oleh Ciptanala Devs</p>
-        <p class="version-line">Versi <strong>v0.13.0-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
+        <p class="version-line">Versi <strong>v0.14.0-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
       </div>
     </footer>
 
     <dialog class="changelog" id="changelog-modal" aria-labelledby="changelog-title">
       <h2 id="changelog-title">Catatan Rilis — Saksara</h2>
+      <h3>v0.14.0-beta — 20 November 2026</h3>
+      <ul>
+        <li><strong>OCR Dokumen:</strong> halaman baru untuk membaca gambar dan PDF pindai secara lokal (Tesseract.js, Bahasa Indonesia + Inggris). Model ±10,6 MB hanya diunduh bila Anda menyetujui; PDF yang tidak terbaca di Detector/Forensic/Bandingkan kini menawarkan jalan pintas ke OCR. OCR membaca halaman sebagai gambar dan tidak memperbaiki ekstraktor teks.</li>
+        <li><strong>Riwayat Analisis (opt-in):</strong> hasil analisis dapat disimpan di perangkat ini (IndexedDB) hanya setelah persetujuan eksplisit; metadata dan teks dokumen memerlukan persetujuan terpisah. Nonaktif secara bawaan; dapat dibuka, diunduh, dan dihapus per entri atau seluruhnya.</li>
+        <li><strong>Batch 2.0:</strong> antrean berkas dengan status per berkas, batas 50 berkas / 20 MB per berkas / 100 MB total dengan pesan yang jelas, pembatalan, coba lagi untuk yang gagal, ringkasan (rata-rata, median, distribusi pita), dan ekspor CSV/JSON/PDF.</li>
+        <li><strong>Laporan PDF 2.0:</strong> kit laporan bersama (identitas, waktu pembuatan, metodologi, keterbatasan, disclaimer) — baru untuk Writing Forensic dan ringkasan Batch; laporan Detector dan Bandingkan mempertahankan isi kayanya yang sudah terverifikasi.</li>
+      </ul>
       <h3>v0.13.0-beta — 20 November 2026</h3>
       <ul>
         <li><strong>Benchmark Center:</strong> halaman transparansi baru yang menerbitkan evaluasi mesin apa adanya — audit dataset terverifikasi (0 duplikat, 0 pelanggaran group-split, 0 tumpang-tindih), evaluasi langsung set regresi 18 sampel oleh mesin produksi di peramban Anda, hasil evaluasi Ensemble Heuristik v3 atas 4.146 dokumen VeritasAI-ID v0 (termasuk recall 3,0% pada GPT-4o — kelemahan lintas-generator yang ditampilkan terbuka), perbandingan heuristik/classifier/gabungan, definisi metrik lengkap, dan ekspor CSV/JSON lokal. Akurasi bukan jaminan untuk satu dokumen; tidak ada kesimpulan kepengarangan dari skor.</li>
