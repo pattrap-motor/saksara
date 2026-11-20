@@ -1078,7 +1078,7 @@
           <div id="cmp-view-in" hidden>
             <div class="wf-panel">
               <h3>Inline — satu aliran teks</h3>
-              <p class="wf-note">Kalimat yang sama tampil polos; kalimat tambahan hijau dengan lencana ＋; kalimat terhapus merah tercoret dengan lencana −; kalimat berubah menampilkan kata yang dihapus (coret merah) dan kata yang ditambah (hijau) sebaris dengan lencana ≈.</p>
+              <p class="wf-note">Kalimat yang sama tampil polos; kalimat tambahan berlatar hijau dengan lencana ＋; kalimat terhapus berlatar merah dengan lencana −; kalimat berubah menampilkan kata yang dihapus (coret merah) dan kata yang ditambah (hijau) sebaris dengan lencana ≈.</p>
               <div class="cmp-inline" id="cmp-inline"></div>
               <p class="wf-note" id="cmp-inline-note"></p>
             </div>
@@ -4347,6 +4347,460 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       $("wf-ex1").addEventListener("click", function(){ wfTa.value = CONTOH_MANUSIA; wfUpdateCounters(); wfRun(); });
       $("wf-ex2").addEventListener("click", function(){ wfTa.value = CONTOH_AI; wfUpdateCounters(); wfRun(); });
       wfUpdateCounters();
+    }
+
+    /* ================= Compare Writing (Phase 4) =================
+       Mesin perbandingan dokumen. Berdiri sendiri: TIDAK menjalankan Detector
+       dan tidak memakai skor deteksi apa pun. */
+    /* CMP-CORE-START — fungsi murni (tanpa DOM), dapat diekstrak & diuji terpisah. */
+    function cmpTokens(text){
+      var re = /[\p{L}\p{N}']+/gu, out = [], m;
+      while((m = re.exec(text)) !== null) out.push({ t: m[0], k: m[0].toLowerCase() });
+      return out;
+    }
+    function cmpLisKeep(seq){
+      var tails = [], tailIdx = [], prev = new Array(seq.length).fill(-1);
+      seq.forEach(function(x, i){
+        var lo = 0, hi = tails.length;
+        while(lo < hi){ var mid = (lo + hi) >> 1; if(tails[mid] < x) lo = mid + 1; else hi = mid; }
+        tails[lo] = x; tailIdx[lo] = i; prev[i] = lo > 0 ? tailIdx[lo - 1] : -1;
+      });
+      var keep = new Set(), k = tailIdx[tails.length - 1];
+      while(k !== undefined && k >= 0){ keep.add(k); k = prev[k]; }
+      return keep;
+    }
+    function cmpAlign(aUnits, bUnits){
+      var bQueues = Object.create(null);
+      bUnits.forEach(function(u, j){ (bQueues[u.key] || (bQueues[u.key] = [])).push(j); });
+      var aMatch = aUnits.map(function(){ return -1; });
+      var bUsed = bUnits.map(function(){ return false; });
+      aUnits.forEach(function(u, i){ var q = bQueues[u.key]; if(q && q.length){ aMatch[i] = q.shift(); bUsed[aMatch[i]] = true; } });
+      var seq = [], seqA = [];
+      aMatch.forEach(function(b, i){ if(b >= 0){ seq.push(b); seqA.push(i); } });
+      var keep = cmpLisKeep(seq), moved = Object.create(null);
+      seqA.forEach(function(ai, pos){ if(!keep.has(pos)) moved[ai] = true; });
+      var pairs = [];
+      aUnits.forEach(function(u, i){ if(aMatch[i] >= 0) pairs.push({ a: i, b: aMatch[i], kind: moved[i] ? "moved" : "same" }); });
+      var aLeft = [], bLeft = [];
+      aUnits.forEach(function(u, i){ if(aMatch[i] < 0) aLeft.push(i); });
+      bUnits.forEach(function(u, j){ if(!bUsed[j]) bLeft.push(j); });
+      var n = Math.min(aLeft.length, bLeft.length), k;
+      for(k = 0; k < n; k++) pairs.push({ a: aLeft[k], b: bLeft[k], kind: "changed" });
+      for(k = n; k < aLeft.length; k++) pairs.push({ a: aLeft[k], b: -1, kind: "removed" });
+      for(k = n; k < bLeft.length; k++) pairs.push({ a: -1, b: bLeft[k], kind: "added" });
+      pairs.forEach(function(p){
+        if(p.a >= 0){ p.sortKey = p.a; return; }
+        var best = -1;
+        pairs.forEach(function(q){ if(q.b >= 0 && q.b < p.b && q.a > best) best = q.a; });
+        p.sortKey = best + 0.5;
+      });
+      pairs.sort(function(x, y){ return x.sortKey - y.sortKey || x.b - y.b; });
+      return pairs;
+    }
+    function cmpWordDiff(aToks, bToks){
+      var n = aToks.length, m = bToks.length;
+      if(n * m > 1000000) return null;
+      var dp = [], i, j;
+      for(i = 0; i <= n; i++) dp.push(new Uint32Array(m + 1));
+      for(i = n - 1; i >= 0; i--) for(j = m - 1; j >= 0; j--) dp[i][j] = aToks[i].k === bToks[j].k ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
+      var ops = []; i = 0; j = 0;
+      while(i < n && j < m){
+        if(aToks[i].k === bToks[j].k){ ops.push({ type: "eq", a: aToks[i], b: bToks[j] }); i++; j++; }
+        else if(dp[i + 1][j] >= dp[i][j + 1]){ ops.push({ type: "del", a: aToks[i] }); i++; }
+        else { ops.push({ type: "ins", b: bToks[j] }); j++; }
+      }
+      while(i < n){ ops.push({ type: "del", a: aToks[i] }); i++; }
+      while(j < m){ ops.push({ type: "ins", b: bToks[j] }); j++; }
+      return ops;
+    }
+    function cmpCountOps(ops){
+      var eq = 0, del = 0, ins = 0, chg = 0, i = 0;
+      while(i < ops.length){
+        if(ops[i].type === "eq"){ eq++; i++; continue; }
+        var d = 0, s = 0;
+        while(i < ops.length && ops[i].type !== "eq"){ if(ops[i].type === "del") d++; else s++; i++; }
+        var c = Math.min(d, s); chg += c; del += d - c; ins += s - c;
+      }
+      return { eq: eq, del: del, ins: ins, chg: chg };
+    }
+    function cmpDiff(textA, textB){
+      var wordsA = wordsOf(textA), wordsB = wordsOf(textB);
+      var parasAT = splitParagraphs(textA), parasBT = splitParagraphs(textB);
+      if(!parasAT.length && textA.trim()) parasAT = [textA];
+      if(!parasBT.length && textB.trim()) parasBT = [textB];
+      var pA = parasAT.map(function(t){ return { text: t, key: wordsOf(t).join(" ") }; });
+      var pB = parasBT.map(function(t){ return { text: t, key: wordsOf(t).join(" ") }; });
+      var pairs = cmpAlign(pA, pB);
+      var R = { wordsA: wordsA.length, wordsB: wordsB.length, parasA: pA.length, parasB: pB.length,
+        sentsA: 0, sentsB: 0, matchedWords: 0, wAdd: 0, wDel: 0, wChg: 0, sAdd: 0, sDel: 0, sChg: 0,
+        pAdd: 0, pDel: 0, pChg: 0, pMoved: 0, rows: [], changedPairs: [], summarizedPairs: 0 };
+      pairs.forEach(function(pr){
+        var aPara = pr.a >= 0 ? pA[pr.a] : null, bPara = pr.b >= 0 ? pB[pr.b] : null;
+        var aSents = aPara ? splitSentences(aPara.text) : [], bSents = bPara ? splitSentences(bPara.text) : [];
+        R.sentsA += aSents.length; R.sentsB += bSents.length;
+        if(pr.kind === "same" || pr.kind === "moved"){
+          if(pr.kind === "moved"){ R.pMoved++; R.rows.push({ kind: "note", text: "Paragraf berikut ini berpindah urutan — isinya sama persis." }); }
+          R.matchedWords += wordsOf(aPara.text).length;
+          if(aSents.length === bSents.length){
+            aSents.forEach(function(s, i){ R.rows.push({ kind: "same", aText: s, bText: bSents[i], paraStart: i === 0 }); });
+          } else {
+            R.rows.push({ kind: "same", aText: aPara.text, bText: bPara.text, paraStart: true });
+          }
+        } else if(pr.kind === "removed"){
+          R.pDel++;
+          aSents.forEach(function(s, i){ R.sDel++; R.wDel += wordsOf(s).length; R.rows.push({ kind: "removed", aText: s, paraStart: i === 0 }); });
+        } else if(pr.kind === "added"){
+          R.pAdd++;
+          bSents.forEach(function(s, i){ R.sAdd++; R.wAdd += wordsOf(s).length; R.rows.push({ kind: "added", bText: s, paraStart: i === 0 }); });
+        } else {
+          R.pChg++;
+          var sA = aSents.map(function(t){ return { text: t, key: wordsOf(t).join(" ") }; });
+          var sB = bSents.map(function(t){ return { text: t, key: wordsOf(t).join(" ") }; });
+          var sp = cmpAlign(sA, sB);
+          sp.forEach(function(sr, ri){
+            var first = ri === 0;
+            if(sr.kind === "same" || sr.kind === "moved"){
+              R.matchedWords += wordsOf(sA[sr.a].text).length;
+              R.rows.push({ kind: "same", aText: sA[sr.a].text, bText: sB[sr.b].text, paraStart: first });
+            } else if(sr.kind === "removed"){
+              R.sDel++; R.wDel += wordsOf(sA[sr.a].text).length;
+              R.rows.push({ kind: "removed", aText: sA[sr.a].text, paraStart: first });
+            } else if(sr.kind === "added"){
+              R.sAdd++; R.wAdd += wordsOf(sB[sr.b].text).length;
+              R.rows.push({ kind: "added", bText: sB[sr.b].text, paraStart: first });
+            } else {
+              R.sChg++;
+              var aT = cmpTokens(sA[sr.a].text), bT = cmpTokens(sB[sr.b].text);
+              var ops = cmpWordDiff(aT, bT), counts;
+              if(ops){ counts = cmpCountOps(ops); }
+              else {
+                R.summarizedPairs++;
+                var fa = Object.create(null), fb = Object.create(null), kk;
+                aT.forEach(function(t){ fa[t.k] = (fa[t.k] || 0) + 1; });
+                bT.forEach(function(t){ fb[t.k] = (fb[t.k] || 0) + 1; });
+                var eq2 = 0, d2 = 0, i2 = 0;
+                for(kk in fa){ var c = Math.min(fa[kk], fb[kk] || 0); eq2 += c; d2 += fa[kk] - c; }
+                for(kk in fb){ i2 += fb[kk] - Math.min(fa[kk] || 0, fb[kk]); }
+                counts = { eq: eq2, del: d2, ins: i2, chg: 0 };
+              }
+              R.matchedWords += counts.eq; R.wDel += counts.del; R.wAdd += counts.ins; R.wChg += counts.chg;
+              R.rows.push({ kind: "changed", aText: sA[sr.a].text, bText: sB[sr.b].text, ops: ops, paraStart: first });
+              R.changedPairs.push({ aText: sA[sr.a].text, bText: sB[sr.b].text });
+            }
+          });
+        }
+      });
+      R.similarity = (R.wordsA + R.wordsB) ? (2 * R.matchedWords) / (R.wordsA + R.wordsB) : 1;
+      R.identical = R.wAdd === 0 && R.wDel === 0 && R.wChg === 0 && R.sAdd === 0 && R.sDel === 0 && R.pAdd === 0 && R.pDel === 0 && R.pMoved === 0;
+      R.surfaceOnly = R.identical && textA.trim() !== textB.trim();
+      return R;
+    }
+    /* CMP-CORE-END */
+
+    /* Compare Writing — render & interaksi (DOM). */
+    var cmpLast = null;
+    function cmpDeltaTxt(a, b, fmt){
+      var d = b - a;
+      if(Math.abs(d) < 1e-9) return "± 0";
+      return (d > 0 ? "▲ +" : "▼ −") + fmt(Math.abs(d));
+    }
+    function cmpOpsHtmlA(ops){
+      if(!ops) return null;
+      return ops.filter(function(o){ return o.type !== "ins"; }).map(function(o){
+        return o.type === "eq" ? escapeHtml(o.a.t) : "<span class=\"seg-del\">" + escapeHtml(o.a.t) + "</span>";
+      }).join(" ");
+    }
+    function cmpOpsHtmlB(ops){
+      if(!ops) return null;
+      return ops.filter(function(o){ return o.type !== "del"; }).map(function(o){
+        return o.type === "eq" ? escapeHtml(o.b.t) : "<span class=\"seg-add\">" + escapeHtml(o.b.t) + "</span>";
+      }).join(" ");
+    }
+    function cmpOpsHtmlInline(ops){
+      if(!ops) return null;
+      return ops.map(function(o){
+        if(o.type === "eq") return escapeHtml(o.a.t);
+        if(o.type === "del") return "<span class=\"seg-del\">" + escapeHtml(o.a.t) + "</span>";
+        return "<span class=\"seg-add\">" + escapeHtml(o.b.t) + "</span>";
+      }).join(" ");
+    }
+    function cmpRender(R, fa, fb){
+      var cards = [
+        [wfFmt(R.similarity * 100) + "%", "kemiripan tekstual (Dice)"],
+        [fmtNumID(R.wordsA) + " → " + fmtNumID(R.wordsB), "kata (A → B)"],
+        ["+" + fmtNumID(R.wAdd), "kata ditambah di B"],
+        ["−" + fmtNumID(R.wDel), "kata dihapus dari A"],
+        ["≈" + fmtNumID(R.wChg), "kata berubah"],
+        [fmtNumID(R.sChg + R.sAdd + R.sDel), "kalimat berubah/tambah/hapus"],
+        [fmtNumID(R.pMoved), "paragraf berpindah urutan"],
+        [fmtNumID(R.changedPairs.length), "pasangan kalimat berubah"]
+      ];
+      $("cmp-cards").innerHTML = cards.map(function(c){ return "<div class=\"wf-card\"><div class=\"n\">" + c[0] + "</div><div class=\"t\">" + c[1] + "</div></div>"; }).join("");
+
+      var sb = $("cmp-surface");
+      if(R.identical && !R.surfaceOnly){ sb.innerHTML = "<strong>Kedua dokumen identik</strong> pada tingkat kata — tidak ada perbedaan isi, urutan, maupun permukaan teks."; sb.classList.add("show"); }
+      else if(R.surfaceOnly){ sb.innerHTML = "<strong>Isi kedua dokumen sama persis.</strong> Perbedaan hanya pada permukaan teks (tanda baca, kapitalisasi, dan/atau spasi) — perbandingan kata memang menormalisasi ketiganya, jadi tidak ada kata yang berubah."; sb.classList.add("show"); }
+      else if(R.summarizedPairs){ sb.innerHTML = "Catatan: " + R.summarizedPairs + " pasangan kalimat sangat besar diringkas dengan selisih himpunan kata (tanpa diff kata rinci) agar perbandingan tetap cepat."; sb.classList.add("show"); }
+      else { sb.innerHTML = ""; sb.classList.remove("show"); }
+
+      $("cmp-changes").innerHTML = wfTable([
+        ["Kata — ditambah / dihapus / berubah", "+" + R.wAdd + " / −" + R.wDel + " / ≈" + R.wChg],
+        ["Kalimat — ditambah / dihapus / berubah", "+" + R.sAdd + " / −" + R.sDel + " / ≈" + R.sChg],
+        ["Paragraf — ditambah / dihapus / berubah", "+" + R.pAdd + " / −" + R.pDel + " / ≈" + R.pChg],
+        ["Paragraf berpindah urutan (isi sama)", String(R.pMoved)],
+        ["Jumlah kata — A / B", fmtNumID(R.wordsA) + " / " + fmtNumID(R.wordsB)],
+        ["Jumlah kalimat — A / B", fmtNumID(R.sentsA) + " / " + fmtNumID(R.sentsB)],
+        ["Jumlah paragraf — A / B", fmtNumID(R.parasA) + " / " + fmtNumID(R.parasB)]
+      ]) + (R.changedPairs.length ? "<p style=\"margin-top:10px;\"><strong>Pasangan kalimat yang berubah</strong> (maks 10 ditampilkan):</p>" + R.changedPairs.slice(0, 10).map(function(p){
+          return "<p class=\"wf-note\" style=\"margin:6px 0;\"><span class=\"d-badge badge-del\">A</span> " + escapeHtml(p.aText) + "<br /><span class=\"d-badge badge-add\">B</span> " + escapeHtml(p.bText) + "</p>";
+        }).join("") : "<p class=\"wf-note\" style=\"margin-top:10px;\">Tidak ada pasangan kalimat yang berubah isinya.</p>");
+
+      var f1 = function(x){ return wfFmt(x, 1); }, f2 = function(x){ return wfFmt(x, 2); }, f3 = function(x){ return wfPctTxt(x); };
+      var rowsF = [
+        ["Kata unik", fmtNumID(fa.unique), fmtNumID(fb.unique), cmpDeltaTxt(fa.unique, fb.unique, function(v){ return fmtNumID(v); })],
+        ["TTR", f3(fa.ttr), f3(fb.ttr), cmpDeltaTxt(fa.ttr, fb.ttr, function(v){ return wfFmt(v * 100) + " poin"; })],
+        ["TTR jendela 50 kata", f3(fa.ttrWin), f3(fb.ttrWin), cmpDeltaTxt(fa.ttrWin, fb.ttrWin, function(v){ return wfFmt(v * 100) + " poin"; })],
+        ["Hapax (% dari unik)", f3(fa.unique ? fa.hapax / fa.unique : 0), f3(fb.unique ? fb.hapax / fb.unique : 0), cmpDeltaTxt(fa.unique ? fa.hapax / fa.unique : 0, fb.unique ? fb.hapax / fb.unique : 0, function(v){ return wfFmt(v * 100) + " poin"; })],
+        ["Indeks Guiraud", f1(fa.guiraud), f1(fb.guiraud), cmpDeltaTxt(fa.guiraud, fb.guiraud, f1)],
+        ["Rata-rata kata per kalimat", f1(fa.lensMean), f1(fb.lensMean), cmpDeltaTxt(fa.lensMean, fb.lensMean, f1)],
+        ["Median kata per kalimat", f1(fa.lensMedian), f1(fb.lensMedian), cmpDeltaTxt(fa.lensMedian, fb.lensMedian, f1)],
+        ["CV ritme kalimat", f2(fa.lensCv), f2(fb.lensCv), cmpDeltaTxt(fa.lensCv, fb.lensCv, f2)],
+        ["Koma per kalimat", f2(fa.commasPerSent), f2(fb.commasPerSent), cmpDeltaTxt(fa.commasPerSent, fb.commasPerSent, f2)],
+        ["Subordinasi per kalimat", f2(fa.subPerSent), f2(fb.subPerSent), cmpDeltaTxt(fa.subPerSent, fb.subPerSent, f2)],
+        ["Kalimat panjang (>25 kata)", f3(fa.longSentPct), f3(fb.longSentPct), cmpDeltaTxt(fa.longSentPct, fb.longSentPct, function(v){ return wfFmt(v * 100) + " poin"; })],
+        ["Transisi per 100 kata", f2(fa.transPer100), f2(fb.transPer100), cmpDeltaTxt(fa.transPer100, fb.transPer100, f2)],
+        ["Kata isi tersering", fa.topContent.length ? "“" + escapeHtml(fa.topContent[0].w) + "” (" + fa.topContent[0].c + "×)" : "—", fb.topContent.length ? "“" + escapeHtml(fb.topContent[0].w) + "” (" + fb.topContent[0].c + "×)" : "—", "—"],
+        ["Pola 4 kata berulang (≥2×)", String(fa.topGrams.length), String(fb.topGrams.length), cmpDeltaTxt(fa.topGrams.length, fb.topGrams.length, function(v){ return String(v); })],
+        ["CV konsistensi antarparagraf", f2(fa.cons.cvLen), f2(fb.cons.cvLen), cmpDeltaTxt(fa.cons.cvLen, fb.cons.cvLen, f2)]
+      ];
+      $("cmp-forensic").innerHTML = "<table class=\"wf-table\"><thead><tr><td>Metrik</td><td style=\"text-align:right;\">Dokumen A</td><td style=\"text-align:right;\">Dokumen B</td><td style=\"text-align:right;\">Selisih (B − A)</td></tr></thead><tbody>" +
+        rowsF.map(function(r){ return "<tr><td>" + r[0] + "</td><td>" + r[1] + "</td><td>" + r[2] + "</td><td>" + r[3] + "</td></tr>"; }).join("") + "</tbody></table>";
+
+      var maxD = 1;
+      fa.buckets.forEach(function(c, i){ maxD = Math.max(maxD, c, fb.buckets[i]); });
+      $("cmp-dist").innerHTML = fa.buckets.map(function(c, i){
+        return "<div class=\"cmp-dist-row\"><span>" + fa.bucketLabels[i] + " kata</span><span class=\"cmp-dist-bars\"><span class=\"cmp-dist-fill fill-a\" style=\"width:" + (c / maxD * 100).toFixed(1) + "%\"></span><span class=\"cmp-dist-fill fill-b\" style=\"width:" + (fb.buckets[i] / maxD * 100).toFixed(1) + "%\"></span></span><span>A " + c + " · B " + fb.buckets[i] + " kalimat</span></div>";
+      }).join("");
+
+      /* Berdampingan + Inline dengan batas tampilan 6.000 kata per sisi. */
+      var usedA = 0, usedB = 0, cut = false;
+      var sbsHtml = "", inHtml = "", lastSame = null;
+      function flushSame(){
+        if(lastSame){ sbsHtml += "<div class=\"cmp-cell\">" + escapeHtml(lastSame.a) + "</div><div class=\"cmp-cell\">" + escapeHtml(lastSame.b) + "</div>"; inHtml += escapeHtml(lastSame.a) + " "; lastSame = null; }
+      }
+      R.rows.forEach(function(r){
+        if(cut) return;
+        var wa = r.aText ? wordsOf(r.aText).length : 0, wb = r.bText ? wordsOf(r.bText).length : 0;
+        if(usedA + wa > 6000 || usedB + wb > 6000){ cut = true; flushSame(); return; }
+        usedA += wa; usedB += wb;
+        if(r.kind === "note"){ flushSame(); sbsHtml += "<div class=\"cmp-same-note\" style=\"grid-column:1 / -1;\">" + escapeHtml(r.text) + "</div>"; inHtml += "<div class=\"cmp-same-note\">" + escapeHtml(r.text) + "</div>"; return; }
+        if(r.kind === "same"){
+          if(lastSame){ lastSame.a += " " + r.aText; lastSame.b += " " + r.bText; }
+          else lastSame = { a: r.aText, b: r.bText };
+          return;
+        }
+        flushSame();
+        if(r.kind === "removed"){
+          sbsHtml += "<div class=\"cmp-cell d-del\"><span class=\"d-badge badge-del\">− HAPUS</span>" + escapeHtml(r.aText) + "</div><div class=\"cmp-cell empty\">— tidak ada di B —</div>";
+          inHtml += "<span class=\"sent-del\"><span class=\"d-badge badge-del\">− HAPUS</span>" + escapeHtml(r.aText) + "</span> ";
+        } else if(r.kind === "added"){
+          sbsHtml += "<div class=\"cmp-cell empty\">— tidak ada di A —</div><div class=\"cmp-cell d-add\"><span class=\"d-badge badge-add\">＋ TAMBAH</span>" + escapeHtml(r.bText) + "</div>";
+          inHtml += "<span class=\"sent-add\"><span class=\"d-badge badge-add\">＋ TAMBAH</span>" + escapeHtml(r.bText) + "</span> ";
+        } else if(r.kind === "changed"){
+          var ha = cmpOpsHtmlA(r.ops), hb = cmpOpsHtmlB(r.ops), hi = cmpOpsHtmlInline(r.ops);
+          sbsHtml += "<div class=\"cmp-cell d-chg\"><span class=\"d-badge badge-chg\">≈ BERUBAH</span>" + (ha !== null ? ha : escapeHtml(r.aText)) + "</div><div class=\"cmp-cell d-chg\"><span class=\"d-badge badge-chg\">≈ BERUBAH</span>" + (hb !== null ? hb : escapeHtml(r.bText)) + "</div>";
+          inHtml += "<span><span class=\"d-badge badge-chg\">≈ BERUBAH</span>" + (hi !== null ? hi : escapeHtml(r.aText) + " → " + escapeHtml(r.bText)) + "</span> ";
+        }
+      });
+      flushSame();
+      $("cmp-sbs").innerHTML = sbsHtml || "<p class=\"wf-note\">Tidak ada baris untuk ditampilkan.</p>";
+      $("cmp-inline").innerHTML = inHtml || "<p class=\"wf-note\">Tidak ada teks untuk ditampilkan.</p>";
+      var noteTxt = cut ? "Tampilan diff dibatasi 6.000 kata pertama per sisi; seluruh hitungan di atas mencakup teks yang dianalisis penuh." : "";
+      $("cmp-sbs-note").textContent = noteTxt;
+      $("cmp-inline-note").textContent = noteTxt;
+    }
+    function cmpSetMode(mode){
+      ["an", "sbs", "in"].forEach(function(m){
+        $("cmp-view-" + m).hidden = m !== mode;
+        $("cmp-tab-" + m).setAttribute("aria-pressed", m === mode ? "true" : "false");
+      });
+    }
+    var cmpTaA = $("cmp-a"), cmpTaB = $("cmp-b");
+    function cmpCounters(){
+      [["a", cmpTaA], ["b", cmpTaB]].forEach(function(pair){
+        var t = pair[1].value;
+        $("cmp-" + pair[0] + "-kata").textContent = fmtNumID(wordsOf(t).length);
+        $("cmp-" + pair[0] + "-kalimat").textContent = fmtNumID(t.trim() ? splitSentences(t).length : 0);
+        $("cmp-" + pair[0] + "-paragraf").textContent = fmtNumID(t.trim() ? splitParagraphs(t).length : 0);
+      });
+    }
+    function cmpShowError(msg){
+      var b = $("cmp-error");
+      if(msg){ b.innerHTML = msg; b.classList.add("show"); }
+      else { b.innerHTML = ""; b.classList.remove("show"); }
+    }
+    function cmpFileStatus(side, html, kind){
+      var el = $("cmp-" + side + "-status");
+      el.innerHTML = html;
+      el.className = "file-status show" + (kind ? " " + kind : "");
+    }
+    function cmpRun(){
+      cmpShowError("");
+      var rawA = cmpTaA.value, rawB = cmpTaB.value;
+      if(!rawA.trim() || !rawB.trim()){
+        cmpShowError("<strong>Kedua dokumen harus terisi.</strong> Tempel teks atau unggah berkas pada Dokumen A dan Dokumen B terlebih dahulu.");
+        return;
+      }
+      var btn = $("cmp-btn");
+      btn.disabled = true;
+      btn.textContent = "Membandingkan…";
+      setTimeout(function(){
+        try {
+          var capA = capAnalysisText(rawA), capB = capAnalysisText(rawB);
+          if(wordsOf(capA.text).length === 0 || wordsOf(capB.text).length === 0){
+            cmpShowError("<strong>Salah satu dokumen tidak memuat kata yang terbaca.</strong> Periksa kembali isinya.");
+            return;
+          }
+          var R = cmpDiff(capA.text, capB.text);
+          var fa = wfAnalyze(capA.text), fb = wfAnalyze(capB.text);
+          cmpLast = { R: R, fa: fa, fb: fb, cappedA: capA.capped, cappedB: capB.capped, totalA: capA.totalWords, totalB: capB.totalWords };
+          $("cmp-results").hidden = false;
+          cmpRender(R, fa, fb);
+          cmpSetMode("an");
+          $("cmp-results").scrollIntoView({ behavior: "smooth", block: "start" });
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "Bandingkan";
+        }
+      }, 30);
+    }
+    function cmpHandleFile(side, f){
+      if(!f) return;
+      var ta = side === "a" ? cmpTaA : cmpTaB;
+      if(typeof f.size === "number" && f.size > MAX_FILE_BYTES){
+        cmpFileStatus(side, "<strong>Berkas terlalu besar</strong> (" + (f.size / 1048576).toFixed(1).replace(".", ",") + " MB) — batas ukuran berkas adalah 20 MB.", "err");
+        return;
+      }
+      var lower = (f.name || "").toLowerCase();
+      if(lower.endsWith(".doc") && !lower.endsWith(".docx")){
+        cmpFileStatus(side, "<strong>Format .doc lama tidak didukung</strong> — simpan ulang sebagai .docx, lalu unggah lagi.", "err");
+        return;
+      }
+      var kind = null;
+      if(lower.endsWith(".docx")) kind = "docx";
+      else if(lower.endsWith(".pdf")) kind = "pdf";
+      else if(lower.endsWith(".txt") || f.type === "text/plain") kind = "txt";
+      else { cmpFileStatus(side, "<strong>Format berkas belum didukung.</strong> Yang bisa diunggah: .txt, .docx, dan .pdf.", "err"); return; }
+      cmpFileStatus(side, "Membaca berkas <span class=\"fname\">" + escapeHtml(f.name) + "</span>…", "");
+      var p = kind === "txt" ? f.text() : f.arrayBuffer().then(kind === "docx" ? extractDocxText : extractPdfText);
+      p.then(function(text){
+        text = String(text || "");
+        var wc = wordsOf(text).length;
+        if(kind === "pdf" && (wc < 30 || looksGarbled(text))){
+          cmpFileStatus(side, "<strong>Teks dari PDF ini tidak terbaca</strong> — kemungkinan PDF hasil pindai/gambar (butuh OCR) atau font-nya tidak standar. Salin-tempel teksnya langsung.", "err");
+          return;
+        }
+        if(!text.trim() || wc === 0){ cmpFileStatus(side, "<strong>Tidak ada teks yang bisa dibaca dari berkas ini.</strong>", "err"); return; }
+        ta.value = text;
+        cmpCounters();
+        cmpFileStatus(side, "Berkas dimuat: <span class=\"fname\">" + escapeHtml(f.name) + "</span> — " + fmtNumID(wc) + " kata terbaca.", "ok");
+        if(cmpTaA.value.trim() && cmpTaB.value.trim()) cmpRun();
+      }).catch(function(){
+        cmpFileStatus(side, "<strong>Berkas tidak bisa dibaca.</strong> Pastikan formatnya benar dan berkas tidak rusak, atau salin-tempel teksnya langsung.", "err");
+      });
+    }
+    async function cmpDownloadPdf(){
+      var st = $("cmp-pdf-status");
+      if(!cmpLast){ st.textContent = "Jalankan perbandingan terlebih dahulu."; return; }
+      var btn = $("cmp-pdf");
+      btn.disabled = true;
+      st.textContent = "Menyiapkan PDF…";
+      try {
+        var jsPDF = await loadJsPdf();
+        var R = cmpLast.R, fa = cmpLast.fa, fb = cmpLast.fb;
+        var doc = new jsPDF({ unit: "mm", format: "a4" });
+        var W = 210, M = 16, y = 18, lh = 5.6;
+        function line(txt, size, bold){
+          doc.setFont("helvetica", bold ? "bold" : "normal");
+          doc.setFontSize(size || 10.5);
+          var parts = doc.splitTextToSize(pdfSafe(txt), W - 2 * M);
+          parts.forEach(function(p){
+            if(y > 282){ doc.addPage(); y = 18; }
+            doc.text(p, M, y);
+            y += lh;
+          });
+        }
+        function gap(mm){ y += (mm || 3); }
+        line("Saksara — Laporan Perbandingan Dokumen (Compare Writing)", 14, true);
+        line("Dibuat lokal di peramban pada " + new Date().toLocaleString("id-ID") + ". Laporan ini deskriptif: kemiripan bukan bukti kepengarangan dan perubahan karakteristik bukan bukti AI.", 9.5);
+        gap(2);
+        line("RINGKASAN", 11.5, true);
+        line("Kemiripan tekstual (Dice): " + wfFmt(R.similarity * 100) + "%");
+        line("Kata: A " + fmtNumID(R.wordsA) + " | B " + fmtNumID(R.wordsB) + " | ditambah +" + R.wAdd + " | dihapus -" + R.wDel + " | berubah ~" + R.wChg);
+        line("Kalimat: A " + R.sentsA + " | B " + R.sentsB + " | ditambah +" + R.sAdd + " | dihapus -" + R.sDel + " | berubah ~" + R.sChg);
+        line("Paragraf: A " + R.parasA + " | B " + R.parasB + " | ditambah +" + R.pAdd + " | dihapus -" + R.pDel + " | berubah ~" + R.pChg + " | berpindah urutan " + R.pMoved);
+        gap(2);
+        line("PASANGAN KALIMAT YANG BERUBAH (maks 15)", 11.5, true);
+        if(R.changedPairs.length){
+          R.changedPairs.slice(0, 15).forEach(function(p, i){
+            line((i + 1) + ". A: " + p.aText.slice(0, 220));
+            line("   B: " + p.bText.slice(0, 220));
+          });
+        } else line("Tidak ada pasangan kalimat yang berubah isinya.");
+        gap(2);
+        line("METRIK WRITING FORENSIC (A -> B)", 11.5, true);
+        [["TTR", wfPctTxt(fa.ttr), wfPctTxt(fb.ttr)], ["TTR jendela", wfPctTxt(fa.ttrWin), wfPctTxt(fb.ttrWin)], ["Guiraud", wfFmt(fa.guiraud), wfFmt(fb.guiraud)], ["Rata-rata kata/kalimat", wfFmt(fa.lensMean), wfFmt(fb.lensMean)], ["CV ritme", wfFmt(fa.lensCv, 2), wfFmt(fb.lensCv, 2)], ["Transisi per 100 kata", wfFmt(fa.transPer100, 2), wfFmt(fb.transPer100, 2)]].forEach(function(r){
+          line(r[0] + ": " + r[1] + " -> " + r[2]);
+        });
+        gap(2);
+        line("METODOLOGI", 11.5, true);
+        line("Kata dibandingkan dalam bentuk ternormalisasi (huruf kecil, tanpa tanda baca). Penjajaran tiga tingkat: paragraf identik dicocokkan lebih dulu (yang urutannya berbeda dilaporkan sebagai berpindah urutan), sisa paragraf dipasangkan menurut posisi, kalimat dijajarkan dengan cara yang sama, dan kata di dalam pasangan kalimat berubah dibandingkan dengan diff LCS. Kemiripan = koefisien Dice: 2 x kata-cocok / (kata-A + kata-B). Metrik karakteristik dihitung dengan fungsi Writing Forensic Saksara.");
+        gap(1);
+        line("KETERBATASAN", 11.5, true);
+        line("Kemiripan tinggi tidak membuktikan penulis yang sama; kemiripan rendah tidak membuktikan penulis berbeda. Parafrase menyeluruh menghasilkan kemiripan tekstual rendah walau maknanya sama. Perubahan karakteristik antarversi adalah deskripsi statistik, bukan bukti AI dan bukan bukti mengakali deteksi. Dokumen pendek membuat persentase mudah berayun. Analisis dibatasi 100.000 kata per dokumen.");
+        doc.save("saksara-perbandingan.pdf");
+        st.textContent = "PDF terunduh.";
+      } catch(e) {
+        st.textContent = "PDF gagal dibuat — pustaka PDF tidak termuat (periksa koneksi internet) atau terjadi kesalahan.";
+      } finally {
+        btn.disabled = false;
+      }
+    }
+    if(cmpTaA && cmpTaB){
+      cmpTaA.addEventListener("input", cmpCounters);
+      cmpTaB.addEventListener("input", cmpCounters);
+      $("cmp-btn").addEventListener("click", cmpRun);
+      $("cmp-swap").addEventListener("click", function(){
+        var v = cmpTaA.value; cmpTaA.value = cmpTaB.value; cmpTaB.value = v;
+        cmpCounters();
+        $("cmp-results").hidden = true;
+        cmpShowError("");
+      });
+      $("cmp-clear").addEventListener("click", function(){
+        cmpTaA.value = ""; cmpTaB.value = "";
+        cmpCounters(); cmpShowError("");
+        $("cmp-results").hidden = true;
+        ["a", "b"].forEach(function(s){ var el = $("cmp-" + s + "-status"); el.innerHTML = ""; el.className = "file-status"; });
+      });
+      $("cmp-clear-a").addEventListener("click", function(){ cmpTaA.value = ""; cmpCounters(); cmpTaA.focus(); });
+      $("cmp-clear-b").addEventListener("click", function(){ cmpTaB.value = ""; cmpCounters(); cmpTaB.focus(); });
+      $("cmp-file-a").addEventListener("change", function(ev){ if(ev.target.files && ev.target.files[0]) cmpHandleFile("a", ev.target.files[0]); ev.target.value = ""; });
+      $("cmp-file-b").addEventListener("change", function(ev){ if(ev.target.files && ev.target.files[0]) cmpHandleFile("b", ev.target.files[0]); ev.target.value = ""; });
+      $("cmp-ex").addEventListener("click", function(){
+        var b = CONTOH_AI
+          .replace("berkembang sangat pesat", "berkembang begitu pesat")
+          .replace("Dengan demikian, penting untuk dicatat bahwa teknologi memberikan kemudahan akses informasi bagi masyarakat di berbagai daerah. ", "")
+          .replace("di berbagai jenjang pendidikan formal.", "di berbagai jenjang pendidikan formal. Oleh sebab itu, sekolah perlu menyiapkan pelatihan literasi digital bagi guru secara berkala.");
+        cmpTaA.value = CONTOH_AI;
+        cmpTaB.value = b;
+        cmpCounters();
+        cmpRun();
+      });
+      $("cmp-tab-an").addEventListener("click", function(){ cmpSetMode("an"); });
+      $("cmp-tab-sbs").addEventListener("click", function(){ cmpSetMode("sbs"); });
+      $("cmp-tab-in").addEventListener("click", function(){ cmpSetMode("in"); });
+      $("cmp-pdf").addEventListener("click", cmpDownloadPdf);
+      cmpCounters();
     }
 
     /* ---------- Phase 2: aktivitas dashboard (hanya memori sesi — tanpa penyimpanan) ---------- */
