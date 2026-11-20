@@ -94,7 +94,7 @@
         padding:9px 18px; border-radius:10px; box-shadow:var(--shadow-sm);
         transition:transform .15s ease, box-shadow .15s ease; }
       .nav-cta:hover{ transform:translateY(-1px); box-shadow:var(--shadow); }
-      @media (max-width:900px){ .nav-links{ display:none; } .nav-cta{ margin-left:auto; } }
+      @media (max-width:900px){ .nav-cta{ margin-left:auto; } }
       @media (max-width:520px){ .nav-tag{ display:none; } .nav-cta{ padding:8px 13px; font-size:13.5px; } }
       /* ---------- hero ---------- */
       header.hero{ padding:58px 0 10px; }
@@ -376,6 +376,33 @@
       dialog.changelog h3{ margin:18px 0 6px; font-size:14.5px; color:#C9A227; }
       dialog.changelog ul{ margin:0; padding-left:18px; font-size:13.5px; line-height:1.55; color:#C7D2E4; }
       dialog.changelog .dlg-close{ margin-top:20px; background:#C9A227; color:#0F2140; border:none; border-radius:9px; padding:9px 18px; font-weight:700; cursor:pointer; }
+      /* ---------- penyempurnaan tampilan HP ---------- */
+      @media (max-width:900px){
+        /* Menu tampilan (Beranda/Cara Kerja/Metode/Posisi & Batasan) TIDAK
+           hilang di HP: ia menjadi baris kedua yang bisa digeser menyamping,
+           karena tanpa menu ini pengunjung HP tidak bisa berpindah tampilan. */
+        .site-nav{ padding-top:env(safe-area-inset-top); }
+        .nav-inner{ flex-wrap:wrap; gap:4px 14px; padding-top:9px; padding-bottom:9px; min-height:0; }
+        .nav-links{ display:flex; order:3; width:100%; margin-left:0; overflow-x:auto; flex-wrap:nowrap;
+          -webkit-overflow-scrolling:touch; scrollbar-width:none; padding-bottom:2px; }
+        .nav-links::-webkit-scrollbar{ display:none; }
+        .nav-links a{ flex:none; padding:9px 12px; }
+      }
+      @media (max-width:640px){
+        /* Tabel batch digeser menyamping, bukan terjepit */
+        #batch-results{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
+        .batch-table{ min-width:560px; }
+        /* Font >= 16px pada kotak teks mencegah zoom otomatis iOS saat fokus */
+        textarea{ font-size:16px; min-height:200px; }
+        section.method h2, section.analyzer h2, section.report h2, section.posisi h2{ font-size:24px; }
+        header.hero p.lede{ font-size:16px; }
+        .panel{ padding:18px 16px; }
+        .hl-panel, .pdf-panel, .donasi{ padding-left:16px; padding-right:16px; }
+        .clf-panel{ padding:15px 16px; }
+        .score-card{ padding:20px 18px; }
+        .strip-stat .n{ font-size:28px; }
+        .examples button{ flex:1 1 100%; }
+      }
       /* ---------- focus & motion ---------- */
       button:focus-visible, .sent:focus-visible, a:focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
       @media (max-width:860px){
@@ -598,7 +625,7 @@
             <h3>Laporan PDF</h3>
             <button type="button" id="btn-pdf">Unduh Laporan PDF</button>
           </div>
-          <p class="pdf-note">Unduh hasil pemeriksaan ini sebagai berkas PDF: ringkasan skor &amp; vonis, rincian ketujuh sinyal, skor dan alasan untuk setiap kalimat, serta teks lengkap dengan kalimat terindikasi ditandai. PDF dibuat langsung di peramban Anda; pustaka jsPDF dimuat dari CDN hanya saat tombol ini ditekan. Isinya adalah analisis <strong>indikasi AI per kalimat</strong>, bukan laporan kecocokan plagiarisme terhadap basis data. <span id="pdf-status" role="status" aria-live="polite"></span></p>
+          <p class="pdf-note">Unduh hasil pemeriksaan ini sebagai berkas PDF bergaya laporan Turnitin: panel skor berwarna, bagian khusus hasil classifier (Lapis 2), rincian ketujuh sinyal dengan warna berbeda per sinyal, keterangan warna, teks lengkap dengan kalimat terindikasi diberi latar warna (frasa khas AI tampil ungu tebal, pola berulang cokelat bergaris bawah), serta skor dan alasan untuk setiap kalimat. PDF dibuat langsung di peramban Anda; pustaka jsPDF dimuat dari CDN hanya saat tombol ini ditekan. Isinya adalah analisis <strong>indikasi AI per kalimat</strong>, bukan laporan kecocokan plagiarisme terhadap basis data. <span id="pdf-status" role="status" aria-live="polite"></span></p>
         </div>
 
         <div class="telemetry" id="telemetry">
@@ -711,12 +738,17 @@
           <a href="#/posisi">Posisi &amp; Batasan</a>
         </nav>
         <p class="copy">© 2026 Saksara — Dikembangkan oleh Ciptanala Devs</p>
-        <p class="version-line">Versi <strong>v0.9.7-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
+        <p class="version-line">Versi <strong>v0.9.8-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
       </div>
     </footer>
 
     <dialog class="changelog" id="changelog-modal" aria-labelledby="changelog-title">
       <h2 id="changelog-title">Catatan Rilis — Saksara</h2>
+      <h3>v0.9.8-beta — 20 November 2026</h3>
+      <ul>
+        <li><strong>Laporan PDF dirombak ala Turnitin:</strong> panel skor besar berwarna sesuai pita, teks yang diperiksa kini tampil dengan <strong>penanda warna</strong> — latar merah/kuning muda per kalimat terindikasi, frasa khas AI berwarna ungu tebal, pola kata berulang cokelat bergaris bawah — dilengkapi <strong>keterangan warna</strong>. Ketujuh sinyal Lapis 1 kini masing-masing berwarna berbeda pada batang nilainya, dan hasil <strong>pemeriksaan Lapis 2 (classifier)</strong> tampil sebagai bagian tersendiri lengkap dengan status gerbang penguat dan rumus gabungannya.</li>
+        <li><strong>Tampilan HP lebih responsif:</strong> menu tampilan (Beranda/Cara Kerja/Metode/Posisi &amp; Batasan) kini menjadi baris kedua yang bisa digeser di layar kecil — tidak lagi hilang; tabel Periksa Banyak Berkas bisa digeser menyamping; kotak teks memakai ukuran huruf yang mencegah zoom otomatis di iPhone; jarak panel dan ukuran judul disesuaikan untuk layar kecil.</li>
+      </ul>
       <h3>v0.9.7-beta — 20 November 2026</h3>
       <ul>
         <li><strong>Isi daftar-daftar tidak lagi ikut dinilai:</strong> seluruh entri <strong>DAFTAR ISI, DAFTAR GAMBAR, dan DAFTAR TABEL</strong> (judul entri + nomor halaman) serta seluruh entri <strong>DAFTAR PUSTAKA</strong> kini <strong>selalu dikeluarkan otomatis dari penilaian</strong>, langsung dari kode — melengkapi pengeluaran judul & kepala bab pada rilis sebelumnya. Jumlah kata yang dikeluarkan diumumkan di laporan dan tercetak di PDF.</li>
@@ -2293,15 +2325,33 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           .replace(/•/g, "-")
           .replace(/[^\x20-\x7E\xA0-\xFF]/g, "");
       }
+      /* ---------- Warna & metadata sinyal untuk laporan PDF ----------
+         Tiap sinyal Lapis 1 punya warna tetap (gaya laporan Turnitin):
+         warna yang sama dipakai pada batang nilai sinyal, kotak alasan di
+         rincian per kalimat, dan penanda di dalam teks berwarna. Pita skor
+         kalimat memakai warna latarnya sendiri (merah/kuning muda). */
+      var SIG_META = [
+        { key: "burst", name: "Burstiness (ritme kalimat)", color: [37, 99, 235], desc: "Keteraturan panjang kalimat — tulisan AI cenderung seragam; tulisan manusia lebih bervariasi." },
+        { key: "vocab", name: "Keragaman kosakata", color: [13, 148, 136], desc: "Keanekaragaman kata (type-token ratio) yang diukur per jendela teks." },
+        { key: "phrase", name: "Frasa khas AI", color: [124, 58, 237], desc: "Kepadatan frasa formulaik yang sangat sering muncul pada keluaran AI (kamus frasa dwibahasa)." },
+        { key: "stylo", name: "Stilometri (gaya & struktur)", color: [234, 88, 12], desc: "Pola awalan kalimat, struktur paragraf, dan rentang panjang kalimat." },
+        { key: "markdown", name: "Sisa Markdown", color: [219, 39, 119], desc: "Sisa format markdown mentah (mis. **tebal**) yang tertinggal dari keluaran AI." },
+        { key: "symmetry", name: "Simetri Paragraf", color: [22, 163, 74], desc: "Keseragaman panjang paragraf — paragraf keluaran AI cenderung simetris." },
+        { key: "repetition", name: "Pengulangan Frasa", color: [146, 64, 14], desc: "Rangkaian 4 kata yang berulang di seluruh dokumen — sidik jari templat." }
+      ];
+      function sigMetaOf(key){
+        for(var i = 0; i < SIG_META.length; i++){ if(SIG_META[i].key === key) return SIG_META[i]; }
+        return SIG_META[0];
+      }
       function sentenceReasons(p){
         var rs = [];
-        if(p.hits && p.hits.found && p.hits.found.length) rs.push("memuat frasa khas AI: \"" + p.hits.found.join("\", \"") + "\"");
-        if(p.repGrams && p.repGrams.length) rs.push("memuat pola 4 kata yang berulang >= 3 kali di seluruh dokumen: \"" + p.repGrams.map(function(g){ return g.text; }).join("\", \"") + "\"");
-        else if(p.repSent > 0) rs.push("memuat pola 4 kata yang berulang >= 3 kali di seluruh dokumen");
-        if(p.mdBonus) rs.push("memuat sisa format markdown mentah khas keluaran AI");
-        if(!rs.length && p.phrase >= 0.5) rs.push("skor frasa kalimat tinggi (" + pct(p.phrase) + "%)");
-        if(!rs.length && p.close >= 0.8) rs.push("panjang kalimat sangat dekat ke rata-rata dokumen — ritme seragam (" + pct(p.close) + "%)");
-        if(!rs.length && p.starter >= 0.7) rs.push("awalan kalimat berulang seperti kalimat lain di dokumen");
+        if(p.hits && p.hits.found && p.hits.found.length) rs.push({ sig: "phrase", text: "memuat frasa khas AI: \"" + p.hits.found.join("\", \"") + "\"" });
+        if(p.repGrams && p.repGrams.length) rs.push({ sig: "repetition", text: "memuat pola 4 kata yang berulang >= 3 kali di seluruh dokumen: \"" + p.repGrams.map(function(g){ return g.text; }).join("\", \"") + "\"" });
+        else if(p.repSent > 0) rs.push({ sig: "repetition", text: "memuat pola 4 kata yang berulang >= 3 kali di seluruh dokumen" });
+        if(p.mdBonus) rs.push({ sig: "markdown", text: "memuat sisa format markdown mentah khas keluaran AI" });
+        if(!rs.length && p.phrase >= 0.5) rs.push({ sig: "phrase", text: "skor frasa kalimat tinggi (" + pct(p.phrase) + "%)" });
+        if(!rs.length && p.close >= 0.8) rs.push({ sig: "burst", text: "panjang kalimat sangat dekat ke rata-rata dokumen — ritme seragam (" + pct(p.close) + "%)" });
+        if(!rs.length && p.starter >= 0.7) rs.push({ sig: "repetition", text: "awalan kalimat berulang seperti kalimat lain di dokumen" });
         return rs;
       }
       async function downloadPdfReport(){
@@ -2317,37 +2367,134 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           var W = doc.internal.pageSize.getWidth();
           var H = doc.internal.pageSize.getHeight();
           var M = 48, y = M, maxW = W - M * 2;
+          var NAVY = [15, 33, 64], GOLD = [201, 162, 39], INK = [26, 32, 44], MUT = [96, 108, 128], TRACK = [226, 232, 240], PANEL = [243, 246, 250], CLF_COLOR = [109, 40, 217];
+          var BANDC = { r: { solid: [176, 42, 32], bg: [250, 224, 219] }, y: { solid: [176, 116, 16], bg: [252, 240, 199] }, g: { solid: [22, 101, 52], bg: [220, 240, 224] } };
+          function setC(c){ doc.setTextColor(c[0], c[1], c[2]); }
+          function setF(c){ doc.setFillColor(c[0], c[1], c[2]); }
           function ensure(h){ if(y + h > H - 58){ doc.addPage(); y = M; } }
-          function write(text, size, style, gapAfter){
+          function writeAt(text, size, style, gapAfter, x, color){
             doc.setFont("helvetica", style || "normal");
             doc.setFontSize(size);
-            var lines = doc.splitTextToSize(pdfSafe(text), maxW);
+            setC(color || INK);
+            var lines = doc.splitTextToSize(pdfSafe(text), maxW - (x - M));
             var lh = size * 1.5;
-            for(var i = 0; i < lines.length; i++){ ensure(lh); doc.text(lines[i], M, y); y += lh; }
+            for(var i = 0; i < lines.length; i++){ ensure(lh); doc.text(lines[i], x, y); y += lh; }
             if(gapAfter) y += gapAfter;
+            setC(INK);
           }
-          function rule(){
-            ensure(10);
-            doc.setDrawColor(180, 180, 180);
-            doc.line(M, y, W - M, y);
-            y += 14;
+          function write(text, size, style, gapAfter, color){ writeAt(text, size, style, gapAfter, M, color); }
+          function h2(text){
+            ensure(48);
+            y += 8;
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(12.5);
+            setC(NAVY);
+            doc.text(pdfSafe(text), M, y);
+            y += 5;
+            setF(GOLD);
+            doc.rect(M, y, 34, 2.4, "F");
+            y += 13;
+            setC(INK);
           }
-          // --- kepala laporan ---
-          doc.setTextColor(22, 41, 77);
-          write("Saksara", 18, "bold", 0);
-          doc.setTextColor(90, 90, 90);
-          write("Gratis Deteksi Tulisan AI — BETA TERBUKA", 9.5, "normal", 2);
-          doc.setTextColor(0, 0, 0);
-          write("Laporan Hasil Pemeriksaan Teks", 14, "bold", 2);
-          rule();
-          // --- ringkasan ---
+          function barRow(label, value, color, labelW){
+            ensure(20);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(9.5);
+            setC(NAVY);
+            doc.text(pdfSafe(label), M, y);
+            var bx = M + labelW, bw = maxW - labelW - 52;
+            setF(TRACK);
+            doc.rect(bx, y - 8, bw, 7, "F");
+            if(value > 0){ setF(color); doc.rect(bx, y - 8, Math.max(1.5, bw * Math.min(1, value)), 7, "F"); }
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(10.5);
+            setC(INK);
+            doc.text(pct(value) + "%", bx + bw + 10, y);
+            y += 19;
+          }
+          // --- data ringkasan ---
           var fnameEl = document.querySelector("#file-status .fname");
           var sumber = fnameEl && fnameEl.textContent.trim() ? fnameEl.textContent.trim() : "Teks tempel";
           var waktu = new Date().toLocaleString("id-ID", { dateStyle: "full", timeStyle: "short" });
-          write("Tanggal & waktu pemeriksaan: " + waktu, 10.5);
-          write("Sumber: " + sumber, 10.5);
-          write("Skor indikasi AI keseluruhan: " + $("score-num").textContent + "%", 12, "bold");
-          write("Vonis: " + $("verdict").textContent, 11, "bold", 2);
+          var shownPct = parseFloat(String($("score-num").textContent).replace(",", "."));
+          if(isNaN(shownPct)) shownPct = pct(res.final);
+          var shownBand = bandOf(shownPct / 100);
+          // --- kepala laporan: pita navy ala laporan resmi ---
+          setF(NAVY);
+          doc.rect(0, 0, W, 58, "F");
+          setF(GOLD);
+          doc.rect(0, 58, W, 3, "F");
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(17);
+          doc.setTextColor(255, 255, 255);
+          doc.text("Saksara", M, 27);
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(9);
+          doc.setTextColor(199, 210, 228);
+          doc.text("Gratis Deteksi Tulisan AI — Beta Terbuka", M, 43);
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(11.5);
+          doc.setTextColor(255, 255, 255);
+          doc.text("LAPORAN PEMERIKSAAN TEKS", W - M, 27, { align: "right" });
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(8.5);
+          doc.setTextColor(199, 210, 228);
+          doc.text(pdfSafe(waktu), W - M, 43, { align: "right" });
+          setC(INK);
+          y = 84;
+          write("Sumber: " + sumber, 10.5, "normal", 2, MUT);
+          // --- panel skor: angka besar berwarna + batang kedua lapis ---
+          ensure(118);
+          var pTop = y - 4;
+          setF(PANEL);
+          doc.rect(M, pTop, maxW, 102, "F");
+          setF(GOLD);
+          doc.rect(M, pTop, 4, 102, "F");
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(31);
+          setC(BANDC[shownBand].solid);
+          doc.text(shownPct + "%", M + 18, pTop + 46);
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(7.5);
+          setC(MUT);
+          doc.text("SKOR INDIKASI AI", M + 18, pTop + 62);
+          doc.text("KESELURUHAN", M + 18, pTop + 72);
+          doc.setFontSize(10);
+          setC(INK);
+          var vLines = doc.splitTextToSize(pdfSafe($("verdict").textContent), 168);
+          for(var vi = 0; vi < Math.min(2, vLines.length); vi++) doc.text(vLines[vi], M + 18, pTop + 88 + vi * 12);
+          var rx = M + 208;
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(9);
+          setC(NAVY);
+          doc.text("LAPIS 1 — HEURISTIK V3", rx, pTop + 26);
+          setF(TRACK);
+          doc.rect(rx, pTop + 32, 168, 7, "F");
+          setF(NAVY);
+          doc.rect(rx, pTop + 32, Math.max(1.5, 168 * res.final), 7, "F");
+          doc.setFontSize(10.5);
+          setC(INK);
+          doc.text(pct(res.final) + "%", rx + 178, pTop + 39);
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(9);
+          setC(NAVY);
+          doc.text("LAPIS 2 — CLASSIFIER", rx, pTop + 62);
+          if(lastClfScore !== null && lastClfScore !== undefined){
+            setF(TRACK);
+            doc.rect(rx, pTop + 68, 168, 7, "F");
+            setF(CLF_COLOR);
+            doc.rect(rx, pTop + 68, Math.max(1.5, 168 * lastClfScore), 7, "F");
+            doc.setFontSize(10.5);
+            setC(INK);
+            doc.text(pct(lastClfScore) + "%", rx + 178, pTop + 75);
+          } else {
+            doc.setFont("helvetica", "italic");
+            doc.setFontSize(9.5);
+            setC(MUT);
+            doc.text("tidak diaktifkan", rx, pTop + 75);
+          }
+          setC(INK);
+          y = pTop + 102 + 16;
           write("Jumlah kata: " + res.words + " | Jumlah kalimat: " + res.sents.length +
                 " | Rata-rata kata per kalimat: " + res.mean.toFixed(1) +
                 " | Type-token ratio (TTR): " + res.overallTTR.toFixed(2), 10.5);
@@ -2358,71 +2505,246 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           if(lastExclusion) write("Catatan: Bagian baku dikecualikan: ±" + lastExclusion.excludedWords + " kata tidak dianalisis (daftar pustaka, kata pengantar, kutipan, baris tabel — sesuai yang ditemukan).", 10, "italic");
           if(lastHeadingsRemoved) write("Catatan: Judul dan kepala bab/subbab dikeluarkan dari penilaian: " + lastHeadingsRemoved.lines + " baris (±" + lastHeadingsRemoved.words + " kata) tidak dianalisis - yang dinilai hanya isi prosa.", 10, "italic");
           if(lastSectionsRemoved) write("Catatan: Isi " + lastSectionsRemoved.sections.join(", ") + " dikeluarkan dari penilaian: ±" + lastSectionsRemoved.words + " kata tidak dianalisis.", 10, "italic");
-          y += 4;
-          write("Mesin & rumus skor", 12, "bold", 1);
-          write("Skor Ensemble Heuristik v3: " + pct(res.final) + "%", 10.5);
+          // --- Lapis 2: bagian khusus classifier ---
+          h2("Pemeriksaan Lapis 2 — Classifier");
           if(lastClfScore !== null && lastClfScore !== undefined){
-            write("Skor classifier (berjalan lokal di peramban): " + pct(lastClfScore) + "%", 10.5);
-            if(lastClfTruncated) write("Catatan cakupan classifier: dokumen sangat panjang - classifier menilai " + MAX_CLF_CHUNKS + " segmen pertama teks (maks. +/-120 ribu karakter).", 10.5);
+            write("Model: XLM-RoBERTa multibahasa (xlm-roberta-base-finetuned-HC3-mix) — berjalan sepenuhnya lokal di peramban; teks tidak dikirim ke server mana pun.", 10, "normal", 3, MUT);
+            barRow("Probabilitas AI menurut classifier", lastClfScore, CLF_COLOR, 218);
+            if(lastClfTruncated) write("Catatan cakupan classifier: dokumen sangat panjang — classifier menilai " + MAX_CLF_CHUNKS + " segmen pertama teks (maks. +/-120 ribu karakter).", 10, "italic");
             if(lastClfApplied){
-              write("Penguat diterapkan (heuristik awal >= 35%): skor classifier ikut menguatkan skor akhir.", 10.5);
+              var blended = res.final + (1 - res.final) * lastClfScore * 0.5;
+              write("Gerbang penguat TERBUKA — heuristik " + pct(res.final) + "% >= 35%, sehingga classifier ikut menaikkan skor akhir.", 10.5);
+              write("Rumus gabungan: skor akhir = heuristik + (1 - heuristik) x classifier x 0,5 = " + pct(res.final) + "% + (100% - " + pct(res.final) + "%) x " + pct(lastClfScore) + "% x 0,5 = " + pct(blended) + "%.", 10.5);
             } else {
-              write("Classifier dinilai tetapi TIDAK menaikkan skor akhir (heuristik awal < 35%) - skor akhir 100% heuristik v3.", 10.5);
+              write("Gerbang penguat TERTUTUP — heuristik " + pct(res.final) + "% < 35%, sehingga skor classifier TIDAK dipakai; skor akhir 100% Lapis 1. Classifier tidak pernah menaikkan skor sendirian.", 10.5);
             }
             if(lastWatchSignal){
-              write("SINYAL WASPADA: classifier memberi probabilitas AI sangat tinggi (" + pct(lastWatchSignal.clf) + "%) sementara heuristik rendah (" + pct(lastWatchSignal.heur) + "%) - kedua lapis tidak sepakat. Ketidaksepakatan ini dapat muncul pada teks AI yang disunting/diparafrase dengan baik, tetapi juga pada tulisan manusia yang sangat formal. Skor akhir tidak diubah; disarankan meninjau teks ini secara manual dan mengklarifikasi kepada penulisnya sebelum menyimpulkan.", 10.5);
+              var wtxt = "SINYAL WASPADA: classifier memberi probabilitas AI sangat tinggi (" + pct(lastWatchSignal.clf) + "%) sementara heuristik rendah (" + pct(lastWatchSignal.heur) + "%) — kedua lapis tidak sepakat. Ketidaksepakatan ini dapat muncul pada teks AI yang disunting/diparafrase dengan baik, tetapi juga pada tulisan manusia yang sangat formal. Skor akhir tidak diubah; disarankan meninjau teks ini secara manual dan mengklarifikasi kepada penulisnya sebelum menyimpulkan.";
+              doc.setFont("helvetica", "normal");
+              doc.setFontSize(10);
+              var wl = doc.splitTextToSize(pdfSafe(wtxt), maxW - 20);
+              var wh = wl.length * 15 + 16;
+              ensure(wh + 6);
+              var wTop = y - 11;
+              setF([253, 240, 213]);
+              doc.rect(M, wTop, maxW, wh, "F");
+              doc.setDrawColor(201, 162, 39);
+              doc.rect(M, wTop, maxW, wh, "S");
+              doc.setFontSize(10);
+              setC([109, 84, 16]);
+              for(var wi = 0; wi < wl.length; wi++){ doc.text(wl[wi], M + 10, y); y += 15; }
+              y += 10;
+              setC(INK);
             }
           } else {
-            write("Skor classifier: tidak digunakan — skor akhir 100% Ensemble Heuristik v3.", 10.5);
+            write("Classifier tidak diaktifkan pada pemeriksaan ini — skor akhir 100% Lapis 1 (Ensemble Heuristik v3). Untuk menyertakannya, aktifkan Penguat AI pada panel classifier di halaman sebelum mengunduh laporan.", 10.5, "normal", 0, MUT);
           }
-          y += 4;
-          // --- rincian per sinyal ---
-          write("Rincian per Sinyal (Ensemble Heuristik v3)", 12, "bold", 1);
-          var sigRows = [
-            ["Burstiness (ritme kalimat)", res.burst],
-            ["Keragaman kosakata", res.vocab],
-            ["Frasa khas AI", res.phraseGlobal],
-            ["Stilometri (gaya & struktur)", res.stylo],
-            ["Sisa Markdown", res.markdown],
-            ["Simetri Paragraf", res.symmetry],
-            ["Pengulangan Frasa", res.repetition]
-          ];
-          sigRows.forEach(function(row, i){ write((i + 1) + ". " + row[0] + ": " + pct(row[1]) + "%", 10.5); });
-          y += 4;
-          // --- rincian per kalimat ---
-          write("Rincian per Kalimat", 12, "bold", 1);
-          write("Pita skor: RENDAH < 35% (cenderung manusiawi) | SEDANG 35-65% (meragukan) | TINGGI >= 65% (sangat mirip pola AI). Kalimat pita SEDANG dan TINGGI ditandai [TERINDIKASI] beserta alasannya.", 9.5, "italic", 3);
+          // --- rincian per sinyal: batang berwarna per sinyal ---
+          h2("Rincian per Sinyal — Lapis 1 (Ensemble Heuristik v3)");
+          var sigVals = { burst: res.burst, vocab: res.vocab, phrase: res.phraseGlobal, stylo: res.stylo, markdown: res.markdown, symmetry: res.symmetry, repetition: res.repetition };
+          SIG_META.forEach(function(sm){
+            var v = sigVals[sm.key];
+            ensure(32);
+            setF(sm.color);
+            doc.rect(M, y - 9, 8, 8, "F");
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(10.5);
+            setC(INK);
+            doc.text(pdfSafe(sm.name), M + 14, y);
+            var bx = M + 218, bw = maxW - 218 - 52;
+            setF(TRACK);
+            doc.rect(bx, y - 8, bw, 7, "F");
+            if(v > 0){ setF(sm.color); doc.rect(bx, y - 8, Math.max(1.5, bw * Math.min(1, v)), 7, "F"); }
+            doc.setFont("helvetica", "bold");
+            doc.text(pct(v) + "%", bx + bw + 10, y);
+            y += 12;
+            writeAt(sm.desc, 8.5, "normal", 5, M + 14, MUT);
+          });
+          write("Warna tiap sinyal dipakai secara konsisten pada keterangan warna, teks berwarna, dan rincian per kalimat di bawah ini.", 9.5, "italic", 2, MUT);
+          // --- keterangan warna ---
+          h2("Keterangan Warna");
+          function legendSwatch(bg, text){
+            ensure(16);
+            setF(bg);
+            doc.rect(M, y - 9, 22, 10, "F");
+            writeAt(text, 10, "normal", 1, M + 32);
+          }
+          legendSwatch(BANDC.r.bg, "Latar kalimat merah muda — kalimat indikasi TINGGI (skor per kalimat >= 65%)");
+          legendSwatch(BANDC.y.bg, "Latar kalimat kuning muda — kalimat indikasi SEDANG (skor per kalimat 35-65%)");
+          legendSwatch(BANDC.g.bg, "Hijau — kalimat indikasi RENDAH (< 35%): pada teks berwarna, kalimat ini tanpa latar");
+          ensure(16);
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(10.5);
+          setC(sigMetaOf("phrase").color);
+          var frasaSample = "frasa khas";
+          doc.text(frasaSample, M, y);
+          writeAt("Teks ungu tebal — frasa khas AI yang ditemukan di dalam kalimat (Sinyal: Frasa khas AI)", 10, "normal", 1, M + doc.getTextWidth(frasaSample) + 10);
+          ensure(16);
+          var repC = sigMetaOf("repetition").color;
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(10.5);
+          setC(repC);
+          var repSample = "pola berulang";
+          doc.text(repSample, M, y);
+          doc.setDrawColor(repC[0], repC[1], repC[2]);
+          doc.setLineWidth(0.7);
+          doc.line(M, y + 2.4, M + doc.getTextWidth(repSample), y + 2.4);
+          writeAt("Teks cokelat bergaris bawah — rangkaian 4 kata yang berulang >= 3 kali di dokumen (Sinyal: Pengulangan Frasa)", 10, "normal", 1, M + doc.getTextWidth(repSample) + 10);
+          setC(INK);
+          // --- teks berwarna penuh (gaya Turnitin) ---
+          h2("Teks yang Diperiksa — dengan Penanda Warna");
+          function sentenceRuns(text, p, band, sentId){
+            var marks = [];
+            function addMarks(str, kind){
+              if(!str) return;
+              var hay = text.toLowerCase(), needle = String(str).toLowerCase(), pos = 0;
+              while(true){
+                var k = hay.indexOf(needle, pos);
+                if(k < 0) break;
+                marks.push({ a: k, b: k + needle.length, kind: kind });
+                pos = k + needle.length;
+              }
+            }
+            if(p.hits && p.hits.found) p.hits.found.forEach(function(ph){ addMarks(ph, "frasa"); });
+            if(p.repGrams) p.repGrams.forEach(function(g){ addMarks(g.text, "ulang"); });
+            marks.sort(function(a, b){ return a.a - b.a; });
+            var runs = [], cur = 0;
+            marks.forEach(function(mk){
+              if(mk.a < cur) return;
+              if(mk.a > cur) runs.push({ t: text.slice(cur, mk.a) });
+              runs.push({ t: text.slice(mk.a, mk.b), kind: mk.kind });
+              cur = mk.b;
+            });
+            if(cur < text.length) runs.push({ t: text.slice(cur) });
+            var bg = band === "g" ? null : BANDC[band].bg;
+            return runs.map(function(rn){
+              return { t: pdfSafe(rn.t), bg: bg, sentId: sentId,
+                color: rn.kind === "frasa" ? sigMetaOf("phrase").color : (rn.kind === "ulang" ? sigMetaOf("repetition").color : INK),
+                bold: rn.kind === "frasa", underline: rn.kind === "ulang" };
+            });
+          }
+          function flowParagraph(runs, size){
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(size);
+            var lh = size * 1.5;
+            var spaceW = doc.getTextWidth(" ");
+            var words = [];
+            runs.forEach(function(rn){
+              if(!rn.t) return;
+              var pieces = rn.t.split(/(\s+)/);
+              for(var pi = 0; pi < pieces.length; pi++){
+                var pc = pieces[pi];
+                if(!pc) continue;
+                if(/^\s+$/.test(pc)){ words.push({ sp: true, rn: rn }); continue; }
+                doc.setFont("helvetica", rn.bold ? "bold" : "normal");
+                words.push({ w: pc, rn: rn, wd: doc.getTextWidth(pc) });
+              }
+            });
+            var lines = [], curL = [], curW = 0;
+            words.forEach(function(it){
+              var iw = it.sp ? spaceW : it.wd;
+              if(!it.sp && curW > 0 && curW + iw > maxW){ lines.push(curL); curL = []; curW = 0; }
+              if(it.sp && curW === 0) return;
+              curL.push(it); curW += iw;
+            });
+            if(curL.length) lines.push(curL);
+            lines.forEach(function(line){
+              ensure(lh);
+              var pos = [], x = M;
+              line.forEach(function(it){ pos.push(x); x += it.sp ? spaceW : it.wd; });
+              var runStart = -1, runKey = null;
+              function flushBg(endIdx){
+                if(runStart >= 0){
+                  var bgc = line[runStart].rn.bg;
+                  doc.setFillColor(bgc[0], bgc[1], bgc[2]);
+                  var x0 = pos[runStart];
+                  var lastIt = line[endIdx - 1];
+                  var x1 = pos[endIdx - 1] + (lastIt.sp ? spaceW : lastIt.wd);
+                  doc.rect(x0 - 1.5, y - size * 1.12, (x1 - x0) + 3, size * 1.44, "F");
+                }
+                runStart = -1; runKey = null;
+              }
+              line.forEach(function(it, ii){
+                var key = it.rn.bg ? (it.rn.sentId + "|" + it.rn.bg.join(",")) : null;
+                if(key !== runKey){ flushBg(ii); if(key){ runStart = ii; runKey = key; } }
+              });
+              flushBg(line.length);
+              line.forEach(function(it, ii){
+                if(it.sp) return;
+                doc.setFont("helvetica", it.rn.bold ? "bold" : "normal");
+                var c = it.rn.color || INK;
+                doc.setTextColor(c[0], c[1], c[2]);
+                doc.text(it.w, pos[ii], y);
+                if(it.rn.underline){
+                  doc.setDrawColor(c[0], c[1], c[2]);
+                  doc.setLineWidth(0.7);
+                  doc.line(pos[ii], y + 2.2, pos[ii] + it.wd, y + 2.2);
+                }
+              });
+              setC(INK);
+              y += lh;
+            });
+          }
+          var sIdx = 0;
+          if(res.words <= 30000){
+            res.paraSents.forEach(function(ps){
+              var runs = [];
+              ps.forEach(function(s, si){
+                var p = res.per[sIdx];
+                var band = bandOf(p.score);
+                if(si > 0) runs.push({ t: " ", bg: null, sentId: -1, color: INK });
+                runs = runs.concat(sentenceRuns(s, p, band, sIdx));
+                sIdx++;
+              });
+              flowParagraph(runs, 10.5);
+              y += 5;
+            });
+          } else {
+            write("(Dokumen sangat panjang — penanda warna penuh diganti penanda teks [TERINDIKASI ...] agar berkas tetap ringan.)", 9.5, "italic", 3, MUT);
+            res.paraSents.forEach(function(ps){
+              var parts = ps.map(function(s){
+                var p = res.per[sIdx++];
+                var band = bandOf(p.score);
+                if(band === "g") return s;
+                return "[TERINDIKASI " + (band === "r" ? "TINGGI" : "SEDANG") + " " + pct(p.score) + "%] " + s;
+              });
+              write(parts.join(" "), 10.5, "normal", 5);
+            });
+          }
+          // --- rincian per kalimat (berwarna) ---
+          h2("Rincian per Kalimat");
+          write("Warna judul tiap kalimat mengikuti pitanya: merah = TINGGI (>= 65%), kuning = SEDANG (35-65%), hijau = RENDAH (< 35%). Untuk kalimat SEDANG dan TINGGI, alasan ditampilkan dengan kotak warna sinyal yang menyebabkannya.", 9.5, "italic", 3, MUT);
           res.sents.forEach(function(s, i){
             var p = res.per[i];
             var band = bandOf(p.score);
             var bandName = band === "r" ? "TINGGI" : (band === "y" ? "SEDANG" : "RENDAH");
-            var head = "Kalimat " + (i + 1) + " — Skor: " + pct(p.score) + "% — Indikasi " + bandName + (band !== "g" ? " [TERINDIKASI]" : "");
-            write(head, 10.5, "bold");
+            ensure(17);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(10.5);
+            setC(BANDC[band].solid);
+            doc.text(pdfSafe("Kalimat " + (i + 1) + " — " + pct(p.score) + "% — Indikasi " + bandName), M, y);
+            y += 16;
+            setC(INK);
             write(s, 10.5);
             if(band !== "g"){
-              var rs = sentenceReasons(p);
-              if(rs.length) write("Alasan: " + rs.join("; ") + ".", 9.5, "italic");
+              sentenceReasons(p).forEach(function(r){
+                var sm = sigMetaOf(r.sig);
+                ensure(14);
+                setF(sm.color);
+                doc.rect(M + 1, y - 8, 7, 7, "F");
+                writeAt(sm.name + " — " + r.text, 9.5, "italic", 1, M + 13);
+              });
             }
             y += 3;
-          });
-          y += 2;
-          // --- teks lengkap dengan penanda ---
-          write("Teks Lengkap yang Diperiksa (kalimat terindikasi ditandai)", 12, "bold", 1);
-          var idx = 0;
-          res.paraSents.forEach(function(ps){
-            var parts = ps.map(function(s){
-              var i = idx++;
-              var band = bandOf(res.per[i].score);
-              if(band === "g") return s;
-              return "[TERINDIKASI " + (band === "r" ? "TINGGI" : "SEDANG") + " " + pct(res.per[i].score) + "%] " + s;
-            });
-            write(parts.join(" "), 10.5, "normal", 5);
           });
           // --- kaki halaman di semua halaman ---
           var footerText = "Catatan: laporan ini adalah analisis indikasi AI per kalimat berdasarkan pola statistik — BUKAN laporan kecocokan plagiarisme terhadap basis data. Skor adalah indikasi, bukan bukti. Saksara adalah versi beta terbuka; gunakan sebagai bahan pemeriksaan, bukan vonis. Dikembangkan oleh Ciptanala Devs.";
           var total = doc.getNumberOfPages();
           for(var pg = 1; pg <= total; pg++){
             doc.setPage(pg);
+            doc.setDrawColor(201, 162, 39);
+            doc.setLineWidth(0.8);
+            doc.line(M, H - 48, W - M, H - 48);
             doc.setFont("helvetica", "normal");
             doc.setFontSize(8);
             doc.setTextColor(110, 110, 110);
@@ -2440,6 +2762,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         }
         btn.disabled = false;
       }
+
       $("btn-pdf").addEventListener("click", function(){ downloadPdfReport(); });
 
       /* ---------- Zona eksklusi: bagian baku yang tidak ikut dinilai ----------
