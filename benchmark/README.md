@@ -13,8 +13,10 @@ node benchmark/run-benchmark.cjs
 
 Runner mengekstrak mesin heuristik **langsung dari `../index.html`** pada
 setiap run — yang diuji selalu kode persis yang dipakai situs, bukan salinan
-yang bisa menyimpang. Runner juga menjalankan ulang 5 contoh kalibrasi
-bawaan situs sebagai penjaga regresi. Hasil pengukuran terakhir ada di
+yang bisa menyimpang. Runner juga menjalankan ulang 4 contoh kalibrasi
+bawaan situs sebagai penjaga regresi (contoh kelima — refleksi birokrasi
+generik — dihapus dari situs pada 2026-11-20 atas permintaan pemilik;
+set kalibrasi bawaan kini 4 sampel). Hasil pengukuran terakhir ada di
 [`results.md`](results.md).
 
 ## Isi kumpulan uji (18 teks, ±200–400 kata)
