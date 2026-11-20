@@ -734,7 +734,7 @@
         <a href="#/posisi" data-route="posisi">Privasi &amp; Batasan</a>
       </nav>
       <a class="btn-primary side-cta" href="#analisis">Mulai Memeriksa</a>
-      <div class="side-foot">Beta Terbuka · v0.15.0-beta<br />Seluruh analisis berjalan lokal di peramban ini — teks Anda tidak dikirim ke mana pun.</div>
+      <div class="side-foot">Beta Terbuka · v0.15.1-beta<br />Seluruh analisis berjalan lokal di peramban ini — teks Anda tidak dikirim ke mana pun.</div>
     </aside>
     <div class="wrap page">
       <header class="hero" data-view="home">
@@ -1426,12 +1426,18 @@
           <a href="#/posisi">Privasi &amp; Batasan</a>
         </nav>
         <p class="copy">© 2026 Saksara — Dikembangkan oleh Ciptanala Devs</p>
-        <p class="version-line">Versi <strong>v0.15.0-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
+        <p class="version-line">Versi <strong>v0.15.1-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
       </div>
     </footer>
 
     <dialog class="changelog" id="changelog-modal" aria-labelledby="changelog-title">
       <h2 id="changelog-title">Catatan Rilis — Saksara</h2>
+      <h3>v0.15.1-beta — 21 November 2026</h3>
+      <ul>
+        <li><strong>Penilaian teks akademik lebih adil:</strong> pengulangan istilah teknis yang memang wajib diulang dalam tulisan ilmiah (misalnya nama sistem atau metode yang diteliti) tidak lagi dihitung sebagai pola templat. Pengulangan frasa utuh yang sama persis tetap dihitung penuh.</li>
+        <li><strong>Kutipan bersitasi tidak ikut dinilai:</strong> kutipan langsung yang melekat pada sitasi (Nama, Tahun) kini dikeluarkan dari penilaian secara otomatis dan diumumkan di hasil — kutipan adalah tulisan orang lain.</li>
+        <li>Perbaikan ini lulus seluruh gerbang kualitas kami: ke-18 skor benchmark dan ke-4 skor kalibrasi tidak berubah sama sekali, dan teks AI yang mengulang frasa topiknya tetap terdeteksi sama kuatnya.</li>
+      </ul>
       <h3>v0.15.0-beta — 21 November 2026</h3>
       <ul>
         <li><strong>Tampilan yang lebih ramah:</strong> menu dan judul kini berbahasa sehari-hari (Periksa Tulisan, Kenali Gaya Tulisan, Baca Teks dari Gambar, Riwayat Saya), Beranda membuka dengan "Pahami tulisan Anda. Jadikan lebih baik." plus kotak periksa langsung, dan setiap hasil kini diawali kesimpulan berbahasa manusia beserta saran.</li>
@@ -1670,7 +1676,42 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         return { score: score, paraScore: paraScore, genericRatio: genericRatio, uniform: uniformScore, counts: counts };
       }
       /* --- Sinyal 7: pengulangan pola 4 kata (4-gram) di seluruh dokumen --- */
-      function repetitionSignal(allWords){
+      /* ===== Pengulangan sadar-istilah (v0.15.1) =====
+         Rangkaian 4 kata yang isinya didominasi istilah topik dokumen (kata
+         isi berfrekuensi tinggi + istilah judul) adalah terminologi yang
+         memang wajib diulang dalam tulisan ilmiah, bukan sidik jari templat;
+         rangkaian seperti itu dikeluarkan dari sinyal pengulangan global
+         maupun bukti per kalimat. Penjaga pengulangan panjang: rangkaian
+         yang berada di dalam rangkaian 7 kata yang juga berulang adalah
+         penyalinan templat dan tetap dihitung penuh. Dievaluasi pada
+         branch eksperimen saksara-exp-academic-repetition — semua gerbang
+         lulus dan baseline tidak berubah (benchmark/exp-academic-results.md). */
+      var EXP_FUNCW = {};
+      ("yang dan di ke dari untuk dengan pada adalah ini itu dalam secara serta atau juga oleh akan telah dapat tidak ada karena sehingga maka tersebut antara melalui terhadap tentang seperti saat ketika agar supaya bagi para setiap lebih sangat sudah belum bisa harus menjadi merupakan ialah yaitu yakni tanpa hingga sampai sejak selama sebelum sesudah setelah jika bila apabila namun tetapi sedangkan melainkan bahkan hanya saja kami kita saya anda dia mereka the of and to in a an is are for with on by this that it as at from or be was were has have had not but if then than so such into over under between through during before after").split(" ").forEach(function(w){ EXP_FUNCW[w] = 1; });
+      function expTopicTerms(allWords, freq, firstPara){
+        var terms = {};
+        var minF = Math.max(4, Math.round(allWords.length * 0.01));
+        Object.keys(freq).forEach(function(w){ if(freq[w] >= minF && !EXP_FUNCW[w] && w.length > 2) terms[w] = 1; });
+        if(firstPara && firstPara.length <= 25){ firstPara.forEach(function(w){ if(!EXP_FUNCW[w] && w.length > 2) terms[w] = 1; }); }
+        return terms;
+      }
+      function expTemplateGrams(allWords){
+        var set = {};
+        var map = {};
+        for(var i = 0; i + 7 <= allWords.length; i++){ var g7 = allWords.slice(i, i + 7).join(" "); map[g7] = (map[g7] || 0) + 1; }
+        Object.keys(map).forEach(function(g7){
+          if(map[g7] < 3) return;
+          var ws = g7.split(" ");
+          for(var k = 0; k + 4 <= ws.length; k++) set[ws.slice(k, k + 4).join(" ")] = 1;
+        });
+        return set;
+      }
+      function expIsTermGram(g, terms){
+        var ws = g.split(" "), c = 0;
+        for(var k = 0; k < ws.length; k++){ if(terms[ws[k]]) c++; }
+        return c >= 3;
+      }
+      function repetitionSignal(allWords, expTerms, expTempl){
         var nW = allWords.length;
         if(nW < 20) return { score: 0, patterns: 0, norm: 0 };
         var map = new Map();
@@ -1679,7 +1720,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           map.set(g, (map.get(g) || 0) + 1);
         }
         var patterns = 0;
-        map.forEach(function(c){ if(c >= 3) patterns++; });
+        map.forEach(function(c, g){ if(c >= 3) patterns += (expTerms && !(expTempl && expTempl[g]) && expIsTermGram(g, expTerms)) ? 0 : 1; });
         var norm = patterns * 2500 / nW;
         var score = clamp(norm / 10);
         if(patterns <= 1) score = Math.min(score, 0.3);
@@ -1733,6 +1774,8 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         // Dihitung sekali di sini karena dipakai per kalimat maupun oleh sinyal pengulangan global.
         var gramCount = {};
         for(var gi = 0; gi + 4 <= allWords.length; gi++){ var gg = allWords.slice(gi, gi + 4).join(" "); gramCount[gg] = (gramCount[gg] || 0) + 1; }
+        var expTerms = expTopicTerms(allWords, freq, paras.length ? wordsOf(paras[0]) : null);
+        var expTempl = expTemplateGrams(allWords);
         // Per kalimat (frasa tiga kamus + bonus pengulangan pola & sisa markdown pada kalimat itu sendiri)
         var per = sents.map(function(s, i){
           var pd = phraseDetail(s);
@@ -1748,10 +1791,13 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
             var g4 = sw.slice(ri, ri + 4).join(" ");
             var gc = gramCount[g4] || 0;
             if(gc >= 3){
-              rg++;
-              var seenG = false;
-              for(var gk = 0; gk < repGrams.length; gk++){ if(repGrams[gk].text === g4){ seenG = true; break; } }
-              if(!seenG && repGrams.length < 4) repGrams.push({ text: g4, count: gc });
+              var isTG = !expTempl[g4] && expIsTermGram(g4, expTerms);
+              rg += isTG ? 0 : 1;
+              if(!isTG){
+                var seenG = false;
+                for(var gk = 0; gk < repGrams.length; gk++){ if(repGrams[gk].text === g4){ seenG = true; break; } }
+                if(!seenG && repGrams.length < 4) repGrams.push({ text: g4, count: gc });
+              }
             }
           }
           var repSent = clamp(rg / 2);
@@ -1768,7 +1814,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         var phraseGlobal = clamp(0.30 * phraseAvg + 0.70 * densityScore);
         var md = markdownSignal(text);
         var sym = symmetrySignal(paras, paraSents);
-        var rep = repetitionSignal(allWords);
+        var rep = repetitionSignal(allWords, expTerms, expTempl);
         var globalSig = 0.16 * burst + 0.04 * vocab + 0.24 * phraseGlobal + 0.05 * stylo + 0.09 * md.score + 0.20 * sym.score + 0.22 * rep.score;
         var final = 0.47 * wAvg + 0.53 * globalSig;
         // Dorongan bukti gabungan: satu sinyal lemah bisa kebetulan, tetapi kepadatan frasa
@@ -2868,6 +2914,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         lastExclusion = null;
         lastHeadingsRemoved = null;
         lastSectionsRemoved = null;
+        lastQuotesRemoved = null;
         var exclBox = $("opt-exclude");
         if(exclBox && exclBox.checked){
           var excl = excludeStandardParts(text);
@@ -2879,6 +2926,14 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         /* Isi daftar isi/gambar/tabel/pustaka: SELALU dikeluarkan (dari
            kode, tanpa kotak centang) — berjalan setelah zona eksklusi agar
            tidak mengganggu jangkar pemotongannya. */
+        /* Kutipan bersitasi: SELALU dikeluarkan — berjalan
+           sebelum penyaringan daftar/judul; classifier menerima teks yang
+           sama dengan heuristik. */
+        var qs = stripQuotedCitations(text);
+        if(qs.words > 0 && wordsOf(qs.text).length > 0){
+          text = qs.text;
+          lastQuotesRemoved = qs;
+        }
         var secs = stripListSections(text);
         if(secs.words > 0 && wordsOf(secs.text).length > 0){
           text = secs.text;
@@ -2997,6 +3052,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         if(lastHeadingsRemoved) ebParts.push("judul dan kepala bab/subbab (" + lastHeadingsRemoved.lines + " baris, ±" + fmtNumID(lastHeadingsRemoved.words) + " kata)");
         if(lastSectionsRemoved) ebParts.push("isi " + lastSectionsRemoved.sections.join(", ").toLowerCase() + " (±" + fmtNumID(lastSectionsRemoved.words) + " kata)");
         if(lastExclusion) ebParts.push("bagian baku — daftar pustaka, kata pengantar, kutipan, baris tabel (±" + fmtNumID(lastExclusion.excludedWords) + " kata)");
+        if(lastQuotesRemoved) ebParts.push("kutipan bersitasi (±" + fmtNumID(lastQuotesRemoved.words) + " kata)");
         if(ebParts.length){
           eb.innerHTML = "<strong>Sebagian teks tidak ikut dinilai:</strong> " + ebParts.join("; ") + ". Yang dinilai hanya isi prosa.";
           eb.classList.add("show");
@@ -3332,6 +3388,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           if(lastExclusion) write("Catatan: Bagian baku dikecualikan: ±" + lastExclusion.excludedWords + " kata tidak dianalisis (daftar pustaka, kata pengantar, kutipan, baris tabel — sesuai yang ditemukan).", 10, "italic");
           if(lastHeadingsRemoved) write("Catatan: Judul dan kepala bab/subbab dikeluarkan dari penilaian: " + lastHeadingsRemoved.lines + " baris (±" + lastHeadingsRemoved.words + " kata) tidak dianalisis - yang dinilai hanya isi prosa.", 10, "italic");
           if(lastSectionsRemoved) write("Catatan: Isi " + lastSectionsRemoved.sections.join(", ") + " dikeluarkan dari penilaian: ±" + lastSectionsRemoved.words + " kata tidak dianalisis.", 10, "italic");
+          if(lastQuotesRemoved) write("Catatan: Kutipan bersitasi dikeluarkan dari penilaian: ±" + lastQuotesRemoved.words + " kata tidak dianalisis.", 10, "italic");
           // --- Lapis 2: bagian khusus classifier ---
           h2("Pemeriksaan Lapis 2 — Classifier");
           if(lastClfScore !== null && lastClfScore !== undefined){
@@ -3667,6 +3724,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       var lastExclusion = null; /* { excludedWords, parts } milik laporan yang tampil, atau null */
       var lastHeadingsRemoved = null; /* { lines, words } penyaringan judul/kepala bab pada laporan yang tampil, atau null */
       var lastSectionsRemoved = null; /* { sections, words } penyaringan isi daftar isi/gambar/tabel/pustaka pada laporan yang tampil, atau null */
+      var lastQuotesRemoved = null; /* { words } penyaringan kutipan bersitasi pada laporan yang tampil, atau null */
       /* ---------- Isi daftar isi/gambar/tabel/pustaka: SELALU dikeluarkan ----------
          Baris-baris entri daftar isi, daftar gambar, dan daftar tabel (judul
          entri + nomor halaman) serta seluruh entri daftar pustaka bukanlah
@@ -3678,6 +3736,22 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
          (maks 5 kata) dan tanpa tanda kalimat, jadi kalimat prosa yang
          menyebut "daftar isi" tidak pernah memicu pemotongan. Hasilnya
          diumumkan di laporan (banner) dan laporan PDF. */
+      /* ---------- Kutipan bersitasi: SELALU dikeluarkan (v0.15.1) ----------
+         Kutipan langsung panjang (>= 8 kata) yang melekat pada sitasi
+         "(... tahun ...)" — sebelum atau sesudah tanda kutip — adalah tulisan
+         orang lain dan tidak boleh dinilai sebagai tulisan pengguna. Pola
+         sitasi wajib memuat tahun 4 digit agar kutipan biasa tanpa sitasi
+         tidak ikut terbuang. Pengeluaran selalu diumumkan di laporan. */
+      function stripQuotedCitations(text){
+        var removed = 0;
+        var out = String(text || "").replace(/\(\s*[^)\n]{0,40}?\d{4}[^)\n]{0,20}\)\s*,?\s*["\u201C]([^"\u201D]{60,}?)["\u201D]|["\u201C]([^"\u201D]{60,}?)["\u201D]\s*\(\s*[^)\n]{0,40}?\d{4}[^)\n]{0,20}\)/g, function(m, innerA, innerB){
+          var inner = innerA || innerB;
+          var w = inner.trim().split(/\s+/).length;
+          if(w >= 8){ removed += w; return " "; }
+          return m;
+        });
+        return { text: out, words: removed };
+      }
       function stripListSections(text){
         var lines = String(text || "").split("\n");
         function sectionKind(line){
