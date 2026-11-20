@@ -11,19 +11,19 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Saksara" />
-    <meta property="og:title" content="Saksara — Deteksi Teks AI untuk Siapa Saja" />
+    <meta property="og:title" content="Saksara — Gratis Deteksi Tulisan AI" />
     <meta property="og:description" content="Saksara — deteksi indikasi teks AI untuk siapa saja, dengan laporan per kalimat dan analisis yang berjalan sepenuhnya di peramban." />
     <meta property="og:url" content="https://saksara.vercel.app/" />
     <meta property="og:image" content="https://saksara.vercel.app/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Saksara — Deteksi Teks AI untuk Siapa Saja (Beta Terbuka)" />
+    <meta property="og:image:alt" content="Saksara — Gratis Deteksi Tulisan AI (Beta Terbuka)" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Saksara — Deteksi Teks AI untuk Siapa Saja" />
+    <meta name="twitter:title" content="Saksara — Gratis Deteksi Tulisan AI" />
     <meta name="twitter:description" content="Saksara — deteksi indikasi teks AI untuk siapa saja, dengan laporan per kalimat dan analisis yang berjalan sepenuhnya di peramban." />
     <meta name="twitter:image" content="https://saksara.vercel.app/og-image.png" />
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='11' fill='%2316294D'/%3E%3Cpath d='M24 10 L36 14 V24 C36 31 31 36 24 39 C17 36 12 31 12 24 V14 Z' fill='none' stroke='white' stroke-width='2.4'/%3E%3Cpath d='M17.5 24.5 L22 29 L31 19.5' fill='none' stroke='%23C9A227' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
-    <title>Saksara — Deteksi Teks AI untuk Siapa Saja</title>
+    <title>Saksara — Gratis Deteksi Tulisan AI</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet" />
@@ -87,6 +87,8 @@
       .nav-links a{ text-decoration:none; font-size:14px; font-weight:600; color:var(--muted);
         padding:8px 12px; border-radius:8px; transition:color .15s ease, background-color .15s ease; }
       .nav-links a:hover{ color:var(--ink); background:var(--surface2); }
+      .nav-links a.active{ color:var(--ink); background:var(--surface2); box-shadow:inset 0 -2px 0 var(--gold); }
+      [data-view][hidden]{ display:none !important; }
       .nav-cta{ flex:none; text-decoration:none; font-size:14px; font-weight:700; color:var(--navy);
         background:linear-gradient(180deg, #D9B83E, var(--gold)); border:1px solid #B08D1E;
         padding:9px 18px; border-radius:10px; box-shadow:var(--shadow-sm);
@@ -387,30 +389,29 @@
       <div class="wrap nav-inner">
         <a class="nav-brand" href="#atas" aria-label="Saksara — kembali ke atas">
           <svg width="34" height="34" viewBox="0 0 48 48" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="11" fill="#16294D"/><path d="M24 10 L36 14 V24 C36 31 31 36 24 39 C17 36 12 31 12 24 V14 Z" fill="none" stroke="#ffffff" stroke-width="2.4"/><path d="M17.5 24.5 L22 29 L31 19.5" fill="none" stroke="#C9A227" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <span><span class="nav-wordmark">Saksara</span></span><span class="nav-tag">Deteksi Teks AI untuk Siapa Saja</span></span>
+          <span><span class="nav-wordmark">Saksara</span></span><span class="nav-tag">Gratis Deteksi Tulisan AI</span></span>
         </a>
         <div class="nav-links">
-          <a href="#analisis">Analisis</a>
-          <a href="#cara-kerja">Cara Kerja</a>
-          <a href="#clf-panel">Mesin Classifier</a>
-          <a href="#benchmark">Benchmark</a>
-          <a href="#posisi">Posisi &amp; Batasan</a>
+          <a href="#/home" data-route="home">Beranda</a>
+          <a href="#/cara-kerja" data-route="cara-kerja">Cara Kerja</a>
+          <a href="#/metode" data-route="metode">Metode</a>
+          <a href="#/posisi" data-route="posisi">Posisi &amp; Batasan</a>
         </div>
         <a class="nav-cta" href="#analisis">Mulai Analisis</a>
       </div>
     </nav>
     <div class="wrap page">
-      <header class="hero">
+      <header class="hero" data-view="home">
         <div class="hero-eyebrow">
           <svg class="brand-logo" width="30" height="30" viewBox="0 0 48 48" role="img" aria-label="Logo Saksara — perisai dengan tanda centang" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="11" fill="#16294D"/><path d="M24 10 L36 14 V24 C36 31 31 36 24 39 C17 36 12 31 12 24 V14 Z" fill="none" stroke="#ffffff" stroke-width="2.4"/><path d="M17.5 24.5 L22 29 L31 19.5" fill="none" stroke="#C9A227" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <span class="tagline">Deteksi Teks AI untuk Siapa Saja</span>
+          <span class="tagline">Gratis Deteksi Tulisan AI</span>
           <span class="proto-badge">Beta Terbuka</span>
         </div>
         <h1 class="hero-title">Indikasi AI yang <em>terukur</em>, metode yang <em>terbuka</em>, privasi yang <em>utuh</em>.</h1>
         <p class="lede">Tempel teks atau unggah berkas .txt, .docx, atau .pdf, lalu lihat skor indikasi AI-nya beserta kalimat-kalimat yang paling mencurigakan — lengkap dengan laporan per kalimat. Seluruh analisis — heuristik maupun classifier — berjalan sepenuhnya di peramban ini; teks dan berkas Anda tidak dikirim ke mana pun.</p>
         <div class="hero-cta">
           <a class="btn-primary" href="#analisis">Mulai Analisis</a>
-          <a class="btn-ghost" href="#cara-kerja">Lihat Cara Kerja</a>
+          <a class="btn-ghost" href="#/cara-kerja">Lihat Cara Kerja</a>
         </div>
         <div class="trust-chips" aria-label="Jaminan metode">
           <span class="chip"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C9A227" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>100% diproses di peramban Anda</span>
@@ -426,13 +427,11 @@
         </div>
       </header>
 
-      <section class="method" id="cara-kerja" aria-labelledby="metode-judul">
+      <section class="method" id="cara-kerja" data-view="cara-kerja" hidden aria-labelledby="metode-judul">
         <div class="kicker">Metode</div>
         <h2 id="metode-judul">Cara kerja</h2>
         <p class="sub">Tidak ada alat yang bisa tahu pasti apakah sebuah teks ditulis manusia atau dihasilkan AI. Yang bisa diukur adalah pola-pola dalam tulisan. Saksara memeriksa teks lewat dua lapis: lapis pertama adalah <strong>pemeriksaan pola statistik</strong> (Ensemble Heuristik v3) — tujuh tanda berikut dihitung lalu digabungkan menjadi satu skor, dengan setiap kalimat dinilai satu per satu; lapis kedua adalah <strong>pemeriksaan model AI</strong> yang hanya boleh menguatkan temuan lapis pertama. Skor akhir berupa persentase: semakin tinggi, semakin mirip pola tulisan itu dengan teks hasil AI. Tujuh tanda pada lapis pertama:</p>
-        <details class="deep" id="cara-kerja-rincian">
-          <summary>Rincian: tujuh sinyal &amp; cara menggabungkan skor</summary>
-          <div class="steps">
+        <div class="steps">
           <div class="step"><span class="num">SINYAL 1</span><h3>Burstiness</h3><p>Variasi panjang kalimat. Tulisan manusia biasanya mencampur kalimat pendek dan panjang; teks AI cenderung berukuran seragam dari satu kalimat ke kalimat berikutnya. Saksara mengukur seberapa beragam panjang kalimat dalam teks Anda.</p></div>
           <div class="step"><span class="num">SINYAL 2</span><h3>Keragaman kosakata</h3><p>Seberapa beragam kata yang dipakai di seluruh teks. Tulisan yang kata-katanya itu-itu saja — sedikit kata unik dan sedikit kata yang hanya muncul sekali — mendapat skor lebih tinggi.</p></div>
           <div class="step"><span class="num">SINYAL 3</span><h3>Frasa khas AI</h3><p>Kamus ungkapan yang sangat sering muncul pada teks hasil AI, dalam Bahasa Indonesia maupun Inggris — frasa penghubung dan pembuka yang generik seperti “berikut adalah”, “merupakan salah satu”, dan “menjaga integritas”. Dihitung per kalimat dan di seluruh dokumen.</p></div>
@@ -442,10 +441,9 @@
           <div class="step"><span class="num">SINYAL 7</span><h3>Pengulangan Frasa</h3><p>Rangkaian 4 kata yang sama muncul berulang kali di seluruh dokumen. Teks generik sering memakai ulang rangkaian kata yang sama berkali-kali; tulisan manusia yang konkret jarang melakukannya.</p></div>
         </div>
         <p class="formula">Kedua lapis itu tidak dicampur sembarangan. Lapis pertama selalu menjadi penemu indikasi awal: bila ia tidak menemukan indikasi yang cukup, skor akhir berhenti di situ — lapis kedua <strong>tidak pernah menuduh sendirian</strong>. Hanya bila lapis pertama sudah menemukan indikasi awal, skor dari model boleh ikut menguatkan skor akhir. Penanda warna pada setiap kalimat selalu berasal dari lapis pertama. Bila model belum siap, laporan tampil dari lapis pertama terlebih dahulu, lalu diperbarui otomatis begitu model siap — dan pada setiap tahap, teks Anda tidak pernah dikirim ke server mana pun.</p>
-        </details>
       </section>
 
-      <section class="analyzer" id="analisis" aria-labelledby="analisis-judul">
+      <section class="analyzer" id="analisis" data-view="home" aria-labelledby="analisis-judul">
         <div class="kicker">Analisis</div>
         <h2 id="analisis-judul">Analisis teks</h2>
         <p class="sub">Tempel teks di bawah ini, unggah berkas .txt, .docx, atau .pdf (klik tombol Unggah, atau seret &amp; letakkan berkas ke panel ini), atau coba salah satu contoh uji.</p>
@@ -487,7 +485,7 @@
         </div>
       </section>
 
-      <section class="report" id="report" aria-labelledby="laporan-judul">
+      <section class="report" id="report" data-view="home" aria-labelledby="laporan-judul">
         <div class="kicker">Laporan</div>
         <h2 id="laporan-judul">Laporan hasil</h2>
         <div class="banner" id="banner-report" style="margin:0 0 16px;"></div>
@@ -602,7 +600,7 @@
         </div>
       </section>
 
-      <section class="batch" id="batch" aria-labelledby="batch-judul">
+      <section class="batch" id="batch" data-view="home" aria-labelledby="batch-judul">
         <div class="kicker">Berkas Banyak</div>
         <h2 id="batch-judul">Periksa Banyak Berkas</h2>
         <p class="sub">Pilih beberapa berkas .txt, .docx, atau .pdf untuk dinilai sekaligus dan diringkas dalam satu tabel. Setiap berkas dinilai dengan Ensemble Heuristik v3; bila Penguat AI (classifier) sudah aktif, penguat bersyarat yang sama ikut diterapkan — bila belum aktif, skornya murni heuristik. Hasil batch tampil di sini saja: ia tidak mengubah laporan utama di atas dan tidak disimpan ke arsip hasil.</p>
@@ -618,13 +616,11 @@
         </div>
       </section>
 
-      <section class="posisi" id="posisi" aria-labelledby="posisi-judul">
+      <section class="posisi" id="posisi" data-view="posisi" hidden aria-labelledby="posisi-judul">
         <div class="kicker">Tentang</div>
         <h2 id="posisi-judul">Posisi &amp; batasan</h2>
         <p class="sub">Saksara adalah pendamping skrining awal untuk tulisan Bahasa Indonesia — bisa dipakai siapa saja, untuk memeriksa tulisan apa pun: esai, artikel, laporan, dan dokumen lainnya. Metodenya dijelaskan terbuka, privasi Anda utuh, dan batas-batasnya disampaikan apa adanya. Empat hal berikut menentukan posisinya:</p>
-        <details class="deep" id="posisi-rincian">
-          <summary>Rincian: posisi, batasan &amp; kinerja terukur (benchmark)</summary>
-          <div class="posisi-grid">
+        <div class="posisi-grid">
           <div class="posisi-card">
             <div class="card-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7C620E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div>
             <h3>Alat skrining awal, bukan pemeriksa plagiarisme</h3>
@@ -646,8 +642,19 @@
             <p>Kamus frasa, sinyal gaya, dan penyetelan mesin ini dibangun untuk tulisan Bahasa Indonesia — termasuk tulisan formal dan birokratis — konteks yang sering luput dari detektor berbahasa asing. Model classifier-nya adalah model bahasa multibahasa: terukur kuat pada teks AI formal Bahasa Indonesia, tetapi terbukti pula bisa menilai tulisan manusia yang sangat formal sebagai mirip AI; keterbatasan itu ditulis apa adanya, dan karena itu classifier hanya menjadi penguat di belakang lapis pertama, bukan penentu tunggal.</p>
           </div>
         </div>
+      </section>
+
+      <section class="method" id="metode" data-view="metode" hidden aria-labelledby="metode-pengukuran-judul">
+        <div class="kicker">Metode</div>
+        <h2 id="metode-pengukuran-judul">Metode &amp; pengukuran</h2>
+        <p class="sub">Halaman ini merangkum bagaimana skor Saksara dibangun dan seberapa jauh kinerjanya sudah terukur — disampaikan apa adanya, termasuk batas-batasnya.</p>
+        <div class="steps">
+          <div class="step"><span class="num">LAPIS 1</span><h3>Ensemble Heuristik v3</h3><p>Tujuh sinyal statistik — burstiness, keragaman kosakata, frasa khas AI, stilometri, sisa markdown, simetri paragraf, dan pengulangan frasa — dihitung untuk seluruh dokumen dan untuk setiap kalimat, lalu digabungkan dengan bobot tetap menjadi satu skor. Lapis ini selalu menjadi penemu indikasi awal dan sumber penanda warna per kalimat; rincian tiap sinyal ada di halaman Cara Kerja.</p></div>
+          <div class="step"><span class="num">LAPIS 2</span><h3>Penguat classifier</h3><p>Model bahasa multibahasa yang berjalan lokal di peramban Anda. Ia hanya boleh <strong>menaikkan</strong> skor, dan hanya bila lapis pertama sudah menemukan indikasi awal — ia tidak pernah menuduh sendirian. Bila lapis pertama bersih, skor akhir tetap murni dari lapis pertama.</p></div>
+          <div class="step"><span class="num">KALIBRASI</span><h3>Disetel pada contoh terukur</h3><p>Bobot dan ambang lapis pertama disetel pada contoh-contoh terukur — tulisan manusia, teks AI, dan teks AI yang diparafrase — dan setiap perubahan mesin wajib lulus uji regresi: skor contoh kalibrasi tidak boleh bergeser. Anda juga dapat membantu penyetelan berikutnya dengan mengirim metrik anonim (tanpa teks) lewat tombol kalibrasi di bawah laporan.</p></div>
+        </div>
         <p class="posisi-note" id="benchmark">Kinerja terukur sejauh ini: pada pengujian internal awal (18 teks Bahasa Indonesia — jumlah yang kecil dan diakui terbuka), tidak ada sampel tulisan manusia yang terindikasi (0/9), teks AI generik tertandai, dan teks AI yang ditulis ulang secara agresif tidak tertangkap — batas yang memang diakui terbuka di halaman ini.</p>
-        </details>
+        <p class="posisi-note">Catatan data: model classifier dilatih pada korpus tanya-jawab publik, lalu diukur ulang di sini pada teks Bahasa Indonesia — karena itu posisinya penguat, bukan penentu tunggal. Selama fase Beta Terbuka, kumpulan teks uji internal akan diperluas bertahap (target 50–100 teks beragam genre) agar angka kinerja di atas makin dapat dipercaya.</p>
       </section>
 
     </div>
@@ -660,19 +667,26 @@
         <p>Saksara — Beta Terbuka deteksi teks AI untuk siapa saja. Skor adalah indikasi statistik, bukan bukti.</p>
         <p>Mesin skor saat ini adalah Ensemble Heuristik v3 — pemeriksaan 7 sinyal yang berjalan sepenuhnya di peramban dan disetel untuk pola tulisan Bahasa Indonesia, termasuk tulisan formal yang generik; classifier terlatih tersedia sebagai lapis tambahan yang juga berjalan sepenuhnya di peramban (model bahasa multibahasa, ±280 MB, hanya diunduh bila Anda mengaktifkannya dari panel classifier, lalu tersimpan di peramban dan bisa dihapus dari panel yang sama; teks tidak dikirim ke mana pun) — model itu kuat pada teks AI formal tetapi juga bisa menilai tulisan manusia yang sangat formal sebagai mirip AI, sehingga ia hanya menjadi penguat dan lapis pertama tetap penemu indikasi awal serta penyeimbang utamanya.</p>
         <nav class="footer-links" aria-label="Tautan bawah">
+          <a href="#/home">Beranda</a>
           <a href="#analisis">Analisis</a>
-          <a href="#cara-kerja">Cara Kerja</a>
-          <a href="#clf-panel">Mesin Classifier</a>
+          <a href="#/cara-kerja">Cara Kerja</a>
+          <a href="#/metode">Metode</a>
           <a href="#benchmark">Benchmark</a>
-          <a href="#posisi">Posisi &amp; Batasan</a>
+          <a href="#/posisi">Posisi &amp; Batasan</a>
         </nav>
         <p class="copy">© 2026 Saksara — Dikembangkan oleh Ciptanala Devs</p>
-        <p class="version-line">Versi <strong>v0.9-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
+        <p class="version-line">Versi <strong>v0.9.1-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
       </div>
     </footer>
 
     <dialog class="changelog" id="changelog-modal" aria-labelledby="changelog-title">
       <h2 id="changelog-title">Catatan Rilis — Saksara</h2>
+      <h3>v0.9.1-beta — 20 November 2026</h3>
+      <ul>
+        <li>Navigasi kini <strong>per halaman</strong>: Beranda, Cara Kerja, Metode, dan Posisi &amp; Batasan.</li>
+        <li>Tagline baru: <strong>"Gratis Deteksi Tulisan AI"</strong>.</li>
+        <li>Halaman <strong>Metode</strong> baru: rangkuman dua lapis pemeriksaan, aturan penguat, kalibrasi, dan kinerja terukur (benchmark).</li>
+      </ul>
       <h3>v0.9-beta — 20 November 2026 · Beta Terbuka</h3>
       <ul>
         <li>Status naik dari Prototipe menjadi <strong>Beta Terbuka</strong>.</li>
@@ -2220,7 +2234,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           doc.setTextColor(22, 41, 77);
           write("Saksara", 18, "bold", 0);
           doc.setTextColor(90, 90, 90);
-          write("Deteksi Teks AI untuk Siapa Saja — BETA TERBUKA", 9.5, "normal", 2);
+          write("Gratis Deteksi Tulisan AI — BETA TERBUKA", 9.5, "normal", 2);
           doc.setTextColor(0, 0, 0);
           write("Laporan Hasil Pemeriksaan Teks", 14, "bold", 2);
           rule();
@@ -2748,6 +2762,37 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       });
       if(close) close.addEventListener("click", function(){ dlg.close(); });
       dlg.addEventListener("click", function(ev){ if(ev.target === dlg) dlg.close(); });
+    })();
+    // Router tampilan per halaman (satu berkas): #/home, #/cara-kerja, #/metode, #/posisi.
+    // Tautan lama (#analisis, #clf-panel, #benchmark, …) tetap didukung lewat peta LEGACY.
+    (function(){
+      var TITLES = { home: "Saksara — Gratis Deteksi Tulisan AI", "cara-kerja": "Cara Kerja — Saksara", metode: "Metode — Saksara", posisi: "Posisi & Batasan — Saksara" };
+      var ROUTES = { "": "home", "/": "home", "/home": "home", "/cara-kerja": "cara-kerja", "/metode": "metode", "/posisi": "posisi" };
+      var LEGACY = { "analisis": ["home", "analisis"], "panel-analisis": ["home", "panel-analisis"], "clf-panel": ["home", "clf-panel"], "report": ["home", "report"], "batch": ["home", "batch"], "cara-kerja": ["cara-kerja", null], "benchmark": ["metode", "benchmark"], "posisi": ["posisi", null], "atas": ["home", null] };
+      function show(view, anchor){
+        var blocks = document.querySelectorAll("[data-view]");
+        for(var i = 0; i < blocks.length; i++){ blocks[i].hidden = blocks[i].getAttribute("data-view") !== view; }
+        var links = document.querySelectorAll("[data-route]");
+        for(var j = 0; j < links.length; j++){
+          var on = links[j].getAttribute("data-route") === view;
+          links[j].classList.toggle("active", on);
+          if(on) links[j].setAttribute("aria-current", "page"); else links[j].removeAttribute("aria-current");
+        }
+        document.title = TITLES[view] || TITLES.home;
+        if(anchor){
+          var t = document.getElementById(anchor);
+          if(t){ t.scrollIntoView(); return; }
+        }
+        window.scrollTo(0, 0);
+      }
+      function route(){
+        var h = location.hash.replace(/^#/, "");
+        if(Object.prototype.hasOwnProperty.call(ROUTES, h)){ show(ROUTES[h], null); return; }
+        if(Object.prototype.hasOwnProperty.call(LEGACY, h)){ show(LEGACY[h][0], LEGACY[h][1]); return; }
+        // Hash lain: jangkar di dalam tampilan yang sedang aktif — biarkan perilaku bawaan peramban.
+      }
+      window.addEventListener("hashchange", route);
+      route();
     })();
   </script>
   </body>
