@@ -508,6 +508,7 @@
         <div class="banner" id="banner-report" style="margin:0 0 16px;"></div>
         <div class="banner" id="banner-cakupan" style="margin:0 0 16px;" role="status"></div>
         <div class="banner" id="banner-eksklusi" style="margin:0 0 16px;" role="status"></div>
+        <div class="banner" id="banner-waspada" style="margin:0 0 16px;" role="alert"></div>
         <div class="report-grid">
           <div class="score-card">
             <div class="cap">Skor indikasi AI keseluruhan</div>
@@ -681,7 +682,7 @@
         <p class="sub">Halaman ini merangkum bagaimana skor Saksara dibangun dan seberapa jauh kinerjanya sudah terukur — disampaikan apa adanya, termasuk batas-batasnya.</p>
         <div class="steps">
           <div class="step"><span class="num">LAPIS 1</span><h3>Ensemble Heuristik v3</h3><p>Tujuh sinyal statistik — burstiness, keragaman kosakata, frasa khas AI, stilometri, sisa markdown, simetri paragraf, dan pengulangan frasa — dihitung untuk seluruh dokumen dan untuk setiap kalimat, lalu digabungkan dengan bobot tetap menjadi satu skor. Lapis ini selalu menjadi penemu indikasi awal dan sumber penanda warna per kalimat; rincian tiap sinyal ada di halaman Cara Kerja.</p></div>
-          <div class="step"><span class="num">LAPIS 2</span><h3>Penguat classifier</h3><p>Model bahasa multibahasa yang berjalan lokal di peramban Anda. Ia hanya boleh <strong>menaikkan</strong> skor, dan hanya bila lapis pertama sudah menemukan indikasi awal — ia tidak pernah menuduh sendirian. Bila lapis pertama bersih, skor akhir tetap murni dari lapis pertama.</p></div>
+          <div class="step"><span class="num">LAPIS 2</span><h3>Penguat classifier</h3><p>Model bahasa multibahasa yang berjalan lokal di peramban Anda. Ia hanya boleh <strong>menaikkan</strong> skor, dan hanya bila lapis pertama sudah menemukan indikasi awal — ia tidak pernah menuduh sendirian. Bila lapis pertama bersih, skor akhir tetap murni dari lapis pertama. Bila keduanya sangat tidak sepakat — lapis pertama rendah tetapi classifier memberi probabilitas AI ≥85% — laporan menampilkan <strong>sinyal waspada</strong> beserta penjelasan alasannya dan menyarankan tinjauan manual, tetap tanpa mengubah skor.</p></div>
           <div class="step"><span class="num">KALIBRASI</span><h3>Disetel pada contoh terukur</h3><p>Bobot dan ambang lapis pertama disetel pada contoh-contoh terukur — tulisan manusia, teks AI, dan teks AI yang diparafrase — dan setiap perubahan mesin wajib lulus uji regresi: skor contoh kalibrasi tidak boleh bergeser. Anda juga dapat membantu penyetelan berikutnya dengan mengirim metrik anonim (tanpa teks) lewat tombol kalibrasi di bawah laporan.</p></div>
         </div>
         <p class="posisi-note" id="benchmark">Kinerja terukur sejauh ini: pada pengujian internal awal (18 teks Bahasa Indonesia — jumlah yang kecil dan diakui terbuka), tidak ada sampel tulisan manusia yang terindikasi (0/9), teks AI generik tertandai, dan teks AI yang ditulis ulang secara agresif tidak tertangkap — batas yang memang diakui terbuka di halaman ini.</p>
@@ -710,12 +711,16 @@
           <a href="#/posisi">Posisi &amp; Batasan</a>
         </nav>
         <p class="copy">© 2026 Saksara — Dikembangkan oleh Ciptanala Devs</p>
-        <p class="version-line">Versi <strong>v0.9.4-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
+        <p class="version-line">Versi <strong>v0.9.5-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
       </div>
     </footer>
 
     <dialog class="changelog" id="changelog-modal" aria-labelledby="changelog-title">
       <h2 id="changelog-title">Catatan Rilis — Saksara</h2>
+      <h3>v0.9.5-beta — 20 November 2026</h3>
+      <ul>
+        <li><strong>Sinyal waspada</strong> baru di laporan: bila lapis pertama menilai rendah (&lt;35%) tetapi classifier memberi probabilitas AI sangat tinggi (≥85%), kini tampil peringatan mencolok <strong>beserta penjelasan alasannya</strong> dan saran tinjauan manual — skor akhir tidak berubah dan sinyal ini bukan vonis. Peringatan yang sama tercetak di laporan PDF.</li>
+      </ul>
       <h3>v0.9.4-beta — 20 November 2026</h3>
       <ul>
         <li>Halaman <strong>Metode</strong> kini menyebut secara terbuka <strong>model yang digunakan</strong>: penguat XLM-RoBERTa (korpus HC3), Ensemble Heuristik v3, dan Saksara Core yang sedang dilatih dengan data donasi + teks sintetis dari Google Gemini.</li>
@@ -1526,6 +1531,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       var lastClfScore = null; /* skor classifier (0..1) pada laporan yang tampil, atau null */
       var lastClfApplied = false; /* true bila penguat bersyarat diterapkan pada laporan yang tampil (heuristik ≥ 0,35) */
       var lastClfTruncated = false; /* true bila skor classifier hanya menilai 100 segmen pertama (dokumen sangat panjang) */
+      var lastWatchSignal = null; /* {heur, clf} bila sinyal waspada tampil pada laporan ini (heuristik < 0,35 tetapi classifier >= 0,85) */
       var clfProvider = null; /* "WebGPU" | "WASM" — penyedia eksekusi sesi yang sedang aktif */
       var clfBuffers = null; /* buffer grafik + shard; disimpan agar sesi bisa dibuat ulang sebagai WASM bila inferensi WebGPU gagal di tengah penilaian */
       var clfCacheExists = false; /* true bila keenam berkas model ditemukan di Cache API (diperiksa saat halaman dibuka, tanpa jaringan) */
@@ -1898,6 +1904,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         // di benchmark kami — tanpa gerbang, ia akan menuduh tulisan manusia
         // yang formal.
         var CLF_GATE = 0.35;
+        var CLF_WATCH = 0.85; /* ambang sinyal waspada: classifier >= ini saat heuristik di bawah gerbang */
         if(res.final >= CLF_GATE){
           lastClfApplied = true;
           var boosted = res.final + (1 - res.final) * r.score * 0.5;
@@ -1909,6 +1916,16 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           $("desc-clf").textContent = "Classifier berjalan lokal di peramban ini — menilai rata-rata " + r.windows + " jendela teks: probabilitas kelas AI " + pct(r.score) + "%. Skor ini TIDAK menaikkan skor akhir: heuristik v3 hanya menemukan indikasi " + pct(res.final) + "% (di bawah ambang 35%), dan classifier di sini hanya boleh memperkuat indikasi yang sudah ditemukan heuristik — tidak pernah menuduh sendirian. (Terukur pada pengujian kami: model ini juga memberi skor tinggi pada sebagian tulisan manusia yang sangat formal — gerbang inilah yang menahannya.) Skor akhir tetap 100% heuristik v3.";
           applyScore(res.final, false);
           $("engine-line").textContent = "Mesin skor: Ensemble Heuristik v3 (classifier dinilai " + pct(r.score) + "%, ditahan — heuristik di bawah ambang 35%)" + clfTruncNote;
+          // SINYAL WASPADA — kedua lapis sangat tidak sepakat (heuristik di
+          // bawah gerbang, classifier sangat tinggi): skor akhir TIDAK
+          // diubah, tetapi ketidaksepakatan itu tidak boleh lolos diam-diam.
+          // Banner menjelaskan alasannya dan menyarankan tinjauan manual.
+          if(r.score >= CLF_WATCH){
+            lastWatchSignal = { heur: res.final, clf: r.score };
+            var bw = $("banner-waspada");
+            bw.innerHTML = "<strong>Sinyal waspada — disarankan ditinjau manual.</strong> Mengapa waspada? Kedua lapis pemeriksa tidak sepakat pada teks ini: lapis pertama (Ensemble Heuristik v3) menilai pola tulisan cenderung manusiawi (" + pct(res.final) + "%), tetapi lapis kedua (classifier) memberi probabilitas AI yang sangat tinggi (" + pct(r.score) + "%). Ketidaksepakatan seperti ini dapat muncul pada teks AI yang disunting atau diparafrase dengan baik, tetapi juga pada tulisan manusia yang sangat formal dan teratur — karena itu skor akhir tidak diubah dan sinyal ini bukan vonis. Gunakan sinyal ini sebagai alasan untuk meninjau isi teks secara manual dan, bila perlu, mengklarifikasi langsung kepada penulisnya.";
+            bw.classList.add("show");
+          }
         }
       }
 
@@ -2001,6 +2018,9 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         lastClfScore = null;
         lastClfApplied = false;
         lastClfTruncated = false;
+        lastWatchSignal = null;
+        $("banner-waspada").classList.remove("show");
+        $("banner-waspada").innerHTML = "";
         var runId = ++analysisRunSeq;
         // Perbandingan antar-analisis dalam sesi ini + telemetri kalibrasi:
         // ringkasan analisis sebelumnya disimpan, yang baru menjadi acuan.
@@ -2314,6 +2334,9 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
               write("Penguat diterapkan (heuristik awal >= 35%): skor classifier ikut menguatkan skor akhir.", 10.5);
             } else {
               write("Classifier dinilai tetapi TIDAK menaikkan skor akhir (heuristik awal < 35%) - skor akhir 100% heuristik v3.", 10.5);
+            }
+            if(lastWatchSignal){
+              write("SINYAL WASPADA: classifier memberi probabilitas AI sangat tinggi (" + pct(lastWatchSignal.clf) + "%) sementara heuristik rendah (" + pct(lastWatchSignal.heur) + "%) - kedua lapis tidak sepakat. Ketidaksepakatan ini dapat muncul pada teks AI yang disunting/diparafrase dengan baik, tetapi juga pada tulisan manusia yang sangat formal. Skor akhir tidak diubah; disarankan meninjau teks ini secara manual dan mengklarifikasi kepada penulisnya sebelum menyimpulkan.", 10.5);
             }
           } else {
             write("Skor classifier: tidak digunakan — skor akhir 100% Ensemble Heuristik v3.", 10.5);
