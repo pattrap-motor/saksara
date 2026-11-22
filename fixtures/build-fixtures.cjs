@@ -236,6 +236,32 @@ FIXTURES["nodocument.docx"] = zipWrite([
   { name: "word/styles.xml", data: STYLES_XML },
 ]);
 
+/* D3: dokumen untuk uji pemetaan & penerapan saran (doc-apply.docx).
+   Setiap blok dirancang memicu saran WI yang terverifikasi (lihat D3_REPORT):
+   heading baku, paragraf biasa, run tebal, kata terbelah dua run (cross-run),
+   butir daftar, rumus OMML dengan saran aman di run tetangga, rumus OMML
+   dengan spasi ganda melintasinya (protected), dan sel tabel. */
+const OMML_FRAC = '<m:oMath><m:f><m:num><m:r><m:t>a</m:t></m:r></m:num><m:den><m:r><m:t>b</m:t></m:r></m:den></m:f></m:oMath>';
+FIXTURES["doc-apply.docx"] = docx(
+  '<w:p><w:pPr><w:pStyle w:val="Heading1"/></w:pPr>' + R("Aktifitas kelompok tani") + "</w:p>" +
+  P(R("Aktifitas ini di lakukan setiap hari Senin.")) +
+  P(
+    R("Kata ") +
+    '<w:r><w:rPr><w:b/></w:rPr><w:t>aktifitas</w:t></w:r>' +
+    R(" pada run tebal ini harus baku.")
+  ) +
+  P(R("Aktifi") + R("tas") + R(" kelompok dicatat dengan rapi.")) +
+  LI(1, "Aktifitas rutin di lakukan tiap pekan.") +
+  P(R("Hasilnya di hitung dengan rumus") + OMML_FRAC + R(" secara teliti.")) +
+  P(R("Nilai akhir yaitu ") + OMML_FRAC + R(" untuk semua siswa.")) +
+  "<w:tbl><w:tr>" +
+    "<w:tc>" + P(R("Data ini di lakukan kemarin.")) + "</w:tc>" +
+    "<w:tc>" + P(R("Sel biasa tanpa masalah.")) + "</w:tc>" +
+  "</w:tr></w:tbl>" +
+  P(R("Paragraf penutup tanpa masalah apa pun.")),
+  { styles: true, numbering: true }
+);
+
 /* Korup: simple.docx terpotong */
 FIXTURES["corrupt.docx"] = FIXTURES["simple.docx"].subarray(0, Math.floor(FIXTURES["simple.docx"].length * 0.55));
 
