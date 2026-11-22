@@ -761,6 +761,11 @@
         background:transparent; border:0; color:transparent; font-size:0; cursor:pointer; }
       .wi-doc-actions{ margin-top:12px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
       .wi-doc-actions[hidden]{ display:none; }
+      /* ---------- Document Intelligence (D3): lencana pemetaan & penghitung dokumen kerja ---------- */
+      .wi-doc-count{ margin-top:10px; font-size:13px; color:var(--muted); }
+      .wi-doc-badge{ margin-top:8px; font-size:12.5px; color:var(--muted); }
+      .wi-doc-badge.ok{ color:var(--navy); font-weight:600; }
+      .wi-doc-badge.refused{ color:#B3261E; font-weight:600; }
     </style>
   </head>
   <body>
@@ -1136,7 +1141,7 @@
         <div class="panel" id="wi-panel-input">
           <div class="wi-doc" id="wi-doc">
             <div class="wi-doc-head">Impor dokumen Word (.docx) atau PDF (.pdf)</div>
-            <p class="wf-note">Muat berkas .docx atau .pdf dari perangkat Anda — berkas dibaca <strong>sepenuhnya di peramban ini</strong>, tidak diunggah ke server dan tidak disimpan — lalu teksnya ditempatkan di kotak teks di bawah untuk dianalisis seperti biasa. Untuk PDF, yang dibaca adalah <strong>lapisan teksnya</strong> dan formatnya hanya perkiraan dari posisi teks; PDF hasil pindaian (gambar) belum dapat dianalisis di sini karena Asisten Menulis <strong>belum mendukung OCR</strong> — gunakan halaman OCR untuk mengekstrak teks dari pindaian. Pada tahap ini hasil revisi tetap berupa teks biasa; penerapan saran dengan format dokumen yang terjaga dan ekspor kembali ke .docx menyusul pada tahap berikutnya.</p>
+            <p class="wf-note">Muat berkas .docx atau .pdf dari perangkat Anda — berkas dibaca <strong>sepenuhnya di peramban ini</strong>, tidak diunggah ke server dan tidak disimpan — lalu teksnya ditempatkan di kotak teks di bawah untuk dianalisis seperti biasa. Untuk PDF, yang dibaca adalah <strong>lapisan teksnya</strong> dan formatnya hanya perkiraan dari posisi teks; PDF hasil pindaian (gambar) belum dapat dianalisis di sini karena Asisten Menulis <strong>belum mendukung OCR</strong> — gunakan halaman OCR untuk mengekstrak teks dari pindaian. Saran yang posisinya aman di dalam dokumen kini juga diterapkan ke salinan kerja dokumen dengan format dokumen yang terjaga (dokumen asli Anda tidak berubah); ekspor kembali ke berkas .docx menyusul pada tahap berikutnya.</p>
             <div class="wi-doc-drop">
               <span class="upload-wrap"><span class="upload-visual" aria-hidden="true">Pilih dokumen (.docx/.pdf)</span><input type="file" id="wi-doc-file" accept=".docx,.pdf,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-label="Pilih dokumen Word (.docx) atau PDF (.pdf)" /></span>
               <span class="wi-doc-hint">atau seret &amp; letakkan berkas .docx/.pdf ke kartu ini · batas 20 MB</span>
@@ -1148,6 +1153,8 @@
             <div class="wi-doc-actions" id="wi-doc-actions" hidden>
               <button type="button" id="wi-doc-remove">Hapus dokumen</button>
             </div>
+            <div class="wi-doc-count" id="wi-doc-count" hidden></div>
+            <div class="banner" id="wi-doc-note"></div>
           </div>
           <label for="wi-input" style="font-weight:700; display:block; margin-bottom:8px;">Teks yang ingin dirapikan</label>
           <textarea id="wi-input" placeholder="Tempel atau ketik teks di sini…"></textarea>
@@ -6805,6 +6812,144 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         return { code: "pdf-invalid", message: "Berkas bukan PDF yang valid atau isinya rusak sehingga tidak dapat dibuka. Pastikan berkas benar-benar PDF yang utuh, lalu coba lagi." };
       return { code: "pdf-failed", message: "PDF tidak dapat dibaca — berkas mungkin rusak atau memakai fitur yang belum didukung." };
     }
+    /* ---------- D3: sinkronisasi model ↔ teks analisis ----------
+       WI-CORE hanya mengenal teks + offset per paragraf. Bagian ini
+       menyelaraskan paragraf hasil analisis dengan blok dokumen secara
+       KONSERVATIF: sebuah paragraf hanya dinyatakan "matched" bila
+       teksnya PERSIS sama dengan teks satu blok, dicari berurutan dari
+       posisi terakhir yang cocok (satu blok tidak dipakai dua kali).
+       Paragraf yang tidak ditemukan persis adalah "edited" — disunting
+       manual atau memang berbeda dari dokumen — dan sarannya tidak
+       pernah diterapkan ke dokumen. Jalur cepat: bila teks yang
+       dianalisis adalah hasil diAssembleText yang tidak diubah, hasil
+       penyelarasan sama persis dengan paraMap rakitan itu. */
+    function diTextBlocks(model){
+      var out = [];
+      (model.blocks || []).forEach(function(b, i){
+        var t = diBlockText(b);
+        if(t && t.replace(/\s+/g, "")) out.push({ blockIdx: i, text: t });
+      });
+      return out;
+    }
+    function diSyncModel(model, analyzed){
+      var paras, i;
+      if(Array.isArray(analyzed)){
+        paras = analyzed.map(function(p){ return String(p == null ? "" : p); });
+      } else {
+        /* Pecah dengan konvensi yang sama seperti wiSplitParas WI-CORE
+           (pemisah baris kosong), sesudah normalisasi CRLF yang sama
+           seperti wiAnalyze. */
+        var norm = String(analyzed == null ? "" : analyzed).replace(/\r\n?/g, "\n");
+        var parts = norm.split(/(\n[ \t]*\n(?:[ \t]*\n)*)/);
+        paras = [];
+        for(i = 0; i < parts.length; i += 2) paras.push(parts[i]);
+      }
+      var tb = diTextBlocks(model);
+      var align = [], cursor = 0;
+      paras.forEach(function(p){
+        if(!p || !/\S/.test(p)){ align.push({ status: "empty", blockIdx: -1 }); return; }
+        var found = -1;
+        for(var j = cursor; j < tb.length; j++){ if(tb[j].text === p){ found = j; break; } }
+        if(found >= 0){ align.push({ status: "matched", blockIdx: tb[found].blockIdx }); cursor = found + 1; }
+        else align.push({ status: "edited", blockIdx: -1 });
+      });
+      return { paragraphs: paras, align: align, textBlocks: tb.length };
+    }
+    /* ---------- D3: pemetaan saran → span dokumen ----------
+       Saran WI membawa (pIdx, start, end, original, replacement) dalam
+       koordinat paragraf. Pemetaan mengembalikannya ke (blok, run,
+       offset-di-dalam-run). Status "applicable" HANYA bila seluruh
+       rentang berada di dalam SATU run yang tidak terlindungi dan teks
+       blok pada rentang itu persis sama dengan `original` saran.
+       Alasan "cross-block" ada di taksonomi untuk kelengkapan: dengan
+       kontrak WI saat ini satu saran selalu berada di dalam satu
+       paragraf = satu blok, jadi alasan itu tidak dapat muncul; semua
+       kegagalan lintas batas muncul sebagai cross-run/protected. */
+    var DI_MAP_REASON_TEXT = {
+      "manual-edit": "paragraf ini berubah dari dokumen aslinya (kemungkinan disunting manual)",
+      "cross-run": "saran melintasi batas potongan teks (run) di dalam dokumen",
+      "protected": "saran menyentuh elemen terlindungi (rumus/kolom isian/gambar) yang tidak pernah diubah",
+      "text-mismatch": "teks dokumen pada posisi ini tidak sama dengan teks yang dianalisis",
+      "cross-block": "saran melintasi lebih dari satu blok dokumen",
+      "no-block": "paragraf ini tidak ditemukan pada dokumen yang dimuat"
+    };
+    function diMapReadonly(reason){
+      return { status: "readonly", reason: reason, reasonText: DI_MAP_REASON_TEXT[reason] || reason };
+    }
+    function diMapSuggestion(model, sync, s){
+      if(!s || s.advisory || typeof s.replacement !== "string")
+        return { status: "advisory" };
+      var a = sync && sync.align ? sync.align[s.pIdx] : null;
+      if(!a || a.status === "empty") return diMapReadonly("no-block");
+      if(a.status === "edited") return diMapReadonly("manual-edit");
+      var block = (model.blocks || [])[a.blockIdx];
+      if(!block) return diMapReadonly("no-block");
+      if(diBlockText(block).slice(s.start, s.end) !== s.original)
+        return diMapReadonly("text-mismatch");
+      /* Telusuri run dalam koordinat teks blok. Offset hanya dihitung
+         dari run TIDAK terlindungi (teks run terlindungi tidak masuk
+         teks analisis — keputusan D1); posisi run terlindungi dicatat
+         untuk mendeteksi rentang yang melintasinya. */
+      var pos = 0, startRun = -1, endRun = -1, protInside = false, spans = {};
+      var runs = block.runs || [];
+      for(var ri = 0; ri < runs.length; ri++){
+        var r = runs[ri];
+        if(r.protected){
+          if(pos > s.start && pos < s.end) protInside = true;
+          continue;
+        }
+        var rs = pos, re = pos + r.text.length;
+        spans[ri] = { start: rs, end: re };
+        if(s.start >= rs && s.start < re) startRun = ri;
+        if(s.end > rs && s.end <= re) endRun = ri;
+        pos = re;
+      }
+      if(protInside) return diMapReadonly("protected");
+      if(startRun < 0 || endRun < 0 || startRun !== endRun)
+        return diMapReadonly("cross-run");
+      return { status: "applicable", blockIdx: a.blockIdx, blockId: block.id, runIdx: startRun,
+        startInRun: s.start - spans[startRun].start, endInRun: s.end - spans[startRun].start,
+        expected: s.original };
+    }
+    function diMapAll(model, sync, suggestions){
+      return (suggestions || []).map(function(s){ return diMapSuggestion(model, sync, s); });
+    }
+    /* ---------- D3: penerapan aman ke salinan kerja model ----------
+       Model hasil impor TIDAK pernah diubah oleh bagian ini — penerapan
+       selalu berjalan pada salinan kerja (diCloneModel). Saat menerapkan,
+       posisi divalidasi ULANG terhadap model kerja yang berjalan:
+       pertama pada offset yang tercatat; bila teks di sana sudah
+       bergeser (penerapan lain lebih dulu), dicari kemunculan TUNGGAL
+       teks asal di dalam run yang sama. Nol kemunculan = "stale",
+       lebih dari satu = "ambiguous" — keduanya ditolak tanpa mengubah
+       apa pun. Yang disambung HANYA teks run sasaran: jumlah & urutan
+       run, flag format, dan struktur blok tidak pernah berubah, dan run
+       terlindungi tidak pernah disentuh. */
+    function diCloneModel(model){
+      return JSON.parse(JSON.stringify(model));
+    }
+    function diApplyToModel(workingModel, mapped, replacement){
+      if(!mapped || mapped.status !== "applicable")
+        return { ok: false, reason: (mapped && mapped.reason) || "not-applicable" };
+      var block = (workingModel.blocks || [])[mapped.blockIdx];
+      if(!block) return { ok: false, reason: "stale" };
+      var run = (block.runs || [])[mapped.runIdx];
+      if(!run || run.protected) return { ok: false, reason: "stale" };
+      var expected = mapped.expected;
+      if(typeof expected !== "string" || !expected.length || typeof replacement !== "string")
+        return { ok: false, reason: "stale" };
+      var at = -1;
+      if(mapped.startInRun >= 0 && run.text.slice(mapped.startInRun, mapped.startInRun + expected.length) === expected)
+        at = mapped.startInRun;
+      else {
+        var first = run.text.indexOf(expected);
+        if(first < 0) return { ok: false, reason: "stale" };
+        if(run.text.indexOf(expected, first + 1) >= 0) return { ok: false, reason: "ambiguous" };
+        at = first;
+      }
+      run.text = run.text.slice(0, at) + replacement + run.text.slice(at + expected.length);
+      return { ok: true, blockIdx: mapped.blockIdx, runIdx: mapped.runIdx, startInRun: at, endInRun: at + expected.length };
+    }
     /* DI-CORE-END */
 
     /* Writing Intelligence — render & interaksi (DOM). */
@@ -7279,6 +7424,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
             var asm = diAssembleText(res.model);
             var stats = diModelStats(res.model);
             wiDocState = { name: f.name, size: f.size, model: res.model, assembly: asm };
+            diInitWork(); /* D3: siapkan salinan kerja + pemetaan untuk dokumen ini */
             ta.value = asm.text;
             wiUpdateCount();
             var parts = [fmtNumID(stats.blocks) + " blok", fmtNumID(stats.words) + " kata"];
@@ -7318,6 +7464,200 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           if(files && files[0]) diHandleFile(files[0]);
         });
       }
+
+      /* ================= Document Intelligence (D3): pemetaan saran & penerapan aman =================
+         Saran WI dipetakan ke DocModel (fungsi murni DI-CORE diSyncModel /
+         diMapSuggestion) dan — hanya bila statusnya "applicable" —
+         diterapkan ke SALINAN KERJA model (diWork) lewat diApplyToModel.
+         Model hasil impor tidak pernah diubah; teks biasa (Hasil Revisi)
+         tetap dihitung WI seperti biasa dan tidak terpengaruh bagian ini.
+         Tanpa dokumen yang dimuat, seluruh bagian ini tidak aktif dan
+         perilaku #/tulis persis seperti sebelumnya.
+         Kaitan ke alur WI yang sudah ada bersifat aditif: listener di
+         bawah didaftarkan SESUDAH handler WI (yang terdaftar lebih dulu
+         di berkas ini), sehingga handler WI selalu berjalan lebih dulu;
+         lencana kartu digambar ulang oleh MutationObserver setiap kali
+         wiRender membangun ulang daftar kartu. */
+      var diWork = null;       /* salinan kerja model; null bila tidak ada dokumen */
+      var diSnapshots = [];    /* snapshot model kerja sebelum tiap penerapan (sejajar diAppliedIds) */
+      var diAppliedIds = [];   /* id saran yang sudah diterapkan ke dokumen kerja */
+      var diMapping = null;    /* id saran -> hasil diMapSuggestion untuk wiResult berjalan */
+      var diMappingFor = null; /* objek wiResult yang menjadi dasar diMapping */
+      var diRefused = {};      /* id saran -> alasan penolakan pada saat penerapan */
+      var diCountEl = $("wi-doc-count"), diNoteEl = $("wi-doc-note");
+
+      function diUpdateDocCount(){
+        if(!diCountEl) return;
+        if(!wiDocState){ diCountEl.hidden = true; diCountEl.textContent = ""; return; }
+        diCountEl.hidden = false;
+        diCountEl.textContent = "Revisi diterapkan ke dokumen kerja: " + diAppliedIds.length;
+      }
+      function diInitWork(){
+        diWork = wiDocState ? diCloneModel(wiDocState.model) : null;
+        diSnapshots = []; diAppliedIds = []; diMapping = null; diMappingFor = null; diRefused = {};
+        diShowBanner(diNoteEl, "");
+        diUpdateDocCount();
+      }
+      function diComputeMapping(){
+        diMappingFor = wiResult;
+        diMapping = null;
+        if(!wiDocState || !wiResult) return;
+        if(diAppliedIds.length){
+          /* wiRun/wiRerun selalu membuang keputusan teks (wiAccepted
+             dikosongkan) — penerapan ke dokumen kerja ikut diatur ulang
+             agar keadaan kedua sisi tidak pernah berbeda. */
+          diWork = diCloneModel(wiDocState.model);
+          diSnapshots = []; diAppliedIds = [];
+          diShowBanner(diNoteEl, "Analisis dijalankan ulang — penerapan ke dokumen kerja diatur ulang mengikuti keputusan teks yang baru.");
+          diUpdateDocCount();
+        }
+        diRefused = {};
+        var sync = diSyncModel(wiDocState.model, wiResult.paragraphs);
+        var mapped = diMapAll(wiDocState.model, sync, wiResult.suggestions);
+        diMapping = {};
+        wiResult.suggestions.forEach(function(s, i){ diMapping[s.id] = mapped[i]; });
+      }
+      function diEnsureMapping(){
+        if(wiResult && diMappingFor !== wiResult) diComputeMapping();
+      }
+      function diRefusalText(reason){
+        return reason === "ambiguous"
+          ? "teks sasarannya muncul lebih dari sekali pada potongan teks yang sama, sehingga posisi pastinya tidak dapat ditentukan"
+          : "teks sasarannya sudah berubah pada dokumen kerja";
+      }
+      function diBadgeFor(s){
+        if(!s || s.advisory) return null;
+        if(diRefused[s.id]) return { cls: "wi-doc-badge refused", text: "Penerapan ke dokumen ditolak — " + diRefused[s.id] + "." };
+        var m = diMapping ? diMapping[s.id] : null;
+        if(!m) return null;
+        if(diAppliedIds.indexOf(s.id) >= 0) return { cls: "wi-doc-badge ok", text: "✓ Diterapkan ke dokumen kerja" };
+        if(m.status === "applicable") return { cls: "wi-doc-badge ok", text: "✓ Dapat diterapkan ke dokumen kerja" };
+        if(m.status === "readonly") return { cls: "wi-doc-badge", text: "Tidak diterapkan ke dokumen — " + m.reasonText + "." };
+        return null;
+      }
+      /* Kartu saran di DOM berkorespondensi 1:1, seurutan, dengan saran
+         yang TIDAK ditolak pada wiResult.suggestions (begitulah wiRender
+         membangunnya). */
+      function diCardFor(s){
+        var list = $("wi-sug-list");
+        if(!list || !wiResult) return null;
+        var cards = list.querySelectorAll(".wi-card"), ci = 0, found = null;
+        wiResult.suggestions.forEach(function(x){
+          if(wiRejected[x.id]) return;
+          if(x.id === s.id) found = cards[ci] || null;
+          ci++;
+        });
+        return found;
+      }
+      function diPaintBadge(s, force){
+        var card = diCardFor(s);
+        if(!card) return;
+        var old = card.querySelector(".wi-doc-badge");
+        if(old && !force) return;
+        var b = diBadgeFor(s);
+        if(old) old.remove();
+        if(!b) return;
+        var div = document.createElement("div");
+        div.className = b.cls;
+        div.textContent = b.text;
+        card.appendChild(div);
+      }
+      function diDecorateCards(){
+        if(!wiDocState || !wiResult) return;
+        diEnsureMapping();
+        if(!diMapping) return;
+        wiResult.suggestions.forEach(function(s){ diPaintBadge(s, false); });
+      }
+      function diTryApply(s){
+        diEnsureMapping();
+        var m = diMapping ? diMapping[s.id] : null;
+        if(!m || m.status !== "applicable" || !diWork) return;
+        var snap = diCloneModel(diWork);
+        var r = diApplyToModel(diWork, m, s.replacement);
+        if(r.ok){
+          diSnapshots.push(snap);
+          diAppliedIds.push(s.id);
+          if(diRefused[s.id]) delete diRefused[s.id];
+          diUpdateDocCount();
+        } else {
+          diRefused[s.id] = diRefusalText(r.reason);
+        }
+        diPaintBadge(s, true);
+      }
+      var diSugListEl = $("wi-sug-list");
+      if(diSugListEl && typeof MutationObserver === "function"){
+        /* Setiap wiRender membangun ulang innerHTML daftar kartu (lencana
+           ikut terhapus) — observer menggambarnya kembali. Menggambar
+           lencana idempoten: kartu yang sudah berlencana tidak berubah,
+           jadi observer tidak berputar. */
+        new MutationObserver(function(){ diDecorateCards(); }).observe(diSugListEl, { childList: true });
+      }
+      if(diSugListEl){
+        diSugListEl.addEventListener("click", function(ev){
+          if(!wiDocState || !wiResult) return;
+          var t = ev.target;
+          var b = (t && t.closest) ? t.closest("[data-wi-accept]") : null;
+          if(!b) return;
+          var id = b.getAttribute("data-wi-accept");
+          if(wiAccepted.indexOf(id) < 0) return; /* handler WI berjalan lebih dulu */
+          var s = null;
+          wiResult.suggestions.forEach(function(x){ if(x.id === id) s = x; });
+          if(s) diTryApply(s);
+        });
+      }
+      /* Urungkan WI mem-pop id terakhir wiAccepted; id itu ditangkap pada
+         fase capture (sebelum handler WI berjalan) lewat leluhur dokumen. */
+      var diUndoId = null;
+      document.addEventListener("click", function(ev){
+        var t = ev.target;
+        if(t && t.closest && t.closest("#wi-undo"))
+          diUndoId = (typeof wiAccepted !== "undefined" && wiAccepted.length) ? wiAccepted[wiAccepted.length - 1] : null;
+      }, true);
+      $("wi-undo").addEventListener("click", function(){
+        var id = diUndoId; diUndoId = null;
+        if(!wiDocState || id == null) return;
+        var i = diAppliedIds.lastIndexOf(id);
+        if(i < 0) return; /* saran terakhir hanya berlaku pada teks */
+        diWork = diSnapshots[i];
+        diSnapshots.length = i;
+        diAppliedIds.length = i;
+        diUpdateDocCount();
+      });
+      $("wi-reset").addEventListener("click", function(){
+        if(!wiDocState) return;
+        diWork = diCloneModel(wiDocState.model);
+        diSnapshots = []; diAppliedIds = []; diRefused = {};
+        diUpdateDocCount();
+      });
+      $("wi-accept-all").addEventListener("click", function(){
+        if(!wiDocState || !wiResult) return;
+        diEnsureMapping();
+        if(!diMapping || !diWork) return;
+        var applied = 0, refused = 0, textOnly = 0;
+        wiResult.suggestions.forEach(function(s){
+          if(s.advisory || wiRejected[s.id] || wiAccepted.indexOf(s.id) < 0) return;
+          if(diAppliedIds.indexOf(s.id) >= 0) return;
+          var m = diMapping[s.id];
+          if(!m) return;
+          if(m.status !== "applicable"){ textOnly++; return; }
+          var snap = diCloneModel(diWork);
+          var r = diApplyToModel(diWork, m, s.replacement);
+          if(r.ok){ diSnapshots.push(snap); diAppliedIds.push(s.id); applied++; }
+          else { diRefused[s.id] = diRefusalText(r.reason); refused++; }
+        });
+        diUpdateDocCount();
+        if(applied || refused || textOnly){
+          diShowBanner(diNoteEl, "Terima semua: " + applied + " saran diterapkan ke dokumen kerja" +
+            (textOnly ? ", " + textOnly + " saran hanya berlaku pada teks" : "") +
+            (refused ? ", " + refused + " saran ditolak saat penerapan karena teks sasarannya berubah atau ambigu" : "") + ".");
+        }
+        diDecorateCards();
+      });
+      $("wi-clear").addEventListener("click", function(){
+        diWork = null; diSnapshots = []; diAppliedIds = []; diMapping = null; diMappingFor = null; diRefused = {};
+        diShowBanner(diNoteEl, "");
+        diUpdateDocCount();
+      });
     })();
 
     /* ================= Compare Writing (Phase 4) =================

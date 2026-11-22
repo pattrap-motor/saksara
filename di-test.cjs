@@ -14,9 +14,21 @@ new Function("sandbox", core +
   " sandbox.diModelStats = diModelStats; sandbox.diParseXml = diParseXml;" +
   " sandbox.diSerializeXml = diSerializeXml; sandbox.DI_CAPS = DI_CAPS; sandbox.DI_MAX_ANALYSIS_CHARS = DI_MAX_ANALYSIS_CHARS;" +
   " sandbox.diPdfPagesToModel = diPdfPagesToModel; sandbox.diPdfTextStats = diPdfTextStats;" +
-  " sandbox.diPdfErrorInfo = diPdfErrorInfo; sandbox.diSniffFormat = diSniffFormat;")(sandbox);
+  " sandbox.diPdfErrorInfo = diPdfErrorInfo; sandbox.diSniffFormat = diSniffFormat;" +
+  " sandbox.diSyncModel = diSyncModel; sandbox.diMapSuggestion = diMapSuggestion; sandbox.diMapAll = diMapAll;" +
+  " sandbox.diApplyToModel = diApplyToModel; sandbox.diCloneModel = diCloneModel;" +
+  " sandbox.diBlockText = diBlockText; sandbox.DI_MAP_REASON_TEXT = DI_MAP_REASON_TEXT;")(sandbox);
 const { diParseDocx, diAssembleText, diModelStats, diParseXml, diSerializeXml, DI_CAPS, DI_MAX_ANALYSIS_CHARS,
-  diPdfPagesToModel, diPdfTextStats, diPdfErrorInfo, diSniffFormat } = sandbox;
+  diPdfPagesToModel, diPdfTextStats, diPdfErrorInfo, diSniffFormat,
+  diSyncModel, diMapSuggestion, diMapAll, diApplyToModel, diCloneModel, diBlockText, DI_MAP_REASON_TEXT } = sandbox;
+
+/* WI-CORE diekstrak juga (read-only) agar uji D3 dapat menegaskan saran
+   sungguhan dari wiAnalyze atas teks rakitan dokumen. */
+const wiRaw = html.split("WI-CORE-START")[1].split("/* WI-CORE-END */")[0];
+const wiCore = wiRaw.slice(wiRaw.indexOf("*/") + 2);
+const wiSandbox = {};
+new Function("sandbox", wiCore + "\nsandbox.wiAnalyze = wiAnalyze;")(wiSandbox);
+const { wiAnalyze } = wiSandbox;
 
 const inflateRaw = (data) => zlib.inflateRawSync(Buffer.from(data.buffer, data.byteOffset, data.byteLength));
 const OPTS = { inflateRaw };
@@ -365,6 +377,241 @@ function blockText(b) { return b.runs.filter(r => !r.protected).map(r => r.text)
     check("blok PDF utuh 2000 karakter", asm.text.split("\n\n").every(p => p.length === 2000));
     const cols = [{ page: 1, items: [pit("Kiri satu.", 56, 720, 50), pit("Kanan satu.", 310, 720, 55)] }];
     check("konversi dua kali deep-equal", eq(diPdfPagesToModel(cols), diPdfPagesToModel(cols)));
+  }
+
+  console.log("24) D3 — fixture doc-apply.docx: struktur & saran sungguhan WI");
+  let applyModel = null, applyAsm = null, applyRes = null;
+  {
+    const r = await parse("doc-apply.docx");
+    check("parse ok", r.ok === true, r);
+    applyModel = r.model;
+    check("jenis blok sesuai rancangan", eq(applyModel.blocks.map(b => b.type),
+      ["heading", "paragraph", "paragraph", "paragraph", "list-item", "paragraph", "paragraph", "table-cell", "table-cell", "paragraph"]),
+      applyModel.blocks.map(b => b.type));
+    applyAsm = diAssembleText(applyModel);
+    check("paraMap identitas 0..9", eq(applyAsm.paraMap, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]), applyAsm.paraMap);
+    applyRes = wiAnalyze(applyAsm.text);
+    const got = applyRes.suggestions.map(s => [s.pIdx, s.kind, s.original]);
+    check("10 saran non-penasihat persis seperti terverifikasi", eq(got, [
+      [0, "kata-tidak-baku", "Aktifitas"], [1, "kata-tidak-baku", "Aktifitas"], [1, "imbuhan", "di lakukan"],
+      [2, "kata-tidak-baku", "aktifitas"], [3, "kata-tidak-baku", "Aktifitas"], [4, "kata-tidak-baku", "Aktifitas"],
+      [4, "imbuhan", "di lakukan"], [5, "imbuhan", "di hitung"], [6, "double-space", "  "], [7, "imbuhan", "di lakukan"],
+    ]), got);
+    check("tidak ada saran penasihat pada fixture", applyRes.suggestions.every(s => !s.advisory));
+  }
+
+  console.log("25) D3 — diSyncModel: jalur cepat = paraMap, masukan array identik");
+  {
+    const sync = diSyncModel(applyModel, applyAsm.text);
+    check("semua paragraf matched", sync.align.every(a => a.status === "matched"), sync.align);
+    check("blockIdx hasil sync == paraMap", eq(sync.align.map(a => a.blockIdx), applyAsm.paraMap));
+    const syncArr = diSyncModel(applyModel, applyRes.paragraphs);
+    check("masukan array (wiResult.paragraphs) identik", eq(syncArr.align, sync.align));
+    const syncCrlf = diSyncModel(applyModel, applyAsm.text.replace(/\n\n/g, "\r\n\r\n"));
+    check("CRLF dinormalisasi seperti wiAnalyze", eq(syncCrlf.align, sync.align));
+  }
+
+  console.log("26) D3 — pemetaan per jenis blok + contoh terkerjakan");
+  let mappedAll = null;
+  {
+    const sync = diSyncModel(applyModel, applyRes.paragraphs);
+    mappedAll = diMapAll(applyModel, sync, applyRes.suggestions);
+    const bySug = {};
+    applyRes.suggestions.forEach((s, i) => { bySug[s.pIdx + ":" + s.kind + ":" + s.original] = mappedAll[i]; });
+    const mHead = bySug["0:kata-tidak-baku:Aktifitas"];
+    check("heading: applicable di blok 0 run 0", mHead.status === "applicable" && mHead.blockIdx === 0 && mHead.runIdx === 0 && mHead.startInRun === 0 && mHead.endInRun === 9, mHead);
+    const mBold = bySug["2:kata-tidak-baku:aktifitas"];
+    check("CONTOH BERHASIL — run tebal: blok 2, run 1, [0,9), expected 'aktifitas'",
+      mBold.status === "applicable" && mBold.blockIdx === 2 && mBold.runIdx === 1 &&
+      mBold.startInRun === 0 && mBold.endInRun === 9 && mBold.expected === "aktifitas", mBold);
+    const mImb = bySug["1:imbuhan:di lakukan"];
+    check("paragraf biasa: blok 1 run 0 [14,24)", mImb.status === "applicable" && mImb.blockIdx === 1 && mImb.runIdx === 0 && mImb.startInRun === 14 && mImb.endInRun === 24, mImb);
+    check("daftar: kedua saran applicable di blok list-item 4",
+      bySug["4:kata-tidak-baku:Aktifitas"].status === "applicable" && bySug["4:kata-tidak-baku:Aktifitas"].blockIdx === 4 &&
+      bySug["4:imbuhan:di lakukan"].status === "applicable" && bySug["4:imbuhan:di lakukan"].blockIdx === 4);
+    check("rumus tetangga: imbuhan applicable di blok 5 run 0",
+      bySug["5:imbuhan:di hitung"].status === "applicable" && bySug["5:imbuhan:di hitung"].blockIdx === 5 && bySug["5:imbuhan:di hitung"].runIdx === 0);
+    check("sel tabel: imbuhan applicable di blok table-cell 7",
+      bySug["7:imbuhan:di lakukan"].status === "applicable" && bySug["7:imbuhan:di lakukan"].blockIdx === 7);
+    const mCross = bySug["3:kata-tidak-baku:Aktifitas"];
+    check("CONTOH DITOLAK — kata terbelah dua run: readonly/cross-run",
+      mCross.status === "readonly" && mCross.reason === "cross-run" && /melintasi batas/.test(mCross.reasonText), mCross);
+    const mProt = bySug["6:double-space:  "];
+    check("CONTOH DITOLAK — spasi ganda melintasi OMML: readonly/protected",
+      mProt.status === "readonly" && mProt.reason === "protected" && /terlindungi/.test(mProt.reasonText), mProt);
+    check("ringkasan: 8 applicable + 2 readonly", mappedAll.filter(m => m.status === "applicable").length === 8 &&
+      mappedAll.filter(m => m.status === "readonly").length === 2, mappedAll.map(m => m.status));
+  }
+
+  console.log("27) D3 — penerapan: hanya run sasaran berubah, model asli utuh");
+  {
+    const work = diCloneModel(applyModel);
+    const bySug = {};
+    applyRes.suggestions.forEach((s, i) => { bySug[s.pIdx + ":" + s.kind] = { s, m: mappedAll[i] }; });
+    const bold = bySug["2:kata-tidak-baku"];
+    const r1 = diApplyToModel(work, bold.m, bold.s.replacement);
+    check("apply run tebal ok", r1.ok === true && r1.runIdx === 1, r1);
+    check("teks run tebal menjadi 'aktivitas'", work.blocks[2].runs[1].text === "aktivitas", work.blocks[2].runs[1]);
+    check("flag tebal dipertahankan", work.blocks[2].runs[1].bold === true);
+    check("run tetangga tidak berubah", work.blocks[2].runs[0].text === "Kata " && work.blocks[2].runs[2].text === " pada run tebal ini harus baku.");
+    check("jumlah run & blok tidak berubah", work.blocks[2].runs.length === 3 && work.blocks.length === 10);
+    const imb = bySug["1:imbuhan"];
+    const r2 = diApplyToModel(work, imb.m, imb.s.replacement);
+    check("apply imbuhan ok", r2.ok === true, r2);
+    check("blok 1 terevisi pada teks", diBlockText(work.blocks[1]) === "Aktifitas ini dilakukan setiap hari Senin.", diBlockText(work.blocks[1]));
+    check("model asli TIDAK berubah (deep-equal hasil parse ulang)", eq(applyModel, (await parse("doc-apply.docx")).model));
+    check("run terlindungi pada model kerja utuh (xml sama)", work.blocks[5].runs[1].protected === true &&
+      work.blocks[5].runs[1].xml === applyModel.blocks[5].runs[1].xml && work.blocks[6].runs[1].xml === applyModel.blocks[6].runs[1].xml);
+  }
+
+  console.log("28) D3 — terima semua (simulasi loop UI): hitungan jujur + keadaan akhir");
+  {
+    const work = diCloneModel(applyModel);
+    let applied = 0, refused = 0;
+    applyRes.suggestions.forEach((s, i) => {
+      const m = mappedAll[i];
+      if (m.status !== "applicable") return;
+      const r = diApplyToModel(work, m, s.replacement);
+      if (r.ok) applied++; else refused++;
+    });
+    check("8 diterapkan, 0 ditolak", applied === 8 && refused === 0, applied + "/" + refused);
+    check("heading terevisi", diBlockText(work.blocks[0]) === "Aktivitas kelompok tani", diBlockText(work.blocks[0]));
+    check("blok 1 terevisi penuh", diBlockText(work.blocks[1]) === "Aktivitas ini dilakukan setiap hari Senin.");
+    check("blok cross-run TIDAK berubah", diBlockText(work.blocks[3]) === "Aktifitas kelompok dicatat dengan rapi.");
+    check("blok spasi-rumus TIDAK berubah", diBlockText(work.blocks[6]) === "Nilai akhir yaitu  untuk semua siswa.");
+    check("sel tabel terevisi", diBlockText(work.blocks[7]) === "Data ini dilakukan kemarin.");
+    check("daftar terevisi penuh", diBlockText(work.blocks[4]) === "Aktivitas rutin dilakukan tiap pekan.");
+  }
+
+  console.log("29) D3 — suntingan manual: paragraf berubah -> manual-edit, sisanya tetap applicable");
+  {
+    const paras = applyRes.paragraphs.slice();
+    paras[1] = "Aktifitas ini di lakukan setiap hari Selasa."; /* satu kata disunting manual */
+    const sync = diSyncModel(applyModel, paras);
+    check("paragraf 1 berstatus edited", sync.align[1].status === "edited", sync.align[1]);
+    check("paragraf lain tetap matched", sync.align.every((a, i) => i === 1 || a.status === "matched"), sync.align.map(a => a.status));
+    const res2 = wiAnalyze(paras.join("\n\n"));
+    const mapped2 = diMapAll(applyModel, sync, res2.suggestions);
+    const inEdited = res2.suggestions.map((s, i) => [s, mapped2[i]]).filter(([s]) => s.pIdx === 1);
+    check("saran pada paragraf suntingan: readonly/manual-edit", inEdited.length === 2 &&
+      inEdited.every(([, m]) => m.status === "readonly" && m.reason === "manual-edit"), inEdited.map(([, m]) => m.reason));
+    const inHead = res2.suggestions.map((s, i) => [s, mapped2[i]]).filter(([s]) => s.pIdx === 0);
+    check("saran heading tetap applicable", inHead.length === 1 && inHead[0][1].status === "applicable");
+    /* paragraf dihapus dari tengah: paragraf sesudahnya tetap menemukan bloknya */
+    const parasCut = applyRes.paragraphs.filter((_, i) => i !== 1);
+    const syncCut = diSyncModel(applyModel, parasCut);
+    check("paragraf terhapus tidak menggeser pemetaan sisanya",
+      syncCut.align.every(a => a.status === "matched") && syncCut.align[1].blockIdx === 2 && syncCut.align[8].blockIdx === 9,
+      syncCut.align.map(a => a.blockIdx));
+  }
+
+  console.log("30) D3 — duplikat & urutan rakus (greedy in-order)");
+  {
+    const model = { format: "docx", tables: [], blocks: [
+      { id: "b0", type: "paragraph", runs: [{ text: "Isi sama." }] },
+      { id: "b1", type: "paragraph", runs: [{ text: "Isi lain." }] },
+      { id: "b2", type: "paragraph", runs: [{ text: "Isi sama." }] },
+    ] };
+    const sync = diSyncModel(model, ["Isi sama.", "Isi sama."]);
+    check("duplikat mengonsumsi blok berurutan: [0, 2]", eq(sync.align.map(a => a.blockIdx), [0, 2]), sync.align);
+    const syncEmpty = diSyncModel(model, ["", "Isi sama."]);
+    check("paragraf kosong berstatus empty, bukan edited", syncEmpty.align[0].status === "empty" && syncEmpty.align[1].blockIdx === 0, syncEmpty.align);
+  }
+
+  console.log("31) D3 — validasi ulang saat apply: pergeseran offset, stale, ambigu, konflik");
+  {
+    const mkModel = (text) => ({ format: "docx", tables: [], blocks: [{ id: "b0", type: "paragraph", runs: [{ text }] }] });
+    /* dua saran berurutan dalam run yang sama: yang kedua bergeser sesudah yang pertama diterapkan */
+    const text = "Kemarin di lakukan dan di lakukan lagi.";
+    const model = mkModel(text);
+    const res = wiAnalyze(text);
+    const sync = diSyncModel(model, res.paragraphs);
+    const maps = diMapAll(model, sync, res.suggestions);
+    check("dua imbuhan sama-sama applicable", maps.length === 2 && maps.every(m => m.status === "applicable"), maps);
+    const work = diCloneModel(model);
+    const a1 = diApplyToModel(work, maps[0], res.suggestions[0].replacement);
+    check("apply pertama ok pada offset tercatat", a1.ok === true && a1.startInRun === 8, a1);
+    const a2 = diApplyToModel(work, maps[1], res.suggestions[1].replacement);
+    check("apply kedua ok lewat pencarian kemunculan tunggal (offset bergeser)", a2.ok === true && a2.startInRun === 22, a2);
+    check("hasil akhir run benar", work.blocks[0].runs[0].text === "Kemarin dilakukan dan dilakukan lagi.", work.blocks[0].runs[0].text);
+    /* stale: menerapkan peta yang sama dua kali — teks asal sudah hilang */
+    const modelB = mkModel("Aktifitas tercatat.");
+    const resB = wiAnalyze("Aktifitas tercatat.");
+    const mapB = diMapAll(modelB, diSyncModel(modelB, resB.paragraphs), resB.suggestions)[0];
+    const workB = diCloneModel(modelB);
+    check("apply pertama (stale-test) ok", diApplyToModel(workB, mapB, "Aktivitas").ok === true);
+    const stale = diApplyToModel(workB, mapB, "Aktivitas");
+    check("apply ulang peta sama -> stale, tanpa perubahan", stale.ok === false && stale.reason === "stale" &&
+      workB.blocks[0].runs[0].text === "Aktivitas tercatat.", stale);
+    /* konflik: rentang lain yang teks asalnya hancur oleh penerapan pertama */
+    const workC = diCloneModel(modelB);
+    diApplyToModel(workC, mapB, "Aktivitas");
+    const conflict = diApplyToModel(workC, { status: "applicable", blockIdx: 0, runIdx: 0, startInRun: 0, endInRun: 8, expected: "Aktifita" }, "X");
+    check("konflik rentang tumpang-tindih -> stale", conflict.ok === false && conflict.reason === "stale", conflict);
+    /* ambigu: teks asal muncul dua kali dan offset tercatat salah */
+    const modelD = mkModel("di lakukan lalu di lakukan.");
+    const workD = diCloneModel(modelD);
+    const amb = diApplyToModel(workD, { status: "applicable", blockIdx: 0, runIdx: 0, startInRun: 3, endInRun: 13, expected: "di lakukan" }, "dilakukan");
+    check("kemunculan ganda + offset meleset -> ambiguous, tanpa perubahan", amb.ok === false && amb.reason === "ambiguous" &&
+      workD.blocks[0].runs[0].text === "di lakukan lalu di lakukan.", amb);
+    /* peta readonly tidak pernah dapat diterapkan */
+    const ro = diApplyToModel(workD, { status: "readonly", reason: "cross-run" }, "x");
+    check("peta readonly ditolak diApplyToModel", ro.ok === false && ro.reason === "cross-run", ro);
+  }
+
+  console.log("32) D3 — field terlindungi (sintetis) & saran penasihat");
+  {
+    const model = { format: "docx", tables: [], blocks: [{ id: "b0", type: "paragraph", runs: [
+      { text: "Hasil " },
+      { text: "42", protected: true, kind: "field", xml: "<w:fldSimple w:instr=\" PAGE \"/>" },
+      { text: " halaman berisi aktifitas." },
+    ] }] };
+    check("teks blok melompati field", diBlockText(model.blocks[0]) === "Hasil  halaman berisi aktifitas.", diBlockText(model.blocks[0]));
+    const res = wiAnalyze(diAssembleText(model).text);
+    const sync = diSyncModel(model, res.paragraphs);
+    const maps = diMapAll(model, sync, res.suggestions);
+    const ds = res.suggestions.findIndex(s => s.kind === "double-space");
+    check("spasi ganda di junction field -> protected", ds >= 0 && maps[ds].status === "readonly" && maps[ds].reason === "protected", ds >= 0 ? maps[ds] : res.suggestions);
+    const bk = res.suggestions.findIndex(s => s.kind === "kata-tidak-baku");
+    check("baku sesudah field pada run sendiri -> applicable (run 2)", bk >= 0 && maps[bk].status === "applicable" && maps[bk].runIdx === 2, bk >= 0 ? maps[bk] : null);
+    const work = diCloneModel(model);
+    const ap = diApplyToModel(work, maps[bk], res.suggestions[bk].replacement);
+    check("apply di samping field ok; field utuh", ap.ok === true && work.blocks[0].runs[1].xml === model.blocks[0].runs[1].xml &&
+      work.blocks[0].runs[2].text === " halaman berisi aktivitas.", work.blocks[0].runs.map(r => r.text));
+    /* saran penasihat tidak pernah dipetakan sebagai applicable */
+    const longText = "Kalimat " + "yang sangat panjang dan berbelit dengan banyak anak kalimat yang terus bersambung tanpa henti untuk menguji saran penasihat ".repeat(3) + "selesai.";
+    const resAdv = wiAnalyze(longText);
+    const adv = resAdv.suggestions.find(s => s.advisory);
+    check("fixture penasihat ditemukan", !!adv, resAdv.suggestions.map(s => s.kind));
+    if (adv) {
+      const mAdv = diMapSuggestion(model, sync, adv);
+      check("penasihat -> status advisory (tidak dapat diterapkan)", mAdv.status === "advisory", mAdv);
+    }
+  }
+
+  console.log("33) D3 — undo (snapshot) & determinisme pemetaan");
+  {
+    const work = diCloneModel(applyModel);
+    const snap = diCloneModel(work);
+    const bySug = {};
+    applyRes.suggestions.forEach((s, i) => { bySug[s.pIdx + ":" + s.kind] = { s, m: mappedAll[i] }; });
+    diApplyToModel(work, bySug["0:kata-tidak-baku"].m, "Aktivitas");
+    diApplyToModel(work, bySug["1:imbuhan"].m, "dilakukan");
+    check("model kerja berubah sesudah dua apply", !eq(work, snap));
+    const restored = snap; /* pola Urungkan UI: snapshot terakhir dipulihkan */
+    check("snapshot memulihkan keadaan persis (deep-equal klon awal)", eq(restored, diCloneModel(applyModel)));
+    const sync2 = diSyncModel(applyModel, applyRes.paragraphs);
+    const maps2 = diMapAll(applyModel, sync2, applyRes.suggestions);
+    check("pemetaan dua kali deep-equal (deterministik)", eq(maps2, mappedAll));
+    const clone = diCloneModel(applyModel);
+    check("klon deep-equal tetapi bukan referensi sama", eq(clone, applyModel) && clone !== applyModel && clone.blocks[0] !== applyModel.blocks[0]);
+    check("taksonomi alasan lengkap", ["manual-edit", "cross-run", "protected", "text-mismatch", "cross-block", "no-block"].every(k => typeof DI_MAP_REASON_TEXT[k] === "string"));
+    /* text-mismatch: peta dihitung dari model yang sudah berubah isinya */
+    const diverged = diCloneModel(applyModel);
+    diverged.blocks[1].runs[0].text = "Teks yang sama sekali berbeda.";
+    const syncD = { paragraphs: applyRes.paragraphs, align: applyRes.paragraphs.map((_, i) => ({ status: "matched", blockIdx: i })), textBlocks: 10 };
+    const mDiv = diMapSuggestion(diverged, syncD, applyRes.suggestions[1]);
+    check("blok berubah isi -> text-mismatch", mDiv.status === "readonly" && mDiv.reason === "text-mismatch", mDiv);
   }
 
   console.log("\nDI-CORE: " + pass + " lulus, " + fail + " gagal, total " + (pass + fail));
