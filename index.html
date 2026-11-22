@@ -748,6 +748,19 @@
       .wi-style-ind-head{ display:flex; flex-wrap:wrap; gap:4px 12px; align-items:baseline; font-size:14px; }
       .wi-style-name{ font-weight:800; }
       .wi-style-label{ font-weight:700; color:var(--gold-ink); }
+      /* ---------- Document Intelligence (D1): impor dokumen .docx di Asisten Menulis ---------- */
+      .wi-doc{ border:1px dashed var(--line); border-radius:12px; padding:14px 16px; margin-bottom:16px; background:var(--surface2); }
+      .wi-doc.dragover{ outline:2px dashed var(--navy); outline-offset:-6px; }
+      .wi-doc-head{ font-size:15px; font-weight:800; margin-bottom:2px; }
+      .wi-doc-drop{ display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-top:10px; }
+      .wi-doc-hint{ font-size:13px; color:var(--muted); }
+      #wi-doc-file{ position:absolute; inset:0; width:100%; height:100%; min-height:0; margin:0; padding:0;
+        opacity:1; cursor:pointer; z-index:2; font-size:0; color:transparent;
+        background:transparent; border:0; -webkit-appearance:none; appearance:none; }
+      #wi-doc-file::file-selector-button{ width:100%; height:100%; margin:0; padding:0;
+        background:transparent; border:0; color:transparent; font-size:0; cursor:pointer; }
+      .wi-doc-actions{ margin-top:12px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+      .wi-doc-actions[hidden]{ display:none; }
     </style>
   </head>
   <body>
@@ -1121,6 +1134,20 @@
         <h2 id="wi-judul">Asisten Menulis</h2>
         <p class="sub">Rapikan tulisan Anda — kata yang terketik ganda, spasi dan tanda baca yang tidak rapi, huruf kapital, kata tidak baku, penulisan kata depan <em>di/ke</em> dan imbuhan <em>di-/ke-</em>, kata ulang, dan salah ketik mekanis — satu saran dalam satu waktu, dan <strong>Anda yang memutuskan</strong> saran mana yang diterima. Daftar kata bakunya merujuk <strong>EYD V dan KBBI</strong>. Pemeriksaan ini berbasis aturan dan daftar kata tertutup — <strong>bukan setara editor profesional</strong>: ia tidak memahami maksud kalimat secara mendalam, sehingga nama orang, tempat, merek, atau istilah asing kadang masih tertandai; untuk kata yang memang disengaja ada tombol <strong>Abaikan kata ini</strong> (hanya berlaku selama sesi ini, tidak disimpan). Saran adalah <strong>rekomendasi, bukan jaminan kebenaran</strong>: baca kembali hasil revisi sebelum memakainya. Teks diproses <strong>sepenuhnya di peramban ini</strong> — tidak dikirim ke server dan tidak disimpan, dan teks asli Anda tidak pernah ditimpa. Saran tingkat kalimat — kata mubazir, kalimat yang panjang atau kompleks, pengulangan frasa, dan awalan kalimat yang monoton — bersifat <strong>heuristik pola</strong>: pemeriksa <strong>tidak memahami makna</strong> kalimat Anda, dan kalimat panjang <strong>tidak otomatis salah</strong>. Saran kata mubazir hanya menghapus kata yang terbukti berlebih atau menukar frasa <em>melakukan …</em> menjadi kata kerja satu akarnya; istilah, nama, angka, kutipan, dan sitasi tidak pernah diubah oleh saran mana pun.</p>
         <div class="panel" id="wi-panel-input">
+          <div class="wi-doc" id="wi-doc">
+            <div class="wi-doc-head">Impor dokumen Word (.docx)</div>
+            <p class="wf-note">Muat berkas .docx dari perangkat Anda — berkas dibaca <strong>sepenuhnya di peramban ini</strong>, tidak diunggah ke server dan tidak disimpan — lalu teksnya ditempatkan di kotak teks di bawah untuk dianalisis seperti biasa. Pada tahap ini hasil revisi tetap berupa teks biasa; penerapan saran dengan format dokumen yang terjaga dan ekspor kembali ke .docx menyusul pada tahap berikutnya.</p>
+            <div class="wi-doc-drop">
+              <span class="upload-wrap"><span class="upload-visual" aria-hidden="true">Pilih dokumen (.docx)</span><input type="file" id="wi-doc-file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-label="Pilih dokumen Word (.docx)" /></span>
+              <span class="wi-doc-hint">atau seret &amp; letakkan berkas .docx ke kartu ini · batas 20 MB</span>
+            </div>
+            <div class="file-status" id="wi-doc-status" role="status" aria-live="polite"></div>
+            <div class="banner" id="wi-doc-error" role="alert"></div>
+            <div class="banner" id="wi-doc-cover"></div>
+            <div class="wi-doc-actions" id="wi-doc-actions" hidden>
+              <button type="button" id="wi-doc-remove">Hapus dokumen</button>
+            </div>
+          </div>
           <label for="wi-input" style="font-weight:700; display:block; margin-bottom:8px;">Teks yang ingin dirapikan</label>
           <textarea id="wi-input" placeholder="Tempel atau ketik teks di sini…"></textarea>
           <div class="wi-count" id="wi-count">0 / 50.000 karakter</div>
@@ -6025,6 +6052,591 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
     }
     /* WI-CORE-END */
 
+    /* DI-CORE-START — Document Intelligence: model dokumen + impor DOCX.
+       Fungsi murni (tanpa DOM, tanpa jaringan, tanpa penyimpanan), dapat
+       diekstrak & diuji terpisah seperti blok inti lainnya. Satu-satunya
+       kemampuan luar yang dipakai: dekompresi deflate lewat
+       DecompressionStream bawaan peramban bila opts.inflateRaw tidak
+       diberikan (pada pengujian Node, zlib disuntikkan lewat opts). */
+    var DI_MAX_ANALYSIS_CHARS = 50000; /* sama dengan batas analisis WI yang sudah ada */
+    var DI_CAPS = { maxEntries: 200, maxTotalBytes: 50 * 1024 * 1024, maxEntryBytes: 20 * 1024 * 1024 };
+    function diFail(code, message){ return { ok: false, code: code, message: message }; }
+    function diCapLabel(bytes){
+      if(bytes >= 1048576) return Math.round(bytes / 1048576) + " MB";
+      if(bytes >= 1024) return Math.round(bytes / 1024) + " KB";
+      return bytes + " byte";
+    }
+    function diCapsWith(opts){
+      var c = { maxEntries: DI_CAPS.maxEntries, maxTotalBytes: DI_CAPS.maxTotalBytes, maxEntryBytes: DI_CAPS.maxEntryBytes };
+      if(opts && opts.caps){ for(var k in opts.caps){ if(typeof opts.caps[k] === "number" && opts.caps[k] > 0) c[k] = opts.caps[k]; } }
+      return c;
+    }
+    /* ---------- ZIP: pembaca direktori pusat yang diperkeras ----------
+       Batas: jumlah entri, ukuran total hasil dekompresi, ukuran per entri.
+       Ditolak eksplisit: entri terenkripsi & arsip yang bergantung ZIP64. */
+    function diZipRead(bytes, caps){
+      if(!bytes || typeof bytes.length !== "number" || bytes.length < 22)
+        return diFail("zip-invalid", "Berkas terlalu kecil untuk menjadi dokumen .docx yang valid.");
+      var view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+      var len = bytes.length, eocd = -1, i;
+      var start = Math.max(0, len - 65557);
+      for(i = len - 22; i >= start; i--){
+        if(view.getUint32(i, true) === 0x06054b50){ eocd = i; break; }
+      }
+      if(eocd < 0)
+        return diFail("zip-invalid", "Berkas bukan dokumen .docx yang valid — struktur arsip ZIP tidak ditemukan. Pastikan berkas benar-benar dokumen Word (.docx), bukan .doc lama atau PDF.");
+      if(eocd >= 20 && (view.getUint32(eocd - 20, true) === 0x07064b50 || view.getUint32(eocd - 20, true) === 0x06064b50))
+        return diFail("zip64", "Dokumen memakai format ZIP64 yang belum didukung. Simpan ulang dokumen sebagai .docx biasa, lalu coba lagi.");
+      var total = view.getUint16(eocd + 10, true);
+      var cdSize = view.getUint32(eocd + 12, true);
+      var cdOffset = view.getUint32(eocd + 16, true);
+      if(total === 0xFFFF || cdSize === 0xFFFFFFFF || cdOffset === 0xFFFFFFFF)
+        return diFail("zip64", "Dokumen memakai format ZIP64 yang belum didukung. Simpan ulang dokumen sebagai .docx biasa, lalu coba lagi.");
+      if(total > caps.maxEntries)
+        return diFail("zip-too-many-entries", "Dokumen memuat terlalu banyak bagian internal (" + total + " entri; batas " + caps.maxEntries + " entri).");
+      var decoder = new TextDecoder("utf-8");
+      var entries = [], pos = cdOffset, e;
+      for(e = 0; e < total; e++){
+        if(pos + 46 > len || view.getUint32(pos, true) !== 0x02014b50)
+          return diFail("zip-invalid", "Struktur arsip dokumen rusak — direktori pusat tidak valid.");
+        var flags = view.getUint16(pos + 8, true);
+        if(flags & 0x0001)
+          return diFail("zip-encrypted", "Dokumen terenkripsi atau dilindungi kata sandi sehingga tidak dapat dibaca.");
+        var method = view.getUint16(pos + 10, true);
+        var compSize = view.getUint32(pos + 20, true);
+        var size = view.getUint32(pos + 24, true);
+        if(compSize === 0xFFFFFFFF || size === 0xFFFFFFFF)
+          return diFail("zip64", "Dokumen memakai format ZIP64 yang belum didukung. Simpan ulang dokumen sebagai .docx biasa, lalu coba lagi.");
+        var nameLen = view.getUint16(pos + 28, true);
+        var extraLen = view.getUint16(pos + 30, true);
+        var commentLen = view.getUint16(pos + 32, true);
+        var localOffset = view.getUint32(pos + 42, true);
+        var name = decoder.decode(bytes.subarray(pos + 46, pos + 46 + nameLen));
+        if(localOffset + 30 > len || view.getUint32(localOffset, true) !== 0x04034b50)
+          return diFail("zip-invalid", "Struktur arsip dokumen rusak — header lokal tidak valid.");
+        var lNameLen = view.getUint16(localOffset + 26, true);
+        var lExtraLen = view.getUint16(localOffset + 28, true);
+        entries.push({ name: name, method: method, compSize: compSize, size: size, dataStart: localOffset + 30 + lNameLen + lExtraLen });
+        pos += 46 + nameLen + extraLen + commentLen;
+      }
+      return { ok: true, entries: entries };
+    }
+    function diInflateRawDefault(data){
+      var stream = new Blob([data]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+      return new Response(stream).arrayBuffer().then(function(ab){ return new Uint8Array(ab); });
+    }
+    function diZipExtract(bytes, entry, caps, inflateRaw){
+      if(entry.method !== 0 && entry.method !== 8)
+        return Promise.resolve(diFail("zip-method", "Bagian dokumen memakai metode kompresi yang tidak didukung (metode " + entry.method + ")."));
+      if(entry.size > caps.maxEntryBytes)
+        return Promise.resolve(diFail("zip-entry-too-large", "Satu bagian dokumen melebihi batas " + diCapLabel(caps.maxEntryBytes) + " setelah dibuka."));
+      var raw = bytes.subarray(entry.dataStart, Math.min(bytes.length, entry.dataStart + entry.compSize));
+      var job = entry.method === 0 ? Promise.resolve(raw)
+        : Promise.resolve().then(function(){ return inflateRaw(raw); });
+      return job.then(function(out){
+        if(!out || typeof out.length !== "number")
+          return diFail("zip-corrupt", "Isi dokumen tidak dapat dibuka.");
+        if(out.length > caps.maxEntryBytes)
+          return diFail("zip-entry-too-large", "Satu bagian dokumen melebihi batas " + diCapLabel(caps.maxEntryBytes) + " setelah dibuka.");
+        return { ok: true, data: out };
+      }).catch(function(){
+        return diFail("zip-corrupt", "Isi dokumen rusak atau tidak dapat dibuka — berkas mungkin terpotong atau korup.");
+      });
+    }
+    /* ---------- XML: parser kecil khusus (berjalan di peramban & Node) ----------
+       Menghasilkan pohon elemen sederhana: { tag, local, attrs, children } —
+       children berisi elemen atau simpul teks { text }. Pencocokan nama
+       memakai nama lokal (sesudah prefiks namespace terakhir). */
+    function diLocalName(tag){ var i = tag.lastIndexOf(":"); return i < 0 ? tag : tag.slice(i + 1); }
+    function diChr(cp){
+      if(!cp || cp < 0 || cp > 0x10FFFF) return "";
+      try { return String.fromCodePoint(cp); } catch(e){ return ""; }
+    }
+    function diXmlUnescape(s){
+      if(s.indexOf("&") < 0) return s;
+      return s.replace(/&#x([0-9a-fA-F]+);/g, function(m, h){ return diChr(parseInt(h, 16)); })
+        .replace(/&#(\d+);/g, function(m, d){ return diChr(parseInt(d, 10)); })
+        .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, "\"").replace(/&apos;/g, "'")
+        .replace(/&amp;/g, "&");
+    }
+    function diEscXmlText(s){ return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+    function diEscXmlAttr(s){ return diEscXmlText(s).replace(/"/g, "&quot;"); }
+    function diSerializeXml(el){
+      if(!el.tag) return diEscXmlText(el.text || "");
+      var out = "<" + el.tag, k;
+      for(k in el.attrs){ out += " " + k + "=\"" + diEscXmlAttr(el.attrs[k]) + "\""; }
+      var kids = el.children || [];
+      if(!kids.length) return out + "/>";
+      out += ">";
+      for(var i = 0; i < kids.length; i++) out += diSerializeXml(kids[i]);
+      return out + "</" + el.tag + ">";
+    }
+    function diParseStartTag(inner){
+      var sp = inner.search(/\s/);
+      var name = sp < 0 ? inner : inner.slice(0, sp);
+      var attrs = {};
+      if(sp >= 0){
+        var rest = inner.slice(sp);
+        var re = /([^\s=]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'))?/g, m;
+        while((m = re.exec(rest)) !== null){
+          if(!m[1]) continue;
+          attrs[m[1]] = diXmlUnescape(m[2] !== undefined ? m[2] : (m[3] !== undefined ? m[3] : ""));
+        }
+      }
+      return { tag: name, local: diLocalName(name), attrs: attrs, children: [] };
+    }
+    function diParseXml(str){
+      function fail(msg){ var e = new Error(msg); e.code = "xml-invalid"; throw e; }
+      if(typeof str !== "string" || !str) fail("XML kosong.");
+      var i = 0, n = str.length, stack = [], root = null;
+      if(str.charCodeAt(0) === 0xFEFF) i = 1;
+      function pushText(s){
+        if(!s || !stack.length) return;
+        stack[stack.length - 1].children.push({ text: s });
+      }
+      function attach(el){
+        if(stack.length) stack[stack.length - 1].children.push(el);
+        else if(!root) root = el;
+        else fail("XML memiliki lebih dari satu elemen akar.");
+      }
+      function closeTag(name){
+        var local = diLocalName(name);
+        if(!stack.length) fail("Tag penutup tanpa pembuka: " + name);
+        var top = stack.pop();
+        if(top.local !== local) fail("Tag penutup tidak cocok: " + name);
+      }
+      while(i < n){
+        if(str.charAt(i) === "<"){
+          if(str.substr(i, 4) === "<!--"){ var e1 = str.indexOf("-->", i + 4); if(e1 < 0) fail("Komentar XML tidak tertutup."); i = e1 + 3; continue; }
+          if(str.substr(i, 9) === "<![CDATA["){
+            var e2 = str.indexOf("]]>", i + 9); if(e2 < 0) fail("CDATA tidak tertutup.");
+            pushText(str.slice(i + 9, e2)); i = e2 + 3; continue;
+          }
+          if(str.substr(i, 2) === "<?"){ var e3 = str.indexOf("?>", i + 2); if(e3 < 0) fail("Instruksi XML tidak tertutup."); i = e3 + 2; continue; }
+          if(str.substr(i, 2) === "<!"){ var e4 = str.indexOf(">", i + 2); if(e4 < 0) fail("Deklarasi XML tidak tertutup."); i = e4 + 1; continue; }
+          if(str.substr(i, 2) === "</"){
+            var e5 = str.indexOf(">", i + 2); if(e5 < 0) fail("Tag penutup tidak lengkap.");
+            closeTag(str.slice(i + 2, e5).replace(/\s.*$/, "")); i = e5 + 1; continue;
+          }
+          var j = i + 1, quote = null;
+          while(j < n){
+            var ch = str.charAt(j);
+            if(quote){ if(ch === quote) quote = null; }
+            else if(ch === "\"" || ch === "'") quote = ch;
+            else if(ch === ">") break;
+            j++;
+          }
+          if(j >= n) fail("Tag pembuka tidak tertutup.");
+          var inner = str.slice(i + 1, j), selfClose = false;
+          if(/\/\s*$/.test(inner)){ selfClose = true; inner = inner.replace(/\/\s*$/, ""); }
+          var el = diParseStartTag(inner);
+          attach(el);
+          if(!selfClose) stack.push(el);
+          i = j + 1; continue;
+        }
+        var lt = str.indexOf("<", i); if(lt < 0) lt = n;
+        pushText(diXmlUnescape(str.slice(i, lt)));
+        i = lt;
+      }
+      if(stack.length) fail("XML tidak tertutup dengan benar.");
+      if(!root) fail("XML tidak memiliki elemen akar.");
+      return root;
+    }
+    function diKids(el, local){
+      var out = [];
+      (el.children || []).forEach(function(c){ if(c.tag && c.local === local) out.push(c); });
+      return out;
+    }
+    function diFirst(el, local){
+      if(!el) return null;
+      var kids = el.children || [];
+      for(var i = 0; i < kids.length; i++){ if(kids[i].tag && kids[i].local === local) return kids[i]; }
+      return null;
+    }
+    function diAttr(el, name){
+      if(!el || !el.attrs) return null;
+      if(el.attrs[name] !== undefined) return el.attrs[name];
+      for(var k in el.attrs){ if(diLocalName(k) === name) return el.attrs[k]; }
+      return null;
+    }
+    function diDeepText(el){
+      var out = "";
+      (el.children || []).forEach(function(c){ out += c.tag ? diDeepText(c) : (c.text || ""); });
+      return out;
+    }
+    function diCollectT(el){
+      var out = "";
+      (el.children || []).forEach(function(c){
+        if(!c.tag) return;
+        if(c.local === "t") out += diDeepText(c);
+        else out += diCollectT(c);
+      });
+      return out;
+    }
+    /* ---------- Bagian pendamping DOCX: styles, numbering, rels ---------- */
+    function diParseStyles(root){
+      var map = {};
+      if(!root) return map;
+      diKids(root, "style").forEach(function(st){
+        var id = diAttr(st, "styleId");
+        if(!id) return;
+        var nameEl = diFirst(st, "name");
+        var rec = { name: nameEl ? diAttr(nameEl, "val") : null, outlineLvl: null };
+        var pPr = diFirst(st, "pPr");
+        if(pPr){
+          var ol = diFirst(pPr, "outlineLvl");
+          if(ol && diAttr(ol, "val") != null){
+            var v = parseInt(diAttr(ol, "val"), 10);
+            if(!isNaN(v)) rec.outlineLvl = v;
+          }
+        }
+        map[id] = rec;
+      });
+      return map;
+    }
+    function diParseNumbering(root){
+      if(!root) return null;
+      var abs = {}, nums = {};
+      diKids(root, "abstractNum").forEach(function(an){
+        var aid = diAttr(an, "abstractNumId");
+        if(aid == null) return;
+        var lvls = {};
+        diKids(an, "lvl").forEach(function(lv){
+          var il = diAttr(lv, "ilvl");
+          if(il == null) return;
+          var nf = diFirst(lv, "numFmt");
+          lvls[il] = nf ? diAttr(nf, "val") : null;
+        });
+        abs[aid] = lvls;
+      });
+      diKids(root, "num").forEach(function(nEl){
+        var nid = diAttr(nEl, "numId");
+        var aEl = diFirst(nEl, "abstractNumId");
+        if(nid != null && aEl) nums[nid] = diAttr(aEl, "val");
+      });
+      return function(numId, ilvl){
+        if(numId == null) return null;
+        var aid = nums[String(numId)];
+        if(aid == null) return null;
+        var lvls = abs[aid];
+        if(!lvls) return null;
+        var f = lvls[String(ilvl)];
+        if(f == null) f = lvls["0"];
+        return f == null ? null : f;
+      };
+    }
+    function diParseRels(root){
+      var map = {};
+      if(!root) return map;
+      diKids(root, "Relationship").forEach(function(rel){
+        var id = diAttr(rel, "Id"), target = diAttr(rel, "Target");
+        if(id && target) map[id] = target;
+      });
+      return map;
+    }
+    /* ---------- DocModel: blok daun berurutan berisi run ----------
+       Blok: { id, type: "paragraph"|"heading"|"list-item"|"table-cell", runs }
+       heading: + level (1–6); list-item: + listKind "bullet"|"number", level;
+       table-cell: + table, r, c, cellPara, gridSpan?, vMerge?.
+       Run: { text, bold?, italic?, underline?, fontName?, fontSize?, link? }
+       atau run terlindungi { text, protected: true, kind: "omml"|"field"|"object", xml }
+       yang teksnya TIDAK ikut dirangkai menjadi teks analisis. */
+    function diPushBlock(model, block){
+      block.id = "b" + model.blocks.length;
+      model.blocks.push(block);
+      return block;
+    }
+    function diOnOff(rPr, name){
+      var el = diFirst(rPr, name);
+      if(!el) return false;
+      var v = diAttr(el, "val");
+      if(v == null) return true;
+      v = String(v).toLowerCase();
+      return !(v === "0" || v === "false" || v === "off" || v === "no");
+    }
+    function diRun(rEl, link){
+      var text = "", field = false, object = false;
+      var kids = rEl.children || [];
+      for(var i = 0; i < kids.length; i++){
+        var ch = kids[i];
+        if(!ch.tag) continue;
+        var ln = ch.local;
+        if(ln === "t") text += diDeepText(ch);
+        else if(ln === "tab") text += "\t";
+        else if(ln === "br" || ln === "cr") text += "\n";
+        else if(ln === "noBreakHyphen") text += "‑";
+        else if(ln === "softHyphen") text += "­";
+        else if(ln === "sym"){
+          var hex = diAttr(ch, "char");
+          if(hex){ var cp = parseInt(hex, 16); if(!isNaN(cp)) text += diChr(cp); }
+        }
+        else if(ln === "fldChar" || ln === "instrText") field = true;
+        else if(ln === "drawing" || ln === "pict" || ln === "object") object = true;
+      }
+      if(field) return { text: text, protected: true, kind: "field", xml: diSerializeXml(rEl) };
+      if(object && !text) return { text: "", protected: true, kind: "object", xml: diSerializeXml(rEl) };
+      if(!text) return null;
+      var run = { text: text };
+      var rPr = diFirst(rEl, "rPr");
+      if(rPr){
+        if(diOnOff(rPr, "b") || diOnOff(rPr, "bCs")) run.bold = true;
+        if(diOnOff(rPr, "i") || diOnOff(rPr, "iCs")) run.italic = true;
+        var u = diFirst(rPr, "u");
+        if(u){
+          var uv = diAttr(u, "val");
+          if(uv !== "none"){ run.underline = true; if(uv && uv !== "single") run.underlineStyle = uv; }
+        }
+        var fonts = diFirst(rPr, "rFonts");
+        if(fonts){
+          var fn = diAttr(fonts, "ascii") || diAttr(fonts, "hAnsi") || diAttr(fonts, "eastAsia") || diAttr(fonts, "cs");
+          if(fn) run.fontName = fn;
+        }
+        var sz = diFirst(rPr, "sz") || diFirst(rPr, "szCs");
+        if(sz){ var sv = parseFloat(diAttr(sz, "val")); if(!isNaN(sv)) run.fontSize = sv / 2; }
+      }
+      if(link) run.link = link;
+      return run;
+    }
+    var DI_SKIP_RUN_PARENT = { pPr: 1, rPr: 1, del: 1, moveFrom: 1, bookmarkStart: 1, bookmarkEnd: 1, proofErr: 1, commentRangeStart: 1, commentRangeEnd: 1, permStart: 1, permEnd: 1 };
+    function diWalkRuns(el, ctx, state, out){
+      var kids = el.children || [];
+      for(var i = 0; i < kids.length; i++){
+        var ch = kids[i];
+        if(!ch.tag) continue;
+        var ln = ch.local;
+        if(DI_SKIP_RUN_PARENT[ln]) continue; /* termasuk w:del — teks terhapus (track changes) tidak ikut */
+        if(ln === "r"){ var run = diRun(ch, state.link); if(run) out.push(run); continue; }
+        if(ln === "hyperlink"){
+          var rid = diAttr(ch, "id");
+          var target = rid && ctx.rels[rid] ? ctx.rels[rid] : null;
+          diWalkRuns(ch, ctx, { link: target }, out);
+          continue;
+        }
+        if(ln === "fldSimple"){
+          out.push({ text: diCollectT(ch), protected: true, kind: "field", xml: diSerializeXml(ch) });
+          continue;
+        }
+        if(ln === "oMath" || ln === "oMathPara"){
+          out.push({ text: diCollectT(ch), protected: true, kind: "omml", xml: diSerializeXml(ch) });
+          continue;
+        }
+        diWalkRuns(ch, ctx, state, out); /* wadah transparan: ins, smartTag, sdt, customXml, txbxContent, moveTo */
+      }
+    }
+    function diParaBlock(pEl, ctx, cellCtx){
+      var pPr = diFirst(pEl, "pPr");
+      var block = { type: "paragraph", runs: [] };
+      var styleName = null, headingLevel = 0, listInfo = null;
+      if(pPr){
+        var pStyle = diFirst(pPr, "pStyle");
+        var styleId = pStyle ? diAttr(pStyle, "val") : null;
+        var st = styleId ? ctx.styles[styleId] : null;
+        if(st) styleName = st.name;
+        var ol = diFirst(pPr, "outlineLvl");
+        var olv = ol ? parseInt(diAttr(ol, "val"), 10) : NaN;
+        if(!isNaN(olv) && olv >= 0) headingLevel = olv + 1;
+        else if(st){
+          if(st.outlineLvl != null && st.outlineLvl >= 0) headingLevel = st.outlineLvl + 1;
+          else {
+            var m = /^(?:heading|judul)\s*([1-9])$/i.exec((st.name || "").replace(/\s+/g, " ").replace(/^\s+|\s+$/g, ""))
+              || /^heading\s?([1-9])$/i.exec(styleId || "");
+            if(m) headingLevel = parseInt(m[1], 10);
+          }
+        }
+        var numPr = diFirst(pPr, "numPr");
+        if(numPr){
+          var ilvlEl = diFirst(numPr, "ilvl"), numIdEl = diFirst(numPr, "numId");
+          var ilvl = ilvlEl && diAttr(ilvlEl, "val") != null ? parseInt(diAttr(ilvlEl, "val"), 10) : 0;
+          if(isNaN(ilvl)) ilvl = 0;
+          var numId = numIdEl ? diAttr(numIdEl, "val") : null;
+          var fmt = ctx.numbering ? ctx.numbering(numId, ilvl) : null;
+          if(fmt !== "none")
+            listInfo = { kind: fmt === "bullet" ? "bullet" : (fmt ? "number" : "bullet"), level: ilvl, numId: numId };
+        }
+        var jc = diFirst(pPr, "jc");
+        if(jc && diAttr(jc, "val")) block.align = diAttr(jc, "val");
+        var ind = diFirst(pPr, "ind");
+        if(ind){
+          var indObj = {}, hasInd = false;
+          ["left", "right", "firstLine", "hanging"].forEach(function(k){
+            var v = diAttr(ind, k);
+            if(v != null){ var iv = parseInt(v, 10); if(!isNaN(iv)){ indObj[k] = iv; hasInd = true; } }
+          });
+          if(hasInd) block.indent = indObj;
+        }
+      }
+      if(styleName) block.styleName = styleName;
+      diWalkRuns(pEl, ctx, { link: null }, block.runs);
+      if(cellCtx){
+        block.type = "table-cell";
+        block.table = cellCtx.table; block.r = cellCtx.r; block.c = cellCtx.c; block.cellPara = cellCtx.cellPara;
+        if(cellCtx.gridSpan > 1) block.gridSpan = cellCtx.gridSpan;
+        if(cellCtx.vMerge) block.vMerge = cellCtx.vMerge;
+      } else if(headingLevel > 0){
+        block.type = "heading"; block.level = Math.min(6, headingLevel);
+      } else if(listInfo){
+        block.type = "list-item"; block.listKind = listInfo.kind; block.level = listInfo.level;
+        if(listInfo.numId != null) block.numId = listInfo.numId;
+      }
+      return block;
+    }
+    function diTableBlock(tblEl, ctx, model){
+      var tIdx = model.tables.length;
+      var table = { index: tIdx, rows: [] };
+      model.tables.push(table);
+      diKids(tblEl, "tr").forEach(function(tr, r){
+        var rowMeta = { cells: [] };
+        var col = 0;
+        diKids(tr, "tc").forEach(function(tc){
+          var tcPr = diFirst(tc, "tcPr");
+          var gridSpan = 1, vMerge = null;
+          if(tcPr){
+            var gs = diFirst(tcPr, "gridSpan");
+            if(gs && diAttr(gs, "val")){ var gv = parseInt(diAttr(gs, "val"), 10); if(!isNaN(gv) && gv > 1) gridSpan = gv; }
+            var vm = diFirst(tcPr, "vMerge");
+            if(vm) vMerge = diAttr(vm, "val") === "restart" ? "restart" : "continue";
+          }
+          var cellMeta = { r: r, c: col, gridSpan: gridSpan, vMerge: vMerge, blockIds: [] };
+          var cellPara = 0;
+          (tc.children || []).forEach(function(ch){
+            if(!ch.tag) return;
+            if(ch.local === "p"){
+              var b = diParaBlock(ch, ctx, { table: tIdx, r: r, c: col, cellPara: cellPara, gridSpan: gridSpan, vMerge: vMerge });
+              diPushBlock(model, b);
+              cellMeta.blockIds.push(b.id);
+              cellPara++;
+            } else if(ch.local === "tbl"){
+              diTableBlock(ch, ctx, model);
+            }
+          });
+          rowMeta.cells.push(cellMeta);
+          col += gridSpan;
+        });
+        table.rows.push(rowMeta);
+      });
+    }
+    function diWalkBody(kids, ctx, model){
+      (kids || []).forEach(function(el){
+        if(!el.tag) return;
+        if(el.local === "p") diPushBlock(model, diParaBlock(el, ctx, null));
+        else if(el.local === "tbl") diTableBlock(el, ctx, model);
+        else if(el.local === "sdt"){
+          var content = diFirst(el, "sdtContent");
+          if(content) diWalkBody(content.children, ctx, model);
+        }
+      });
+    }
+    function diBuildModel(docRoot, ctx){
+      var model = { format: "docx", blocks: [], tables: [] };
+      var body = diFirst(docRoot, "body") || docRoot;
+      diWalkBody(body.children, ctx, model);
+      return model;
+    }
+    /* ---------- Perakitan teks analisis + statistik ----------
+       Pilihan desain (D1): run terlindungi TIDAK menyumbang karakter apa pun
+       ke teks analisis — tidak ada placeholder — agar teks yang dianalisis
+       persis teks dokumen yang terbaca; elemen terlindungi hanya dihitung
+       pada statistik. Blok tanpa teks terbaca tidak menjadi paragraf analisis. */
+    function diBlockText(block){
+      var out = "";
+      (block.runs || []).forEach(function(r){ if(!r.protected) out += r.text; });
+      return out;
+    }
+    function diAssembleText(model){
+      var eligible = [];
+      (model.blocks || []).forEach(function(b, i){
+        var t = diBlockText(b);
+        if(t && t.replace(/\s+/g, "")) eligible.push({ idx: i, text: t });
+      });
+      var totalChars = 0;
+      eligible.forEach(function(e, i){ totalChars += e.text.length + (i > 0 ? 2 : 0); });
+      var paras = [], paraMap = [], cur = 0, truncated = false;
+      for(var i = 0; i < eligible.length; i++){
+        var need = eligible[i].text.length + (paras.length > 0 ? 2 : 0);
+        if(cur + need > DI_MAX_ANALYSIS_CHARS){ truncated = true; break; }
+        paras.push(eligible[i].text); paraMap.push(eligible[i].idx); cur += need;
+      }
+      if(eligible.length > paras.length) truncated = true;
+      return { text: paras.join("\n\n"), paraMap: paraMap, truncated: truncated, keptBlocks: paras.length, totalBlocks: eligible.length, totalChars: totalChars };
+    }
+    function diModelStats(model){
+      var stats = { blocks: 0, paragraphs: 0, headings: 0, listItems: 0, cells: 0, tables: (model.tables || []).length, words: 0, chars: 0, protected: 0 };
+      (model.blocks || []).forEach(function(b){
+        stats.blocks++;
+        if(b.type === "heading") stats.headings++;
+        else if(b.type === "list-item") stats.listItems++;
+        else if(b.type === "table-cell") stats.cells++;
+        else stats.paragraphs++;
+        (b.runs || []).forEach(function(r){
+          if(r.protected){ stats.protected++; return; }
+          stats.chars += r.text.length;
+          var m = r.text.match(/[\p{L}\p{N}]+/gu);
+          if(m) stats.words += m.length;
+        });
+      });
+      return stats;
+    }
+    /* ---------- Pintu masuk: parse berkas .docx menjadi DocModel ----------
+       Mengembalikan Promise<{ ok: true, model } | { ok: false, code, message }>.
+       Validasi berdasar ISI: struktur ZIP + bagian wajib DOCX, bukan ekstensi. */
+    function diParseDocx(bytes, opts){
+      opts = opts || {};
+      var caps = diCapsWith(opts);
+      var inflateRaw = typeof opts.inflateRaw === "function" ? opts.inflateRaw : diInflateRawDefault;
+      var zr = diZipRead(bytes, caps);
+      if(!zr.ok) return Promise.resolve(zr);
+      var byName = {};
+      zr.entries.forEach(function(en){ byName[en.name] = en; });
+      if(!byName["[Content_Types].xml"])
+        return Promise.resolve(diFail("docx-no-content-types", "Berkas bukan dokumen .docx yang valid — bagian [Content_Types].xml tidak ditemukan."));
+      if(!byName["word/document.xml"])
+        return Promise.resolve(diFail("docx-no-document", "Berkas bukan dokumen Word yang didukung — isi utama dokumen (word/document.xml) tidak ditemukan."));
+      var totalOut = 0;
+      function getPart(name){
+        var en = byName[name];
+        if(!en) return Promise.resolve(null);
+        if(totalOut + en.size > caps.maxTotalBytes)
+          return Promise.resolve(diFail("zip-too-large", "Total isi dokumen setelah dibuka melebihi batas " + diCapLabel(caps.maxTotalBytes) + "."));
+        return diZipExtract(bytes, en, caps, inflateRaw).then(function(r){
+          if(!r.ok) return r;
+          totalOut += r.data.length;
+          if(totalOut > caps.maxTotalBytes)
+            return diFail("zip-too-large", "Total isi dokumen setelah dibuka melebihi batas " + diCapLabel(caps.maxTotalBytes) + ".");
+          return { ok: true, text: new TextDecoder("utf-8").decode(r.data) };
+        });
+      }
+      var parts = {};
+      var chain = getPart("word/document.xml").then(function(r){ parts.document = r; });
+      ["word/styles.xml", "word/numbering.xml", "word/_rels/document.xml.rels"].forEach(function(name){
+        chain = chain.then(function(){
+          if(parts.error || (parts.document && !parts.document.ok)) return null;
+          return getPart(name).then(function(r){
+            if(r && !r.ok) parts.error = r;
+            else if(r) parts[name] = r.text;
+          });
+        });
+      });
+      return chain.then(function(){
+        if(parts.document && !parts.document.ok) return parts.document;
+        if(parts.error) return parts.error;
+        if(!parts.document) return diFail("docx-no-document", "Isi utama dokumen tidak dapat dibaca.");
+        try {
+          var docRoot = diParseXml(parts.document.text);
+          var styles = {}, numbering = null, rels = {};
+          if(parts["word/styles.xml"]){ try { styles = diParseStyles(diParseXml(parts["word/styles.xml"])); } catch(e){ styles = {}; } }
+          if(parts["word/numbering.xml"]){ try { numbering = diParseNumbering(diParseXml(parts["word/numbering.xml"])); } catch(e){ numbering = null; } }
+          if(parts["word/_rels/document.xml.rels"]){ try { rels = diParseRels(diParseXml(parts["word/_rels/document.xml.rels"])); } catch(e){ rels = {}; } }
+          var model = diBuildModel(docRoot, { styles: styles, numbering: numbering, rels: rels });
+          return { ok: true, model: model };
+        } catch(err){
+          if(err && err.code === "xml-invalid")
+            return diFail("xml-invalid", "Isi dokumen tidak dapat dibaca — struktur XML di dalamnya rusak.");
+          return diFail("parse-error", "Dokumen tidak dapat dibaca.");
+        }
+      });
+    }
+    /* DI-CORE-END */
+
     /* Writing Intelligence — render & interaksi (DOM). */
     var WI_KIND_LABEL = { "repeated-word": "Kata berulang", "double-space": "Spasi tidak rapi", "missing-space-after-punctuation": "Spasi hilang setelah tanda baca", "sentence-capital": "Huruf awal kalimat", "kata-tidak-baku": "Kata tidak baku", "kata-depan": "Kata depan di/ke", "imbuhan": "Imbuhan di-/ke-", "tanda-baca": "Tanda baca", "huruf-kapital": "Huruf kapital", "kata-ulang": "Kata ulang", "pemisahan-kata": "Pemisahan kata", "ejaan-mekanis": "Ejaan", "kalimat-mubazir": "Kata mubazir", "kalimat-pengulangan-frasa": "Pengulangan frasa", "kalimat-kompleks": "Kalimat kompleks", "kalimat-panjang": "Kalimat panjang", "transisi-awalan": "Transisi antarkalimat" };
     var WI_CERT_LABEL = { "pasti": "Aturan pasti", "saran": "Saran", "potensial": "Masalah potensial", "gaya": "Saran gaya" };
@@ -6351,6 +6963,107 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       wiUpdateCount();
       wiRenderIgnored();
     }
+
+    /* ================= Document Intelligence (D1) =================
+       Impor dokumen .docx ke Asisten Menulis. Blok inti dokumen membaca
+       berkas menjadi DocModel; teks rakitannya ditempatkan di #wi-input
+       dan dianalisis dengan alur yang sama persis seperti teks tempel.
+       Model hanya hidup di variabel memori halaman ini — tidak disimpan
+       di penyimpanan apa pun dan tidak dikirim ke mana pun. Menerapkan
+       saran ke model (menjaga format) adalah tahap berikutnya; pada D1
+       penerapan saran tetap berjalan pada teks seperti biasa. */
+    (function(){
+      var ta = $("wi-input");
+      var fileIn = $("wi-doc-file");
+      if(!ta || !fileIn) return;
+      var card = $("wi-doc"), statusEl = $("wi-doc-status"), errEl = $("wi-doc-error"),
+          coverEl = $("wi-doc-cover"), actionsEl = $("wi-doc-actions");
+      var wiDocState = null; /* { name, size, model, assembly } */
+      function diFmtSize(n){
+        if(typeof n !== "number" || isNaN(n)) return "";
+        if(n < 1024) return n + " byte";
+        if(n < 1048576) return (n / 1024).toFixed(1).replace(".", ",") + " KB";
+        return (n / 1048576).toFixed(1).replace(".", ",") + " MB";
+      }
+      function diShowBanner(el, html){
+        if(html){ el.innerHTML = html; el.classList.add("show"); }
+        else { el.innerHTML = ""; el.classList.remove("show"); }
+      }
+      function diResetCard(){
+        wiDocState = null;
+        statusEl.innerHTML = ""; statusEl.className = "file-status";
+        diShowBanner(errEl, ""); diShowBanner(coverEl, "");
+        actionsEl.hidden = true;
+        fileIn.value = "";
+      }
+      /* Bersihkan (alur reset yang sudah ada) juga membuang model dokumen. */
+      $("wi-clear").addEventListener("click", diResetCard);
+      $("wi-doc-remove").addEventListener("click", function(){
+        diResetCard();
+        $("wi-clear").click(); /* pakai jalur reset teks yang sudah ada */
+      });
+      function diHandleFile(f){
+        diShowBanner(errEl, ""); diShowBanner(coverEl, "");
+        actionsEl.hidden = true;
+        if(!f) return;
+        if(typeof f.size === "number" && f.size > MAX_FILE_BYTES){
+          statusEl.innerHTML = ""; statusEl.className = "file-status";
+          diShowBanner(errEl, "Berkas terlalu besar — batas ukuran berkas adalah 20 MB.");
+          return;
+        }
+        statusEl.className = "file-status show";
+        statusEl.innerHTML = "Memproses <span class=\"fname\">" + escapeHtml(f.name) + "</span> (" + diFmtSize(f.size) + ")…";
+        /* Beri kesempatan status tampil dulu (pola yang sama dengan wiRun),
+           penguraian berjalan sesudahnya agar halaman tidak terasa terkunci. */
+        setTimeout(function(){
+          f.arrayBuffer().then(function(ab){
+            return diParseDocx(new Uint8Array(ab));
+          }).then(function(res){
+            if(!res.ok){
+              statusEl.innerHTML = ""; statusEl.className = "file-status";
+              diShowBanner(errEl, escapeHtml(res.message));
+              fileIn.value = "";
+              return;
+            }
+            var asm = diAssembleText(res.model);
+            var stats = diModelStats(res.model);
+            wiDocState = { name: f.name, size: f.size, model: res.model, assembly: asm };
+            ta.value = asm.text;
+            wiUpdateCount();
+            var parts = [fmtNumID(stats.blocks) + " blok", fmtNumID(stats.words) + " kata"];
+            if(stats.headings) parts.push(fmtNumID(stats.headings) + " judul");
+            if(stats.tables) parts.push(fmtNumID(stats.tables) + " tabel");
+            if(stats.protected) parts.push(fmtNumID(stats.protected) + " elemen terlindungi (rumus/kolom isian/gambar) — tidak ikut dianalisis");
+            statusEl.className = "file-status show ok";
+            statusEl.innerHTML = "<span class=\"fname\">" + escapeHtml(f.name) + "</span> berhasil dimuat — " + parts.join(" · ") + ". Teksnya sudah ada di kotak di bawah; tekan <strong>Analisis</strong> untuk memeriksanya.";
+            actionsEl.hidden = false;
+            if(asm.truncated){
+              diShowBanner(coverEl, "Dokumen dipotong pada batas blok: " + fmtNumID(asm.keptBlocks) + " dari " + fmtNumID(asm.totalBlocks) + " blok teks pertama yang dimuat (batas 50.000 karakter per analisis). Blok selebihnya belum dianalisis.");
+            }
+            if(!asm.text.replace(/\s+/g, "")){
+              diShowBanner(errEl, "Dokumen tidak memuat teks yang dapat dianalisis — mungkin isinya hanya gambar, tabel kosong, atau rumus.");
+            }
+          }).catch(function(){
+            statusEl.innerHTML = ""; statusEl.className = "file-status";
+            diShowBanner(errEl, "Berkas tidak dapat dibaca. Pastikan berkas adalah dokumen .docx yang utuh.");
+            fileIn.value = "";
+          });
+        }, 30);
+      }
+      fileIn.addEventListener("change", function(){
+        if(fileIn.files && fileIn.files[0]) diHandleFile(fileIn.files[0]);
+      });
+      if(card){
+        card.addEventListener("dragover", function(ev){ ev.preventDefault(); card.classList.add("dragover"); });
+        card.addEventListener("dragleave", function(){ card.classList.remove("dragover"); });
+        card.addEventListener("drop", function(ev){
+          ev.preventDefault();
+          card.classList.remove("dragover");
+          var files = ev.dataTransfer && ev.dataTransfer.files;
+          if(files && files[0]) diHandleFile(files[0]);
+        });
+      }
+    })();
 
     /* ================= Compare Writing (Phase 4) =================
        Mesin perbandingan dokumen. Berdiri sendiri: TIDAK menjalankan Detector
