@@ -748,6 +748,50 @@
       .wi-style-ind-head{ display:flex; flex-wrap:wrap; gap:4px 12px; align-items:baseline; font-size:14px; }
       .wi-style-name{ font-weight:800; }
       .wi-style-label{ font-weight:700; color:var(--gold-ink); }
+      /* ---------- Document Intelligence (D1): impor dokumen .docx di Asisten Menulis ---------- */
+      .wi-doc{ border:1px dashed var(--line); border-radius:12px; padding:14px 16px; margin-bottom:16px; background:var(--surface2); }
+      .wi-doc.dragover{ outline:2px dashed var(--navy); outline-offset:-6px; }
+      .wi-doc-head{ font-size:15px; font-weight:800; margin-bottom:2px; }
+      .wi-doc-drop{ display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-top:10px; }
+      .wi-doc-hint{ font-size:13px; color:var(--muted); }
+      #wi-doc-file{ position:absolute; inset:0; width:100%; height:100%; min-height:0; margin:0; padding:0;
+        opacity:1; cursor:pointer; z-index:2; font-size:0; color:transparent;
+        background:transparent; border:0; -webkit-appearance:none; appearance:none; }
+      #wi-doc-file::file-selector-button{ width:100%; height:100%; margin:0; padding:0;
+        background:transparent; border:0; color:transparent; font-size:0; cursor:pointer; }
+      .wi-doc-actions{ margin-top:12px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+      .wi-doc-actions[hidden]{ display:none; }
+      /* ---------- Document Intelligence (D3): lencana pemetaan & penghitung dokumen kerja ---------- */
+      .wi-doc-count{ margin-top:10px; font-size:13px; color:var(--muted); }
+      .wi-doc-badge{ margin-top:8px; font-size:12.5px; color:var(--muted); }
+      .wi-doc-badge.ok{ color:var(--navy); font-weight:600; }
+      .wi-doc-badge.refused{ color:#B3261E; font-weight:600; }
+      /* ---------- Document Intelligence (D4): perbandingan sebelum/sesudah ---------- */
+      .wi-doc-diff{ margin-top:12px; border-top:1px solid var(--line); padding-top:10px; }
+      .wi-doc-diff[hidden]{ display:none; }
+      .wi-doc-diff-head{ font-size:13px; font-weight:700; margin-bottom:8px; }
+      .di-diff-block{ padding:6px 9px; border-radius:8px; margin-bottom:6px; font-size:13.5px; line-height:1.55; }
+      .di-diff-block.same{ color:var(--muted); }
+      .di-diff-block.changed{ background:var(--surface); border:1px solid var(--line); }
+      .di-diff-tag{ display:inline-block; font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); margin-right:8px; }
+      .wi-doc-diff del{ background:var(--red-bg); color:var(--red-ink); text-decoration:line-through; border-radius:3px; padding:0 2px; }
+      .wi-doc-diff ins{ background:var(--grn-bg); color:var(--grn-ink); text-decoration:none; border-radius:3px; padding:0 2px; }
+      /* ---------- Document Intelligence (D5): Laporan Analisis terstruktur ---------- */
+      .wi-rep-sec{ margin-top:14px; }
+      .wi-rep-sec > h4{ margin:0 0 6px; font-size:15px; }
+      .wi-rep-details{ border-top:1px solid var(--line); padding:8px 0 2px; font-size:13.5px; }
+      .wi-rep-details summary{ cursor:pointer; font-weight:700; }
+      .wi-rep-row{ display:flex; flex-wrap:wrap; gap:4px 10px; align-items:baseline; padding:7px 0 7px 14px; border-bottom:1px solid var(--line-soft); font-size:13.5px; line-height:1.5; }
+      .wi-rep-row:last-child{ border-bottom:none; }
+      .wi-rep-loc{ color:var(--muted); font-size:12.5px; }
+      .wi-rep-state{ font-size:12.5px; font-weight:700; color:var(--gold-ink); }
+      .wi-rep-quote{ flex-basis:100%; font-family:"IBM Plex Mono", monospace; font-size:12.5px; background:var(--surface2); border:1px solid var(--line); border-radius:8px; padding:5px 9px; white-space:pre-wrap; word-break:break-word; }
+      .wi-rep-locate{ font-size:12.5px; padding:4px 12px; }
+      .wi-rep-note{ margin-top:10px; font-size:13.5px; color:var(--warn-ink); }
+      .wi-rep-note:empty{ display:none; }
+      .wi-rep-list{ margin:6px 0 0; padding-left:20px; }
+      .wi-rep-list li{ margin:5px 0; font-size:13.5px; line-height:1.6; }
+      .wi-card.flash{ outline:2px solid var(--gold-ink); outline-offset:2px; }
     </style>
   </head>
   <body>
@@ -795,7 +839,7 @@
         <a href="#/posisi" data-route="posisi">Privasi &amp; Batasan</a>
       </nav>
       <a class="btn-primary side-cta" href="#analisis">Mulai Memeriksa</a>
-      <div class="side-foot">Beta Terbuka · v0.16.0-beta<br />Seluruh analisis berjalan lokal di peramban ini — teks Anda tidak dikirim ke mana pun.</div>
+      <div class="side-foot">Beta Terbuka · v0.17.0-beta<br />Seluruh analisis berjalan lokal di peramban ini — teks Anda tidak dikirim ke mana pun.</div>
     </aside>
     <div class="wrap page">
       <header class="hero" data-view="home">
@@ -1117,10 +1161,32 @@
       </section>
 
       <section class="tulis" id="tulis" data-view="tulis" hidden aria-labelledby="wi-judul">
-        <div class="kicker">Writing Intelligence</div>
+        <div class="kicker">Asisten Menulis Cerdas</div>
         <h2 id="wi-judul">Asisten Menulis</h2>
         <p class="sub">Rapikan tulisan Anda — kata yang terketik ganda, spasi dan tanda baca yang tidak rapi, huruf kapital, kata tidak baku, penulisan kata depan <em>di/ke</em> dan imbuhan <em>di-/ke-</em>, kata ulang, dan salah ketik mekanis — satu saran dalam satu waktu, dan <strong>Anda yang memutuskan</strong> saran mana yang diterima. Daftar kata bakunya merujuk <strong>EYD V dan KBBI</strong>. Pemeriksaan ini berbasis aturan dan daftar kata tertutup — <strong>bukan setara editor profesional</strong>: ia tidak memahami maksud kalimat secara mendalam, sehingga nama orang, tempat, merek, atau istilah asing kadang masih tertandai; untuk kata yang memang disengaja ada tombol <strong>Abaikan kata ini</strong> (hanya berlaku selama sesi ini, tidak disimpan). Saran adalah <strong>rekomendasi, bukan jaminan kebenaran</strong>: baca kembali hasil revisi sebelum memakainya. Teks diproses <strong>sepenuhnya di peramban ini</strong> — tidak dikirim ke server dan tidak disimpan, dan teks asli Anda tidak pernah ditimpa. Saran tingkat kalimat — kata mubazir, kalimat yang panjang atau kompleks, pengulangan frasa, dan awalan kalimat yang monoton — bersifat <strong>heuristik pola</strong>: pemeriksa <strong>tidak memahami makna</strong> kalimat Anda, dan kalimat panjang <strong>tidak otomatis salah</strong>. Saran kata mubazir hanya menghapus kata yang terbukti berlebih atau menukar frasa <em>melakukan …</em> menjadi kata kerja satu akarnya; istilah, nama, angka, kutipan, dan sitasi tidak pernah diubah oleh saran mana pun.</p>
         <div class="panel" id="wi-panel-input">
+          <div class="wi-doc" id="wi-doc">
+            <div class="wi-doc-head">Impor dokumen Word (.docx) atau PDF (.pdf)</div>
+            <p class="wf-note">Muat berkas .docx atau .pdf dari perangkat Anda — berkas dibaca <strong>sepenuhnya di peramban ini</strong>, tidak diunggah ke server dan tidak disimpan — lalu teksnya ditempatkan di kotak teks di bawah untuk dianalisis seperti biasa. Untuk PDF, yang dibaca adalah <strong>lapisan teksnya</strong> dan formatnya hanya perkiraan dari posisi teks; PDF hasil pindaian (gambar) belum dapat dianalisis di sini karena Asisten Menulis <strong>belum mendukung OCR</strong> — gunakan halaman OCR untuk mengekstrak teks dari pindaian. Saran yang posisinya aman di dalam dokumen kini juga diterapkan ke salinan kerja dokumen dengan format dokumen yang terjaga (dokumen asli Anda tidak berubah). Dokumen kerja juga dapat disalin dengan format, dibandingkan dengan dokumen asli, dan diunduh kembali sebagai berkas .docx.</p>
+            <div class="wi-doc-drop">
+              <span class="upload-wrap"><span class="upload-visual" aria-hidden="true">Pilih dokumen (.docx/.pdf)</span><input type="file" id="wi-doc-file" accept=".docx,.pdf,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-label="Pilih dokumen Word (.docx) atau PDF (.pdf)" /></span>
+              <span class="wi-doc-hint">atau seret &amp; letakkan berkas .docx/.pdf ke kartu ini · batas 20 MB</span>
+            </div>
+            <div class="file-status" id="wi-doc-status" role="status" aria-live="polite"></div>
+            <div class="banner" id="wi-doc-error" role="alert"></div>
+            <div class="banner" id="wi-doc-cover"></div>
+            <div class="banner" id="wi-doc-warn"></div>
+            <div class="wi-doc-actions" id="wi-doc-actions" hidden>
+              <button type="button" id="wi-doc-remove">Hapus dokumen</button>
+              <button type="button" id="wi-doc-copy">Salin dengan format</button>
+              <button type="button" id="wi-doc-export">Unduh DOCX</button>
+              <button type="button" id="wi-doc-compare">Bandingkan</button>
+            </div>
+            <div class="wi-doc-count" id="wi-doc-count" hidden></div>
+            <div class="banner" id="wi-doc-note"></div>
+            <div class="banner" id="wi-doc-expwarn"></div>
+            <div class="wi-doc-diff" id="wi-doc-diff" hidden></div>
+          </div>
           <label for="wi-input" style="font-weight:700; display:block; margin-bottom:8px;">Teks yang ingin dirapikan</label>
           <textarea id="wi-input" placeholder="Tempel atau ketik teks di sini…"></textarea>
           <div class="wi-count" id="wi-count">0 / 50.000 karakter</div>
@@ -1135,6 +1201,15 @@
         </div>
 
         <div id="wi-results" hidden>
+          <div class="wf-panel" id="wi-report" hidden>
+            <h3>Laporan Analisis</h3>
+            <div class="wi-controls">
+              <button type="button" id="wi-report-pdf">Ekspor PDF</button>
+              <span class="file-status" id="wi-report-pdf-status" role="status" aria-live="polite"></span>
+            </div>
+            <div id="wi-report-body"></div>
+            <p class="wi-rep-note" id="wi-report-note" role="status" aria-live="polite"></p>
+          </div>
           <div class="wf-panel">
             <h3>Saran perbaikan</h3>
             <div class="file-status" id="wi-status" role="status" aria-live="polite"></div>
@@ -1177,7 +1252,7 @@
         </div>
 
         <div class="wf-panel wi-style-panel">
-          <h3>Kontrol Gaya Tulisan</h3>
+          <h3>Pengaturan Gaya Tulisan</h3>
           <p class="wf-note">Pilih profil sebagai <strong>konteks pemeriksaan</strong> — bukan klasifikasi: satu tulisan dapat menunjukkan karakteristik beberapa gaya sekaligus, dan <strong>tidak ada gaya yang lebih baik dari gaya lainnya</strong>. Analisis ini bekerja dengan <strong>pencocokan pola terhadap daftar kata dan frasa kurasi</strong>, bukan pemahaman makna: hasilnya adalah temuan untuk Anda pertimbangkan sendiri. Tidak ada kata yang diganti otomatis, tidak ada teks yang diubah, dan teks tidak dikirim ke server maupun disimpan.</p>
           <div class="wi-controls">
             <label for="wi-style-profile">Profil acuan</label>
@@ -1197,7 +1272,7 @@
       </section>
 
       <section class="forensik" id="forensik" data-view="forensik" hidden aria-labelledby="wf-judul">
-        <div class="kicker">Writing Forensic</div>
+        <div class="kicker">Analisis Forensik Tulisan</div>
         <h2 id="wf-judul">Kenali gaya tulisan Anda</h2>
         <div class="mode-toggle" role="group" aria-label="Tingkat tampilan"><span>Tampilan:</span><button type="button" class="mt-btn" data-mode="simple" aria-pressed="true">Sederhana</button><button type="button" class="mt-btn" data-mode="deep" aria-pressed="false">Mendalam</button><span class="mt-note">Mode Mendalam menampilkan seluruh angka &amp; rincian teknis.</span></div>
         <p class="sub">Ukur karakteristik gaya sebuah teks — keragaman kosakata, ritme kalimat, kompleksitas struktur, konsistensi paragraf, kata transisi, dan pengulangan — dihitung sepenuhnya di peramban ini. Modul ini <strong>bukan detektor AI</strong>: hasilnya adalah statistik deskriptif untuk penyuntingan dan pembelajaran menulis, <strong>bukan bukti siapa penulisnya</strong>, dan tidak memengaruhi skor Detector.</p>
@@ -1257,9 +1332,9 @@
       </section>
 
       <section class="compare" id="compare" data-view="compare" hidden aria-labelledby="cmp-judul">
-        <p class="wf-kicker">Compare Writing</p>
+        <p class="wf-kicker">Bandingkan Tulisan</p>
         <h2 id="cmp-judul">Bandingkan dua tulisan</h2>
-        <p class="wf-lede">Lihat persis apa yang berubah antara dua versi teks — kata, kalimat, dan paragraf yang ditambah, dihapus, berubah, atau berpindah urutan — beserta perbandingan karakteristik Writing Forensic keduanya. Perbandingan ini <strong>deskriptif</strong>: kemiripan tekstual <strong>bukan</strong> bukti penulis yang sama, dan perubahan karakteristik <strong>bukan</strong> bukti AI atau bukti mengakali deteksi. Halaman ini tidak menjalankan Detector dan tidak menampilkan skor deteksi apa pun.</p>
+        <p class="wf-lede">Lihat persis apa yang berubah antara dua versi teks — kata, kalimat, dan paragraf yang ditambah, dihapus, berubah, atau berpindah urutan — beserta perbandingan karakteristik Analisis Forensik Tulisan keduanya. Perbandingan ini <strong>deskriptif</strong>: kemiripan tekstual <strong>bukan</strong> bukti penulis yang sama, dan perubahan karakteristik <strong>bukan</strong> bukti AI atau bukti mengakali deteksi. Halaman ini tidak menjalankan Detector dan tidak menampilkan skor deteksi apa pun.</p>
         <div class="cmp-grid">
           <div class="wf-panel cmp-panel">
             <h3>Dokumen A</h3>
@@ -1311,8 +1386,8 @@
               <div class="cmp-legend"><span><span class="d-badge badge-add">＋ TAMBAH</span> kata/kalimat/paragraf baru di B</span><span><span class="d-badge badge-del">− HAPUS</span> ada di A, hilang di B</span><span><span class="d-badge badge-chg">≈ BERUBAH</span> pasangan yang berbeda isi</span></div>
             </div>
             <div class="wf-panel">
-              <h3>Perbandingan karakteristik (Writing Forensic)</h3>
-              <p class="wf-note">Angka dihitung dengan fungsi Writing Forensic yang sama persis. Kolom selisih bersifat deskriptif netral — naik/turunnya sebuah angka bukan penilaian baik-buruk dan bukan bukti perbedaan penulis.</p>
+              <h3>Perbandingan karakteristik (Analisis Forensik Tulisan)</h3>
+              <p class="wf-note">Angka dihitung dengan fungsi Analisis Forensik Tulisan yang sama persis. Kolom selisih bersifat deskriptif netral — naik/turunnya sebuah angka bukan penilaian baik-buruk dan bukan bukti perbedaan penulis.</p>
               <div id="cmp-forensic"></div>
             </div>
             <div class="wf-panel">
@@ -1569,12 +1644,23 @@
           <a href="#/posisi">Privasi &amp; Batasan</a>
         </nav>
         <p class="copy">© 2026 Saksara — Dikembangkan oleh Ciptanala Devs</p>
-        <p class="version-line">Versi <strong>v0.16.0-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
+        <p class="version-line">Versi <strong>v0.17.0-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
       </div>
     </footer>
 
     <dialog class="changelog" id="changelog-modal" aria-labelledby="changelog-title">
       <h2 id="changelog-title">Catatan Rilis — Saksara</h2>
+      <h3>v0.17.0-beta — 22 November 2026</h3>
+      <ul>
+        <li><strong>Impor dokumen Word &amp; PDF di Asisten Menulis:</strong> kini Anda dapat memuat berkas .docx dan .pdf langsung ke Asisten Menulis. Dokumen Word dibaca terstruktur — judul, daftar, tabel, serta teks tebal/miring dan tautan dipertahankan; dokumen PDF dibaca per halaman. Berkas dibaca sepenuhnya di peramban ini; analisis tidak berjalan otomatis, Anda yang menekan tombol periksa.</li>
+        <li><strong>Revisi yang aman untuk dokumen:</strong> saran perbaikan yang Anda terima dapat diterapkan kembali ke dokumen kerja — setiap penerapan divalidasi ulang pada saat diklik, dan yang tidak dapat diterapkan dengan aman akan ditolak dengan penjelasan, bukan dipaksakan. Hasil revisi dapat diunduh kembali sebagai berkas Word (.docx), disalin dengan formatnya, dan dibandingkan berdampingan dengan dokumen asal sebelum Anda memutuskan.</li>
+        <li><strong>Laporan Analisis terstruktur:</strong> setiap hasil pemeriksaan Asisten Menulis kini disertai laporan — ringkasan dokumen, ringkasan kualitas tulisan, indeks temuan yang dikelompokkan per kategori (ejaan, tata bahasa, tanda baca &amp; spasi, redundansi, kalimat), rekomendasi, dan tombol "Lihat lokasi" yang menunjukkan persis letak setiap temuan pada teks Anda.</li>
+        <li><strong>Unduh laporan analisis sebagai PDF:</strong> laporan yang sama dapat diunduh sebagai berkas PDF yang rapi dengan huruf tertanam, sehingga kutipan dan tanda baca tampil persis seperti aslinya. Bila ada karakter yang tidak dapat ditampilkan dengan aman, pengunduhan dihentikan dengan pesan yang menyebut karakternya — tidak ada isi yang diam-diam diubah atau dihapus.</li>
+        <li><strong>Peringatan kesesuaian dokumen:</strong> bila dokumen Anda memuat hal yang tidak dapat dipertahankan utuh saat diekspor (misalnya rumus, tabel di dalam tabel, atau catatan kaki), Anda diperingatkan lebih dulu sebelum mengunduh — tidak ada kejutan sesudah berkas jadi.</li>
+        <li><strong>Keamanan diperkuat:</strong> batas dekompresi ZIP untuk impor DOCX kini ditegakkan di kedua pembaca DOCX — pembaca Document Intelligence dan extractor lama pada rute detektor/batch/forensik/bandingkan (paritas D7-A) — dengan angka yang sama: maksimum 200 entri, 50 MB total hasil dekompresi, 20 MB per entri, ditegakkan dari direktori pusat sebelum inflasi dan selama inflasi berlangsung; berkas terenkripsi/ZIP64/metode tak dikenal ditolak dengan pesan Indonesia. Ini melindungi dari berkas DOCX berbahaya yang mengembang sangat besar (zip bomb). Jalur PDF bukan ZIP dan tidak dicakup batas ini — jalur PDF diatur penjaga ukuran berkas 20 MB dan batas analisis 50.000 karakter. Sebagian besar pustaka pihak ketiga juga dimuat dengan pemeriksaan integritas (SRI), dan situs kini berjalan dengan kebijakan keamanan konten (CSP) dalam mode pantau.</li>
+        <li><strong>Mesin pembaca PDF diperbarui:</strong> pembaca PDF diperbarui ke PDF.js 4.10.38 (build legacy). Hasil pembacaan pada 11 berkas uji kami terverifikasi identik dengan versi sebelumnya — teks yang diekstrak, jumlah halaman, statistik halaman, dan pesan kesalahan sama. Berkas di luar set uji (misalnya PDF hasil konversi dari ponsel dengan font CID tanpa ToUnicode — keterbatasan lama B-01 — dan PDF bergambar JPX/JBIG2) belum terverifikasi dan perilakunya dapat berbeda; keterbatasan B-01 tidak berubah oleh pembaruan ini. Pembaca baru memakai build legacy agar tetap berjalan di peramban yang lebih lama, tetapi dukungan Safari iOS dan peramban lama belum diuji pada perangkat nyata.</li>
+        <li>Mesin detektor, classifier, rumus, bobot, ambang, dan seluruh skor <strong>tidak berubah</strong>: hasil Periksa Tulisan Anda sama persis seperti versi sebelumnya.</li>
+      </ul>
       <h3>v0.16.0-beta — 22 November 2026</h3>
       <ul>
         <li><strong>Asisten Menulis baru (#/tulis):</strong> periksa dan perbaiki tulisan Anda di peramban — saran tata bahasa dan ejaan (102 pasangan kata baku serta aturan di-/ke-), saran kejelasan kalimat, analisis keterbacaan, dan kontrol gaya tulisan dengan 6 profil (formal, akademik, profesional, populer, ringkas, naratif). Anda yang memutuskan setiap saran; teks asli tidak pernah ditimpa.</li>
@@ -2041,6 +2127,16 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         return s.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, "\"").replace(/&apos;/g, "'").replace(/&#(\d+);/g, function(m, n){ return String.fromCharCode(parseInt(n, 10)); }).replace(/&#x([0-9a-fA-F]+);/g, function(m, n){ return String.fromCharCode(parseInt(n, 16)); }).replace(/&amp;/g, "&");
       }
       /* --- DOCX: .docx adalah ZIP — parse manual, baca semua bagian yang memuat teks --- */
+      /* D7-A: paritas batas dekompresi dengan DI-CORE (D1). Nilai HARUS sama
+         dengan DI_CAPS di DI-CORE: maks 200 entri, maks 50 MB total hasil
+         dekompresi, maks 20 MB per entri. Ukuran diperiksa dari direktori
+         pusat SEBELUM inflasi, dan ditegakkan lagi secara kumulatif SELAMA
+         inflasi (direktori pusat bisa berbohong), jadi arsip bom tidak dapat
+         membekukan tab. Kesalahan keamanan membawa pesan Indonesia yang
+         jelas (message) + kode stabil (code) — rute Batch menampilkan
+         message apa adanya, rute lain menampilkan pesan generiknya. */
+      var LEGACY_ZIP_CAPS = { maxEntries: 200, maxTotalBytes: 50 * 1024 * 1024, maxEntryBytes: 20 * 1024 * 1024 };
+      function legacyZipError(code, message){ var e = new Error(message); e.code = code; return e; }
       function listZipEntries(bytes){
         var view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
         var len = bytes.length;
@@ -2050,36 +2146,94 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           if(view.getUint32(i, true) === 0x06054b50){ eocd = i; break; }
         }
         if(eocd < 0) throw new Error("zip-invalid");
+        if(eocd >= 20 && (view.getUint32(eocd - 20, true) === 0x07064b50 || view.getUint32(eocd - 20, true) === 0x06064b50))
+          throw legacyZipError("zip64", "Dokumen memakai format ZIP64 yang belum didukung. Simpan ulang dokumen sebagai .docx biasa, lalu coba lagi.");
         var total = view.getUint16(eocd + 10, true);
+        var cdSize = view.getUint32(eocd + 12, true);
         var cdOffset = view.getUint32(eocd + 16, true);
+        if(total === 0xFFFF || cdSize === 0xFFFFFFFF || cdOffset === 0xFFFFFFFF)
+          throw legacyZipError("zip64", "Dokumen memakai format ZIP64 yang belum didukung. Simpan ulang dokumen sebagai .docx biasa, lalu coba lagi.");
+        if(total > LEGACY_ZIP_CAPS.maxEntries)
+          throw legacyZipError("zip-too-many-entries", "Dokumen memuat terlalu banyak bagian internal (" + total + " entri; batas " + LEGACY_ZIP_CAPS.maxEntries + " entri).");
         var pos = cdOffset;
         var decoder = new TextDecoder("utf-8");
         var entries = [];
+        var declaredTotal = 0;
         for(var e = 0; e < total; e++){
           if(pos + 46 > len || view.getUint32(pos, true) !== 0x02014b50) break;
+          var flags = view.getUint16(pos + 8, true);
+          if(flags & 0x0001)
+            throw legacyZipError("zip-encrypted", "Dokumen terenkripsi atau dilindungi kata sandi sehingga tidak dapat dibaca.");
           var method = view.getUint16(pos + 10, true);
           var compSize = view.getUint32(pos + 20, true);
+          var size = view.getUint32(pos + 24, true);
           var nameLen = view.getUint16(pos + 28, true);
           var extraLen = view.getUint16(pos + 30, true);
           var commentLen = view.getUint16(pos + 32, true);
           var localOffset = view.getUint32(pos + 42, true);
+          if(compSize === 0xFFFFFFFF || size === 0xFFFFFFFF || localOffset === 0xFFFFFFFF)
+            throw legacyZipError("zip64", "Dokumen memakai format ZIP64 yang belum didukung. Simpan ulang dokumen sebagai .docx biasa, lalu coba lagi.");
+          if(size > LEGACY_ZIP_CAPS.maxEntryBytes)
+            throw legacyZipError("zip-entry-too-large", "Satu bagian dokumen melebihi batas 20 MB setelah dibuka.");
+          declaredTotal += size;
+          if(declaredTotal > LEGACY_ZIP_CAPS.maxTotalBytes)
+            throw legacyZipError("zip-total-too-large", "Total isi dokumen setelah dibuka melebihi batas 50 MB.");
           var name = decoder.decode(bytes.subarray(pos + 46, pos + 46 + nameLen));
           if(localOffset + 30 <= len && view.getUint32(localOffset, true) === 0x04034b50){
             var lNameLen = view.getUint16(localOffset + 26, true);
             var lExtraLen = view.getUint16(localOffset + 28, true);
             var dataStart = localOffset + 30 + lNameLen + lExtraLen;
-            entries.push({ name: name, method: method, data: bytes.subarray(dataStart, dataStart + compSize) });
+            entries.push({ name: name, method: method, size: size, data: bytes.subarray(dataStart, dataStart + compSize) });
           }
           pos += 46 + nameLen + extraLen + commentLen;
         }
         return entries;
       }
-      function zipEntryText(entry){
+      /* Dekompresi beraliran dengan penghitung byte: berhenti (membatalkan
+         aliran) begitu keluaran melewati batas per-entri atau sisa anggaran
+         total — keluaran tidak pernah dibuffer melebihi batas. */
+      function decompressBytesCapped(bytes, format, maxBytes, budget){
+        if(typeof DecompressionStream === "undefined"){
+          return Promise.reject(new Error("no-decompression"));
+        }
+        var ds = new DecompressionStream(format);
+        var stream = new Blob([bytes]).stream().pipeThrough(ds);
+        var reader = stream.getReader();
+        var chunks = [], total = 0;
+        function step(){
+          return reader.read().then(function(r){
+            if(r.done){
+              var out = new Uint8Array(total), off = 0;
+              chunks.forEach(function(c){ out.set(c, off); off += c.length; });
+              if(budget) budget.total += total;
+              return out;
+            }
+            total += r.value.length;
+            if(total > maxBytes){
+              try { reader.cancel(); } catch(e) {}
+              throw legacyZipError("zip-entry-too-large", "Satu bagian dokumen melebihi batas 20 MB setelah dibuka.");
+            }
+            if(budget && budget.total + total > budget.maxTotal){
+              try { reader.cancel(); } catch(e) {}
+              throw legacyZipError("zip-total-too-large", "Total isi dokumen setelah dibuka melebihi batas 50 MB.");
+            }
+            chunks.push(r.value);
+            return step();
+          });
+        }
+        return step();
+      }
+      function zipEntryText(entry, budget){
         if(entry.method === 0){
+          if(entry.data.length > LEGACY_ZIP_CAPS.maxEntryBytes)
+            return Promise.reject(legacyZipError("zip-entry-too-large", "Satu bagian dokumen melebihi batas 20 MB setelah dibuka."));
+          if(budget && budget.total + entry.data.length > budget.maxTotal)
+            return Promise.reject(legacyZipError("zip-total-too-large", "Total isi dokumen setelah dibuka melebihi batas 50 MB."));
+          if(budget) budget.total += entry.data.length;
           return Promise.resolve(new TextDecoder("utf-8").decode(entry.data));
         }
         if(entry.method === 8){
-          return decompressBytes(entry.data, "deflate-raw").then(function(raw){
+          return decompressBytesCapped(entry.data, "deflate-raw", LEGACY_ZIP_CAPS.maxEntryBytes, budget).then(function(raw){
             return new TextDecoder("utf-8").decode(raw);
           });
         }
@@ -2113,12 +2267,22 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
             order.push(en.name);
           }
         });
-        var jobs = order.map(function(name){
-          return zipEntryText(byName[name]).then(function(xml){
-            return docxXmlToText(xml);
-          }).catch(function(){ return ""; });
+        /* D7-A: bagian dibaca berurutan dengan satu anggaran total bersama,
+           dan kegagalan bagian mana pun kini MENOLAK seluruh impor (paritas
+           DI-CORE) — sebelumnya kegagalan bagian ditelan diam-diam, yang
+           menyembunyikan penolakan metode/batas dan dapat menghilangkan
+           teks dari analisis tanpa pemberitahuan. */
+        var budget = { total: 0, maxTotal: LEGACY_ZIP_CAPS.maxTotalBytes };
+        var chain = Promise.resolve([]);
+        order.forEach(function(name){
+          chain = chain.then(function(texts){
+            return zipEntryText(byName[name], budget).then(function(xml){
+              texts.push(docxXmlToText(xml));
+              return texts;
+            });
+          });
         });
-        return Promise.all(jobs).then(function(texts){
+        return chain.then(function(texts){
           return texts.filter(function(t){ return t && t.trim(); }).join("\n\n").trim();
         });
       }
@@ -3324,6 +3488,29 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
          .txt/.docx/.pdf — yang dilaporkan adalah teks hasil ekstraksi yang dianalisis.
          Label jujur di kaki laporan: ini analisis INDIKASI AI per kalimat, BUKAN
          laporan kecocokan plagiarisme terhadap basis data. */
+      /* D7-A: Subresource Integrity (SRI) untuk aset CDN ter-pin yang dimuat
+         lewat elemen <script>. Hash sha384 dihitung dari byte persis berkas
+         versi ter-pin (diambil dua kali dengan byte identik; untuk dua aset
+         cdnjs, hash sha512 byte yang sama cocok dengan yang diterbitkan
+         cdnjs). Aset yang dimuat sebagai modul ES (import()) atau sebagai
+         worker TIDAK dapat membawa SRI menurut spesifikasi — keduanya
+         didokumentasikan di laporan D7-A, tidak diberi proteksi palsu.
+         D7-B: entri pdf.js DIHAPUS dari tabel ini — sejak migrasi ke
+         PDF.js 4.10.38 (build legacy) pustaka itu dimuat lewat dynamic
+         import() sehingga SRI runtime tidak lagi dapat diterapkan pada
+         berkas utamanya. Hash sha384 berkas 4.10.38 dicatat sebagai
+         PROVENANCE saja di komentar pemuat bersama (saksaraLoadPdfJs),
+         BUKAN sebagai perlindungan SRI runtime. SRI jsPDF, docx, dan
+         Tesseract di bawah ini tetap berlaku penuh. */
+      var SAKSARA_SRI = {
+        "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js": "sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk",
+        "https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js": "sha384-4xaIisuLEy2lo2HkB2C4rEf7v8jbTb2kuogX6TkuEt9feTWKBSFSOzsqNNbV+sKh",
+        "https://cdn.jsdelivr.net/npm/tesseract.js@5.0.5/dist/tesseract.min.js": "sha384-sZlPHqJ8Pk1GMyFXfg9vOgDjyUZZe7wE2c0NoPg2z1vs2fmI4wOC0O1ONVyr73qa"
+      };
+      function saksaraSriApply(scriptEl, url){
+        var h = SAKSARA_SRI[url];
+        if(h){ scriptEl.integrity = h; scriptEl.crossOrigin = "anonymous"; }
+      }
       var JSPDF_URL = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
       var jspdfPromise = null;
       function loadJsPdf(){
@@ -3332,6 +3519,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         jspdfPromise = new Promise(function(resolve, reject){
           var s = document.createElement("script");
           s.src = JSPDF_URL;
+          saksaraSriApply(s, JSPDF_URL);
           s.async = true;
           s.onload = function(){
             if(window.jspdf && window.jspdf.jsPDF) resolve(window.jspdf.jsPDF);
@@ -6025,11 +6213,1571 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
     }
     /* WI-CORE-END */
 
+    /* DI-CORE-START — Document Intelligence: model dokumen + impor DOCX.
+       Fungsi murni (tanpa DOM, tanpa jaringan, tanpa penyimpanan), dapat
+       diekstrak & diuji terpisah seperti blok inti lainnya. Satu-satunya
+       kemampuan luar yang dipakai: dekompresi deflate lewat
+       DecompressionStream bawaan peramban bila opts.inflateRaw tidak
+       diberikan (pada pengujian Node, zlib disuntikkan lewat opts). */
+    var DI_MAX_ANALYSIS_CHARS = 50000; /* sama dengan batas analisis WI yang sudah ada */
+    var DI_CAPS = { maxEntries: 200, maxTotalBytes: 50 * 1024 * 1024, maxEntryBytes: 20 * 1024 * 1024 };
+    function diFail(code, message){ return { ok: false, code: code, message: message }; }
+    function diCapLabel(bytes){
+      if(bytes >= 1048576) return Math.round(bytes / 1048576) + " MB";
+      if(bytes >= 1024) return Math.round(bytes / 1024) + " KB";
+      return bytes + " byte";
+    }
+    function diCapsWith(opts){
+      var c = { maxEntries: DI_CAPS.maxEntries, maxTotalBytes: DI_CAPS.maxTotalBytes, maxEntryBytes: DI_CAPS.maxEntryBytes };
+      if(opts && opts.caps){ for(var k in opts.caps){ if(typeof opts.caps[k] === "number" && opts.caps[k] > 0) c[k] = opts.caps[k]; } }
+      return c;
+    }
+    /* ---------- ZIP: pembaca direktori pusat yang diperkeras ----------
+       Batas: jumlah entri, ukuran total hasil dekompresi, ukuran per entri.
+       Ditolak eksplisit: entri terenkripsi & arsip yang bergantung ZIP64. */
+    function diZipRead(bytes, caps){
+      if(!bytes || typeof bytes.length !== "number" || bytes.length < 22)
+        return diFail("zip-invalid", "Berkas terlalu kecil untuk menjadi dokumen .docx yang valid.");
+      var view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+      var len = bytes.length, eocd = -1, i;
+      var start = Math.max(0, len - 65557);
+      for(i = len - 22; i >= start; i--){
+        if(view.getUint32(i, true) === 0x06054b50){ eocd = i; break; }
+      }
+      if(eocd < 0)
+        return diFail("zip-invalid", "Berkas bukan dokumen .docx yang valid — struktur arsip ZIP tidak ditemukan. Pastikan berkas benar-benar dokumen Word (.docx), bukan .doc lama atau PDF.");
+      if(eocd >= 20 && (view.getUint32(eocd - 20, true) === 0x07064b50 || view.getUint32(eocd - 20, true) === 0x06064b50))
+        return diFail("zip64", "Dokumen memakai format ZIP64 yang belum didukung. Simpan ulang dokumen sebagai .docx biasa, lalu coba lagi.");
+      var total = view.getUint16(eocd + 10, true);
+      var cdSize = view.getUint32(eocd + 12, true);
+      var cdOffset = view.getUint32(eocd + 16, true);
+      if(total === 0xFFFF || cdSize === 0xFFFFFFFF || cdOffset === 0xFFFFFFFF)
+        return diFail("zip64", "Dokumen memakai format ZIP64 yang belum didukung. Simpan ulang dokumen sebagai .docx biasa, lalu coba lagi.");
+      if(total > caps.maxEntries)
+        return diFail("zip-too-many-entries", "Dokumen memuat terlalu banyak bagian internal (" + total + " entri; batas " + caps.maxEntries + " entri).");
+      var decoder = new TextDecoder("utf-8");
+      var entries = [], pos = cdOffset, e;
+      for(e = 0; e < total; e++){
+        if(pos + 46 > len || view.getUint32(pos, true) !== 0x02014b50)
+          return diFail("zip-invalid", "Struktur arsip dokumen rusak — direktori pusat tidak valid.");
+        var flags = view.getUint16(pos + 8, true);
+        if(flags & 0x0001)
+          return diFail("zip-encrypted", "Dokumen terenkripsi atau dilindungi kata sandi sehingga tidak dapat dibaca.");
+        var method = view.getUint16(pos + 10, true);
+        var compSize = view.getUint32(pos + 20, true);
+        var size = view.getUint32(pos + 24, true);
+        if(compSize === 0xFFFFFFFF || size === 0xFFFFFFFF)
+          return diFail("zip64", "Dokumen memakai format ZIP64 yang belum didukung. Simpan ulang dokumen sebagai .docx biasa, lalu coba lagi.");
+        var nameLen = view.getUint16(pos + 28, true);
+        var extraLen = view.getUint16(pos + 30, true);
+        var commentLen = view.getUint16(pos + 32, true);
+        var localOffset = view.getUint32(pos + 42, true);
+        var name = decoder.decode(bytes.subarray(pos + 46, pos + 46 + nameLen));
+        if(localOffset + 30 > len || view.getUint32(localOffset, true) !== 0x04034b50)
+          return diFail("zip-invalid", "Struktur arsip dokumen rusak — header lokal tidak valid.");
+        var lNameLen = view.getUint16(localOffset + 26, true);
+        var lExtraLen = view.getUint16(localOffset + 28, true);
+        entries.push({ name: name, method: method, compSize: compSize, size: size, dataStart: localOffset + 30 + lNameLen + lExtraLen });
+        pos += 46 + nameLen + extraLen + commentLen;
+      }
+      return { ok: true, entries: entries };
+    }
+    function diInflateRawDefault(data){
+      var stream = new Blob([data]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+      return new Response(stream).arrayBuffer().then(function(ab){ return new Uint8Array(ab); });
+    }
+    function diZipExtract(bytes, entry, caps, inflateRaw){
+      if(entry.method !== 0 && entry.method !== 8)
+        return Promise.resolve(diFail("zip-method", "Bagian dokumen memakai metode kompresi yang tidak didukung (metode " + entry.method + ")."));
+      if(entry.size > caps.maxEntryBytes)
+        return Promise.resolve(diFail("zip-entry-too-large", "Satu bagian dokumen melebihi batas " + diCapLabel(caps.maxEntryBytes) + " setelah dibuka."));
+      var raw = bytes.subarray(entry.dataStart, Math.min(bytes.length, entry.dataStart + entry.compSize));
+      var job = entry.method === 0 ? Promise.resolve(raw)
+        : Promise.resolve().then(function(){ return inflateRaw(raw); });
+      return job.then(function(out){
+        if(!out || typeof out.length !== "number")
+          return diFail("zip-corrupt", "Isi dokumen tidak dapat dibuka.");
+        if(out.length > caps.maxEntryBytes)
+          return diFail("zip-entry-too-large", "Satu bagian dokumen melebihi batas " + diCapLabel(caps.maxEntryBytes) + " setelah dibuka.");
+        return { ok: true, data: out };
+      }).catch(function(){
+        return diFail("zip-corrupt", "Isi dokumen rusak atau tidak dapat dibuka — berkas mungkin terpotong atau korup.");
+      });
+    }
+    /* ---------- XML: parser kecil khusus (berjalan di peramban & Node) ----------
+       Menghasilkan pohon elemen sederhana: { tag, local, attrs, children } —
+       children berisi elemen atau simpul teks { text }. Pencocokan nama
+       memakai nama lokal (sesudah prefiks namespace terakhir). */
+    function diLocalName(tag){ var i = tag.lastIndexOf(":"); return i < 0 ? tag : tag.slice(i + 1); }
+    function diChr(cp){
+      if(!cp || cp < 0 || cp > 0x10FFFF) return "";
+      try { return String.fromCodePoint(cp); } catch(e){ return ""; }
+    }
+    function diXmlUnescape(s){
+      if(s.indexOf("&") < 0) return s;
+      return s.replace(/&#x([0-9a-fA-F]+);/g, function(m, h){ return diChr(parseInt(h, 16)); })
+        .replace(/&#(\d+);/g, function(m, d){ return diChr(parseInt(d, 10)); })
+        .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, "\"").replace(/&apos;/g, "'")
+        .replace(/&amp;/g, "&");
+    }
+    function diEscXmlText(s){ return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+    function diEscXmlAttr(s){ return diEscXmlText(s).replace(/"/g, "&quot;"); }
+    function diSerializeXml(el){
+      if(!el.tag) return diEscXmlText(el.text || "");
+      var out = "<" + el.tag, k;
+      for(k in el.attrs){ out += " " + k + "=\"" + diEscXmlAttr(el.attrs[k]) + "\""; }
+      var kids = el.children || [];
+      if(!kids.length) return out + "/>";
+      out += ">";
+      for(var i = 0; i < kids.length; i++) out += diSerializeXml(kids[i]);
+      return out + "</" + el.tag + ">";
+    }
+    function diParseStartTag(inner){
+      var sp = inner.search(/\s/);
+      var name = sp < 0 ? inner : inner.slice(0, sp);
+      var attrs = {};
+      if(sp >= 0){
+        var rest = inner.slice(sp);
+        var re = /([^\s=]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'))?/g, m;
+        while((m = re.exec(rest)) !== null){
+          if(!m[1]) continue;
+          attrs[m[1]] = diXmlUnescape(m[2] !== undefined ? m[2] : (m[3] !== undefined ? m[3] : ""));
+        }
+      }
+      return { tag: name, local: diLocalName(name), attrs: attrs, children: [] };
+    }
+    function diParseXml(str){
+      function fail(msg){ var e = new Error(msg); e.code = "xml-invalid"; throw e; }
+      if(typeof str !== "string" || !str) fail("XML kosong.");
+      var i = 0, n = str.length, stack = [], root = null;
+      if(str.charCodeAt(0) === 0xFEFF) i = 1;
+      function pushText(s){
+        if(!s || !stack.length) return;
+        stack[stack.length - 1].children.push({ text: s });
+      }
+      function attach(el){
+        if(stack.length) stack[stack.length - 1].children.push(el);
+        else if(!root) root = el;
+        else fail("XML memiliki lebih dari satu elemen akar.");
+      }
+      function closeTag(name){
+        var local = diLocalName(name);
+        if(!stack.length) fail("Tag penutup tanpa pembuka: " + name);
+        var top = stack.pop();
+        if(top.local !== local) fail("Tag penutup tidak cocok: " + name);
+      }
+      while(i < n){
+        if(str.charAt(i) === "<"){
+          if(str.substr(i, 4) === "<!--"){ var e1 = str.indexOf("-->", i + 4); if(e1 < 0) fail("Komentar XML tidak tertutup."); i = e1 + 3; continue; }
+          if(str.substr(i, 9) === "<![CDATA["){
+            var e2 = str.indexOf("]]>", i + 9); if(e2 < 0) fail("CDATA tidak tertutup.");
+            pushText(str.slice(i + 9, e2)); i = e2 + 3; continue;
+          }
+          if(str.substr(i, 2) === "<?"){ var e3 = str.indexOf("?>", i + 2); if(e3 < 0) fail("Instruksi XML tidak tertutup."); i = e3 + 2; continue; }
+          if(str.substr(i, 2) === "<!"){ var e4 = str.indexOf(">", i + 2); if(e4 < 0) fail("Deklarasi XML tidak tertutup."); i = e4 + 1; continue; }
+          if(str.substr(i, 2) === "</"){
+            var e5 = str.indexOf(">", i + 2); if(e5 < 0) fail("Tag penutup tidak lengkap.");
+            closeTag(str.slice(i + 2, e5).replace(/\s.*$/, "")); i = e5 + 1; continue;
+          }
+          var j = i + 1, quote = null;
+          while(j < n){
+            var ch = str.charAt(j);
+            if(quote){ if(ch === quote) quote = null; }
+            else if(ch === "\"" || ch === "'") quote = ch;
+            else if(ch === ">") break;
+            j++;
+          }
+          if(j >= n) fail("Tag pembuka tidak tertutup.");
+          var inner = str.slice(i + 1, j), selfClose = false;
+          if(/\/\s*$/.test(inner)){ selfClose = true; inner = inner.replace(/\/\s*$/, ""); }
+          var el = diParseStartTag(inner);
+          attach(el);
+          if(!selfClose) stack.push(el);
+          i = j + 1; continue;
+        }
+        var lt = str.indexOf("<", i); if(lt < 0) lt = n;
+        pushText(diXmlUnescape(str.slice(i, lt)));
+        i = lt;
+      }
+      if(stack.length) fail("XML tidak tertutup dengan benar.");
+      if(!root) fail("XML tidak memiliki elemen akar.");
+      return root;
+    }
+    function diKids(el, local){
+      var out = [];
+      (el.children || []).forEach(function(c){ if(c.tag && c.local === local) out.push(c); });
+      return out;
+    }
+    function diFirst(el, local){
+      if(!el) return null;
+      var kids = el.children || [];
+      for(var i = 0; i < kids.length; i++){ if(kids[i].tag && kids[i].local === local) return kids[i]; }
+      return null;
+    }
+    function diAttr(el, name){
+      if(!el || !el.attrs) return null;
+      if(el.attrs[name] !== undefined) return el.attrs[name];
+      for(var k in el.attrs){ if(diLocalName(k) === name) return el.attrs[k]; }
+      return null;
+    }
+    function diDeepText(el){
+      var out = "";
+      (el.children || []).forEach(function(c){ out += c.tag ? diDeepText(c) : (c.text || ""); });
+      return out;
+    }
+    function diCollectT(el){
+      var out = "";
+      (el.children || []).forEach(function(c){
+        if(!c.tag) return;
+        if(c.local === "t") out += diDeepText(c);
+        else out += diCollectT(c);
+      });
+      return out;
+    }
+    /* ---------- Bagian pendamping DOCX: styles, numbering, rels ---------- */
+    function diParseStyles(root){
+      var map = {};
+      if(!root) return map;
+      diKids(root, "style").forEach(function(st){
+        var id = diAttr(st, "styleId");
+        if(!id) return;
+        var nameEl = diFirst(st, "name");
+        var rec = { name: nameEl ? diAttr(nameEl, "val") : null, outlineLvl: null };
+        var pPr = diFirst(st, "pPr");
+        if(pPr){
+          var ol = diFirst(pPr, "outlineLvl");
+          if(ol && diAttr(ol, "val") != null){
+            var v = parseInt(diAttr(ol, "val"), 10);
+            if(!isNaN(v)) rec.outlineLvl = v;
+          }
+        }
+        map[id] = rec;
+      });
+      return map;
+    }
+    function diParseNumbering(root){
+      if(!root) return null;
+      var abs = {}, nums = {};
+      diKids(root, "abstractNum").forEach(function(an){
+        var aid = diAttr(an, "abstractNumId");
+        if(aid == null) return;
+        var lvls = {};
+        diKids(an, "lvl").forEach(function(lv){
+          var il = diAttr(lv, "ilvl");
+          if(il == null) return;
+          var nf = diFirst(lv, "numFmt");
+          lvls[il] = nf ? diAttr(nf, "val") : null;
+        });
+        abs[aid] = lvls;
+      });
+      diKids(root, "num").forEach(function(nEl){
+        var nid = diAttr(nEl, "numId");
+        var aEl = diFirst(nEl, "abstractNumId");
+        if(nid != null && aEl) nums[nid] = diAttr(aEl, "val");
+      });
+      return function(numId, ilvl){
+        if(numId == null) return null;
+        var aid = nums[String(numId)];
+        if(aid == null) return null;
+        var lvls = abs[aid];
+        if(!lvls) return null;
+        var f = lvls[String(ilvl)];
+        if(f == null) f = lvls["0"];
+        return f == null ? null : f;
+      };
+    }
+    function diParseRels(root){
+      var map = {};
+      if(!root) return map;
+      diKids(root, "Relationship").forEach(function(rel){
+        var id = diAttr(rel, "Id"), target = diAttr(rel, "Target");
+        if(id && target) map[id] = target;
+      });
+      return map;
+    }
+    /* ---------- DocModel: blok daun berurutan berisi run ----------
+       Blok: { id, type: "paragraph"|"heading"|"list-item"|"table-cell", runs }
+       heading: + level (1–6); list-item: + listKind "bullet"|"number", level;
+       table-cell: + table, r, c, cellPara, gridSpan?, vMerge?.
+       Run: { text, bold?, italic?, underline?, fontName?, fontSize?, link? }
+       atau run terlindungi { text, protected: true, kind: "omml"|"field"|"object", xml }
+       yang teksnya TIDAK ikut dirangkai menjadi teks analisis. */
+    function diPushBlock(model, block){
+      block.id = "b" + model.blocks.length;
+      model.blocks.push(block);
+      return block;
+    }
+    function diOnOff(rPr, name){
+      var el = diFirst(rPr, name);
+      if(!el) return false;
+      var v = diAttr(el, "val");
+      if(v == null) return true;
+      v = String(v).toLowerCase();
+      return !(v === "0" || v === "false" || v === "off" || v === "no");
+    }
+    function diRun(rEl, link){
+      var text = "", field = false, object = false;
+      var kids = rEl.children || [];
+      for(var i = 0; i < kids.length; i++){
+        var ch = kids[i];
+        if(!ch.tag) continue;
+        var ln = ch.local;
+        if(ln === "t") text += diDeepText(ch);
+        else if(ln === "tab") text += "\t";
+        else if(ln === "br" || ln === "cr") text += "\n";
+        else if(ln === "noBreakHyphen") text += "‑";
+        else if(ln === "softHyphen") text += "­";
+        else if(ln === "sym"){
+          var hex = diAttr(ch, "char");
+          if(hex){ var cp = parseInt(hex, 16); if(!isNaN(cp)) text += diChr(cp); }
+        }
+        else if(ln === "fldChar" || ln === "instrText") field = true;
+        else if(ln === "drawing" || ln === "pict" || ln === "object") object = true;
+      }
+      if(field) return { text: text, protected: true, kind: "field", xml: diSerializeXml(rEl) };
+      if(object && !text) return { text: "", protected: true, kind: "object", xml: diSerializeXml(rEl) };
+      if(!text) return null;
+      var run = { text: text };
+      var rPr = diFirst(rEl, "rPr");
+      if(rPr){
+        if(diOnOff(rPr, "b") || diOnOff(rPr, "bCs")) run.bold = true;
+        if(diOnOff(rPr, "i") || diOnOff(rPr, "iCs")) run.italic = true;
+        var u = diFirst(rPr, "u");
+        if(u){
+          var uv = diAttr(u, "val");
+          if(uv !== "none"){ run.underline = true; if(uv && uv !== "single") run.underlineStyle = uv; }
+        }
+        var fonts = diFirst(rPr, "rFonts");
+        if(fonts){
+          var fn = diAttr(fonts, "ascii") || diAttr(fonts, "hAnsi") || diAttr(fonts, "eastAsia") || diAttr(fonts, "cs");
+          if(fn) run.fontName = fn;
+        }
+        var sz = diFirst(rPr, "sz") || diFirst(rPr, "szCs");
+        if(sz){ var sv = parseFloat(diAttr(sz, "val")); if(!isNaN(sv)) run.fontSize = sv / 2; }
+      }
+      if(link) run.link = link;
+      return run;
+    }
+    var DI_SKIP_RUN_PARENT = { pPr: 1, rPr: 1, del: 1, moveFrom: 1, bookmarkStart: 1, bookmarkEnd: 1, proofErr: 1, commentRangeStart: 1, commentRangeEnd: 1, permStart: 1, permEnd: 1 };
+    function diWalkRuns(el, ctx, state, out){
+      var kids = el.children || [];
+      for(var i = 0; i < kids.length; i++){
+        var ch = kids[i];
+        if(!ch.tag) continue;
+        var ln = ch.local;
+        if(DI_SKIP_RUN_PARENT[ln]) continue; /* termasuk w:del — teks terhapus (track changes) tidak ikut */
+        if(ln === "r"){ var run = diRun(ch, state.link); if(run) out.push(run); continue; }
+        if(ln === "hyperlink"){
+          var rid = diAttr(ch, "id");
+          var target = rid && ctx.rels[rid] ? ctx.rels[rid] : null;
+          diWalkRuns(ch, ctx, { link: target }, out);
+          continue;
+        }
+        if(ln === "fldSimple"){
+          out.push({ text: diCollectT(ch), protected: true, kind: "field", xml: diSerializeXml(ch) });
+          continue;
+        }
+        if(ln === "oMath" || ln === "oMathPara"){
+          out.push({ text: diCollectT(ch), protected: true, kind: "omml", xml: diSerializeXml(ch) });
+          continue;
+        }
+        diWalkRuns(ch, ctx, state, out); /* wadah transparan: ins, smartTag, sdt, customXml, txbxContent, moveTo */
+      }
+    }
+    function diParaBlock(pEl, ctx, cellCtx){
+      var pPr = diFirst(pEl, "pPr");
+      var block = { type: "paragraph", runs: [] };
+      var styleName = null, headingLevel = 0, listInfo = null;
+      if(pPr){
+        var pStyle = diFirst(pPr, "pStyle");
+        var styleId = pStyle ? diAttr(pStyle, "val") : null;
+        var st = styleId ? ctx.styles[styleId] : null;
+        if(st) styleName = st.name;
+        var ol = diFirst(pPr, "outlineLvl");
+        var olv = ol ? parseInt(diAttr(ol, "val"), 10) : NaN;
+        if(!isNaN(olv) && olv >= 0) headingLevel = olv + 1;
+        else if(st){
+          if(st.outlineLvl != null && st.outlineLvl >= 0) headingLevel = st.outlineLvl + 1;
+          else {
+            var m = /^(?:heading|judul)\s*([1-9])$/i.exec((st.name || "").replace(/\s+/g, " ").replace(/^\s+|\s+$/g, ""))
+              || /^heading\s?([1-9])$/i.exec(styleId || "");
+            if(m) headingLevel = parseInt(m[1], 10);
+          }
+        }
+        var numPr = diFirst(pPr, "numPr");
+        if(numPr){
+          var ilvlEl = diFirst(numPr, "ilvl"), numIdEl = diFirst(numPr, "numId");
+          var ilvl = ilvlEl && diAttr(ilvlEl, "val") != null ? parseInt(diAttr(ilvlEl, "val"), 10) : 0;
+          if(isNaN(ilvl)) ilvl = 0;
+          var numId = numIdEl ? diAttr(numIdEl, "val") : null;
+          var fmt = ctx.numbering ? ctx.numbering(numId, ilvl) : null;
+          if(fmt !== "none")
+            listInfo = { kind: fmt === "bullet" ? "bullet" : (fmt ? "number" : "bullet"), level: ilvl, numId: numId };
+        }
+        var jc = diFirst(pPr, "jc");
+        if(jc && diAttr(jc, "val")) block.align = diAttr(jc, "val");
+        var ind = diFirst(pPr, "ind");
+        if(ind){
+          var indObj = {}, hasInd = false;
+          ["left", "right", "firstLine", "hanging"].forEach(function(k){
+            var v = diAttr(ind, k);
+            if(v != null){ var iv = parseInt(v, 10); if(!isNaN(iv)){ indObj[k] = iv; hasInd = true; } }
+          });
+          if(hasInd) block.indent = indObj;
+        }
+      }
+      if(styleName) block.styleName = styleName;
+      diWalkRuns(pEl, ctx, { link: null }, block.runs);
+      if(cellCtx){
+        block.type = "table-cell";
+        block.table = cellCtx.table; block.r = cellCtx.r; block.c = cellCtx.c; block.cellPara = cellCtx.cellPara;
+        if(cellCtx.gridSpan > 1) block.gridSpan = cellCtx.gridSpan;
+        if(cellCtx.vMerge) block.vMerge = cellCtx.vMerge;
+      } else if(headingLevel > 0){
+        block.type = "heading"; block.level = Math.min(6, headingLevel);
+      } else if(listInfo){
+        block.type = "list-item"; block.listKind = listInfo.kind; block.level = listInfo.level;
+        if(listInfo.numId != null) block.numId = listInfo.numId;
+      }
+      /* D4.1 (F5): styleId hanya dicatat pada blok heading — detektor
+         nama gaya kustom membutuhkan identitas gaya yang tidak ambigu
+         (styleName saja dapat berarti bawaan terlokalisasi). */
+      if(block.type === "heading" && styleId) block.styleId = styleId;
+      return block;
+    }
+    function diTableBlock(tblEl, ctx, model, probe){
+      var tIdx = model.tables.length;
+      var table = { index: tIdx, rows: [] };
+      model.tables.push(table);
+      diKids(tblEl, "tr").forEach(function(tr, r){
+        var rowMeta = { cells: [] };
+        var col = 0;
+        diKids(tr, "tc").forEach(function(tc){
+          var tcPr = diFirst(tc, "tcPr");
+          var gridSpan = 1, vMerge = null;
+          if(tcPr){
+            var gs = diFirst(tcPr, "gridSpan");
+            if(gs && diAttr(gs, "val")){ var gv = parseInt(diAttr(gs, "val"), 10); if(!isNaN(gv) && gv > 1) gridSpan = gv; }
+            var vm = diFirst(tcPr, "vMerge");
+            if(vm) vMerge = diAttr(vm, "val") === "restart" ? "restart" : "continue";
+          }
+          var cellMeta = { r: r, c: col, gridSpan: gridSpan, vMerge: vMerge, blockIds: [] };
+          var cellPara = 0;
+          (tc.children || []).forEach(function(ch){
+            if(!ch.tag) return;
+            if(ch.local === "p"){
+              var b = diParaBlock(ch, ctx, { table: tIdx, r: r, c: col, cellPara: cellPara, gridSpan: gridSpan, vMerge: vMerge });
+              diPushBlock(model, b);
+              cellMeta.blockIds.push(b.id);
+              cellPara++;
+            } else if(ch.local === "tbl"){
+              /* D4.1 (F3): tabel di dalam sel — diratakan oleh pemanggilan
+                 rekursif ini; kejadiannya dihitung untuk peringatan. */
+              if(probe) probe.nestedTables++;
+              diTableBlock(ch, ctx, model, probe);
+            }
+          });
+          rowMeta.cells.push(cellMeta);
+          col += gridSpan;
+        });
+        table.rows.push(rowMeta);
+      });
+    }
+    function diWalkBody(kids, ctx, model, probe){
+      (kids || []).forEach(function(el){
+        if(!el.tag) return;
+        if(el.local === "p") diPushBlock(model, diParaBlock(el, ctx, null));
+        else if(el.local === "tbl") diTableBlock(el, ctx, model, probe);
+        else if(el.local === "sdt"){
+          var content = diFirst(el, "sdtContent");
+          if(content) diWalkBody(content.children, ctx, model, probe);
+        }
+      });
+    }
+    /* D4.1 (F7): pemindaian struktural pohon document.xml untuk
+       pemberitahuan impor. Hanya NAMA elemen yang diperiksa, tidak
+       pernah teks: ins/del/moveFrom/moveTo menandai track changes,
+       commentReference menandai adanya komentar yang dirujuk isi,
+       footnoteReference menandai adanya catatan kaki yang dirujuk isi. */
+    function diScanPartFlags(el, out){
+      out = out || { trackedChanges: false, commentRefs: false, footnoteRefs: false };
+      if(!el || !el.tag) return out;
+      var ln = el.local;
+      if(ln === "ins" || ln === "del" || ln === "moveFrom" || ln === "moveTo") out.trackedChanges = true;
+      else if(ln === "commentReference") out.commentRefs = true;
+      else if(ln === "footnoteReference") out.footnoteRefs = true;
+      (el.children || []).forEach(function(c){ if(c.tag) diScanPartFlags(c, out); });
+      return out;
+    }
+    function diBuildModel(docRoot, ctx){
+      var model = { format: "docx", blocks: [], tables: [] };
+      var body = diFirst(docRoot, "body") || docRoot;
+      var probe = { nestedTables: 0 };
+      diWalkBody(body.children, ctx, model, probe);
+      /* D4.1: flag impor dicatat HANYA bila kondisinya terdeteksi —
+         dokumen tanpa kondisi apa pun tidak membawa kunci flags,
+         sehingga modelnya sama persis dengan keadaan sebelumnya. */
+      var scan = diScanPartFlags(docRoot);
+      var flags = {};
+      if(probe.nestedTables > 0) flags.nestedTables = probe.nestedTables;
+      if(scan.trackedChanges) flags.trackedChanges = true;
+      if(scan.footnoteRefs) flags.footnotes = true;
+      if(scan.commentRefs) flags.comments = true;
+      if(Object.keys(flags).length) model.flags = flags;
+      return model;
+    }
+    /* ---------- Perakitan teks analisis + statistik ----------
+       Pilihan desain (D1): run terlindungi TIDAK menyumbang karakter apa pun
+       ke teks analisis — tidak ada placeholder — agar teks yang dianalisis
+       persis teks dokumen yang terbaca; elemen terlindungi hanya dihitung
+       pada statistik. Blok tanpa teks terbaca tidak menjadi paragraf analisis. */
+    function diBlockText(block){
+      var out = "";
+      (block.runs || []).forEach(function(r){ if(!r.protected) out += r.text; });
+      return out;
+    }
+    function diAssembleText(model){
+      var eligible = [];
+      (model.blocks || []).forEach(function(b, i){
+        var t = diBlockText(b);
+        if(t && t.replace(/\s+/g, "")) eligible.push({ idx: i, text: t });
+      });
+      var totalChars = 0;
+      eligible.forEach(function(e, i){ totalChars += e.text.length + (i > 0 ? 2 : 0); });
+      var paras = [], paraMap = [], cur = 0, truncated = false;
+      for(var i = 0; i < eligible.length; i++){
+        var need = eligible[i].text.length + (paras.length > 0 ? 2 : 0);
+        if(cur + need > DI_MAX_ANALYSIS_CHARS){ truncated = true; break; }
+        paras.push(eligible[i].text); paraMap.push(eligible[i].idx); cur += need;
+      }
+      if(eligible.length > paras.length) truncated = true;
+      return { text: paras.join("\n\n"), paraMap: paraMap, truncated: truncated, keptBlocks: paras.length, totalBlocks: eligible.length, totalChars: totalChars };
+    }
+    function diModelStats(model){
+      var stats = { blocks: 0, paragraphs: 0, headings: 0, listItems: 0, cells: 0, tables: (model.tables || []).length, words: 0, chars: 0, protected: 0 };
+      if(model && typeof model.pages === "number") stats.pages = model.pages; /* D2: hanya model PDF yang membawa jumlah halaman; model DOCX tidak berubah */
+      (model.blocks || []).forEach(function(b){
+        stats.blocks++;
+        if(b.type === "heading") stats.headings++;
+        else if(b.type === "list-item") stats.listItems++;
+        else if(b.type === "table-cell") stats.cells++;
+        else stats.paragraphs++;
+        (b.runs || []).forEach(function(r){
+          if(r.protected){ stats.protected++; return; }
+          stats.chars += r.text.length;
+          var m = r.text.match(/[\p{L}\p{N}]+/gu);
+          if(m) stats.words += m.length;
+        });
+      });
+      return stats;
+    }
+    /* ---------- Pintu masuk: parse berkas .docx menjadi DocModel ----------
+       Mengembalikan Promise<{ ok: true, model } | { ok: false, code, message }>.
+       Validasi berdasar ISI: struktur ZIP + bagian wajib DOCX, bukan ekstensi. */
+    function diParseDocx(bytes, opts){
+      opts = opts || {};
+      var caps = diCapsWith(opts);
+      var inflateRaw = typeof opts.inflateRaw === "function" ? opts.inflateRaw : diInflateRawDefault;
+      var zr = diZipRead(bytes, caps);
+      if(!zr.ok) return Promise.resolve(zr);
+      var byName = {};
+      zr.entries.forEach(function(en){ byName[en.name] = en; });
+      if(!byName["[Content_Types].xml"])
+        return Promise.resolve(diFail("docx-no-content-types", "Berkas bukan dokumen .docx yang valid — bagian [Content_Types].xml tidak ditemukan."));
+      if(!byName["word/document.xml"])
+        return Promise.resolve(diFail("docx-no-document", "Berkas bukan dokumen Word yang didukung — isi utama dokumen (word/document.xml) tidak ditemukan."));
+      var totalOut = 0;
+      function getPart(name){
+        var en = byName[name];
+        if(!en) return Promise.resolve(null);
+        if(totalOut + en.size > caps.maxTotalBytes)
+          return Promise.resolve(diFail("zip-too-large", "Total isi dokumen setelah dibuka melebihi batas " + diCapLabel(caps.maxTotalBytes) + "."));
+        return diZipExtract(bytes, en, caps, inflateRaw).then(function(r){
+          if(!r.ok) return r;
+          totalOut += r.data.length;
+          if(totalOut > caps.maxTotalBytes)
+            return diFail("zip-too-large", "Total isi dokumen setelah dibuka melebihi batas " + diCapLabel(caps.maxTotalBytes) + ".");
+          return { ok: true, text: new TextDecoder("utf-8").decode(r.data) };
+        });
+      }
+      var parts = {};
+      var chain = getPart("word/document.xml").then(function(r){ parts.document = r; });
+      ["word/styles.xml", "word/numbering.xml", "word/_rels/document.xml.rels"].forEach(function(name){
+        chain = chain.then(function(){
+          if(parts.error || (parts.document && !parts.document.ok)) return null;
+          return getPart(name).then(function(r){
+            if(r && !r.ok) parts.error = r;
+            else if(r) parts[name] = r.text;
+          });
+        });
+      });
+      return chain.then(function(){
+        if(parts.document && !parts.document.ok) return parts.document;
+        if(parts.error) return parts.error;
+        if(!parts.document) return diFail("docx-no-document", "Isi utama dokumen tidak dapat dibaca.");
+        try {
+          var docRoot = diParseXml(parts.document.text);
+          var styles = {}, numbering = null, rels = {};
+          if(parts["word/styles.xml"]){ try { styles = diParseStyles(diParseXml(parts["word/styles.xml"])); } catch(e){ styles = {}; } }
+          if(parts["word/numbering.xml"]){ try { numbering = diParseNumbering(diParseXml(parts["word/numbering.xml"])); } catch(e){ numbering = null; } }
+          if(parts["word/_rels/document.xml.rels"]){ try { rels = diParseRels(diParseXml(parts["word/_rels/document.xml.rels"])); } catch(e){ rels = {}; } }
+          var model = diBuildModel(docRoot, { styles: styles, numbering: numbering, rels: rels });
+          /* D4.1 (F7): lengkapi flag impor dari bagian pendamping.
+             Pengambilan footnotes/comments bersifat TOLERAN — kegagalan
+             membaca bagian pendamping tidak pernah menggagalkan impor;
+             flag-nya saja yang tidak terpasang. Header/footer dideteksi
+             dari nama entri pada peta ZIP. Catatan kaki hanya dihitung
+             bila ada entri sungguhan (bukan separator struktural). */
+          var extra = [];
+          if(byName["word/footnotes.xml"]) extra.push(getPart("word/footnotes.xml").then(function(r){ if(r && r.ok) parts.footnotesText = r.text; }));
+          if(byName["word/comments.xml"]) extra.push(getPart("word/comments.xml").then(function(r){ if(r && r.ok) parts.commentsText = r.text; }));
+          return Promise.all(extra).then(function(){
+            var flags = model.flags || {};
+            if(Object.keys(byName).some(function(n){ return /^word\/(?:header|footer)\d*\.xml$/.test(n); }))
+              flags.headerFooter = true;
+            if(parts.footnotesText){
+              try {
+                var fnReal = 0;
+                diKids(diParseXml(parts.footnotesText), "footnote").forEach(function(fn){
+                  var t = diAttr(fn, "type");
+                  if(t !== "separator" && t !== "continuationSeparator" && t !== "continuationNotice") fnReal++;
+                });
+                if(fnReal > 0) flags.footnotes = true;
+              } catch(e){ /* bagian rusak diperlakukan sebagai tidak ada */ }
+            }
+            if(parts.commentsText){
+              try {
+                if(diKids(diParseXml(parts.commentsText), "comment").length > 0) flags.comments = true;
+              } catch(e){ /* bagian rusak diperlakukan sebagai tidak ada */ }
+            }
+            if(Object.keys(flags).length) model.flags = flags;
+            return { ok: true, model: model };
+          });
+        } catch(err){
+          if(err && err.code === "xml-invalid")
+            return diFail("xml-invalid", "Isi dokumen tidak dapat dibaca — struktur XML di dalamnya rusak.");
+          return diFail("parse-error", "Dokumen tidak dapat dibaca.");
+        }
+      });
+    }
+    /* ---------- PDF: konversi item teks pdf.js menjadi DocModel (D2) ----------
+       Lapisan lem pdf.js hidup di lapisan UI; DI-CORE hanya menerima data
+       item yang sudah dinormalisasi:
+         pages = [{ page, items: [{ str, x, y, width, fontName, fontSize }] }]
+       x/y adalah posisi baseline item (transform pdf.js); y BERTAMBAH ke
+       atas sesuai konvensi PDF dan dinormalisasi di sini menjadi urutan
+       baca (halaman menaik, atas ke bawah, kiri ke kanan).
+       Keputusan desain:
+       - Semua blok bertipe "paragraph" dan membawa nomor halaman (page).
+         PDF tidak menyimpan struktur semantik, jadi TIDAK ada klaim
+         heading dari ukuran huruf — menebak judul dari geometri akan
+         mengarang struktur yang tidak ada di berkas.
+       - bold/italic hanyalah heuristik nama font (mengandung "Bold" /
+         "Italic" / "Oblique"). fontName adalah nama keluarga font menurut
+         pdf.js (dapat memuat prefiks subset seperti "ABCDEE+"), bukan
+         gaya tertanam: format hasil PDF selalu bersifat perkiraan.
+       - Pengelompokan baris murni geometris (kedekatan y, toleransi
+         sebagian ukuran font). Dokumen dua kolom terbaca menyilang per
+         baris — batas yang diketahui dan didokumentasikan.
+       - Paragraf dipisah oleh jarak vertikal > 1,5x tinggi baris
+         sebelumnya; baris di dalam paragraf disambung dengan satu spasi
+         (kecuali sesudah tanda hubung di akhir baris). */
+    function diSniffFormat(bytes){
+      if(!bytes || typeof bytes.length !== "number" || bytes.length < 4) return "unknown";
+      if(bytes[0] === 0x50 && bytes[1] === 0x4B && bytes[2] === 0x03 && bytes[3] === 0x04) return "zip";
+      var lim = Math.min(bytes.length, 1024);
+      for(var i = 0; i + 4 <= lim; i++){
+        if(bytes[i] === 0x25 && bytes[i + 1] === 0x50 && bytes[i + 2] === 0x44 && bytes[i + 3] === 0x46) return "pdf";
+      }
+      return "unknown";
+    }
+    function diPdfFontFlags(fontName){
+      var n = String(fontName || "");
+      return { bold: /bold/i.test(n), italic: /italic|oblique/i.test(n) };
+    }
+    function diPdfItemSize(it){
+      return (it && typeof it.fontSize === "number" && it.fontSize > 0) ? it.fontSize : 12;
+    }
+    function diPdfSameRun(a, b){
+      return !!a && !!b && !a.protected && !b.protected &&
+        a.bold === b.bold && a.italic === b.italic &&
+        a.fontName === b.fontName && a.fontSize === b.fontSize;
+    }
+    function diPdfLineRuns(items){
+      /* items = item-item satu baris yang sudah terurut x menaik.
+         Item berfont sama & berdekatan digabung menjadi satu run; celah
+         lebar di antara dua item menjadi satu spasi. */
+      var runs = [], prev = null;
+      items.forEach(function(it){
+        var size = diPdfItemSize(it);
+        var flags = diPdfFontFlags(it.fontName);
+        var run = { text: String(it.str) };
+        if(it.fontName) run.fontName = String(it.fontName);
+        run.fontSize = Math.round(size * 10) / 10;
+        if(flags.bold) run.bold = true;
+        if(flags.italic) run.italic = true;
+        var x = typeof it.x === "number" ? it.x : 0;
+        var w = typeof it.width === "number" ? it.width : 0;
+        if(prev){
+          var gap = x - (prev.x + prev.width);
+          var space = gap > 0.22 * size && !/\s$/.test(prev.run.text) && !/^\s/.test(run.text);
+          if(diPdfSameRun(prev.run, run)){
+            if(space) prev.run.text += " ";
+            prev.run.text += run.text;
+            prev.x = x; prev.width = w;
+            return;
+          }
+          if(space) run.text = " " + run.text;
+        }
+        runs.push(run);
+        prev = { x: x, width: w, run: run };
+      });
+      return runs;
+    }
+    function diPdfPageLines(items){
+      var deco = [];
+      (items || []).forEach(function(it, i){
+        if(!it || typeof it.str !== "string" || !it.str.length) return;
+        deco.push({ it: it, idx: i, x: typeof it.x === "number" ? it.x : 0,
+          y: typeof it.y === "number" ? it.y : 0, size: diPdfItemSize(it) });
+      });
+      deco.sort(function(a, b){ return (b.y - a.y) || (a.x - b.x) || (a.idx - b.idx); });
+      var lines = [];
+      deco.forEach(function(d){
+        var line = lines[lines.length - 1];
+        var tol = line ? Math.max(1.25, 0.45 * Math.min(d.size, line.size)) : 0;
+        if(line && Math.abs(d.y - line.y) <= tol){
+          line.items.push(d);
+          if(d.size > line.size) line.size = d.size;
+        } else {
+          lines.push({ y: d.y, size: d.size, items: [d] });
+        }
+      });
+      return lines.map(function(line){
+        var sorted = line.items.slice().sort(function(a, b){ return (a.x - b.x) || (a.idx - b.idx); });
+        return { y: line.y, height: line.size,
+          runs: diPdfLineRuns(sorted.map(function(d){ return d.it; })) };
+      });
+    }
+    function diPdfAppendRun(runs, run, spaceBefore){
+      if(!run || !run.text) return;
+      var last = runs[runs.length - 1];
+      if(last && spaceBefore && !/[\s\-]$/.test(last.text) && !/^\s/.test(run.text)){
+        if(diPdfSameRun(last, run)){ last.text += " " + run.text; return; }
+        runs.push({ text: " " });
+        last = runs[runs.length - 1];
+      }
+      if(last && diPdfSameRun(last, run)){ last.text += run.text; return; }
+      var copy = { text: run.text };
+      if(run.fontName) copy.fontName = run.fontName;
+      if(typeof run.fontSize === "number") copy.fontSize = run.fontSize;
+      if(run.bold) copy.bold = true;
+      if(run.italic) copy.italic = true;
+      runs.push(copy);
+    }
+    function diPdfPagesToModel(pages){
+      var model = { format: "pdf", blocks: [], tables: [], pages: Array.isArray(pages) ? pages.length : 0 };
+      (pages || []).forEach(function(pg, pi){
+        var pageNo = (pg && typeof pg.page === "number") ? pg.page : pi + 1;
+        var lines = diPdfPageLines(pg ? pg.items : []);
+        var curRuns = null, lastY = 0, lastHeight = 0;
+        function flush(){
+          if(curRuns && curRuns.some(function(r){ return /\S/.test(r.text); }))
+            diPushBlock(model, { type: "paragraph", page: pageNo, runs: curRuns });
+          curRuns = null;
+        }
+        lines.forEach(function(line){
+          if(!line.runs.length) return;
+          if(curRuns && (lastY - line.y) > 1.5 * lastHeight) flush();
+          if(!curRuns) curRuns = [];
+          line.runs.forEach(function(run, ri){
+            diPdfAppendRun(curRuns, run, ri === 0 && curRuns.length > 0);
+          });
+          lastY = line.y; lastHeight = line.height;
+        });
+        flush();
+      });
+      return model;
+    }
+    /* Statistik lapisan teks PDF untuk deteksi pindaian: karakter yang
+       dihitung adalah karakter bukan-spasi dari seluruh item. PDF disebut
+       mirip pindaian bila totalnya 0, atau rata-rata per halaman < 10 —
+       ambang untuk peringatan jujur "butuh OCR" di lapisan UI. */
+    function diPdfTextStats(pages){
+      var per = [], total = 0, empty = 0;
+      (pages || []).forEach(function(pg){
+        var n = 0;
+        ((pg && pg.items) || []).forEach(function(it){
+          if(it && typeof it.str === "string") n += it.str.replace(/\s+/g, "").length;
+        });
+        per.push(n); total += n; if(n === 0) empty++;
+      });
+      return { pages: per.length, totalChars: total, emptyPages: empty, charsPerPage: per,
+        scanLike: total === 0 || (per.length > 0 && total / per.length < 10) };
+    }
+    /* Pemetaan galat pdf.js menjadi kode + pesan terstruktur (Bahasa
+       Indonesia). Menerima objek mirip galat { name, message } agar dapat
+       diuji tanpa pdf.js. Pesan mentah tidak pernah ditampilkan ke
+       pengguna — lapisan UI mencatatnya ke konsol saja. */
+    function diPdfErrorInfo(err){
+      var name = (err && typeof err.name === "string") ? err.name : "";
+      var msg = (err && typeof err.message === "string") ? err.message : (typeof err === "string" ? err : "");
+      if(name === "PasswordException" || /password/i.test(name))
+        return { code: "pdf-encrypted", message: "PDF terenkripsi atau dilindungi kata sandi sehingga tidak dapat dibuka. Simpan ulang berkas tanpa perlindungan kata sandi, lalu coba lagi." };
+      if(name === "InvalidPDFException" || name === "MissingPDFException" || /invalid pdf/i.test(msg))
+        return { code: "pdf-invalid", message: "Berkas bukan PDF yang valid atau isinya rusak sehingga tidak dapat dibuka. Pastikan berkas benar-benar PDF yang utuh, lalu coba lagi." };
+      return { code: "pdf-failed", message: "PDF tidak dapat dibaca — berkas mungkin rusak atau memakai fitur yang belum didukung." };
+    }
+    /* ---------- D3: sinkronisasi model ↔ teks analisis ----------
+       WI-CORE hanya mengenal teks + offset per paragraf. Bagian ini
+       menyelaraskan paragraf hasil analisis dengan blok dokumen secara
+       KONSERVATIF: sebuah paragraf hanya dinyatakan "matched" bila
+       teksnya PERSIS sama dengan teks satu blok, dicari berurutan dari
+       posisi terakhir yang cocok (satu blok tidak dipakai dua kali).
+       Paragraf yang tidak ditemukan persis adalah "edited" — disunting
+       manual atau memang berbeda dari dokumen — dan sarannya tidak
+       pernah diterapkan ke dokumen. Jalur cepat: bila teks yang
+       dianalisis adalah hasil diAssembleText yang tidak diubah, hasil
+       penyelarasan sama persis dengan paraMap rakitan itu. */
+    function diTextBlocks(model){
+      var out = [];
+      (model.blocks || []).forEach(function(b, i){
+        var t = diBlockText(b);
+        if(t && t.replace(/\s+/g, "")) out.push({ blockIdx: i, text: t });
+      });
+      return out;
+    }
+    function diSyncModel(model, analyzed){
+      var paras, i;
+      if(Array.isArray(analyzed)){
+        paras = analyzed.map(function(p){ return String(p == null ? "" : p); });
+      } else {
+        /* Pecah dengan konvensi yang sama seperti wiSplitParas WI-CORE
+           (pemisah baris kosong), sesudah normalisasi CRLF yang sama
+           seperti wiAnalyze. */
+        var norm = String(analyzed == null ? "" : analyzed).replace(/\r\n?/g, "\n");
+        var parts = norm.split(/(\n[ \t]*\n(?:[ \t]*\n)*)/);
+        paras = [];
+        for(i = 0; i < parts.length; i += 2) paras.push(parts[i]);
+      }
+      var tb = diTextBlocks(model);
+      var align = [], cursor = 0;
+      paras.forEach(function(p){
+        if(!p || !/\S/.test(p)){ align.push({ status: "empty", blockIdx: -1 }); return; }
+        var found = -1;
+        for(var j = cursor; j < tb.length; j++){ if(tb[j].text === p){ found = j; break; } }
+        if(found >= 0){ align.push({ status: "matched", blockIdx: tb[found].blockIdx }); cursor = found + 1; }
+        else align.push({ status: "edited", blockIdx: -1 });
+      });
+      return { paragraphs: paras, align: align, textBlocks: tb.length };
+    }
+    /* ---------- D3: pemetaan saran → span dokumen ----------
+       Saran WI membawa (pIdx, start, end, original, replacement) dalam
+       koordinat paragraf. Pemetaan mengembalikannya ke (blok, run,
+       offset-di-dalam-run). Status "applicable" HANYA bila seluruh
+       rentang berada di dalam SATU run yang tidak terlindungi dan teks
+       blok pada rentang itu persis sama dengan `original` saran.
+       Alasan "cross-block" ada di taksonomi untuk kelengkapan: dengan
+       kontrak WI saat ini satu saran selalu berada di dalam satu
+       paragraf = satu blok, jadi alasan itu tidak dapat muncul; semua
+       kegagalan lintas batas muncul sebagai cross-run/protected. */
+    var DI_MAP_REASON_TEXT = {
+      "manual-edit": "paragraf ini berubah dari dokumen aslinya (kemungkinan disunting manual)",
+      "cross-run": "saran melintasi batas potongan teks (run) di dalam dokumen",
+      "protected": "saran menyentuh elemen terlindungi (rumus/kolom isian/gambar) yang tidak pernah diubah",
+      "text-mismatch": "teks dokumen pada posisi ini tidak sama dengan teks yang dianalisis",
+      "cross-block": "saran melintasi lebih dari satu blok dokumen",
+      "no-block": "paragraf ini tidak ditemukan pada dokumen yang dimuat"
+    };
+    function diMapReadonly(reason){
+      return { status: "readonly", reason: reason, reasonText: DI_MAP_REASON_TEXT[reason] || reason };
+    }
+    function diMapSuggestion(model, sync, s){
+      if(!s || s.advisory || typeof s.replacement !== "string")
+        return { status: "advisory" };
+      var a = sync && sync.align ? sync.align[s.pIdx] : null;
+      if(!a || a.status === "empty") return diMapReadonly("no-block");
+      if(a.status === "edited") return diMapReadonly("manual-edit");
+      var block = (model.blocks || [])[a.blockIdx];
+      if(!block) return diMapReadonly("no-block");
+      if(diBlockText(block).slice(s.start, s.end) !== s.original)
+        return diMapReadonly("text-mismatch");
+      /* Telusuri run dalam koordinat teks blok. Offset hanya dihitung
+         dari run TIDAK terlindungi (teks run terlindungi tidak masuk
+         teks analisis — keputusan D1); posisi run terlindungi dicatat
+         untuk mendeteksi rentang yang melintasinya. */
+      var pos = 0, startRun = -1, endRun = -1, protInside = false, spans = {};
+      var runs = block.runs || [];
+      for(var ri = 0; ri < runs.length; ri++){
+        var r = runs[ri];
+        if(r.protected){
+          if(pos > s.start && pos < s.end) protInside = true;
+          continue;
+        }
+        var rs = pos, re = pos + r.text.length;
+        spans[ri] = { start: rs, end: re };
+        if(s.start >= rs && s.start < re) startRun = ri;
+        if(s.end > rs && s.end <= re) endRun = ri;
+        pos = re;
+      }
+      if(protInside) return diMapReadonly("protected");
+      if(startRun < 0 || endRun < 0 || startRun !== endRun)
+        return diMapReadonly("cross-run");
+      return { status: "applicable", blockIdx: a.blockIdx, blockId: block.id, runIdx: startRun,
+        startInRun: s.start - spans[startRun].start, endInRun: s.end - spans[startRun].start,
+        expected: s.original };
+    }
+    function diMapAll(model, sync, suggestions){
+      return (suggestions || []).map(function(s){ return diMapSuggestion(model, sync, s); });
+    }
+    /* ---------- D3: penerapan aman ke salinan kerja model ----------
+       Model hasil impor TIDAK pernah diubah oleh bagian ini — penerapan
+       selalu berjalan pada salinan kerja (diCloneModel). Saat menerapkan,
+       posisi divalidasi ULANG terhadap model kerja yang berjalan:
+       pertama pada offset yang tercatat; bila teks di sana sudah
+       bergeser (penerapan lain lebih dulu), dicari kemunculan TUNGGAL
+       teks asal di dalam run yang sama. Nol kemunculan = "stale",
+       lebih dari satu = "ambiguous" — keduanya ditolak tanpa mengubah
+       apa pun. Yang disambung HANYA teks run sasaran: jumlah & urutan
+       run, flag format, dan struktur blok tidak pernah berubah, dan run
+       terlindungi tidak pernah disentuh. */
+    function diCloneModel(model){
+      return JSON.parse(JSON.stringify(model));
+    }
+    function diApplyToModel(workingModel, mapped, replacement){
+      if(!mapped || mapped.status !== "applicable")
+        return { ok: false, reason: (mapped && mapped.reason) || "not-applicable" };
+      var block = (workingModel.blocks || [])[mapped.blockIdx];
+      if(!block) return { ok: false, reason: "stale" };
+      var run = (block.runs || [])[mapped.runIdx];
+      if(!run || run.protected) return { ok: false, reason: "stale" };
+      var expected = mapped.expected;
+      if(typeof expected !== "string" || !expected.length || typeof replacement !== "string")
+        return { ok: false, reason: "stale" };
+      var at = -1;
+      if(mapped.startInRun >= 0 && run.text.slice(mapped.startInRun, mapped.startInRun + expected.length) === expected)
+        at = mapped.startInRun;
+      else {
+        var first = run.text.indexOf(expected);
+        if(first < 0) return { ok: false, reason: "stale" };
+        if(run.text.indexOf(expected, first + 1) >= 0) return { ok: false, reason: "ambiguous" };
+        at = first;
+      }
+      run.text = run.text.slice(0, at) + replacement + run.text.slice(at + expected.length);
+      return { ok: true, blockIdx: mapped.blockIdx, runIdx: mapped.runIdx, startInRun: at, endInRun: at + expected.length };
+    }
+    /* ---------- D4: representasi HTML (salin kaya), peringatan ekspor, diff model ----------
+       Tiga fungsi murni untuk mengeluarkan model dari halaman:
+       - diModelToHtml: HTML untuk clipboard rich-text. HTML dibangun
+         HANYA dari tag buatan sendiri + teks dokumen yang di-escape —
+         tidak ada markup dari dokumen yang lolos apa adanya. Tautan
+         hanya dirender sebagai <a> untuk skema http/https/mailto;
+         skema lain (mis. javascript:) menjadi teks biasa.
+       - diExportWarnings: daftar deterministik hal-hal yang TIDAK
+         dipertahankan sempurna oleh salinan/ekspor, agar UI dapat
+         menampilkannya SEBELUM unduhan — tidak ada kehilangan diam-diam.
+       - diDiffModels: perbandingan per blok antara model asli dan model
+         kerja (kata yang berubah ditandai del/ins). Murni membaca —
+         tidak pernah mengubah kedua model. */
+    function diLinkSafe(href){
+      if(typeof href !== "string") return null;
+      var h = href.replace(/^[\s\u0000-\u0020]+/, "").replace(/[\s\u0000-\u0020]+$/, "");
+      if(!h) return null;
+      if(/^https?:\/\//i.test(h) || /^mailto:/i.test(h)) return h;
+      return null;
+    }
+    function diHtmlText(s){
+      /* Teks dokumen -> HTML: escape dulu, lalu \n menjadi <br>. */
+      return diEscXmlText(String(s == null ? "" : s)).replace(/\n/g, "<br>");
+    }
+    var DI_FONT_NAME_OK = /^[A-Za-z0-9][A-Za-z0-9 ,.'\-()]*$/;
+    function diRunHtml(run){
+      if(run.protected)
+        return "<span class=\"di-prot\">" + diHtmlText(run.text) + "</span>";
+      var inner = diHtmlText(run.text);
+      if(run.underline) inner = "<u>" + inner + "</u>";
+      if(run.italic) inner = "<em>" + inner + "</em>";
+      if(run.bold) inner = "<strong>" + inner + "</strong>";
+      var style = "";
+      if(run.fontName && DI_FONT_NAME_OK.test(run.fontName)) style += "font-family:'" + run.fontName + "';";
+      if(typeof run.fontSize === "number" && run.fontSize > 0) style += "font-size:" + run.fontSize + "pt;";
+      if(style) inner = "<span style=\"" + diEscXmlAttr(style) + "\">" + inner + "</span>";
+      var safe = run.link ? diLinkSafe(run.link) : null;
+      if(safe) inner = "<a href=\"" + diEscXmlAttr(safe) + "\">" + inner + "</a>";
+      return inner;
+    }
+    function diBlockRunsHtml(block){
+      var out = "";
+      (block.runs || []).forEach(function(r){ out += diRunHtml(r); });
+      return out;
+    }
+    function diAlignStyle(block){
+      var a = block.align;
+      if(a === "center") return " style=\"text-align:center\"";
+      if(a === "right" || a === "end") return " style=\"text-align:right\"";
+      if(a === "both" || a === "distribute") return " style=\"text-align:justify\"";
+      return "";
+    }
+    function diTableHtml(model, tIdx, byId){
+      var table = (model.tables || [])[tIdx];
+      if(!table) return "";
+      var out = "<table>";
+      (table.rows || []).forEach(function(row, r){
+        out += "<tr>";
+        (row.cells || []).forEach(function(cell){
+          if(cell.vMerge === "continue"){ out += "<td class=\"di-vmerge-cont\"></td>"; return; }
+          var attrs = "";
+          if(cell.gridSpan > 1) attrs += " colspan=\"" + cell.gridSpan + "\"";
+          if(cell.vMerge === "restart"){
+            var span = 1;
+            for(var rr = r + 1; rr < table.rows.length; rr++){
+              var cont = false;
+              (table.rows[rr].cells || []).forEach(function(c2){ if(c2.c === cell.c && c2.vMerge === "continue") cont = true; });
+              if(!cont) break;
+              span++;
+            }
+            if(span > 1) attrs += " rowspan=\"" + span + "\"";
+          }
+          out += "<td" + attrs + ">";
+          var cbs = (cell.blockIds || []).map(function(id){ return byId[id]; }).filter(Boolean)
+            .sort(function(x, y){ return (x.cellPara || 0) - (y.cellPara || 0); });
+          if(!cbs.length) out += "<p></p>";
+          cbs.forEach(function(b){ out += "<p>" + diBlockRunsHtml(b) + "</p>"; });
+          out += "</td>";
+        });
+        out += "</tr>";
+      });
+      return out + "</table>";
+    }
+    function diModelToHtml(model){
+      var blocks = (model && model.blocks) || [];
+      var byId = {};
+      blocks.forEach(function(b){ byId[b.id] = b; });
+      var out = "", listStack = []; /* { tag, kind, level, liOpen } */
+      function closeList(){
+        var top = listStack.pop();
+        if(!top) return;
+        if(top.liOpen) out += "</li>";
+        out += "</" + top.tag + ">";
+      }
+      function closeListsTo(level, kind){
+        while(listStack.length){
+          var top = listStack[listStack.length - 1];
+          if(top.level > level || (top.level === level && top.kind !== kind)) closeList();
+          else break;
+        }
+      }
+      function closeAllLists(){ while(listStack.length) closeList(); }
+      var emittedTables = {};
+      blocks.forEach(function(b){
+        if(b.type === "table-cell"){
+          if(!emittedTables[b.table]){
+            emittedTables[b.table] = true;
+            closeAllLists();
+            out += diTableHtml(model, b.table, byId);
+          }
+          return;
+        }
+        if(b.type === "list-item"){
+          var kind = b.listKind === "number" ? "number" : "bullet";
+          var level = typeof b.level === "number" ? b.level : 0;
+          closeListsTo(level, kind);
+          var top = listStack[listStack.length - 1];
+          if(!top || top.level < level){
+            var tag = kind === "number" ? "ol" : "ul";
+            out += "<" + tag + ">";
+            listStack.push({ tag: tag, kind: kind, level: level, liOpen: false });
+            top = listStack[listStack.length - 1];
+          }
+          if(top.liOpen) out += "</li>";
+          out += "<li" + diAlignStyle(b) + ">" + diBlockRunsHtml(b);
+          top.liOpen = true;
+          return;
+        }
+        closeAllLists();
+        if(b.type === "heading"){
+          var lv = Math.min(6, Math.max(1, b.level || 1));
+          out += "<h" + lv + diAlignStyle(b) + ">" + diBlockRunsHtml(b) + "</h" + lv + ">";
+        } else {
+          out += "<p" + diAlignStyle(b) + ">" + diBlockRunsHtml(b) + "</p>";
+        }
+      });
+      closeAllLists();
+      return out;
+    }
+    function diModelToPlainText(model){
+      return diAssembleText(model).text;
+    }
+    /* D4.1 (F4): skema sebuah tautan, dinormalisasi seperti diLinkSafe
+       (spasi/karakter kontrol di kedua ujung dipangkas dulu). Mengembalikan
+       null bila tautan tidak memiliki skema (relatif atau jangkar) — tautan
+       semacam itu TIDAK pernah dianggap tidak aman oleh peringatan. */
+    var DI_SAFE_LINK_SCHEMES = { http: 1, https: 1, mailto: 1 };
+    function diLinkScheme(link){
+      if(typeof link !== "string") return null;
+      var h = link.replace(/^[\s\u0000-\u0020]+/, "").replace(/[\s\u0000-\u0020]+$/, "");
+      var m = /^([A-Za-z][A-Za-z0-9+.-]*):/.exec(h);
+      return m ? m[1].toLowerCase() : null;
+    }
+    /* D4.1 (F5): apakah blok heading membawa identitas gaya KUSTOM yang
+       namanya akan diganti gaya bawaan Heading pada berkas hasil.
+       Bawaan dibuktikan oleh styleId Heading1..Heading6 ATAU nama
+       ternormalisasi "heading N" / "judul N" (lokalisasi Word). Heading
+       tanpa identitas gaya sama sekali tidak memicu: tidak ada nama
+       gaya yang hilang. Gaya bawaan yang labelnya diganti pengguna
+       (styleId tetap bawaan) diperlakukan sebagai bawaan — identitas
+       gayanya memang bawaan; batas deteksi ini dinyatakan di laporan. */
+    function diHeadingStyleCustom(b){
+      if(!b || b.type !== "heading") return false;
+      var id = b.styleId || null, nm = b.styleName || null;
+      if(!id && !nm) return false;
+      if(id && /^Heading[1-6]$/.test(id)) return false;
+      if(nm && /^(heading|judul) [1-6]$/.test(String(nm).replace(/\s+/g, " ").replace(/^\s+|\s+$/g, "").toLowerCase())) return false;
+      return true;
+    }
+    /* D4.1 (F6): jumlah blok berindentasi bukan-nol. Dipakai HANYA oleh
+       jalur salin — pada ekspor DOCX indentasi dipertahankan, jadi
+       jenis peringatan ini sengaja TIDAK masuk diExportWarnings. */
+    function diModelIndentCount(model){
+      var n = 0;
+      ((model && model.blocks) || []).forEach(function(b){
+        var ind = b.indent;
+        if(!ind) return;
+        for(var k in ind){
+          if(typeof ind[k] === "number" && ind[k] !== 0){ n++; return; }
+        }
+      });
+      return n;
+    }
+    function diExportWarnings(model){
+      var omml = 0, field = 0, object = 0, ulStyle = 0, linkUnsafe = 0, headingCustom = 0;
+      ((model && model.blocks) || []).forEach(function(b){
+        if(diHeadingStyleCustom(b)) headingCustom++;
+        (b.runs || []).forEach(function(r){
+          if(r.protected){
+            if(r.kind === "omml") omml++;
+            else if(r.kind === "field") field++;
+            else if(r.kind === "object") object++;
+          } else if(r.underline && r.underlineStyle) ulStyle++;
+          if(r.link){
+            var sc = diLinkScheme(r.link);
+            if(sc && !DI_SAFE_LINK_SCHEMES[sc]) linkUnsafe++;
+          }
+        });
+      });
+      var nested = (model && model.flags && typeof model.flags.nestedTables === "number") ? model.flags.nestedTables : 0;
+      var out = [];
+      if(omml) out.push({ kind: "protected-omml", count: omml, message: "Rumus (OMML) tidak ditulis ulang sebagai rumus — pada salinan dan berkas hasil, rumus tampil sebagai teks linear biasa." });
+      if(field) out.push({ kind: "protected-field", count: field, message: "Kolom isian (field) Word hanya dipertahankan sebagai teks hasil terakhirnya; field-nya sendiri tidak dipertahankan." });
+      if(object) out.push({ kind: "protected-object", count: object, message: "Gambar/objek tertanam tidak disertakan pada salinan maupun berkas hasil." });
+      if(ulStyle) out.push({ kind: "underline-style", count: ulStyle, message: "Gaya garis bawah selain garis tunggal (misalnya ganda atau bergelombang) menjadi garis tunggal." });
+      if(nested) out.push({ kind: "nested-table", count: nested, message: "Ada tabel di dalam sel tabel — pada hasil, tabel tersebut ditempatkan sesudah tabel induknya, bukan di dalam sel." });
+      if(linkUnsafe) out.push({ kind: "link-scheme", count: linkUnsafe, message: "Sebagian tautan memakai skema yang tidak didukung (di luar http/https/mailto) dan menjadi teks biasa pada hasil." });
+      if(headingCustom) out.push({ kind: "heading-style", count: headingCustom, message: "Nama gaya heading kustom diganti gaya bawaan Heading pada berkas hasil; level heading dipertahankan." });
+      if(model && model.format === "pdf") out.push({ kind: "pdf-source", count: (typeof model.pages === "number" ? model.pages : 1), message: "Dokumen ini berasal dari PDF: struktur halaman tidak dibuat ulang, dan format teksnya hanya perkiraan dari nama font — hasil ekspor adalah dokumen Word baru, bukan salinan persis PDF." });
+      return out;
+    }
+    /* Diff kata per kata: token adalah run spasi / run bukan-spasi, sehingga
+       perubahan spasi pun terlihat. Segmen dihitung dengan pemangkasan
+       awalan+akhiran token yang sama (deterministik, O(n)); bagian tengah
+       yang berbeda menjadi satu segmen del (asli) + satu segmen ins (kerja).
+       Rekonstruksi: same+del+same = teks asli; same+ins+same = teks kerja. */
+    function diDiffTokens(text){
+      var parts = String(text == null ? "" : text).split(/(\s+)/), out = [];
+      parts.forEach(function(t){ if(t) out.push(t); });
+      return out;
+    }
+    function diDiffSegments(aText, bText){
+      var a = diDiffTokens(aText), b = diDiffTokens(bText);
+      var pre = 0;
+      while(pre < a.length && pre < b.length && a[pre] === b[pre]) pre++;
+      var suf = 0;
+      while(suf < a.length - pre && suf < b.length - pre && a[a.length - 1 - suf] === b[b.length - 1 - suf]) suf++;
+      var segs = [];
+      function push(t, text){
+        if(!text) return;
+        var last = segs[segs.length - 1];
+        if(last && last.t === t) last.text += text; else segs.push({ t: t, text: text });
+      }
+      push("same", a.slice(0, pre).join(""));
+      push("del", a.slice(pre, a.length - suf).join(""));
+      push("ins", b.slice(pre, b.length - suf).join(""));
+      push("same", a.slice(a.length - suf).join(""));
+      return segs;
+    }
+    /* Penyelarasan blok berdasarkan INDEKS: penerapan D3 tidak pernah
+       menambah/menghapus blok, jadi untuk alur nyata pasangan indeks selalu
+       tepat. Bila dua model berbeda panjang (kasus sintetis), kelebihan blok
+       di model kerja berstatus "added" dan kelebihan di model asli "removed". */
+    function diDiffModels(original, working){
+      var ob = (original && original.blocks) || [], wb = (working && working.blocks) || [];
+      var entries = [], changedCount = 0, n = Math.max(ob.length, wb.length);
+      for(var i = 0; i < n; i++){
+        if(i >= wb.length){
+          entries.push({ status: "removed", origIdx: i, workIdx: -1, type: ob[i].type, origText: diBlockText(ob[i]) });
+          changedCount++;
+        } else if(i >= ob.length){
+          entries.push({ status: "added", origIdx: -1, workIdx: i, type: wb[i].type, workText: diBlockText(wb[i]) });
+          changedCount++;
+        } else {
+          var ot = diBlockText(ob[i]), wt = diBlockText(wb[i]);
+          if(ot === wt) entries.push({ status: "unchanged", origIdx: i, workIdx: i, type: wb[i].type, workText: wt });
+          else { entries.push({ status: "changed", origIdx: i, workIdx: i, type: wb[i].type, origText: ot, workText: wt, segments: diDiffSegments(ot, wt) }); changedCount++; }
+        }
+      }
+      return { entries: entries, changedCount: changedCount };
+    }
+    /* DI-CORE-END */
+
+    /* REPORT-CORE-START — Lapisan presentasi laporan (D5): fungsi MURNI
+       pembangun model Laporan Analisis dari hasil wiAnalyze yang sudah
+       ada. Blok ini berdiri di lapisan presentasi, BUKAN bagian inti
+       dokumen dan BUKAN bagian inti penulisan: ia tidak mengubah model
+       dokumen, pemetaan saran D3, penerapan aman, atau hasil analisis;
+       ia hanya menyusun ulang data yang sudah dihitung menjadi data
+       presentasi (hitungan, kelompok kategori, lokasi, rekomendasi
+       turunan hitungan). Tanpa DOM, tanpa efek samping, deterministik:
+       masukan tidak pernah diubah, urutan saran sumber tidak pernah
+       diurutkan ulang, dan setiap saran muncul tepat satu kali pada
+       keluarannya. */
+    var DI_REPORT_CATEGORIES = [
+      { name: "Ejaan", kinds: ["ejaan-mekanis", "kata-tidak-baku", "huruf-kapital", "sentence-capital"] },
+      { name: "Tata bahasa", kinds: ["kata-depan", "imbuhan", "pemisahan-kata", "kata-ulang"] },
+      { name: "Tanda baca & spasi", kinds: ["tanda-baca", "double-space", "missing-space-after-punctuation"] },
+      { name: "Redundansi", kinds: ["repeated-word", "kalimat-mubazir"] },
+      { name: "Kalimat", kinds: ["kalimat-kompleks", "kalimat-panjang", "kalimat-pengulangan-frasa", "transisi-awalan"] }
+    ];
+    var DI_REPORT_FALLBACK_CATEGORY = "Lainnya";
+    var DI_REPORT_CERTAINTIES = ["pasti", "saran", "potensial", "gaya"];
+    function diReportCategoryForKind(kind){
+      for(var i = 0; i < DI_REPORT_CATEGORIES.length; i++)
+        if(DI_REPORT_CATEGORIES[i].kinds.indexOf(kind) >= 0) return DI_REPORT_CATEGORIES[i].name;
+      return DI_REPORT_FALLBACK_CATEGORY;
+    }
+    /* diBuildReport(analysis, extras) — pembangun model laporan.
+       analysis: keluaran wiAnalyze apa adanya { paragraphs, separators,
+       suggestions, truncated }.
+       extras (semua opsional; data polos yang diserahkan lapisan UI):
+         acceptedIds: [id...], rejectedIds: [id...],
+         readability: { score, band, words, sentences, paragraphs,
+           avgWordsPerSentence, longShare, denseParas } | null,
+         doc: { name, stats, assembly: { truncated, keptBlocks,
+           totalBlocks }, mapping: { id: hasil pemetaan D3 },
+           appliedIds: [id...], refused: { id: teks alasan } } | null.
+       Keadaan keputusan meniru persis penghitungan wiRender: saran yang
+       ditolak terhitung "rejected" (atau "read" bila penasihat); saran
+       non-penasihat yang diterima terhitung "accepted"; sisanya
+       "pending". Rekomendasi HANYA diturunkan dari hitungan yang ada. */
+    function diBuildReport(analysis, extras){
+      extras = extras || {};
+      var suggestions = (analysis && analysis.suggestions) || [];
+      var paras = (analysis && analysis.paragraphs) || [];
+      var seps = (analysis && analysis.separators) || [];
+      var accepted = {};
+      (extras.acceptedIds || []).forEach(function(id){ accepted[id] = 1; });
+      var rejected = {};
+      (extras.rejectedIds || []).forEach(function(id){ rejected[id] = 1; });
+      var doc = extras.doc || null;
+      var mapping = doc && doc.mapping ? doc.mapping : null;
+      var applied = {};
+      if(doc && doc.appliedIds) doc.appliedIds.forEach(function(id){ applied[id] = 1; });
+      /* Offset global tiap paragraf di dalam teks gabungan: penggabungan
+         paragraf+pemisah mereproduksi persis string yang dianalisis,
+         jadi rentang global saran = awal paragraf + (start..end) saran. */
+      var paraStart = [], acc = 0;
+      paras.forEach(function(p, i){
+        paraStart.push(acc);
+        acc += p.length + (i < seps.length ? String(seps[i] == null ? "" : seps[i]).length : 0);
+      });
+      var byCertainty = { "pasti": 0, "saran": 0, "potensial": 0, "gaya": 0 };
+      var pendingCertainty = { "pasti": 0, "saran": 0, "potensial": 0, "gaya": 0 };
+      var decisions = { accepted: 0, pending: 0, rejected: 0, read: 0 };
+      var groups = {};
+      var readonlyReasons = {}, readonlyTotal = 0, advisoryCount = 0;
+      suggestions.forEach(function(s){
+        if(Object.prototype.hasOwnProperty.call(byCertainty, s.certainty)) byCertainty[s.certainty]++;
+        var state;
+        if(rejected[s.id]) state = s.advisory ? "read" : "rejected";
+        else if(!s.advisory && accepted[s.id]) state = "accepted";
+        else state = "pending";
+        decisions[state]++;
+        if(state === "pending" && Object.prototype.hasOwnProperty.call(pendingCertainty, s.certainty)) pendingCertainty[s.certainty]++;
+        if(s.advisory) advisoryCount++;
+        var item = {
+          id: s.id, kind: s.kind, certainty: s.certainty,
+          paragraph: (typeof s.pIdx === "number" ? s.pIdx : 0) + 1,
+          original: s.original,
+          advisory: !!s.advisory,
+          canApply: !s.advisory && typeof s.replacement === "string",
+          state: state,
+          globalStart: (typeof s.pIdx === "number" && paraStart[s.pIdx] != null ? paraStart[s.pIdx] : 0) + (s.start || 0),
+          globalEnd: (typeof s.pIdx === "number" && paraStart[s.pIdx] != null ? paraStart[s.pIdx] : 0) + (s.end || 0),
+          doc: null
+        };
+        if(doc){
+          var m = mapping ? mapping[s.id] : null;
+          item.doc = {
+            status: m ? (m.status || null) : null,
+            reason: m ? (m.reason || null) : null,
+            reasonText: m ? (m.reasonText || null) : null,
+            blockIdx: m && typeof m.blockIdx === "number" ? m.blockIdx : null,
+            applied: !!applied[s.id],
+            refused: doc.refused && doc.refused[s.id] ? doc.refused[s.id] : null
+          };
+          if(m && m.status === "readonly"){
+            var rt = m.reasonText || m.reason || "readonly";
+            readonlyReasons[rt] = (readonlyReasons[rt] || 0) + 1;
+            readonlyTotal++;
+          }
+        }
+        var catName = diReportCategoryForKind(s.kind);
+        if(!groups[catName]) groups[catName] = { byCertainty: { "pasti": 0, "saran": 0, "potensial": 0, "gaya": 0 }, items: [] };
+        groups[catName].items.push(item);
+        if(Object.prototype.hasOwnProperty.call(groups[catName].byCertainty, s.certainty)) groups[catName].byCertainty[s.certainty]++;
+      });
+      var categories = [];
+      function pushCategory(name){
+        if(!groups[name]) return;
+        categories.push({ name: name, count: groups[name].items.length, byCertainty: groups[name].byCertainty, items: groups[name].items });
+      }
+      DI_REPORT_CATEGORIES.forEach(function(c){ pushCategory(c.name); });
+      pushCategory(DI_REPORT_FALLBACK_CATEGORY);
+      /* Rekomendasi: hanya kalimat yang dapat ditelusur ke hitungan di atas. */
+      var recommendations = [];
+      if(suggestions.length === 0){
+        recommendations.push("Tidak ada temuan pada teks ini. Pemeriksa bekerja dengan aturan dan daftar kata tertutup, jadi teks tetap perlu dibaca kembali secara manual.");
+      }
+      if(pendingCertainty.pasti > 0)
+        recommendations.push("Mulai dari " + pendingCertainty.pasti + " temuan Aturan pasti yang masih menunggu keputusan — temuan ini mengikuti aturan tulis baku dan perbaikannya bersifat mekanis.");
+      if(doc && readonlyTotal > 0){
+        var topReason = null, topCount = 0;
+        Object.keys(readonlyReasons).forEach(function(k){ if(readonlyReasons[k] > topCount){ topCount = readonlyReasons[k]; topReason = k; } });
+        recommendations.push("Sebanyak " + readonlyTotal + " saran tidak dapat diterapkan otomatis ke dokumen kerja (alasan terbanyak: " + topReason + ") — terapkan perbaikannya secara manual pada dokumen bila Anda setuju.");
+      }
+      if(doc && doc.assembly && doc.assembly.truncated)
+        recommendations.push("Dokumen terpotong pada batas blok (" + doc.assembly.keptBlocks + " dari " + doc.assembly.totalBlocks + " blok yang dianalisis) — periksa blok selebihnya secara terpisah agar seluruh dokumen tertinjau.");
+      if(advisoryCount > 0)
+        recommendations.push(advisoryCount + " saran bersifat penasihat (kalimat panjang, kalimat kompleks, pengulangan frasa, transisi antarkalimat) — saran ini tidak mengubah teks dan hanya untuk Anda pertimbangkan.");
+      var limitations = [
+        "Pemeriksa ini bekerja dengan aturan dan daftar kata tertutup — tidak semua kesalahan tertangkap, dan teks tetap perlu dibaca kembali secara manual.",
+        "Skor keterbacaan adalah indikator statistik internal Saksara — bukan penilaian ilmiah tervalidasi, bukan penilaian akademik, dan bukan ukuran mutlak kualitas tulisan."
+      ];
+      if(doc && doc.stats && doc.stats.protected > 0)
+        limitations.push("Sebanyak " + doc.stats.protected + " elemen terlindungi pada dokumen (rumus, kolom isian, gambar) tidak ikut dianalisis dan tidak pernah diubah.");
+      if(doc)
+        limitations.push("Lokasi temuan menunjuk teks hasil impor di kotak masukan, bukan berkas asli Anda.");
+      return {
+        total: suggestions.length,
+        byCertainty: DI_REPORT_CERTAINTIES.map(function(k){ return { key: k, count: byCertainty[k] }; }),
+        decisions: decisions,
+        categories: categories,
+        readability: extras.readability || null,
+        coverage: {
+          mode: doc ? "doc" : "text",
+          paragraphs: paras.length,
+          analyzedChars: acc,
+          analysisTruncated: !!(analysis && analysis.truncated),
+          docName: doc ? (doc.name || null) : null,
+          docStats: doc ? (doc.stats || null) : null,
+          docTruncated: doc && doc.assembly ? !!doc.assembly.truncated : false,
+          keptBlocks: doc && doc.assembly ? doc.assembly.keptBlocks : null,
+          totalBlocks: doc && doc.assembly ? doc.assembly.totalBlocks : null,
+          appliedToDoc: doc ? (doc.appliedIds || []).length : 0,
+          readonlyCount: readonlyTotal
+        },
+        recommendations: recommendations,
+        limitations: limitations
+      };
+    }
+    /* ---------- D6: jahitan murni ekspor PDF Laporan Analisis ----------
+       Fungsi-fungsi murni (tanpa DOM, deterministik, tidak mengubah
+       masukan) yang mengubah MODEL laporan D5 menjadi susunan blok teks
+       PDF, plus pra-cek karakter. PDF adalah representasi model yang
+       sama dengan panel — tidak ada hitungan ulang di sini: angka
+       diformat (pengelompokan ribuan titik, meniru fmtNumID lapisan UI
+       agar angka PDF == angka panel), label diserahkan lapisan UI
+       lewat extras (kindLabels/certLabels/stateLabels — peta label
+       yang sama dengan yang dipakai panel), penjelasan + saran
+       perbaikan digabungkan dari saran sumber lewat id (details),
+       dan teks status dokumen dihitung lapisan UI dengan fungsi yang
+       sama dengan panel (docStatus). Kutipan selalu item.original
+       MENTAH — tidak pernah hasil gambar wiShowWs. */
+    function diReportFmtNum(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
+    function diReportPdfFileName(date){
+      function p2(x){ return (x < 10 ? "0" : "") + x; }
+      return "saksara-laporan-analisis-" + date.getFullYear() + "-" + p2(date.getMonth() + 1) + "-" + p2(date.getDate()) + ".pdf";
+    }
+    function diReportPdfLines(model, extras){
+      extras = extras || {};
+      var kindLabels = extras.kindLabels || {}, certLabels = extras.certLabels || {}, stateLabels = extras.stateLabels || {};
+      var details = extras.details || {}, docStatus = extras.docStatus || {};
+      var cov = model.coverage || {};
+      var blocks = [];
+      blocks.push({ t: "title", text: "LAPORAN ANALISIS TULISAN" });
+      blocks.push({ t: "meta", text: "Asisten Menulis Cerdas · Saksara" });
+      blocks.push({ t: "meta", text: "Dibuat lokal di peramban · " + (extras.dateStr || "") + " · saksara.vercel.app" });
+      /* Ringkasan analisis — angka yang sama dengan bagian A panel. */
+      blocks.push({ t: "h", text: "Ringkasan Analisis" });
+      var rows = [];
+      rows.push(["Total temuan", diReportFmtNum(model.total)]);
+      (model.byCertainty || []).forEach(function(c){ rows.push([certLabels[c.key] || c.key, diReportFmtNum(c.count)]); });
+      var dec = model.decisions || { accepted: 0, pending: 0, rejected: 0, read: 0 };
+      var decParts = [diReportFmtNum(dec.accepted) + " diterima", diReportFmtNum(dec.pending) + " menunggu keputusan"];
+      if(dec.rejected) decParts.push(diReportFmtNum(dec.rejected) + " ditolak");
+      if(dec.read) decParts.push(diReportFmtNum(dec.read) + " ditandai sudah dibaca");
+      rows.push(["Keputusan Anda", decParts.join(", ")]);
+      rows.push(["Paragraf dianalisis", diReportFmtNum(cov.paragraphs || 0)]);
+      rows.push(["Karakter dianalisis", diReportFmtNum(cov.analyzedChars || 0)]);
+      if(cov.mode === "doc"){
+        rows.push(["Dokumen", cov.docName || ""]);
+        if(cov.docStats){
+          var st = cov.docStats;
+          rows.push(["Blok dokumen", diReportFmtNum(st.blocks)]);
+          rows.push(["Kata pada dokumen", diReportFmtNum(st.words)]);
+          if(st.headings) rows.push(["Judul pada dokumen", diReportFmtNum(st.headings)]);
+          if(st.tables) rows.push(["Tabel pada dokumen", diReportFmtNum(st.tables)]);
+          if(typeof st.pages === "number" && st.pages > 0) rows.push(["Halaman dokumen", diReportFmtNum(st.pages)]);
+        }
+        rows.push(["Diterapkan ke dokumen kerja", diReportFmtNum(cov.appliedToDoc || 0)]);
+      }
+      blocks.push({ t: "kv", rows: rows });
+      if(cov.docTruncated) blocks.push({ t: "p", text: "Cakupan: dokumen dipotong pada batas blok — " + diReportFmtNum(cov.keptBlocks) + " dari " + diReportFmtNum(cov.totalBlocks) + " blok teks pertama yang dianalisis; blok selebihnya belum dianalisis." });
+      if(cov.analysisTruncated) blocks.push({ t: "p", text: "Cakupan: analisis internal terpotong pada batas 50.000 karakter." });
+      if(cov.mode === "doc" && cov.docStats && cov.docStats.protected > 0)
+        blocks.push({ t: "p", text: "Sebanyak " + diReportFmtNum(cov.docStats.protected) + " elemen terlindungi (rumus, kolom isian, gambar) tidak ikut dianalisis." });
+      /* Ringkasan kualitas — skor keterbacaan D5 apa adanya + catatan wajib. */
+      if(model.readability){
+        var rd = model.readability;
+        blocks.push({ t: "h", text: "Ringkasan Kualitas — Keterbacaan" });
+        blocks.push({ t: "kv", rows: [
+          ["Skor keterbacaan", String(rd.score) + " — " + rd.band],
+          ["Rata-rata kata per kalimat", String(rd.avgWordsPerSentence).replace(".", ",")],
+          ["Kalimat > 40 kata", String(rd.longShare).replace(".", ",") + "%"],
+          ["Paragraf padat", diReportFmtNum(rd.denseParas)],
+          ["Kalimat", diReportFmtNum(rd.sentences)],
+          ["Kata", diReportFmtNum(rd.words)]
+        ] });
+        blocks.push({ t: "p", text: "Skor ini adalah indikator statistik internal/heuristik — bukan penilaian akademik, bukan penilaian ilmiah tervalidasi, dan bukan ukuran mutlak kualitas tulisan." });
+      }
+      /* Detail temuan — setiap item model tepat satu kali, urutan model. */
+      blocks.push({ t: "h", text: "Detail Temuan" });
+      if(!model.total) blocks.push({ t: "p", text: "Tidak ada temuan pada teks ini." });
+      (model.categories || []).forEach(function(cat){
+        blocks.push({ t: "h2", text: cat.name + " — " + diReportFmtNum(cat.count) + " temuan" });
+        cat.items.forEach(function(item){
+          var fields = [];
+          fields.push(["Kutipan", String(item.original == null ? "" : item.original)]);
+          var det = details[item.id] || {};
+          if(det.explanation) fields.push(["Penjelasan", String(det.explanation)]);
+          if(!item.advisory && typeof det.replacement === "string") fields.push(["Saran perbaikan", det.replacement]);
+          fields.push(["Keputusan", stateLabels[item.state] || item.state]);
+          if(docStatus[item.id]) fields.push(["Dokumen", String(docStatus[item.id])]);
+          if(item.advisory) fields.push(["Catatan", "Saran penasihat — tidak mengubah teks"]);
+          blocks.push({ t: "finding", id: item.id,
+            head: (kindLabels[item.kind] || item.kind) + " · " + (certLabels[item.certainty] || item.certainty) + " · Paragraf ke-" + diReportFmtNum(item.paragraph),
+            fields: fields });
+        });
+      });
+      /* Rekomendasi + keterbatasan — string model apa adanya. */
+      blocks.push({ t: "h", text: "Rekomendasi" });
+      (model.recommendations || []).forEach(function(r){ blocks.push({ t: "li", text: String(r) }); });
+      blocks.push({ t: "h", text: "Keterbatasan Analisis" });
+      (model.limitations || []).forEach(function(r){ blocks.push({ t: "li", text: String(r) }); });
+      blocks.push({ t: "p", text: "Laporan ini adalah bantuan analisis tulisan — bukan keputusan akademik yang mutlak." });
+      return blocks;
+    }
+    /* Seluruh string yang akan dicetak PDF, diratakan dari blok —
+       dasar pra-cek karakter (tidak ada teks yang lolos dari pra-cek). */
+    function diReportPdfTexts(blocks){
+      var out = [];
+      (blocks || []).forEach(function(b){
+        if(b.t === "kv"){ b.rows.forEach(function(r){ out.push(String(r[0])); out.push(String(r[1])); }); }
+        else if(b.t === "finding"){ out.push(b.head); b.fields.forEach(function(f){ out.push(String(f[0])); out.push(String(f[1])); }); }
+        else if(b.text != null) out.push(String(b.text));
+      });
+      return out;
+    }
+    /* Pra-cek font ter-embed: coverage adalah daftar rentang codepoint
+       [lo, hi] terurut yang DIEKSTRAK dari cmap berkas font subset yang
+       benar-benar terbangun (fonts/noto-sans-coverage.json), bukan dari
+       niat charset. Karakter whitespace tata-letak (\n \r \t) dilewati —
+       ia dirender sebagai spasi/pindah baris, bukan glif isi. */
+    function diPdfCpInRanges(ranges, cp){
+      var lo = 0, hi = (ranges || []).length - 1;
+      while(lo <= hi){
+        var mid = (lo + hi) >> 1;
+        if(cp < ranges[mid][0]) hi = mid - 1;
+        else if(cp > ranges[mid][1]) lo = mid + 1;
+        else return true;
+      }
+      return false;
+    }
+    function diPdfEachChar(texts, fn){
+      (texts || []).forEach(function(t){
+        var s = String(t == null ? "" : t);
+        for(var i = 0; i < s.length; i++){
+          var cp = s.codePointAt(i);
+          var ch = String.fromCodePoint(cp);
+          if(cp > 0xFFFF) i++;
+          if(cp === 0x0A || cp === 0x0D || cp === 0x09) continue;
+          fn(ch, cp);
+        }
+      });
+    }
+    function diPdfPreflight(texts, coverage){
+      var seen = {}, unsupported = [];
+      diPdfEachChar(texts, function(ch, cp){
+        if(diPdfCpInRanges(coverage, cp)) return;
+        var key = "U+" + cp.toString(16).toUpperCase();
+        if(seen[key]) return;
+        seen[key] = 1;
+        unsupported.push({ ch: ch, cp: "U+" + (cp < 0x10000 ? ("000" + cp.toString(16).toUpperCase()).slice(-4) : cp.toString(16).toUpperCase()) });
+      });
+      return { ok: unsupported.length === 0, unsupported: unsupported };
+    }
+    /* Helvetica (font inti jsPDF): karakter "aman ketat" bila pdfSafe
+       membiarkannya persis sama — himpunan eksplisit yang setara dengan
+       perilaku pdfSafe: \x20–\x7E dan \xA0–\xFF KECUALI yang dipetakan
+       pdfSafe (« » ± ×). Karakter "terhapus" adalah yang dibuang
+       pdfSafe diam-diam (di luar kedua rentang dan tidak dipetakan):
+       inilah yang menghentikan ekspor fallback, karena penghapusan
+       menempelkan kata dan mengubah makna (A→B menjadi AB, €50 menjadi
+       50). Karakter yang DIPETAKAN pdfSafe (— menjadi -, "…" menjadi
+       ...) tidak hilang dan tidak menempelkan kata; pada jalur fallback
+       ia dirender lewat pdfSafe dengan pemberitahuan font cadangan
+       yang eksplisit — perilaku yang sama dengan keempat laporan PDF
+       Saksara yang sudah ada. */
+    var DI_PDF_HELVETICA_MAPPED = { 0x201C: 1, 0x201D: 1, 0x201E: 1, 0x00AB: 1, 0x00BB: 1, 0x2018: 1, 0x2019: 1, 0x201A: 1, 0x2014: 1, 0x2013: 1, 0x2026: 1, 0x00B1: 1, 0x00D7: 1, 0x2265: 1, 0x2264: 1, 0x2022: 1 };
+    function diPdfHelveticaSafeChar(cp){
+      if(cp >= 0x20 && cp <= 0x7E) return true;
+      if(cp >= 0xA0 && cp <= 0xFF) return !(cp === 0xAB || cp === 0xBB || cp === 0xB1 || cp === 0xD7);
+      return false;
+    }
+    function diPdfHelveticaSafe(text){
+      var ok = true;
+      diPdfEachChar([text], function(ch, cp){ if(!diPdfHelveticaSafeChar(cp)) ok = false; });
+      return ok;
+    }
+    function diPdfHelveticaDeleted(texts){
+      var seen = {}, out = [];
+      diPdfEachChar(texts, function(ch, cp){
+        var inRange = (cp >= 0x20 && cp <= 0x7E) || (cp >= 0xA0 && cp <= 0xFF);
+        if(inRange || DI_PDF_HELVETICA_MAPPED[cp]) return;
+        var key = "U+" + cp.toString(16).toUpperCase();
+        if(seen[key]) return;
+        seen[key] = 1;
+        out.push({ ch: ch, cp: "U+" + (cp < 0x10000 ? ("000" + cp.toString(16).toUpperCase()).slice(-4) : cp.toString(16).toUpperCase()) });
+      });
+      return out;
+    }
+    /* REPORT-CORE-END */
+
     /* Writing Intelligence — render & interaksi (DOM). */
     var WI_KIND_LABEL = { "repeated-word": "Kata berulang", "double-space": "Spasi tidak rapi", "missing-space-after-punctuation": "Spasi hilang setelah tanda baca", "sentence-capital": "Huruf awal kalimat", "kata-tidak-baku": "Kata tidak baku", "kata-depan": "Kata depan di/ke", "imbuhan": "Imbuhan di-/ke-", "tanda-baca": "Tanda baca", "huruf-kapital": "Huruf kapital", "kata-ulang": "Kata ulang", "pemisahan-kata": "Pemisahan kata", "ejaan-mekanis": "Ejaan", "kalimat-mubazir": "Kata mubazir", "kalimat-pengulangan-frasa": "Pengulangan frasa", "kalimat-kompleks": "Kalimat kompleks", "kalimat-panjang": "Kalimat panjang", "transisi-awalan": "Transisi antarkalimat" };
     var WI_CERT_LABEL = { "pasti": "Aturan pasti", "saran": "Saran", "potensial": "Masalah potensial", "gaya": "Saran gaya" };
     var wiTa = $("wi-input");
     var wiResult = null, wiAccepted = [], wiRejected = {};
+    var wiReportHook = null; /* D5: diisi blok Document Intelligence — render Laporan Analisis setiap wiRender selesai. */
     var wiIgnored = [];
     function wiShowError(msg){
       var b = $("wi-error");
@@ -6094,6 +7842,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       $("wi-undo").disabled = wiAccepted.length === 0;
       $("wi-accept-all").disabled = pendingRep === 0;
       $("wi-reset").disabled = wiAccepted.length === 0 && rejected === 0 && read === 0;
+      if(wiReportHook) wiReportHook(); /* D5: Laporan Analisis mengikuti hasil & keputusan yang baru digambar. */
     }
     function wiRenderIgnored(){
       var box = $("wi-ignored");
@@ -6351,6 +8100,1208 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       wiUpdateCount();
       wiRenderIgnored();
     }
+
+    /* ================= Document Intelligence (D1) =================
+       Impor dokumen .docx ke Asisten Menulis. Blok inti dokumen membaca
+       berkas menjadi DocModel; teks rakitannya ditempatkan di #wi-input
+       dan dianalisis dengan alur yang sama persis seperti teks tempel.
+       Model hanya hidup di variabel memori halaman ini — tidak disimpan
+       di penyimpanan apa pun dan tidak dikirim ke mana pun. Menerapkan
+       saran ke model (menjaga format) adalah tahap berikutnya; pada D1
+       penerapan saran tetap berjalan pada teks seperti biasa. */
+    (function(){
+      var ta = $("wi-input");
+      var fileIn = $("wi-doc-file");
+      if(!ta || !fileIn) return;
+      var card = $("wi-doc"), statusEl = $("wi-doc-status"), errEl = $("wi-doc-error"),
+          coverEl = $("wi-doc-cover"), warnEl = $("wi-doc-warn"), actionsEl = $("wi-doc-actions");
+      var wiDocState = null; /* { name, size, model, assembly, pdfStats } */
+      function diFmtSize(n){
+        if(typeof n !== "number" || isNaN(n)) return "";
+        if(n < 1024) return n + " byte";
+        if(n < 1048576) return (n / 1024).toFixed(1).replace(".", ",") + " KB";
+        return (n / 1048576).toFixed(1).replace(".", ",") + " MB";
+      }
+      function diShowBanner(el, html){
+        if(html){ el.innerHTML = html; el.classList.add("show"); }
+        else { el.innerHTML = ""; el.classList.remove("show"); }
+      }
+      function diResetCard(){
+        wiDocState = null;
+        statusEl.innerHTML = ""; statusEl.className = "file-status";
+        diShowBanner(errEl, ""); diShowBanner(coverEl, ""); diShowBanner(warnEl, "");
+        actionsEl.hidden = true;
+        fileIn.value = "";
+      }
+      /* ================= Document Intelligence (D2): impor PDF =================
+         Memakai pdf.js yang sama dengan route OCR lewat SATU pemuat
+         bersama global (saksaraLoadPdfJs); tidak ada dependensi baru.
+         Item teks pdf.js dinormalisasi menjadi data polos, lalu konversi
+         ke DocModel dilakukan fungsi murni DI-CORE (diPdfPagesToModel). */
+      function diLoadPdfJs(){
+        /* Pemuat bersama global saksaraLoadPdfJs (D7-B) — didefinisikan
+           di scope global di samping p6LoadScript agar route OCR (di
+           luar IIFE ini) memakai jalur yang sama persis. */
+        return saksaraLoadPdfJs();
+      }
+      function diImportPdf(bytes){
+        return diLoadPdfJs().then(function(pdfjsLib){
+          return pdfjsLib.getDocument({ data: bytes }).promise.then(function(doc){
+            var pagesData = [];
+            var chain = Promise.resolve();
+            function collect(n){
+              return doc.getPage(n).then(function(page){
+                return page.getTextContent().then(function(tc){
+                  var items = [];
+                  (tc.items || []).forEach(function(it){
+                    if(!it || typeof it.str !== "string" || !it.str.length) return;
+                    var t = it.transform || [1, 0, 0, 1, 0, 0];
+                    var fam = "";
+                    if(tc.styles && it.fontName && tc.styles[it.fontName] && tc.styles[it.fontName].fontFamily)
+                      fam = tc.styles[it.fontName].fontFamily;
+                    items.push({ str: it.str, x: t[4], y: t[5],
+                      width: typeof it.width === "number" ? it.width : 0,
+                      fontName: fam || it.fontName || "",
+                      fontSize: Math.abs(t[3]) || Math.abs(t[0]) || 0 });
+                  });
+                  pagesData.push({ page: n, items: items });
+                  if(typeof page.cleanup === "function") page.cleanup();
+                });
+              });
+            }
+            for(var n = 1; n <= doc.numPages; n++){
+              (function(pn){ chain = chain.then(function(){ return collect(pn); }); })(n);
+            }
+            return chain.then(function(){
+              if(typeof doc.destroy === "function") doc.destroy();
+              var tstats = diPdfTextStats(pagesData);
+              if(tstats.scanLike) return { ok: false, code: "pdf-scan", pdfStats: tstats };
+              return { ok: true, model: diPdfPagesToModel(pagesData), pdfStats: tstats };
+            });
+          });
+        }, function(loadErr){
+          if(window.console && console.warn) console.warn("Saksara: pustaka PDF gagal dimuat", loadErr);
+          return { ok: false, code: "pdf-load", message: "Pustaka pembaca PDF gagal dimuat — periksa koneksi internet, lalu coba lagi." };
+        }).catch(function(err){
+          if(window.console && console.warn) console.warn("Saksara: impor PDF gagal", err && err.name, err && err.message);
+          var info = diPdfErrorInfo(err);
+          return { ok: false, code: info.code, message: info.message };
+        });
+      }
+      /* Bersihkan (alur reset yang sudah ada) juga membuang model dokumen. */
+      $("wi-clear").addEventListener("click", diResetCard);
+      $("wi-doc-remove").addEventListener("click", function(){
+        diResetCard();
+        $("wi-clear").click(); /* pakai jalur reset teks yang sudah ada */
+      });
+      function diHandleFile(f){
+        diShowBanner(errEl, ""); diShowBanner(coverEl, ""); diShowBanner(warnEl, "");
+        actionsEl.hidden = true;
+        if(!f) return;
+        if(typeof f.size === "number" && f.size > MAX_FILE_BYTES){
+          statusEl.innerHTML = ""; statusEl.className = "file-status";
+          diShowBanner(errEl, "Berkas terlalu besar — batas ukuran berkas adalah 20 MB.");
+          return;
+        }
+        statusEl.className = "file-status show";
+        statusEl.innerHTML = "Memproses <span class=\"fname\">" + escapeHtml(f.name) + "</span> (" + diFmtSize(f.size) + ")…";
+        /* Beri kesempatan status tampil dulu (pola yang sama dengan wiRun),
+           penguraian berjalan sesudahnya agar halaman tidak terasa terkunci. */
+        setTimeout(function(){
+          f.arrayBuffer().then(function(ab){
+            var bytes = new Uint8Array(ab);
+            /* Pilihan jalur berdasar ISI berkas (tanda tangan %PDF-), bukan ekstensi. */
+            if(diSniffFormat(bytes) === "pdf") return diImportPdf(bytes);
+            return diParseDocx(bytes);
+          }).then(function(res){
+            if(res && res.code === "pdf-scan"){
+              /* PDF mirip pindaian: tidak ada lapisan teks yang terbaca.
+                 Textarea TIDAK disentuh dan tidak ada model yang disimpan —
+                 tampilkan peringatan jujur + arahkan ke halaman OCR. */
+              var pst = res.pdfStats || { pages: 0, totalChars: 0 };
+              statusEl.className = "file-status show";
+              statusEl.innerHTML = "<span class=\"fname\">" + escapeHtml(f.name) + "</span> dimuat (" + fmtNumID(pst.pages) + " halaman), tetapi " +
+                (pst.totalChars > 0
+                  ? "hampir tidak ada teks yang dapat diekstrak darinya (hanya " + fmtNumID(pst.totalChars) + " karakter)."
+                  : "tidak ada teks yang dapat diekstrak darinya.");
+              diShowBanner(warnEl, "<strong>PDF ini tampaknya hasil pindaian (gambar), bukan dokumen teks.</strong> Asisten Menulis membaca lapisan teks PDF dan <strong>belum mendukung OCR</strong>, jadi berkas ini belum dapat dianalisis di sini. Untuk mengekstrak teks dari pindaian, gunakan <a href=\"#/ocr\">halaman OCR Saksara</a>, lalu tempel teks hasilnya ke kotak di bawah.");
+              fileIn.value = "";
+              return;
+            }
+            if(!res.ok){
+              statusEl.innerHTML = ""; statusEl.className = "file-status";
+              diShowBanner(errEl, escapeHtml(res.message));
+              fileIn.value = "";
+              return;
+            }
+            var asm = diAssembleText(res.model);
+            var stats = diModelStats(res.model);
+            wiDocState = { name: f.name, size: f.size, model: res.model, assembly: asm, pdfStats: res.pdfStats || null };
+            diInitWork(); /* D3: siapkan salinan kerja + pemetaan untuk dokumen ini */
+            ta.value = asm.text;
+            wiUpdateCount();
+            var parts = [fmtNumID(stats.blocks) + " blok", fmtNumID(stats.words) + " kata"];
+            if(typeof stats.pages === "number" && stats.pages > 0) parts.push(fmtNumID(stats.pages) + " halaman");
+            if(stats.headings) parts.push(fmtNumID(stats.headings) + " judul");
+            if(stats.tables) parts.push(fmtNumID(stats.tables) + " tabel");
+            if(stats.protected) parts.push(fmtNumID(stats.protected) + " elemen terlindungi (rumus/kolom isian/gambar) — tidak ikut dianalisis");
+            statusEl.className = "file-status show ok";
+            statusEl.innerHTML = "<span class=\"fname\">" + escapeHtml(f.name) + "</span> berhasil dimuat — " + parts.join(" · ") + ". Teksnya sudah ada di kotak di bawah; tekan <strong>Analisis</strong> untuk memeriksanya.";
+            actionsEl.hidden = false;
+            if(asm.truncated){
+              diShowBanner(coverEl, "Dokumen dipotong pada batas blok: " + fmtNumID(asm.keptBlocks) + " dari " + fmtNumID(asm.totalBlocks) + " blok teks pertama yang dimuat (batas 50.000 karakter per analisis). Blok selebihnya belum dianalisis.");
+            }
+            if(res.pdfStats && res.pdfStats.emptyPages > 0){
+              diShowBanner(warnEl, fmtNumID(res.pdfStats.emptyPages) + " dari " + fmtNumID(res.pdfStats.pages) + " halaman PDF tidak menghasilkan teks (kemungkinan halaman gambar/pindaian) — halaman tersebut tidak ikut dianalisis.");
+            }
+            /* D4.1 (F7): pemberitahuan impor — hanya bila flag D4.1 pada
+               model DOCX membuktikan salah satu kondisi terdeteksi saat
+               penguraian (bagian header/footer, catatan kaki sungguhan,
+               komentar, atau track changes). Model PDF tidak pernah
+               membawa flag, jadi pemberitahuan ini tidak tampil untuk
+               PDF — tidak ada klaim pemeriksaan yang tidak dijalankan. */
+            if(res.model.format === "docx" && res.model.flags &&
+              (res.model.flags.headerFooter || res.model.flags.footnotes || res.model.flags.comments || res.model.flags.trackedChanges)){
+              diShowBanner(warnEl, "Header, footer, catatan kaki, dan komentar tidak ikut dimuat. Dokumen dengan track changes dimuat dalam tampilan perubahan yang diterima.");
+            }
+            if(!asm.text.replace(/\s+/g, "")){
+              diShowBanner(errEl, "Dokumen tidak memuat teks yang dapat dianalisis — mungkin isinya hanya gambar, tabel kosong, atau rumus.");
+            }
+          }).catch(function(){
+            statusEl.innerHTML = ""; statusEl.className = "file-status";
+            diShowBanner(errEl, "Berkas tidak dapat dibaca. Pastikan berkas adalah dokumen .docx yang utuh.");
+            fileIn.value = "";
+          });
+        }, 30);
+      }
+      fileIn.addEventListener("change", function(){
+        if(fileIn.files && fileIn.files[0]) diHandleFile(fileIn.files[0]);
+      });
+      if(card){
+        card.addEventListener("dragover", function(ev){ ev.preventDefault(); card.classList.add("dragover"); });
+        card.addEventListener("dragleave", function(){ card.classList.remove("dragover"); });
+        card.addEventListener("drop", function(ev){
+          ev.preventDefault();
+          card.classList.remove("dragover");
+          var files = ev.dataTransfer && ev.dataTransfer.files;
+          if(files && files[0]) diHandleFile(files[0]);
+        });
+      }
+
+      /* ================= Document Intelligence (D3): pemetaan saran & penerapan aman =================
+         Saran WI dipetakan ke DocModel (fungsi murni DI-CORE diSyncModel /
+         diMapSuggestion) dan — hanya bila statusnya "applicable" —
+         diterapkan ke SALINAN KERJA model (diWork) lewat diApplyToModel.
+         Model hasil impor tidak pernah diubah; teks biasa (Hasil Revisi)
+         tetap dihitung WI seperti biasa dan tidak terpengaruh bagian ini.
+         Tanpa dokumen yang dimuat, seluruh bagian ini tidak aktif dan
+         perilaku #/tulis persis seperti sebelumnya.
+         Kaitan ke alur WI yang sudah ada bersifat aditif: listener di
+         bawah didaftarkan SESUDAH handler WI (yang terdaftar lebih dulu
+         di berkas ini), sehingga handler WI selalu berjalan lebih dulu;
+         lencana kartu digambar ulang oleh MutationObserver setiap kali
+         wiRender membangun ulang daftar kartu. */
+      var diWork = null;       /* salinan kerja model; null bila tidak ada dokumen */
+      var diSnapshots = [];    /* snapshot model kerja sebelum tiap penerapan (sejajar diAppliedIds) */
+      var diAppliedIds = [];   /* id saran yang sudah diterapkan ke dokumen kerja */
+      var diMapping = null;    /* id saran -> hasil diMapSuggestion untuk wiResult berjalan */
+      var diMappingFor = null; /* objek wiResult yang menjadi dasar diMapping */
+      var diRefused = {};      /* id saran -> alasan penolakan pada saat penerapan */
+      var diCountEl = $("wi-doc-count"), diNoteEl = $("wi-doc-note");
+
+      function diUpdateDocCount(){
+        if(!diCountEl) return;
+        if(!wiDocState){ diCountEl.hidden = true; diCountEl.textContent = ""; return; }
+        diCountEl.hidden = false;
+        diCountEl.textContent = "Revisi diterapkan ke dokumen kerja: " + diAppliedIds.length;
+      }
+      function diInitWork(){
+        diWork = wiDocState ? diCloneModel(wiDocState.model) : null;
+        diSnapshots = []; diAppliedIds = []; diMapping = null; diMappingFor = null; diRefused = {};
+        diShowBanner(diNoteEl, "");
+        diUpdateDocCount();
+      }
+      function diComputeMapping(){
+        diMappingFor = wiResult;
+        diMapping = null;
+        if(!wiDocState || !wiResult) return;
+        if(diAppliedIds.length){
+          /* wiRun/wiRerun selalu membuang keputusan teks (wiAccepted
+             dikosongkan) — penerapan ke dokumen kerja ikut diatur ulang
+             agar keadaan kedua sisi tidak pernah berbeda. */
+          diWork = diCloneModel(wiDocState.model);
+          diSnapshots = []; diAppliedIds = [];
+          diShowBanner(diNoteEl, "Analisis dijalankan ulang — penerapan ke dokumen kerja diatur ulang mengikuti keputusan teks yang baru.");
+          diUpdateDocCount();
+        }
+        diRefused = {};
+        var sync = diSyncModel(wiDocState.model, wiResult.paragraphs);
+        var mapped = diMapAll(wiDocState.model, sync, wiResult.suggestions);
+        diMapping = {};
+        wiResult.suggestions.forEach(function(s, i){ diMapping[s.id] = mapped[i]; });
+      }
+      function diEnsureMapping(){
+        if(wiResult && diMappingFor !== wiResult) diComputeMapping();
+      }
+      function diRefusalText(reason){
+        return reason === "ambiguous"
+          ? "teks sasarannya muncul lebih dari sekali pada potongan teks yang sama, sehingga posisi pastinya tidak dapat ditentukan"
+          : "teks sasarannya sudah berubah pada dokumen kerja";
+      }
+      function diBadgeFor(s){
+        if(!s || s.advisory) return null;
+        if(diRefused[s.id]) return { cls: "wi-doc-badge refused", text: "Penerapan ke dokumen ditolak — " + diRefused[s.id] + "." };
+        var m = diMapping ? diMapping[s.id] : null;
+        if(!m) return null;
+        if(diAppliedIds.indexOf(s.id) >= 0) return { cls: "wi-doc-badge ok", text: "✓ Diterapkan ke dokumen kerja" };
+        if(m.status === "applicable") return { cls: "wi-doc-badge ok", text: "✓ Dapat diterapkan ke dokumen kerja" };
+        if(m.status === "readonly") return { cls: "wi-doc-badge", text: "Tidak diterapkan ke dokumen — " + m.reasonText + "." };
+        return null;
+      }
+      /* Kartu saran di DOM berkorespondensi 1:1, seurutan, dengan saran
+         yang TIDAK ditolak pada wiResult.suggestions (begitulah wiRender
+         membangunnya). */
+      function diCardFor(s){
+        var list = $("wi-sug-list");
+        if(!list || !wiResult) return null;
+        var cards = list.querySelectorAll(".wi-card"), ci = 0, found = null;
+        wiResult.suggestions.forEach(function(x){
+          if(wiRejected[x.id]) return;
+          if(x.id === s.id) found = cards[ci] || null;
+          ci++;
+        });
+        return found;
+      }
+      function diPaintBadge(s, force){
+        var card = diCardFor(s);
+        if(!card) return;
+        var old = card.querySelector(".wi-doc-badge");
+        if(old && !force) return;
+        var b = diBadgeFor(s);
+        if(old) old.remove();
+        if(!b) return;
+        var div = document.createElement("div");
+        div.className = b.cls;
+        div.textContent = b.text;
+        card.appendChild(div);
+      }
+      function diDecorateCards(){
+        if(!wiDocState || !wiResult) return;
+        diEnsureMapping();
+        if(!diMapping) return;
+        wiResult.suggestions.forEach(function(s){ diPaintBadge(s, false); });
+      }
+      function diTryApply(s){
+        diEnsureMapping();
+        var m = diMapping ? diMapping[s.id] : null;
+        if(!m || m.status !== "applicable" || !diWork) return;
+        var snap = diCloneModel(diWork);
+        var r = diApplyToModel(diWork, m, s.replacement);
+        if(r.ok){
+          diSnapshots.push(snap);
+          diAppliedIds.push(s.id);
+          if(diRefused[s.id]) delete diRefused[s.id];
+          diUpdateDocCount();
+        } else {
+          diRefused[s.id] = diRefusalText(r.reason);
+        }
+        diPaintBadge(s, true);
+      }
+      var diSugListEl = $("wi-sug-list");
+      if(diSugListEl && typeof MutationObserver === "function"){
+        /* Setiap wiRender membangun ulang innerHTML daftar kartu (lencana
+           ikut terhapus) — observer menggambarnya kembali. Menggambar
+           lencana idempoten: kartu yang sudah berlencana tidak berubah,
+           jadi observer tidak berputar. */
+        new MutationObserver(function(){ diDecorateCards(); }).observe(diSugListEl, { childList: true });
+      }
+      if(diSugListEl){
+        diSugListEl.addEventListener("click", function(ev){
+          if(!wiDocState || !wiResult) return;
+          var t = ev.target;
+          var b = (t && t.closest) ? t.closest("[data-wi-accept]") : null;
+          if(!b) return;
+          var id = b.getAttribute("data-wi-accept");
+          if(wiAccepted.indexOf(id) < 0) return; /* handler WI berjalan lebih dulu */
+          var s = null;
+          wiResult.suggestions.forEach(function(x){ if(x.id === id) s = x; });
+          if(s) diTryApply(s);
+        });
+      }
+      /* Urungkan WI mem-pop id terakhir wiAccepted; id itu ditangkap pada
+         fase capture (sebelum handler WI berjalan) lewat leluhur dokumen. */
+      var diUndoId = null;
+      document.addEventListener("click", function(ev){
+        var t = ev.target;
+        if(t && t.closest && t.closest("#wi-undo"))
+          diUndoId = (typeof wiAccepted !== "undefined" && wiAccepted.length) ? wiAccepted[wiAccepted.length - 1] : null;
+      }, true);
+      $("wi-undo").addEventListener("click", function(){
+        var id = diUndoId; diUndoId = null;
+        if(!wiDocState || id == null) return;
+        var i = diAppliedIds.lastIndexOf(id);
+        if(i < 0) return; /* saran terakhir hanya berlaku pada teks */
+        diWork = diSnapshots[i];
+        diSnapshots.length = i;
+        diAppliedIds.length = i;
+        diUpdateDocCount();
+      });
+      $("wi-reset").addEventListener("click", function(){
+        if(!wiDocState) return;
+        diWork = diCloneModel(wiDocState.model);
+        diSnapshots = []; diAppliedIds = []; diRefused = {};
+        diUpdateDocCount();
+      });
+      $("wi-accept-all").addEventListener("click", function(){
+        if(!wiDocState || !wiResult) return;
+        diEnsureMapping();
+        if(!diMapping || !diWork) return;
+        var applied = 0, refused = 0, textOnly = 0;
+        wiResult.suggestions.forEach(function(s){
+          if(s.advisory || wiRejected[s.id] || wiAccepted.indexOf(s.id) < 0) return;
+          if(diAppliedIds.indexOf(s.id) >= 0) return;
+          var m = diMapping[s.id];
+          if(!m) return;
+          if(m.status !== "applicable"){ textOnly++; return; }
+          var snap = diCloneModel(diWork);
+          var r = diApplyToModel(diWork, m, s.replacement);
+          if(r.ok){ diSnapshots.push(snap); diAppliedIds.push(s.id); applied++; }
+          else { diRefused[s.id] = diRefusalText(r.reason); refused++; }
+        });
+        diUpdateDocCount();
+        if(applied || refused || textOnly){
+          diShowBanner(diNoteEl, "Terima semua: " + applied + " saran diterapkan ke dokumen kerja" +
+            (textOnly ? ", " + textOnly + " saran hanya berlaku pada teks" : "") +
+            (refused ? ", " + refused + " saran ditolak saat penerapan karena teks sasarannya berubah atau ambigu" : "") + ".");
+        }
+        diDecorateCards();
+      });
+      $("wi-clear").addEventListener("click", function(){
+        diWork = null; diSnapshots = []; diAppliedIds = []; diMapping = null; diMappingFor = null; diRefused = {};
+        diShowBanner(diNoteEl, "");
+        diUpdateDocCount();
+      });
+
+      /* ================= Document Intelligence (D4): salin kaya, ekspor DOCX, perbandingan =================
+         Mengeluarkan SALINAN KERJA model (diWork) dari halaman:
+         - "Salin dengan format": ClipboardItem text/html (diModelToHtml)
+           + text/plain sekaligus; bila clipboard kaya tidak tersedia,
+           jatuh ke penyalinan teks biasa dengan pemberitahuan.
+         - "Unduh DOCX": berkas dibangun dari model kerja oleh pustaka
+           docx 8.5.0 (UMD) yang dimuat malas dari jsDelivr — satu-satunya
+           dependensi baru proyek ini, dan satu-satunya pengambilan
+           jaringan di alur dokumen (isi dokumen tidak pernah dikirim).
+           Peringatan diExportWarnings ditampilkan dulu; klik kedua
+           ("Tetap unduh DOCX") barulah mengunduh. Keadaan konfirmasi
+           diikat pada cap keadaan dokumen, jadi dokumen/keputusan baru
+           selalu memicu peringatan lagi.
+         - "Bandingkan": tampilan baca-saja diDiffModels (asli vs kerja).
+         Tanpa dokumen, seluruh bagian ini tidak aktif seperti D1–D3. */
+      var DI_DOCX_URL = "https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js";
+      var diCopyBtn = $("wi-doc-copy"), diExpBtn = $("wi-doc-export"), diCmpBtn = $("wi-doc-compare"),
+          diExpWarnEl = $("wi-doc-expwarn"), diDiffEl = $("wi-doc-diff");
+      var diDocxPromise = null, diExportWarnedFor = null, diExportBusy = false;
+      /* D4.1: jenis peringatan yang SEDANG tampil pada panel ekspor —
+         jalur salin tidak mengulang jenis yang sudah terlihat di sana
+         (anti-duplikasi lintas permukaan, per jenis). */
+      var diExpWarnKinds = [];
+
+      function diWorkEmpty(){
+        if(!diWork || !diWork.blocks || !diWork.blocks.length) return true;
+        for(var i = 0; i < diWork.blocks.length; i++){
+          var runs = diWork.blocks[i].runs || [];
+          for(var j = 0; j < runs.length; j++){
+            if(runs[j].protected) return false;
+            if(runs[j].text && runs[j].text.replace(/\s+/g, "")) return false;
+          }
+        }
+        return true;
+      }
+      function diRefreshD4Controls(){
+        var empty = diWorkEmpty();
+        [diCopyBtn, diExpBtn, diCmpBtn].forEach(function(b){
+          if(!b) return;
+          b.disabled = empty;
+          b.title = empty ? "Dokumen belum memuat isi yang dapat diproses." : "";
+        });
+      }
+      function diHideDiff(){
+        if(diDiffEl){ diDiffEl.hidden = true; diDiffEl.innerHTML = ""; }
+        if(diCmpBtn) diCmpBtn.textContent = "Bandingkan";
+      }
+      function diResetD4(){
+        diExportWarnedFor = null;
+        diExpWarnKinds = [];
+        if(diExpBtn) diExpBtn.textContent = "Unduh DOCX";
+        diShowBanner(diExpWarnEl, "");
+        diHideDiff();
+        diRefreshD4Controls();
+      }
+      function diExportStamp(){
+        if(!wiDocState || !diWork) return "";
+        var st = diModelStats(diWork);
+        return wiDocState.name + "|" + diAppliedIds.length + "|" + st.chars + "|" + st.protected + "|" + (diWork.blocks || []).length;
+      }
+      function diLoadDocx(){
+        if(window.docx && window.docx.Packer) return Promise.resolve(window.docx);
+        if(!diDocxPromise){
+          diDocxPromise = p6LoadScript(DI_DOCX_URL).then(function(){
+            if(!window.docx || !window.docx.Packer || !window.docx.Document)
+              throw new Error("global docx tidak lengkap");
+            return window.docx;
+          });
+        }
+        return diDocxPromise;
+      }
+      /* ----- Pembangunan berkas DOCX dari model kerja ----- */
+      function diDocxRunProps(r){
+        var p = {};
+        if(r.bold) p.bold = true;
+        if(r.italic) p.italics = true;
+        if(r.underline) p.underline = {};
+        if(r.fontName) p.font = { name: r.fontName };
+        if(typeof r.fontSize === "number" && r.fontSize > 0) p.size = Math.round(r.fontSize * 2);
+        return p;
+      }
+      function diDocxRuns(dx, block){
+        var out = [];
+        (block.runs || []).forEach(function(r){
+          if(r.protected){
+            /* Objek tertanam tidak disertakan (dinyatakan pada peringatan);
+               rumus/field menjadi run teks linear biasa. */
+            if(r.kind === "object") return;
+            if(r.text) out.push(new dx.TextRun({ text: r.text }));
+            return;
+          }
+          var safe = r.link ? diLinkSafe(r.link) : null;
+          String(r.text).split("\n").forEach(function(seg, i){
+            var props = diDocxRunProps(r);
+            props.text = seg;
+            if(i > 0) props.break = 1;
+            if(safe){ props.style = "Hyperlink"; props.underline = {}; }
+            var tr = new dx.TextRun(props);
+            out.push(safe ? new dx.ExternalHyperlink({ link: safe, children: [tr] }) : tr);
+          });
+        });
+        return out;
+      }
+      function diDocxAlign(dx, block){
+        var A = dx.AlignmentType;
+        switch(block.align){
+          case "center": return A.CENTER;
+          case "right": case "end": return A.RIGHT;
+          case "both": return A.JUSTIFY;
+          case "distribute": return A.DISTRIBUTE;
+          case "left": case "start": return A.LEFT;
+          default: return undefined;
+        }
+      }
+      function diDocxIndent(block){
+        if(!block.indent) return undefined;
+        var ind = {}, any = false;
+        ["left", "right", "firstLine", "hanging"].forEach(function(k){
+          if(typeof block.indent[k] === "number"){ ind[k] = block.indent[k]; any = true; }
+        });
+        return any ? ind : undefined;
+      }
+      function diDocxTable(dx, model, tIdx, byId){
+        var table = (model.tables || [])[tIdx];
+        if(!table) return null;
+        var rows = (table.rows || []).map(function(row){
+          var cells = (row.cells || []).map(function(cell){
+            var opts = {};
+            if(cell.gridSpan > 1) opts.columnSpan = cell.gridSpan;
+            if(cell.vMerge === "restart") opts.verticalMerge = dx.VerticalMergeType.RESTART;
+            else if(cell.vMerge === "continue") opts.verticalMerge = dx.VerticalMergeType.CONTINUE;
+            var cbs = (cell.blockIds || []).map(function(id){ return byId[id]; }).filter(Boolean)
+              .sort(function(x, y){ return (x.cellPara || 0) - (y.cellPara || 0); });
+            opts.children = cbs.length
+              ? cbs.map(function(b){ return new dx.Paragraph({ children: diDocxRuns(dx, b) }); })
+              : [new dx.Paragraph("")];
+            return new dx.TableCell(opts);
+          });
+          return new dx.TableRow({ children: cells });
+        });
+        return new dx.Table({ rows: rows });
+      }
+      function diBuildDocx(dx, model){
+        var byId = {};
+        (model.blocks || []).forEach(function(b){ byId[b.id] = b; });
+        /* Satu referensi penomoran per numId asal (daftar bernomor yang
+           terpisah tidak saling menyambung nomor) + satu untuk bullet. */
+        var numRefs = {}, hasBullet = false;
+        function numKey(b){ return b.numId == null ? "x" : String(b.numId).replace(/[^A-Za-z0-9_-]/g, ""); }
+        (model.blocks || []).forEach(function(b){
+          if(b.type !== "list-item") return;
+          if(b.listKind === "number"){ var k = numKey(b); if(!numRefs[k]) numRefs[k] = "di-num-" + k; }
+          else hasBullet = true;
+        });
+        function levels(format, text){
+          var lv = [];
+          for(var i = 0; i < 8; i++)
+            lv.push({ level: i, format: format, text: text, alignment: dx.AlignmentType.LEFT,
+              style: { paragraphFormat: { indent: { left: 360 * (i + 1), hanging: 260 } } } });
+          return lv;
+        }
+        var config = [];
+        Object.keys(numRefs).forEach(function(k){ config.push({ reference: numRefs[k], levels: levels("decimal", "%1.") }); });
+        if(hasBullet) config.push({ reference: "di-bul", levels: levels("bullet", "•") });
+        var children = [], emitted = {};
+        (model.blocks || []).forEach(function(b){
+          if(b.type === "table-cell"){
+            if(!emitted[b.table]){
+              emitted[b.table] = true;
+              var t = diDocxTable(dx, model, b.table, byId);
+              if(t) children.push(t);
+            }
+            return;
+          }
+          if(b.type === "heading"){
+            var lv = Math.min(6, Math.max(1, b.level || 1));
+            children.push(new dx.Paragraph({
+              heading: dx.HeadingLevel["HEADING_" + lv],
+              outlineLevel: lv - 1,
+              alignment: diDocxAlign(dx, b), indent: diDocxIndent(b),
+              children: diDocxRuns(dx, b)
+            }));
+            return;
+          }
+          if(b.type === "list-item"){
+            children.push(new dx.Paragraph({
+              numbering: { reference: b.listKind === "number" ? numRefs[numKey(b)] : "di-bul",
+                level: Math.min(7, Math.max(0, b.level || 0)) },
+              alignment: diDocxAlign(dx, b),
+              children: diDocxRuns(dx, b)
+            }));
+            return;
+          }
+          children.push(new dx.Paragraph({
+            alignment: diDocxAlign(dx, b), indent: diDocxIndent(b),
+            children: diDocxRuns(dx, b)
+          }));
+        });
+        var opts = { sections: [{ children: children }] };
+        if(config.length) opts.numbering = { config: config };
+        return new dx.Document(opts);
+      }
+      function diExportFileName(){
+        var base = String((wiDocState && wiDocState.name) || "dokumen").replace(/\.[^.]+$/, "");
+        base = base.replace(/[^\p{L}\p{N}._-]+/gu, "-").replace(/^-+|-+$/g, "");
+        if(!base) base = "dokumen";
+        return base + "-revisi.docx";
+      }
+      function diDoExport(){
+        if(diExportBusy) return;
+        diExportBusy = true;
+        if(diExpBtn) diExpBtn.disabled = true;
+        diLoadDocx().then(function(dx){
+          return dx.Packer.toBlob(diBuildDocx(dx, diWork));
+        }).then(function(blob){
+          var name = diExportFileName();
+          var a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = name;
+          document.body.appendChild(a); a.click();
+          setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 400);
+          diShowBanner(diNoteEl, "Dokumen kerja diunduh sebagai " + escapeHtml(name) + ".");
+        }).catch(function(err){
+          if(window.console && console.warn) console.warn("Saksara: ekspor DOCX gagal", err && err.message);
+          diShowBanner(diNoteEl, "Ekspor DOCX gagal — pustaka pengekspor tidak dapat dimuat atau dokumen tidak dapat dibangun. Periksa koneksi internet, lalu coba lagi.");
+        }).then(function(){
+          diExportBusy = false;
+          diRefreshD4Controls();
+        });
+      }
+      if(diExpBtn) diExpBtn.addEventListener("click", function(){
+        if(!wiDocState || !diWork || diWorkEmpty()) return;
+        var warnings = diExportWarnings(diWork);
+        var stamp = diExportStamp();
+        if(warnings.length && diExportWarnedFor !== stamp){
+          diExportWarnedFor = stamp;
+          diExpWarnKinds = warnings.map(function(w){ return w.kind; });
+          var html = "<strong>Sebelum mengunduh, perhatikan:</strong><ul style=\"margin:6px 0 0; padding-left:18px;\">";
+          warnings.forEach(function(w){
+            html += "<li>" + escapeHtml(w.message) + (w.kind === "pdf-source" ? "" : " (" + fmtNumID(w.count) + ")") + "</li>";
+          });
+          html += "</ul>";
+          diShowBanner(diExpWarnEl, html);
+          diExpBtn.textContent = "Tetap unduh DOCX";
+          return;
+        }
+        diExportWarnedFor = null;
+        diExpWarnKinds = [];
+        diShowBanner(diExpWarnEl, "");
+        diExpBtn.textContent = "Unduh DOCX";
+        diDoExport();
+      });
+      /* ----- Salin dengan format (rich-text) + fallback teks biasa ----- */
+      function diExecCopy(text){
+        var tmp = document.createElement("textarea");
+        tmp.value = text;
+        tmp.style.position = "fixed"; tmp.style.opacity = "0";
+        document.body.appendChild(tmp);
+        tmp.select();
+        var ok = false;
+        try { ok = document.execCommand("copy"); } catch(e){ ok = false; }
+        tmp.remove();
+        return ok;
+      }
+      function diFallbackCopy(plain){
+        if(navigator.clipboard && navigator.clipboard.writeText)
+          return navigator.clipboard.writeText(plain).then(function(){ return true; }, function(){ return diExecCopy(plain); });
+        return Promise.resolve(diExecCopy(plain));
+      }
+      /* D4.1: jenis peringatan yang relevan untuk permukaan SALIN HTML.
+         heading-style tidak termasuk (HTML tidak mengenal nama gaya —
+         tidak ada degradasi di permukaan ini) dan pdf-source tidak
+         termasuk (naskahnya spesifik berkas DOCX). clipboard-indent
+         khusus salin: indentasi tidak dibawa HTML, tetapi dipertahankan
+         DOCX — karena itu ia tidak masuk diExportWarnings. */
+      var DI_COPY_WARN_KINDS = { "protected-omml": 1, "protected-field": 1, "protected-object": 1,
+        "underline-style": 1, "nested-table": 1, "link-scheme": 1 };
+      if(diCopyBtn) diCopyBtn.addEventListener("click", function(){
+        if(!wiDocState || !diWork || diWorkEmpty()) return;
+        var html = diModelToHtml(diWork), plain = diModelToPlainText(diWork);
+        /* Peringatan salin dihitung dari model kerja saat klik; jenis
+           yang sedang tampil di panel ekspor disaring keluar agar tidak
+           muncul dua kali di kartu yang sama. */
+        var copyWarn = diExportWarnings(diWork).filter(function(w){ return DI_COPY_WARN_KINDS[w.kind]; });
+        var indentCount = diModelIndentCount(diWork);
+        if(indentCount > 0) copyWarn.push({ kind: "clipboard-indent", count: indentCount,
+          message: "Indentasi paragraf tidak ikut tersalin ke format HTML (indentasi tetap dipertahankan pada unduhan DOCX)." });
+        copyWarn = copyWarn.filter(function(w){ return diExpWarnKinds.indexOf(w.kind) < 0; });
+        var rich = null;
+        if(navigator.clipboard && typeof navigator.clipboard.write === "function" && typeof window.ClipboardItem === "function"){
+          try {
+            rich = navigator.clipboard.write([new window.ClipboardItem({
+              "text/html": new Blob([html], { type: "text/html" }),
+              "text/plain": new Blob([plain], { type: "text/plain" })
+            })]).then(function(){ return true; }, function(){ return false; });
+          } catch(e){ rich = null; }
+        }
+        Promise.resolve(rich).then(function(okRich){
+          if(okRich){
+            var noteHtml = "Dokumen kerja disalin dengan format (judul, tebal/miring, daftar, tautan, dan tabel dipertahankan sebatas dukungan aplikasi tujuan) beserta teks biasa.";
+            if(copyWarn.length){
+              noteHtml += "<br><strong>Perhatikan untuk salinan ini:</strong><ul style=\"margin:6px 0 0; padding-left:18px;\">";
+              copyWarn.forEach(function(w){
+                noteHtml += "<li>" + escapeHtml(w.message) + " (" + fmtNumID(w.count) + ")</li>";
+              });
+              noteHtml += "</ul>";
+            }
+            diShowBanner(diNoteEl, noteHtml);
+            return;
+          }
+          return diFallbackCopy(plain).then(function(okPlain){
+            diShowBanner(diNoteEl, okPlain
+              ? "Salinan dengan format tidak tersedia di peramban ini — teks biasa dokumen kerja disalin."
+              : "Penyalinan gagal. Anda tetap dapat menyalin teks hasil revisi lewat tombol Salin hasil.");
+          });
+        });
+      });
+      /* ----- Perbandingan sebelum/sesudah (baca-saja) ----- */
+      var DI_DIFF_TAG = { heading: "Judul", paragraph: "Paragraf", "list-item": "Daftar", "table-cell": "Sel tabel" };
+      function diRenderDiff(){
+        var diff = diDiffModels(wiDocState.model, diWork);
+        var html = "<div class=\"wi-doc-diff-head\">Perbandingan dokumen asli ↔ dokumen kerja — " +
+          fmtNumID(diff.changedCount) + " blok berubah dari " + fmtNumID(diff.entries.length) + " blok.</div>";
+        if(!diff.changedCount){
+          html += "<p class=\"wi-doc-hint\">Belum ada revisi — dokumen kerja sama dengan dokumen asli.</p>";
+        } else {
+          diff.entries.forEach(function(e){
+            var tag = DI_DIFF_TAG[e.type] || "Blok";
+            if(e.status === "unchanged"){
+              var t = e.workText;
+              if(t.length > 160) t = t.slice(0, 160) + "…";
+              html += "<div class=\"di-diff-block same\"><span class=\"di-diff-tag\">" + tag + " · tetap</span>" + escapeHtml(t) + "</div>";
+            } else if(e.status === "changed"){
+              var seg = "";
+              e.segments.forEach(function(s){
+                if(s.t === "del") seg += "<del>" + escapeHtml(s.text) + "</del>";
+                else if(s.t === "ins") seg += "<ins>" + escapeHtml(s.text) + "</ins>";
+                else seg += escapeHtml(s.text);
+              });
+              html += "<div class=\"di-diff-block changed\"><span class=\"di-diff-tag\">" + tag + " · berubah</span>" + seg + "</div>";
+            } else if(e.status === "added"){
+              html += "<div class=\"di-diff-block changed\"><span class=\"di-diff-tag\">" + tag + " · baru</span><ins>" + escapeHtml(e.workText) + "</ins></div>";
+            } else {
+              html += "<div class=\"di-diff-block changed\"><span class=\"di-diff-tag\">" + tag + " · terhapus</span><del>" + escapeHtml(e.origText) + "</del></div>";
+            }
+          });
+        }
+        diDiffEl.innerHTML = html;
+      }
+      if(diCmpBtn) diCmpBtn.addEventListener("click", function(){
+        if(!wiDocState || !diWork) return;
+        if(diDiffEl.hidden){ diRenderDiff(); diDiffEl.hidden = false; diCmpBtn.textContent = "Tutup perbandingan"; }
+        else diHideDiff();
+      });
+      /* Keadaan D4 selalu mengikuti siklus dokumen: impor baru / hapus /
+         bersihkan mengatur ulang konfirmasi ekspor + perbandingan. */
+      $("wi-clear").addEventListener("click", function(){ diResetD4(); });
+      $("wi-undo").addEventListener("click", function(){ diHideDiff(); });
+      $("wi-reset").addEventListener("click", function(){ diHideDiff(); });
+      if(statusEl && typeof MutationObserver === "function")
+        new MutationObserver(function(){ diResetD4(); }).observe(statusEl, { childList: true });
+      diRefreshD4Controls();
+
+      /* ================= Document Intelligence (D5): Laporan Analisis =================
+         Panel #wi-report menampilkan ringkasan terstruktur dari hasil
+         wiAnalyze yang SUDAH ada. Model laporan dibangun fungsi murni
+         diBuildReport (blok REPORT-CORE, lapisan presentasi) dari
+         wiResult + data polos: keputusan pengguna, keterbacaan yang
+         di-cache per objek hasil, dan keadaan dokumen D3. Laporan adalah
+         INDEKS di atas daftar kartu — kartu tidak pernah diurutkan
+         ulang, dipindah, atau digambar ulang oleh bagian ini; alasan
+         lengkap dan tombol Terima/Tolak tetap hanya ada di kartu.
+         Render dipicu satu baris panggilan di akhir wiRender lewat
+         wiReportHook. Seluruh teks pengguna/dokumen digambar lewat
+         escapeHtml/wiShowWs. Tidak ada isi dokumen yang disimpan atau
+         dikirim ke mana pun. */
+      var diReportEl = $("wi-report"), diReportBody = $("wi-report-body"), diReportNote = $("wi-report-note");
+      var diReportModel = null;      /* model laporan terakhir — sumber data navigasi lokasi */
+      var diReportReadFor = null, diReportRead = null; /* cache wiReadability per objek wiResult */
+      var DI_REPORT_STATE_TEXT = { accepted: "Diterima", pending: "Menunggu keputusan", rejected: "Ditolak", read: "Sudah dibaca" };
+      /* Keadaan kelompok kategori yang sedang terbuka dipertahankan
+         lintas render ulang (render mengikuti setiap keputusan, dan
+         membuka kelompok adalah tindakan membaca, bukan keputusan). */
+      var prevOpen = [];
+      function diReportDocStatusText(item){
+        var d = item.doc;
+        if(!d || item.advisory) return "";
+        if(d.refused) return "Penerapan ke dokumen ditolak — " + d.refused + ".";
+        if(d.applied) return "Diterapkan ke dokumen kerja";
+        if(d.status === "applicable") return "Dapat diterapkan ke dokumen kerja";
+        if(d.status === "readonly") return "Tidak diterapkan ke dokumen — " + (d.reasonText || d.reason || "") + ".";
+        return "";
+      }
+      function diRenderReport(){
+        if(!diReportEl || !diReportBody) return;
+        if(!wiResult){ diReportEl.hidden = true; diReportBody.innerHTML = ""; diReportModel = null; return; }
+        if(diReportReadFor !== wiResult){
+          diReportRead = wiReadability(wiJoin(wiResult.paragraphs, wiResult.separators));
+          diReportReadFor = wiResult;
+        }
+        var ex = { acceptedIds: wiAccepted.slice(), rejectedIds: Object.keys(wiRejected), readability: null, doc: null };
+        if(diReportRead && !diReportRead.empty){
+          ex.readability = { score: diReportRead.score, band: diReportRead.band, words: diReportRead.words,
+            sentences: diReportRead.sentences, paragraphs: diReportRead.paragraphs,
+            avgWordsPerSentence: diReportRead.avgWordsPerSentence, longShare: diReportRead.longShare,
+            denseParas: diReportRead.denseParas.length };
+        }
+        if(wiDocState){
+          diEnsureMapping();
+          /* D7-A: statistik PDF D2 (jumlah halaman + halaman kosong) yang
+             dipertahankan di wiDocState sejak impor diserahkan ke model
+             laporan lewat saluran extras.doc.stats yang sudah ada —
+             angka yang sama persis dengan banner impor. */
+          var repStats = diModelStats(wiDocState.model);
+          if(wiDocState.pdfStats){
+            repStats.pdfEmptyPages = wiDocState.pdfStats.emptyPages;
+            repStats.pdfTotalPages = wiDocState.pdfStats.pages;
+          }
+          ex.doc = { name: wiDocState.name, stats: repStats,
+            assembly: { truncated: !!wiDocState.assembly.truncated, keptBlocks: wiDocState.assembly.keptBlocks, totalBlocks: wiDocState.assembly.totalBlocks },
+            mapping: diMapping, appliedIds: diAppliedIds.slice(), refused: diRefused };
+        }
+        var R = diBuildReport(wiResult, ex);
+        diReportModel = R;
+        diReportNote.textContent = "";
+        prevOpen = [];
+        diReportBody.querySelectorAll(".wi-rep-details").forEach(function(d){ prevOpen.push(d.open); });
+        var h = "";
+        /* A — Ringkasan dokumen */
+        h += "<div class=\"wi-rep-sec\"><h4>Ringkasan dokumen</h4><div class=\"wi-read-stats\">";
+        if(R.coverage.mode === "doc") h += "<div><dt>Dokumen</dt><dd>" + escapeHtml(R.coverage.docName || "") + "</dd></div>";
+        h += "<div><dt>Total temuan</dt><dd>" + fmtNumID(R.total) + "</dd></div>";
+        h += "<div><dt>Paragraf dianalisis</dt><dd>" + fmtNumID(R.coverage.paragraphs) + "</dd></div>";
+        h += "<div><dt>Karakter dianalisis</dt><dd>" + fmtNumID(R.coverage.analyzedChars) + "</dd></div>";
+        if(R.coverage.mode === "doc" && R.coverage.docStats){
+          var st = R.coverage.docStats;
+          h += "<div><dt>Blok dokumen</dt><dd>" + fmtNumID(st.blocks) + "</dd></div>";
+          h += "<div><dt>Kata pada dokumen</dt><dd>" + fmtNumID(st.words) + "</dd></div>";
+          if(st.headings) h += "<div><dt>Judul</dt><dd>" + fmtNumID(st.headings) + "</dd></div>";
+          if(st.tables) h += "<div><dt>Tabel</dt><dd>" + fmtNumID(st.tables) + "</dd></div>";
+          if(typeof st.pages === "number" && st.pages > 0) h += "<div><dt>Halaman</dt><dd>" + fmtNumID(st.pages) + "</dd></div>";
+          if(typeof st.pdfEmptyPages === "number" && typeof st.pdfTotalPages === "number") h += "<div><dt>Halaman PDF tanpa teks</dt><dd>" + fmtNumID(st.pdfEmptyPages) + " dari " + fmtNumID(st.pdfTotalPages) + "</dd></div>";
+          h += "<div><dt>Diterapkan ke dokumen kerja</dt><dd>" + fmtNumID(R.coverage.appliedToDoc) + "</dd></div>";
+        }
+        h += "</div>";
+        h += "<p class=\"wf-note\">Berdasarkan tingkat kepastian: " + R.byCertainty.map(function(c){ return (WI_CERT_LABEL[c.key] || c.key) + " " + fmtNumID(c.count); }).join(" · ") + ".</p>";
+        var dec = [fmtNumID(R.decisions.accepted) + " diterima", fmtNumID(R.decisions.pending) + " menunggu keputusan"];
+        if(R.decisions.rejected) dec.push(fmtNumID(R.decisions.rejected) + " ditolak");
+        if(R.decisions.read) dec.push(fmtNumID(R.decisions.read) + " ditandai sudah dibaca");
+        h += "<p class=\"wf-note\">Keputusan Anda sejauh ini: " + dec.join(", ") + ".</p>";
+        if(R.coverage.docTruncated) h += "<p class=\"wf-note\">Cakupan: dokumen dipotong pada batas blok — " + fmtNumID(R.coverage.keptBlocks) + " dari " + fmtNumID(R.coverage.totalBlocks) + " blok teks pertama yang dianalisis; blok selebihnya belum dianalisis.</p>";
+        if(R.coverage.analysisTruncated) h += "<p class=\"wf-note\">Cakupan: analisis internal terpotong pada batas 50.000 karakter.</p>";
+        if(R.coverage.mode === "doc" && R.coverage.docStats && R.coverage.docStats.protected > 0)
+          h += "<p class=\"wf-note\">Sebanyak " + fmtNumID(R.coverage.docStats.protected) + " elemen terlindungi (rumus, kolom isian, gambar) tidak ikut dianalisis.</p>";
+        h += "</div>";
+        /* B — Ringkasan kualitas: skor keterbacaan yang sudah ada, apa adanya */
+        if(R.readability){
+          var rd = R.readability;
+          h += "<div class=\"wi-rep-sec\"><h4>Ringkasan kualitas — keterbacaan</h4>"
+            + "<div class=\"wi-read-score\"><div class=\"wi-read-num\">" + rd.score + "</div><div><div class=\"wi-read-band\">" + escapeHtml(rd.band) + "</div>"
+            + "<div class=\"wi-read-expl\">Indikator keterbacaan internal Saksara untuk teks yang dianalisis.</div></div></div>"
+            + "<div class=\"wi-read-stats\">"
+            + "<div><dt>Rata-rata kata per kalimat</dt><dd>" + String(rd.avgWordsPerSentence).replace(".", ",") + "</dd></div>"
+            + "<div><dt>Kalimat &gt; 40 kata</dt><dd>" + String(rd.longShare).replace(".", ",") + "%</dd></div>"
+            + "<div><dt>Paragraf padat</dt><dd>" + fmtNumID(rd.denseParas) + "</dd></div>"
+            + "<div><dt>Kalimat</dt><dd>" + fmtNumID(rd.sentences) + "</dd></div>"
+            + "</div>"
+            + "<p class=\"wf-note\">Skor ini adalah indikator statistik internal/heuristik — <strong>bukan penilaian akademik, bukan penilaian ilmiah tervalidasi, dan bukan ukuran mutlak kualitas tulisan</strong>. Rincian lengkapnya ada di panel Analisis Keterbacaan.</p></div>";
+        }
+        /* C — Indeks temuan per kategori (ringkasan navigasi di atas kartu) */
+        h += "<div class=\"wi-rep-sec\"><h4>Indeks temuan berdasarkan kategori</h4>";
+        if(R.total === 0) h += "<div class=\"wi-empty\">Tidak ditemukan saran untuk teks ini.</div>";
+        R.categories.forEach(function(cat, ci){
+          var sub = R.byCertainty.map(function(c){ return { label: WI_CERT_LABEL[c.key] || c.key, n: cat.byCertainty[c.key] || 0 }; })
+            .filter(function(x){ return x.n > 0; })
+            .map(function(x){ return x.label + " " + fmtNumID(x.n); }).join(" · ");
+          h += "<details class=\"wi-rep-details\"" + (prevOpen[ci] ? " open" : "") + "><summary>" + escapeHtml(cat.name) + " — " + fmtNumID(cat.count) + " temuan" + (sub ? " (" + sub + ")" : "") + "</summary>";
+          cat.items.forEach(function(item){
+            var docTxt = diReportDocStatusText(item);
+            h += "<div class=\"wi-rep-row\">"
+              + "<span class=\"wi-kind\">" + escapeHtml(WI_KIND_LABEL[item.kind] || item.kind) + "</span>"
+              + "<span class=\"wi-cert\">" + escapeHtml(WI_CERT_LABEL[item.certainty] || item.certainty) + "</span>"
+              + "<span class=\"wi-rep-loc\">Paragraf ke-" + fmtNumID(item.paragraph) + "</span>"
+              + "<span class=\"wi-rep-state\">" + (DI_REPORT_STATE_TEXT[item.state] || item.state) + "</span>"
+              + (item.advisory ? "<span class=\"wi-rep-loc\">Saran penasihat — tidak mengubah teks</span>" : "")
+              + (docTxt ? "<span class=\"wi-rep-loc\">" + escapeHtml(docTxt) + "</span>" : "")
+              + "<button type=\"button\" class=\"wi-rep-locate\" data-wi-locate=\"" + item.id + "\">Lihat lokasi</button>"
+              + "<span class=\"wi-rep-quote\">" + wiShowWs(item.original) + "</span>"
+              + "</div>";
+          });
+          h += "</details>";
+        });
+        h += "<p class=\"wf-note\">Indeks ini hanya ringkasan navigasi — alasan lengkap dan tombol Terima/Tolak tetap ada pada kartu saran di bawah, dalam urutan dokumen yang sama.</p></div>";
+        /* E — Rekomendasi turunan hitungan + keterbatasan */
+        h += "<div class=\"wi-rep-sec\"><h4>Rekomendasi</h4><ul class=\"wi-rep-list\">";
+        R.recommendations.forEach(function(r){ h += "<li>" + escapeHtml(r) + "</li>"; });
+        h += "</ul><h4>Keterbatasan analisis</h4><ul class=\"wi-rep-list\">";
+        R.limitations.forEach(function(r){ h += "<li>" + escapeHtml(r) + "</li>"; });
+        h += "</ul></div>";
+        diReportBody.innerHTML = h;
+        diReportEl.hidden = false;
+      }
+      /* Navigasi lokasi: jujur atau tidak sama sekali. Offset global dari
+         model laporan hanya dipakai bila isi textarea saat klik PERSIS
+         sama dengan teks yang dianalisis; bila teks sudah berubah,
+         navigasi ditolak dengan pemberitahuan — tidak ada navigasi semu,
+         dan teks pengguna tidak pernah diubah oleh bagian ini. */
+      function diLocateFinding(id){
+        if(!wiResult || !diReportModel) return;
+        var item = null;
+        diReportModel.categories.forEach(function(cat){ cat.items.forEach(function(it){ if(it.id === id) item = it; }); });
+        if(!item) return;
+        if(ta.value !== wiJoin(wiResult.paragraphs, wiResult.separators)){
+          diReportNote.textContent = "Teks telah berubah sejak analisis terakhir — lokasi temuan tidak lagi dijamin tepat. Jalankan Analisis ulang agar lokasi temuan akurat.";
+          return;
+        }
+        diReportNote.textContent = "";
+        ta.focus();
+        try { ta.setSelectionRange(item.globalStart, item.globalEnd); } catch(e) {}
+        if(typeof ta.scrollIntoView === "function") ta.scrollIntoView({ block: "center" });
+        var s = null;
+        wiResult.suggestions.forEach(function(x){ if(x.id === id) s = x; });
+        var card = s ? diCardFor(s) : null;
+        if(card){
+          card.classList.add("flash");
+          setTimeout(function(){ card.classList.remove("flash"); }, 2000);
+        }
+      }
+      if(diReportEl){
+        diReportEl.addEventListener("click", function(ev){
+          var t = ev.target;
+          var b = (t && t.closest) ? t.closest("[data-wi-locate]") : null;
+          if(b) diLocateFinding(b.getAttribute("data-wi-locate"));
+        });
+      }
+      wiReportHook = diRenderReport;
+      /* Sinkronisasi keadaan dokumen D3: wiRender berjalan SEBELUM
+         listener D3 pada klik yang sama, jadi penerapan ke dokumen
+         kerja (yang mengubah diAppliedIds/diRefused sesudah render)
+         tidak terlihat oleh render laporan pada klik itu. Dua sinyal
+         DOM menutup celahnya: setiap mutasi diAppliedIds di D3 selalu
+         diikuti diUpdateDocCount (penghitung #wi-doc-count berubah),
+         dan setiap perubahan lencana — termasuk penolakan penerapan —
+         mengubah subtree daftar kartu. Keduanya memicu render ulang
+         laporan di sini. Pintu kejujuran yang sama dengan navigasi
+         dipakai: render ulang hanya bila isi textarea masih persis
+         teks yang dianalisis — impor dokumen baru mengganti isi
+         textarea, jadi laporan lama tidak pernah dicampur dokumen
+         baru. Render laporan sendiri tidak menyentuh kedua elemen
+         yang diamati, jadi pengamat tidak berputar. */
+      function diReportSyncFromDoc(){
+        if(!wiResult || !wiDocState || !diReportModel) return;
+        if(ta.value !== wiJoin(wiResult.paragraphs, wiResult.separators)) return;
+        diRenderReport();
+      }
+      if(typeof MutationObserver === "function"){
+        if(diCountEl) new MutationObserver(diReportSyncFromDoc).observe(diCountEl, { childList: true, characterData: true });
+        if(diSugListEl) new MutationObserver(diReportSyncFromDoc).observe(diSugListEl, { childList: true, subtree: true });
+      }
+
+      /* ================= Document Intelligence (D6): Ekspor PDF Laporan Analisis =================
+         Tombol "Ekspor PDF" pada panel #wi-report mencetak MODEL laporan
+         yang sama persis dengan yang dirender panel (diReportModel) —
+         tidak ada hitungan ulang: susunan blok dibangun fungsi murni
+         diReportPdfLines (REPORT-CORE) dari model + label panel +
+         penjelasan/saran yang digabungkan lewat id saran + teks status
+         dokumen dari diReportDocStatusText yang sama dengan panel.
+         Kutipan selalu original MENTAH (tidak pernah wiShowWs).
+         Font: subset Noto Sans (fonts/, OFL 1.1) dimuat MALAS hanya
+         saat ekspor dari origin yang sama — tidak ada isi dokumen yang
+         dikirim ke mana pun; satu-satunya lalu lintas adalah GET aset
+         statis (jsPDF dari CDN yang sudah ada + berkas font lokal).
+         Pra-cek karakter SEBELUM PDF dibuat:
+         - font termuat -> setiap karakter wajib ada di cakupan cmap
+           subset yang terbangun (fonts/noto-sans-coverage.json); yang
+           tidak didukung menghentikan ekspor dengan pesan yang menyebut
+           karakternya — tidak ada PDF yang kehilangan isi diam-diam.
+         - font GAGAL dimuat -> fallback Helvetica hanya bila tidak ada
+           karakter yang akan DIHAPUS pdfSafe (penghapusan menempelkan
+           kata/mengubah makna); ekspor fallback menyatakan pemakaian
+           font cadangan di status dan di dalam PDF. Bila ada karakter
+           terhapus, ekspor dihentikan dengan pesan jelas.
+         Dokumen dibangun di atas p6PdfKit (dokumen + geometri yang
+         sama); primitif baris lokal D6 diperlukan karena line() kit
+         mengunci helvetica + pdfSafe (akan merusak teks font Unicode)
+         dan kit tidak punya tabel/keep-with-next — kedua pembangun
+         PDF lain tidak diubah sama sekali. */
+      var diPdfBtn = $("wi-report-pdf"), diPdfStatusEl = $("wi-report-pdf-status");
+      var DI_PDF_FONT_FAMILY = "SaksaraLaporan";
+      var DI_PDF_FONT_URLS = { normal: "fonts/saksara-laporan-regular.ttf", bold: "fonts/saksara-laporan-bold.ttf" };
+      var DI_PDF_FONT_VFS = { normal: "saksara-laporan-regular.ttf", bold: "saksara-laporan-bold.ttf" };
+      var DI_PDF_COVERAGE_URL = "fonts/noto-sans-coverage.json";
+      var DI_PDF_FALLBACK_NOTICE = "Catatan: font utama laporan (Noto Sans) gagal dimuat, jadi laporan ini dicetak dengan font cadangan (Helvetica). Beberapa karakter tipografis disederhanakan mengikuti font cadangan.";
+      var DI_PDF_LH = 5.6, DI_PDF_TOP = 18, DI_PDF_BOTTOM = 278, DI_PDF_M = 16, DI_PDF_W = 210;
+      var diPdfFontPromise = null;
+      function diPdfSetStatus(msg){ if(diPdfStatusEl) diPdfStatusEl.textContent = msg || ""; }
+      function diPdfB64(buf){
+        var bytes = new Uint8Array(buf), bin = "", CH = 0x8000;
+        for(var i = 0; i < bytes.length; i += CH) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + CH));
+        return btoa(bin);
+      }
+      function diPdfFetchFont(url){
+        return fetch(url).then(function(r){
+          if(!r.ok) throw new Error("berkas font " + url + " gagal dimuat (HTTP " + r.status + ")");
+          return r.arrayBuffer();
+        });
+      }
+      function diLoadReportFonts(){
+        if(diPdfFontPromise) return diPdfFontPromise;
+        diPdfFontPromise = Promise.all([
+          diPdfFetchFont(DI_PDF_FONT_URLS.normal),
+          diPdfFetchFont(DI_PDF_FONT_URLS.bold),
+          fetch(DI_PDF_COVERAGE_URL).then(function(r){
+            if(!r.ok) throw new Error("data cakupan font gagal dimuat (HTTP " + r.status + ")");
+            return r.json();
+          })
+        ]).then(function(res){
+          return { normal: diPdfB64(res[0]), bold: diPdfB64(res[1]), coverage: (res[2] && res[2].coverage) || [] };
+        });
+        /* Kegagalan tidak dimemoisasi: ekspor berikutnya boleh mencoba lagi. */
+        diPdfFontPromise.catch(function(){ diPdfFontPromise = null; });
+        return diPdfFontPromise;
+      }
+      function diPdfUnsupportedText(list){
+        var shown = list.slice(0, 8).map(function(u){ return "'" + u.ch + "' (" + u.cp + ")"; }).join(", ");
+        if(list.length > 8) shown += ", dan " + (list.length - 8) + " karakter lainnya";
+        return shown;
+      }
+      /* ----- primitif tata letak lokal D6 (di atas dokumen p6PdfKit) ----- */
+      function diPdfPrep(R, size, bold){ R.doc.setFont(R.font, bold ? "bold" : "normal"); R.doc.setFontSize(size); R.doc.setTextColor(0); }
+      function diPdfTxt(R, txt){ return R.safe ? pdfSafe(txt) : String(txt); }
+      function diPdfWrap(R, txt, size, bold, width){ diPdfPrep(R, size, bold); return R.doc.splitTextToSize(diPdfTxt(R, txt), width); }
+      function diPdfPageBreak(R){ R.doc.addPage(); R.kit.setY(DI_PDF_TOP); }
+      function diPdfDrawParts(R, parts, x){
+        parts.forEach(function(p){
+          if(R.kit.getY() > DI_PDF_BOTTOM) diPdfPageBreak(R);
+          R.doc.text(p, x, R.kit.getY());
+          R.kit.setY(R.kit.getY() + DI_PDF_LH);
+        });
+      }
+      function diPdfPara(R, txt, size, bold){ diPdfDrawParts(R, diPdfWrap(R, txt, size || 10.5, !!bold, DI_PDF_W - 2 * DI_PDF_M), DI_PDF_M); }
+      function diPdfGap(R, h){ R.kit.setY(R.kit.getY() + (h || 3)); }
+      function diPdfHeading(R, txt, size, gapBefore){
+        var parts = diPdfWrap(R, txt, size, true, DI_PDF_W - 2 * DI_PDF_M);
+        var need = parts.length * DI_PDF_LH + DI_PDF_LH + (gapBefore || 0);
+        if(R.kit.getY() > DI_PDF_TOP + 0.1 && R.kit.getY() + need > DI_PDF_BOTTOM) diPdfPageBreak(R);
+        else if(gapBefore) diPdfGap(R, gapBefore);
+        diPdfPrep(R, size, true);
+        diPdfDrawParts(R, parts, DI_PDF_M);
+        diPdfGap(R, 1.2);
+      }
+      function diPdfKv(R, rows){
+        rows.forEach(function(row){
+          var lp = diPdfWrap(R, row[0], 10.5, true, 54);
+          var vp = diPdfWrap(R, row[1], 10.5, false, DI_PDF_W - DI_PDF_M - 72);
+          var lines = Math.max(lp.length, vp.length);
+          /* Baris yang muat satu halaman diusahakan utuh; baris yang
+             lebih panjang dari satu halaman mengalir per baris —
+             tidak ada baris nilai yang dibuang dalam keadaan apa pun. */
+          if(R.kit.getY() + lines * DI_PDF_LH > DI_PDF_BOTTOM && lines * DI_PDF_LH <= DI_PDF_BOTTOM - DI_PDF_TOP) diPdfPageBreak(R);
+          for(var i = 0; i < lines; i++){
+            if(R.kit.getY() > DI_PDF_BOTTOM) diPdfPageBreak(R);
+            var y = R.kit.getY();
+            if(i < lp.length){ diPdfPrep(R, 10.5, true); R.doc.text(lp[i], DI_PDF_M, y); }
+            if(i < vp.length){ diPdfPrep(R, 10.5, false); R.doc.text(vp[i], 72, y); }
+            R.kit.setY(y + DI_PDF_LH);
+          }
+        });
+      }
+      function diPdfFinding(R, block){
+        /* Bungkus dulu seluruh blok agar tingginya diketahui: blok yang
+           muat satu halaman diusahakan tidak terbelah; blok yang lebih
+           panjang dari satu halaman mengalir apa adanya. */
+        var headParts = diPdfWrap(R, block.head, 10.5, true, DI_PDF_W - 2 * DI_PDF_M);
+        var fields = block.fields.map(function(f){
+          diPdfPrep(R, 10.5, true);
+          var lw = R.doc.getTextWidth(diPdfTxt(R, f[0]) + "  ");
+          if(lw > 60) lw = 60;
+          return { label: f[0], lw: lw, parts: diPdfWrap(R, f[1], 10.5, false, DI_PDF_W - 2 * DI_PDF_M - lw) };
+        });
+        var totalLines = headParts.length;
+        fields.forEach(function(f){ totalLines += Math.max(1, f.parts.length); });
+        var height = totalLines * DI_PDF_LH + 2.5;
+        if(R.kit.getY() + height > DI_PDF_BOTTOM && height <= DI_PDF_BOTTOM - DI_PDF_TOP) diPdfPageBreak(R);
+        diPdfPrep(R, 10.5, true);
+        diPdfDrawParts(R, headParts, DI_PDF_M);
+        fields.forEach(function(f){
+          if(R.kit.getY() > DI_PDF_BOTTOM) diPdfPageBreak(R);
+          var y0 = R.kit.getY();
+          diPdfPrep(R, 10.5, true);
+          R.doc.text(diPdfTxt(R, f.label), DI_PDF_M, y0);
+          diPdfPrep(R, 10.5, false);
+          f.parts.forEach(function(p, i){
+            var yy = y0 + i * DI_PDF_LH;
+            if(yy > DI_PDF_BOTTOM){ diPdfPageBreak(R); yy = R.kit.getY(); y0 = yy - i * DI_PDF_LH; }
+            R.doc.text(p, DI_PDF_M + f.lw, yy);
+          });
+          R.kit.setY(y0 + Math.max(1, f.parts.length) * DI_PDF_LH);
+        });
+        diPdfGap(R, 2.5);
+      }
+      function diPdfBullet(R, txt){
+        var parts = diPdfWrap(R, txt, 10.5, false, DI_PDF_W - 2 * DI_PDF_M - 4);
+        parts.forEach(function(p, i){
+          if(R.kit.getY() > DI_PDF_BOTTOM) diPdfPageBreak(R);
+          if(i === 0){ diPdfPrep(R, 10.5, false); R.doc.text(diPdfTxt(R, "•"), DI_PDF_M, R.kit.getY()); }
+          R.doc.text(p, DI_PDF_M + 4, R.kit.getY());
+          R.kit.setY(R.kit.getY() + DI_PDF_LH);
+        });
+      }
+      function diPdfRender(R, blocks, opts){
+        /* Kepala laporan (pola wordmark kit, dengan font aktif D6). */
+        diPdfPrep(R, 16, true);
+        R.doc.setTextColor(29, 95, 209);
+        R.doc.text("Saksara", DI_PDF_M, R.kit.getY());
+        R.doc.setTextColor(0);
+        R.kit.setY(R.kit.getY() + 8);
+        var coverDone = false;
+        blocks.forEach(function(b){
+          if(b.t === "title"){ diPdfPara(R, b.text, 13.5, true); }
+          else if(b.t === "meta"){ diPdfPara(R, b.text, 9.5, false); }
+          else if(b.t === "h"){
+            if(!coverDone){
+              coverDone = true;
+              diPdfGap(R, 1);
+              R.doc.setDrawColor(160);
+              R.doc.line(DI_PDF_M, R.kit.getY(), DI_PDF_W - DI_PDF_M, R.kit.getY());
+              diPdfGap(R, 5);
+              if(opts.fallback){ diPdfPara(R, DI_PDF_FALLBACK_NOTICE, 10, false); diPdfGap(R, 2); }
+            }
+            diPdfHeading(R, b.text, 12, 4);
+          }
+          else if(b.t === "h2"){ diPdfHeading(R, b.text, 11, 3); }
+          else if(b.t === "kv"){ diPdfKv(R, b.rows); diPdfGap(R, 2); }
+          else if(b.t === "p"){ diPdfPara(R, b.text, 10.5, false); diPdfGap(R, 1); }
+          else if(b.t === "li"){ diPdfBullet(R, b.text); }
+          else if(b.t === "finding"){ diPdfFinding(R, b); }
+        });
+      }
+      function diPdfStamp(R, dateStr){
+        var n = R.doc.getNumberOfPages();
+        var left = "Saksara · Laporan Analisis Tulisan · dibuat lokal di peramban ini · " + dateStr;
+        for(var i = 1; i <= n; i++){
+          R.doc.setPage(i);
+          R.doc.setFont(R.font, "normal");
+          R.doc.setFontSize(8);
+          R.doc.setTextColor(120);
+          R.doc.text(diPdfTxt(R, left), DI_PDF_M, 290);
+          R.doc.text(diPdfTxt(R, "Halaman " + i + " dari " + n), DI_PDF_W - DI_PDF_M, 290, { align: "right" });
+        }
+        R.doc.setTextColor(0);
+      }
+      async function diExportReportPdf(){
+        if(!diReportModel || !wiResult){
+          diPdfSetStatus("Belum ada laporan — jalankan analisis terlebih dahulu, lalu ekspor PDF-nya.");
+          return;
+        }
+        var details = {}, docStatus = {};
+        wiResult.suggestions.forEach(function(s){
+          details[s.id] = { explanation: s.explanation || "", replacement: typeof s.replacement === "string" ? s.replacement : null };
+        });
+        diReportModel.categories.forEach(function(cat){
+          cat.items.forEach(function(it){
+            var t = diReportDocStatusText(it);
+            if(t) docStatus[it.id] = t;
+          });
+        });
+        var dateStr = new Date().toLocaleString("id-ID");
+        var blocks = diReportPdfLines(diReportModel, {
+          kindLabels: WI_KIND_LABEL, certLabels: WI_CERT_LABEL, stateLabels: DI_REPORT_STATE_TEXT,
+          details: details, docStatus: docStatus, dateStr: dateStr
+        });
+        var fileName = diReportPdfFileName(new Date());
+        var texts = diReportPdfTexts(blocks).concat([
+          "Saksara", "Saksara · Laporan Analisis Tulisan · dibuat lokal di peramban ini · " + dateStr,
+          "Halaman 1 dari 1", DI_PDF_FALLBACK_NOTICE
+        ]);
+        diPdfBtn.disabled = true;
+        diPdfSetStatus("Menyiapkan PDF…");
+        try {
+          var jsPDF = await loadJsPdf();
+          var fonts = null;
+          try { fonts = await diLoadReportFonts(); } catch(eFont) { fonts = null; }
+          var useFont = !!fonts;
+          if(useFont){
+            var pf = diPdfPreflight(texts, fonts.coverage);
+            if(!pf.ok){
+              diPdfSetStatus("Ekspor dihentikan: karakter berikut tidak didukung font laporan, sehingga isi laporan tidak dapat dipertahankan persis: " + diPdfUnsupportedText(pf.unsupported) + ". PDF tidak dibuat agar tidak ada isi yang hilang diam-diam.");
+              return;
+            }
+          } else {
+            var deleted = diPdfHelveticaDeleted(texts);
+            if(deleted.length){
+              diPdfSetStatus("Ekspor dihentikan: font laporan (Noto Sans) gagal dimuat, dan karakter berikut akan hilang bila dicetak dengan font cadangan: " + diPdfUnsupportedText(deleted) + ". PDF tidak dibuat — periksa koneksi internet lalu coba lagi.");
+              return;
+            }
+          }
+          var kit = p6PdfKit(jsPDF, "Laporan Analisis Tulisan — Saksara");
+          var doc = kit.doc;
+          if(useFont){
+            doc.addFileToVFS(DI_PDF_FONT_VFS.normal, fonts.normal);
+            doc.addFont(DI_PDF_FONT_VFS.normal, DI_PDF_FONT_FAMILY, "normal");
+            doc.addFileToVFS(DI_PDF_FONT_VFS.bold, fonts.bold);
+            doc.addFont(DI_PDF_FONT_VFS.bold, DI_PDF_FONT_FAMILY, "bold");
+          }
+          var R = { doc: doc, kit: kit, font: useFont ? DI_PDF_FONT_FAMILY : "helvetica", safe: !useFont };
+          diPdfRender(R, blocks, { fallback: !useFont });
+          diPdfStamp(R, dateStr);
+          doc.save(fileName);
+          diPdfSetStatus(useFont
+            ? "PDF dibuat: " + fileName + " — dicetak dengan font Noto Sans subset (karakter Unicode dipertahankan)."
+            : "PDF dibuat dengan font cadangan (Helvetica) karena font utama gagal dimuat: " + fileName + " — beberapa karakter tipografis disederhanakan.");
+        } catch(e){
+          diPdfSetStatus("Ekspor PDF gagal: " + (e && e.message ? e.message : e));
+        } finally {
+          diPdfBtn.disabled = false;
+        }
+      }
+      if(diPdfBtn) diPdfBtn.addEventListener("click", function(){ diExportReportPdf(); });
+    })();
 
     /* ================= Compare Writing (Phase 4) =================
        Mesin perbandingan dokumen. Berdiri sendiri: TIDAK menjalankan Detector
@@ -6744,7 +9695,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           });
         }
         function gap(mm){ y += (mm || 3); }
-        line("Saksara — Laporan Perbandingan Dokumen (Compare Writing)", 14, true);
+        line("Saksara — Laporan Perbandingan Dokumen (Bandingkan Tulisan)", 14, true);
         line("Dibuat lokal di peramban pada " + new Date().toLocaleString("id-ID") + ". Laporan ini deskriptif: kemiripan bukan bukti kepengarangan dan perubahan karakteristik bukan bukti AI.", 9.5);
         gap(2);
         line("RINGKASAN", 11.5, true);
@@ -7171,10 +10122,56 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       return new Promise(function(resolve, reject){
         var s = document.createElement("script");
         s.src = url; s.async = true;
+        if(typeof saksaraSriApply === "function") saksaraSriApply(s, url);
         s.onload = function(){ resolve(); };
         s.onerror = function(){ reject(new Error("Gagal memuat " + url)); };
         document.head.appendChild(s);
       });
+    }
+
+    /* ================= PDF.js bersama (D7-B) =================
+       SATU jalur pemuatan PDF.js untuk Document Intelligence dan OCR.
+       PDF.js 4.10.38, build LEGACY, dari jsDelivr (satu CDN yang sama
+       untuk pustaka dan worker; versi ter-pin persis):
+         pustaka: https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/legacy/build/pdf.min.mjs
+         worker:  https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/legacy/build/pdf.worker.min.mjs
+       Sejak 4.x tidak ada lagi build UMD/<script> klasik — pustaka
+       dimuat malas (lazy) lewat dynamic import() dan namespace-nya
+       dipasang ke window.pdfjsLib agar kedua pemanggil tetap membaca
+       tempat yang sama. Panggilan bersamaan berbagi SATU promise yang
+       sedang berjalan (tanpa muat ulang / race). Bila import() gagal,
+       state pemuat DIBERSIHKAN sebelum galat diteruskan, sehingga
+       percobaan berikutnya dapat berhasil — state tidak teracuni
+       permanen. p6LoadScript di atas TIDAK diubah dan tetap dipakai
+       pustaka lain (jsPDF, docx, Tesseract) beserta SRI-nya.
+       SRI: dynamic import() tidak dapat membawa integrity, jadi
+       berkas utama pdf.js TIDAK lagi ber-SRI runtime (kehilangan ini
+       disetujui eksplisit oleh pemilik pada mandat D7-B). Hash berikut
+       dicatat sebagai PROVENANCE saja — dihitung dari dua unduhan
+       byte-identik pada 22 Nov 2026 — BUKAN perlindungan SRI runtime:
+         pdf.min.mjs        sha384-z/XbAtvhBXJoK+yvYimnFuTCF6/2wTCDSIFD09/HtIfwFtvDKOMdAe5Z3wOChkmW
+         pdf.worker.min.mjs sha384-vbNBYP03jHFPlgtK4qSXtazEmGfmpTWlSsfq9OiU20MroW/Q9TbaEXiM7PpeWg+6 */
+    var saksaraPdfJsPromise = null;
+    function saksaraLoadPdfJs(){
+      if(window.pdfjsLib){
+        if(!window.pdfjsLib.GlobalWorkerOptions.workerSrc)
+          window.pdfjsLib.GlobalWorkerOptions.workerSrc = OCR_PDFJS_WORKER;
+        return Promise.resolve(window.pdfjsLib);
+      }
+      if(!saksaraPdfJsPromise){
+        saksaraPdfJsPromise = import(OCR_PDFJS).then(function(mod){
+          var lib = (mod && typeof mod.getDocument === "function") ? mod
+            : (mod && mod.default && typeof mod.default.getDocument === "function") ? mod.default : null;
+          if(!lib) throw new Error("Modul PDF.js tidak lengkap");
+          window.pdfjsLib = lib;
+          lib.GlobalWorkerOptions.workerSrc = OCR_PDFJS_WORKER;
+          return lib;
+        }).catch(function(err){
+          saksaraPdfJsPromise = null; /* bersihkan state: izinkan percobaan ulang */
+          throw err;
+        });
+      }
+      return saksaraPdfJsPromise;
     }
 
     /* ---------------- Riwayat (IndexedDB, opt-in) ---------------- */
@@ -7248,7 +10245,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         });
       });
     }
-    var HIST_KIND_LABEL = { detector: "Detector", forensik: "Writing Forensic", compare: "Bandingkan", batch: "Batch" };
+    var HIST_KIND_LABEL = { detector: "Periksa Tulisan", forensik: "Analisis Forensik Tulisan", compare: "Bandingkan Tulisan", batch: "Periksa Banyak Dokumen" };
     function histSummaryLine(e){
       var s = e.summary || {}, parts = [];
       if(e.kind === "detector") parts.push("Skor " + s.scorePct + "%" + (s.blended ? " (diperkuat classifier)" : "") + " · " + fmtNumID(s.words || 0) + " kata");
@@ -7583,8 +10580,11 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
     var OCR_TESS_WORKER = "https://cdn.jsdelivr.net/npm/tesseract.js@5.0.5/dist/worker.min.js";
     var OCR_TESS_CORE = "https://cdn.jsdelivr.net/npm/tesseract.js-core@5.0.0";
     var OCR_TESS_LANG = "https://tessdata.projectnaptha.com/4.0.0_fast";
-    var OCR_PDFJS = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
-    var OCR_PDFJS_WORKER = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    /* D7-B: PDF.js 4.10.38 build legacy (.mjs) — dimuat lewat pemuat
+       bersama saksaraLoadPdfJs (dynamic import), BUKAN <script> klasik.
+       Nama konstanta dipertahankan karena dipakai kedua fitur. */
+    var OCR_PDFJS = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/legacy/build/pdf.min.mjs";
+    var OCR_PDFJS_WORKER = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/legacy/build/pdf.worker.min.mjs";
     function ocrStatus(msg){ var el = $("ocr-enable-status"); if(el) el.textContent = msg; }
     function ocrProgress(msg, frac){
       var p = $("ocr-progress"); if(p) p.textContent = msg;
@@ -7610,10 +10610,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       try {
         ocrStatus("Mengunduh pustaka OCR…");
         if(!window.Tesseract) await p6LoadScript(OCR_TESS_JS);
-        if(!window.pdfjsLib){
-          await p6LoadScript(OCR_PDFJS);
-          window.pdfjsLib.GlobalWorkerOptions.workerSrc = OCR_PDFJS_WORKER;
-        }
+        if(!window.pdfjsLib) await saksaraLoadPdfJs();
         ocrStatus("Mengunduh model bahasa (Indonesia + Inggris) & menyiapkan mesin…");
         await ocrEnsureWorker();
         ocrState.ready = true;
