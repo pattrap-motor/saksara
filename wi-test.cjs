@@ -7,9 +7,10 @@ const core = coreRaw.slice(coreRaw.indexOf("*/") + 2);
 
 const sandbox = {};
 new Function("sandbox", core +
-  "\nsandbox.wiAnalyze = wiAnalyze; sandbox.wiApply = wiApply; sandbox.WI_MAX_CHARS = WI_MAX_CHARS; sandbox.wiSentences = wiSentences; sandbox.wiReadability = wiReadability; sandbox.wiSyllables = wiSyllables;")(sandbox);
+  "\nsandbox.wiAnalyze = wiAnalyze; sandbox.wiApply = wiApply; sandbox.WI_MAX_CHARS = WI_MAX_CHARS; sandbox.wiSentences = wiSentences; sandbox.wiReadability = wiReadability; sandbox.wiSyllables = wiSyllables; sandbox.wiStyle = wiStyle;")(sandbox);
 const wiAnalyze = sandbox.wiAnalyze, wiApply = sandbox.wiApply, wiSentences = sandbox.wiSentences;
 const wiReadability = sandbox.wiReadability, wiSyllables = sandbox.wiSyllables;
+const wiStyle = sandbox.wiStyle;
 
 let pass = 0, fail = 0;
 function check(name, cond, extra) {
@@ -444,6 +445,71 @@ const bigText = Array(reps).fill(repSent).join(" ");
 const rdB = wiReadability(bigText);
 check("8.4 teks besar: panjang <= 50.000", bigText.length <= 50000, bigText.length);
 check("8.4 teks besar: kalimat & kata berskala eksak, tanpa lempar", rdB.empty === false && rdB.sentences === reps && rdB.words === reps * 9, [rdB.sentences, rdB.words, reps]);
+
+console.log("43) Phase 8.5 — profil, formalitas, kontrak kosong");
+const ST1 = "Penelitian ini bertujuan untuk mengkaji sistem irigasi modern. Metode yang digunakan adalah observasi lapangan dan wawancara terstruktur. Hasil penelitian menunjukkan peningkatan efisiensi penggunaan air.";
+const st1 = wiStyle(ST1, "formal");
+check("8.5 formal: teks formal -> informalCount 0 & label 'Cenderung formal'", st1.indicators.formality.informalCount === 0 && st1.indicators.formality.label === "Cenderung formal", st1.indicators.formality);
+check("8.5 formal: tidak ada temuan profil pada teks formal", st1.findings.filter(f => f.scope === "profil").length === 0, st1.findings);
+check("8.5 formal: konsistensi istilah 'Istilah konsisten', 0 kelompok", st1.indicators.termConsistency.label === "Istilah konsisten" && st1.indicators.termConsistency.variantGroups === 0, st1.indicators.termConsistency);
+check("8.5 kosong: string kosong -> empty", wiStyle("").empty === true);
+check("8.5 kosong: null -> empty tanpa lempar", wiStyle(null).empty === true);
+check("8.5 kosong: hanya angka -> empty", wiStyle("123 456.").empty === true);
+check("8.5 profil tidak dikenal -> diperlakukan sebagai formal", wiStyle(ST1, "tidak-ada").profile === "formal" && JSON.stringify(wiStyle(ST1, "tidak-ada").findings) === JSON.stringify(st1.findings));
+check("8.5 determinisme: dua panggilan -> identik", JSON.stringify(wiStyle(ST1, "akademik")) === JSON.stringify(wiStyle(ST1, "akademik")));
+
+console.log("44) Phase 8.5 — konsistensi sapaan & kutipan");
+const stMix = wiStyle("Saya pergi ke pasar. Aku pulang ke rumah.", "formal");
+check("8.5 sapaan: campuran saya+aku di luar kutip -> temuan sapaan-orang-pertama (potensial)", stMix.findings.some(f => f.kind === "sapaan-orang-pertama" && f.scope === "dokumen" && f.certainty === "potensial"), stMix.findings);
+const stQuote = wiStyle("Dia berkata, “Saya pergi sekarang. Aku akan pulang nanti.” Semua orang mendengarkan.", "formal");
+check("8.5 sapaan: campuran hanya di dalam kutip -> tidak ada temuan sapaan", !stQuote.findings.some(f => f.kind === "sapaan-orang-pertama" || f.kind === "sapaan-orang-kedua"), stQuote.findings);
+const stAk = wiStyle("Aku melakukan observasi di lapangan penelitian.", "akademik");
+check("8.5 akademik: 'aku' -> temuan sapaan-akademik (gaya, profil)", stAk.findings.some(f => f.kind === "sapaan-akademik" && f.scope === "profil" && f.certainty === "gaya"), stAk.findings);
+check("8.5 formal: 'aku' bukan penanda informal -> tidak ada temuan profil", wiStyle("Aku melakukan observasi di lapangan penelitian.", "formal").findings.filter(f => f.scope === "profil").length === 0);
+
+console.log("45) Phase 8.5 — variasi istilah, satuan, desimal");
+check("8.5 istilah: email+surel -> temuan variasi-istilah", wiStyle("Email pertama dikirim kemarin. Surel kedua dikirim hari ini.", "formal").findings.some(f => f.kind === "variasi-istilah"));
+check("8.5 istilah: hanya email -> tidak ada temuan", !wiStyle("Email pertama dikirim kemarin. Email kedua dikirim hari ini.", "formal").findings.some(f => f.kind === "variasi-istilah"));
+check("8.5 istilah: 'situs web' utuh -> 'web' tidak ikut terhitung", !wiStyle("Situs web resmi kami dibuka untuk publik.", "formal").findings.some(f => f.kind === "variasi-istilah"));
+check("8.5 istilah: ponsel + telepon pintar -> temuan", wiStyle("Ponsel saya baru dibeli. Telepon pintar itu mahal.", "formal").findings.some(f => f.kind === "variasi-istilah"));
+check("8.5 satuan: 5 km + 3 kilometer -> temuan variasi-satuan", wiStyle("Jarak tempuhnya 5 km dari sini. Jalan itu panjangnya 3 kilometer.", "formal").findings.some(f => f.kind === "variasi-satuan"));
+check("8.5 satuan: hanya km -> tidak ada temuan", !wiStyle("Jaraknya 5 km dari sini.", "formal").findings.some(f => f.kind === "variasi-satuan"));
+check("8.5 satuan: 5 l + 2 liter -> temuan", wiStyle("Air sebanyak 5 l dituang ke ember. Volume totalnya 2 liter.", "formal").findings.some(f => f.kind === "variasi-satuan"));
+check("8.5 satuan: 10% + persen -> temuan", wiStyle("Diskon 10% berlaku hari ini. Potongan sepuluh persen juga diberikan.", "formal").findings.some(f => f.kind === "variasi-satuan"));
+check("8.5 desimal: 3,5 dan 2.5 -> temuan desimal-campuran", wiStyle("Beratnya 3,5 kg dan tingginya 2.5 meter.", "formal").findings.some(f => f.kind === "desimal-campuran"));
+check("8.5 desimal: 1.000 (ribuan) + 3,5 -> tidak ada temuan", !wiStyle("Sebanyak 1.000 orang hadir dan beratnya 3,5 kg.", "formal").findings.some(f => f.kind === "desimal-campuran"));
+
+console.log("46) Phase 8.5 — temuan per profil");
+const ST_INF = "Pekerjaan itu udah selesai dan hasilnya bagus banget.";
+const stInfF = wiStyle(ST_INF, "formal");
+const infF = stInfF.findings.filter(f => f.kind === "kata-informal");
+check("8.5 informal: profil formal -> temuan udah & banget (gaya, profil)", infF.length === 2 && infF.every(f => f.certainty === "gaya" && f.scope === "profil"), stInfF.findings);
+check("8.5 informal: kepadatan 25 -> label 'Cenderung informal'", stInfF.indicators.formality.density === 25 && stInfF.indicators.formality.label === "Cenderung informal", stInfF.indicators.formality);
+check("8.5 informal: profil naratif -> tidak ada temuan profil", wiStyle(ST_INF, "naratif").findings.filter(f => f.scope === "profil").length === 0);
+const ST_BIR = "Dalam rangka meningkatkan layanan, kami membuka loket baru.";
+check("8.5 populer: 'dalam rangka' -> temuan frasa-birokratis", wiStyle(ST_BIR, "populer").findings.some(f => f.kind === "frasa-birokratis" && f.scope === "profil"));
+check("8.5 formal: 'dalam rangka' -> tidak ada temuan birokratis", !wiStyle(ST_BIR, "formal").findings.some(f => f.kind === "frasa-birokratis"));
+check("8.5 ringkas: 'disebabkan karena' -> temuan kata-mubazir", wiStyle("Keterlambatan disebabkan karena hujan deras.", "ringkas").findings.some(f => f.kind === "kata-mubazir" && f.scope === "profil"));
+const ST_LONG = "Penelitian ini mengkaji kinerja sistem irigasi modern yang dipasang di lahan petani kecil di wilayah Kabupaten Kuningan selama musim kemarau tahun ini dengan menggunakan sensor tanah dan pompa otomatis bertenaga surya.";
+check("8.5 ringkas: kalimat 31 kata -> temuan kalimat-panjang-ringkas", wiStyle(ST_LONG, "ringkas").findings.some(f => f.kind === "kalimat-panjang-ringkas"));
+check("8.5 formal: kalimat 31 kata -> tidak ada temuan ringkas", !wiStyle(ST_LONG, "formal").findings.some(f => f.kind === "kalimat-panjang-ringkas"));
+
+console.log("47) Phase 8.5 — keamanan nama/istilah, pengulangan frasa, kosakata");
+const ST_NAME = "Arduino dipasang oleh tim PT Sumber Abadi di Jakarta. Dr. Rahman memimpin proyek itu.";
+["formal", "akademik", "profesional", "populer", "ringkas", "naratif"].forEach(function(pf) {
+  check("8.5 nama: profil " + pf + " -> nol temuan", wiStyle(ST_NAME, pf).findings.length === 0, wiStyle(ST_NAME, pf).findings);
+});
+const ST_REP = "Hasil penelitian ini menunjukkan peningkatan. Hasil penelitian ini juga membuktikan hipotesis. Hasil penelitian ini menjadi dasar kebijakan.";
+check("8.5 frasa: 3-gram muncul 3 kali -> temuan pengulangan-frasa (gaya)", wiStyle(ST_REP, "formal").findings.some(f => f.kind === "pengulangan-frasa" && f.certainty === "gaya"));
+check("8.5 frasa: 3-gram muncul 2 kali -> tidak ada temuan", !wiStyle("Hasil penelitian ini menunjukkan peningkatan. Hasil penelitian ini juga membuktikan hipotesis.", "formal").findings.some(f => f.kind === "pengulangan-frasa"));
+const stTtr = wiStyle("Kucing makan ikan. Kucing minum susu. Kucing tidur nyenyak.", "formal");
+check("8.5 kosakata: TTR eksak 0,778 (7 unik dari 9 kata)", stTtr.indicators.vocabRepeat.ttr === 0.778 && stTtr.indicators.vocabRepeat.unique === 7 && stTtr.indicators.vocabRepeat.total === 9, stTtr.indicators.vocabRepeat);
+check("8.5 kosakata: topRepeated = kucing x3", JSON.stringify(stTtr.indicators.vocabRepeat.topRepeated) === JSON.stringify([{ word: "kucing", count: 3 }]), stTtr.indicators.vocabRepeat.topRepeated);
+
+console.log("48) Phase 8.5 — teks besar & urutan temuan");
+const stBig = wiStyle(bigText, "formal");
+check("8.5 teks besar: berjalan tanpa lempar, kata berskala eksak", stBig.empty === false && stBig.words === reps * 9, [stBig.words, reps]);
+check("8.5 urutan: temuan dokumen selalu sebelum temuan profil", (() => { const fs2 = wiStyle(ST_INF + " Saya pergi. Aku pulang.", "formal").findings; let seenProf = false; for (const f of fs2) { if (f.scope === "profil") seenProf = true; if (f.scope === "dokumen" && seenProf) return false; } return fs2.length >= 3; })());
 
 console.log("\nWI TESTS:", pass, "passed,", fail, "failed");
 process.exit(fail ? 1 : 0);
