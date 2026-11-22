@@ -6501,9 +6501,13 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         block.type = "list-item"; block.listKind = listInfo.kind; block.level = listInfo.level;
         if(listInfo.numId != null) block.numId = listInfo.numId;
       }
+      /* D4.1 (F5): styleId hanya dicatat pada blok heading — detektor
+         nama gaya kustom membutuhkan identitas gaya yang tidak ambigu
+         (styleName saja dapat berarti bawaan terlokalisasi). */
+      if(block.type === "heading" && styleId) block.styleId = styleId;
       return block;
     }
-    function diTableBlock(tblEl, ctx, model){
+    function diTableBlock(tblEl, ctx, model, probe){
       var tIdx = model.tables.length;
       var table = { index: tIdx, rows: [] };
       model.tables.push(table);
@@ -6529,7 +6533,10 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
               cellMeta.blockIds.push(b.id);
               cellPara++;
             } else if(ch.local === "tbl"){
-              diTableBlock(ch, ctx, model);
+              /* D4.1 (F3): tabel di dalam sel — diratakan oleh pemanggilan
+                 rekursif ini; kejadiannya dihitung untuk peringatan. */
+              if(probe) probe.nestedTables++;
+              diTableBlock(ch, ctx, model, probe);
             }
           });
           rowMeta.cells.push(cellMeta);
@@ -6538,21 +6545,47 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         table.rows.push(rowMeta);
       });
     }
-    function diWalkBody(kids, ctx, model){
+    function diWalkBody(kids, ctx, model, probe){
       (kids || []).forEach(function(el){
         if(!el.tag) return;
         if(el.local === "p") diPushBlock(model, diParaBlock(el, ctx, null));
-        else if(el.local === "tbl") diTableBlock(el, ctx, model);
+        else if(el.local === "tbl") diTableBlock(el, ctx, model, probe);
         else if(el.local === "sdt"){
           var content = diFirst(el, "sdtContent");
-          if(content) diWalkBody(content.children, ctx, model);
+          if(content) diWalkBody(content.children, ctx, model, probe);
         }
       });
+    }
+    /* D4.1 (F7): pemindaian struktural pohon document.xml untuk
+       pemberitahuan impor. Hanya NAMA elemen yang diperiksa, tidak
+       pernah teks: ins/del/moveFrom/moveTo menandai track changes,
+       commentReference menandai adanya komentar yang dirujuk isi,
+       footnoteReference menandai adanya catatan kaki yang dirujuk isi. */
+    function diScanPartFlags(el, out){
+      out = out || { trackedChanges: false, commentRefs: false, footnoteRefs: false };
+      if(!el || !el.tag) return out;
+      var ln = el.local;
+      if(ln === "ins" || ln === "del" || ln === "moveFrom" || ln === "moveTo") out.trackedChanges = true;
+      else if(ln === "commentReference") out.commentRefs = true;
+      else if(ln === "footnoteReference") out.footnoteRefs = true;
+      (el.children || []).forEach(function(c){ if(c.tag) diScanPartFlags(c, out); });
+      return out;
     }
     function diBuildModel(docRoot, ctx){
       var model = { format: "docx", blocks: [], tables: [] };
       var body = diFirst(docRoot, "body") || docRoot;
-      diWalkBody(body.children, ctx, model);
+      var probe = { nestedTables: 0 };
+      diWalkBody(body.children, ctx, model, probe);
+      /* D4.1: flag impor dicatat HANYA bila kondisinya terdeteksi —
+         dokumen tanpa kondisi apa pun tidak membawa kunci flags,
+         sehingga modelnya sama persis dengan keadaan sebelumnya. */
+      var scan = diScanPartFlags(docRoot);
+      var flags = {};
+      if(probe.nestedTables > 0) flags.nestedTables = probe.nestedTables;
+      if(scan.trackedChanges) flags.trackedChanges = true;
+      if(scan.footnoteRefs) flags.footnotes = true;
+      if(scan.commentRefs) flags.comments = true;
+      if(Object.keys(flags).length) model.flags = flags;
       return model;
     }
     /* ---------- Perakitan teks analisis + statistik ----------
@@ -6651,7 +6684,37 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           if(parts["word/numbering.xml"]){ try { numbering = diParseNumbering(diParseXml(parts["word/numbering.xml"])); } catch(e){ numbering = null; } }
           if(parts["word/_rels/document.xml.rels"]){ try { rels = diParseRels(diParseXml(parts["word/_rels/document.xml.rels"])); } catch(e){ rels = {}; } }
           var model = diBuildModel(docRoot, { styles: styles, numbering: numbering, rels: rels });
-          return { ok: true, model: model };
+          /* D4.1 (F7): lengkapi flag impor dari bagian pendamping.
+             Pengambilan footnotes/comments bersifat TOLERAN — kegagalan
+             membaca bagian pendamping tidak pernah menggagalkan impor;
+             flag-nya saja yang tidak terpasang. Header/footer dideteksi
+             dari nama entri pada peta ZIP. Catatan kaki hanya dihitung
+             bila ada entri sungguhan (bukan separator struktural). */
+          var extra = [];
+          if(byName["word/footnotes.xml"]) extra.push(getPart("word/footnotes.xml").then(function(r){ if(r && r.ok) parts.footnotesText = r.text; }));
+          if(byName["word/comments.xml"]) extra.push(getPart("word/comments.xml").then(function(r){ if(r && r.ok) parts.commentsText = r.text; }));
+          return Promise.all(extra).then(function(){
+            var flags = model.flags || {};
+            if(Object.keys(byName).some(function(n){ return /^word\/(?:header|footer)\d*\.xml$/.test(n); }))
+              flags.headerFooter = true;
+            if(parts.footnotesText){
+              try {
+                var fnReal = 0;
+                diKids(diParseXml(parts.footnotesText), "footnote").forEach(function(fn){
+                  var t = diAttr(fn, "type");
+                  if(t !== "separator" && t !== "continuationSeparator" && t !== "continuationNotice") fnReal++;
+                });
+                if(fnReal > 0) flags.footnotes = true;
+              } catch(e){ /* bagian rusak diperlakukan sebagai tidak ada */ }
+            }
+            if(parts.commentsText){
+              try {
+                if(diKids(diParseXml(parts.commentsText), "comment").length > 0) flags.comments = true;
+              } catch(e){ /* bagian rusak diperlakukan sebagai tidak ada */ }
+            }
+            if(Object.keys(flags).length) model.flags = flags;
+            return { ok: true, model: model };
+          });
         } catch(err){
           if(err && err.code === "xml-invalid")
             return diFail("xml-invalid", "Isi dokumen tidak dapat dibaca — struktur XML di dalamnya rusak.");
@@ -7107,22 +7170,72 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
     function diModelToPlainText(model){
       return diAssembleText(model).text;
     }
-    function diExportWarnings(model){
-      var omml = 0, field = 0, object = 0, ulStyle = 0;
+    /* D4.1 (F4): skema sebuah tautan, dinormalisasi seperti diLinkSafe
+       (spasi/karakter kontrol di kedua ujung dipangkas dulu). Mengembalikan
+       null bila tautan tidak memiliki skema (relatif atau jangkar) — tautan
+       semacam itu TIDAK pernah dianggap tidak aman oleh peringatan. */
+    var DI_SAFE_LINK_SCHEMES = { http: 1, https: 1, mailto: 1 };
+    function diLinkScheme(link){
+      if(typeof link !== "string") return null;
+      var h = link.replace(/^[\s\u0000-\u0020]+/, "").replace(/[\s\u0000-\u0020]+$/, "");
+      var m = /^([A-Za-z][A-Za-z0-9+.-]*):/.exec(h);
+      return m ? m[1].toLowerCase() : null;
+    }
+    /* D4.1 (F5): apakah blok heading membawa identitas gaya KUSTOM yang
+       namanya akan diganti gaya bawaan Heading pada berkas hasil.
+       Bawaan dibuktikan oleh styleId Heading1..Heading6 ATAU nama
+       ternormalisasi "heading N" / "judul N" (lokalisasi Word). Heading
+       tanpa identitas gaya sama sekali tidak memicu: tidak ada nama
+       gaya yang hilang. Gaya bawaan yang labelnya diganti pengguna
+       (styleId tetap bawaan) diperlakukan sebagai bawaan — identitas
+       gayanya memang bawaan; batas deteksi ini dinyatakan di laporan. */
+    function diHeadingStyleCustom(b){
+      if(!b || b.type !== "heading") return false;
+      var id = b.styleId || null, nm = b.styleName || null;
+      if(!id && !nm) return false;
+      if(id && /^Heading[1-6]$/.test(id)) return false;
+      if(nm && /^(heading|judul) [1-6]$/.test(String(nm).replace(/\s+/g, " ").replace(/^\s+|\s+$/g, "").toLowerCase())) return false;
+      return true;
+    }
+    /* D4.1 (F6): jumlah blok berindentasi bukan-nol. Dipakai HANYA oleh
+       jalur salin — pada ekspor DOCX indentasi dipertahankan, jadi
+       jenis peringatan ini sengaja TIDAK masuk diExportWarnings. */
+    function diModelIndentCount(model){
+      var n = 0;
       ((model && model.blocks) || []).forEach(function(b){
+        var ind = b.indent;
+        if(!ind) return;
+        for(var k in ind){
+          if(typeof ind[k] === "number" && ind[k] !== 0){ n++; return; }
+        }
+      });
+      return n;
+    }
+    function diExportWarnings(model){
+      var omml = 0, field = 0, object = 0, ulStyle = 0, linkUnsafe = 0, headingCustom = 0;
+      ((model && model.blocks) || []).forEach(function(b){
+        if(diHeadingStyleCustom(b)) headingCustom++;
         (b.runs || []).forEach(function(r){
           if(r.protected){
             if(r.kind === "omml") omml++;
             else if(r.kind === "field") field++;
             else if(r.kind === "object") object++;
           } else if(r.underline && r.underlineStyle) ulStyle++;
+          if(r.link){
+            var sc = diLinkScheme(r.link);
+            if(sc && !DI_SAFE_LINK_SCHEMES[sc]) linkUnsafe++;
+          }
         });
       });
+      var nested = (model && model.flags && typeof model.flags.nestedTables === "number") ? model.flags.nestedTables : 0;
       var out = [];
       if(omml) out.push({ kind: "protected-omml", count: omml, message: "Rumus (OMML) tidak ditulis ulang sebagai rumus — pada salinan dan berkas hasil, rumus tampil sebagai teks linear biasa." });
       if(field) out.push({ kind: "protected-field", count: field, message: "Kolom isian (field) Word hanya dipertahankan sebagai teks hasil terakhirnya; field-nya sendiri tidak dipertahankan." });
       if(object) out.push({ kind: "protected-object", count: object, message: "Gambar/objek tertanam tidak disertakan pada salinan maupun berkas hasil." });
       if(ulStyle) out.push({ kind: "underline-style", count: ulStyle, message: "Gaya garis bawah selain garis tunggal (misalnya ganda atau bergelombang) menjadi garis tunggal." });
+      if(nested) out.push({ kind: "nested-table", count: nested, message: "Ada tabel di dalam sel tabel — pada hasil, tabel tersebut ditempatkan sesudah tabel induknya, bukan di dalam sel." });
+      if(linkUnsafe) out.push({ kind: "link-scheme", count: linkUnsafe, message: "Sebagian tautan memakai skema yang tidak didukung (di luar http/https/mailto) dan menjadi teks biasa pada hasil." });
+      if(headingCustom) out.push({ kind: "heading-style", count: headingCustom, message: "Nama gaya heading kustom diganti gaya bawaan Heading pada berkas hasil; level heading dipertahankan." });
       if(model && model.format === "pdf") out.push({ kind: "pdf-source", count: (typeof model.pages === "number" ? model.pages : 1), message: "Dokumen ini berasal dari PDF: struktur halaman tidak dibuat ulang, dan format teksnya hanya perkiraan dari nama font — hasil ekspor adalah dokumen Word baru, bukan salinan persis PDF." });
       return out;
     }
@@ -7667,6 +7780,16 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
             if(res.pdfStats && res.pdfStats.emptyPages > 0){
               diShowBanner(warnEl, fmtNumID(res.pdfStats.emptyPages) + " dari " + fmtNumID(res.pdfStats.pages) + " halaman PDF tidak menghasilkan teks (kemungkinan halaman gambar/pindaian) — halaman tersebut tidak ikut dianalisis.");
             }
+            /* D4.1 (F7): pemberitahuan impor — hanya bila flag D4.1 pada
+               model DOCX membuktikan salah satu kondisi terdeteksi saat
+               penguraian (bagian header/footer, catatan kaki sungguhan,
+               komentar, atau track changes). Model PDF tidak pernah
+               membawa flag, jadi pemberitahuan ini tidak tampil untuk
+               PDF — tidak ada klaim pemeriksaan yang tidak dijalankan. */
+            if(res.model.format === "docx" && res.model.flags &&
+              (res.model.flags.headerFooter || res.model.flags.footnotes || res.model.flags.comments || res.model.flags.trackedChanges)){
+              diShowBanner(warnEl, "Header, footer, catatan kaki, dan komentar tidak ikut dimuat. Dokumen dengan track changes dimuat dalam tampilan perubahan yang diterima.");
+            }
             if(!asm.text.replace(/\s+/g, "")){
               diShowBanner(errEl, "Dokumen tidak memuat teks yang dapat dianalisis — mungkin isinya hanya gambar, tabel kosong, atau rumus.");
             }
@@ -7904,6 +8027,10 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       var diCopyBtn = $("wi-doc-copy"), diExpBtn = $("wi-doc-export"), diCmpBtn = $("wi-doc-compare"),
           diExpWarnEl = $("wi-doc-expwarn"), diDiffEl = $("wi-doc-diff");
       var diDocxPromise = null, diExportWarnedFor = null, diExportBusy = false;
+      /* D4.1: jenis peringatan yang SEDANG tampil pada panel ekspor —
+         jalur salin tidak mengulang jenis yang sudah terlihat di sana
+         (anti-duplikasi lintas permukaan, per jenis). */
+      var diExpWarnKinds = [];
 
       function diWorkEmpty(){
         if(!diWork || !diWork.blocks || !diWork.blocks.length) return true;
@@ -7930,6 +8057,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       }
       function diResetD4(){
         diExportWarnedFor = null;
+        diExpWarnKinds = [];
         if(diExpBtn) diExpBtn.textContent = "Unduh DOCX";
         diShowBanner(diExpWarnEl, "");
         diHideDiff();
@@ -8116,6 +8244,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         var stamp = diExportStamp();
         if(warnings.length && diExportWarnedFor !== stamp){
           diExportWarnedFor = stamp;
+          diExpWarnKinds = warnings.map(function(w){ return w.kind; });
           var html = "<strong>Sebelum mengunduh, perhatikan:</strong><ul style=\"margin:6px 0 0; padding-left:18px;\">";
           warnings.forEach(function(w){
             html += "<li>" + escapeHtml(w.message) + (w.kind === "pdf-source" ? "" : " (" + fmtNumID(w.count) + ")") + "</li>";
@@ -8126,6 +8255,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           return;
         }
         diExportWarnedFor = null;
+        diExpWarnKinds = [];
         diShowBanner(diExpWarnEl, "");
         diExpBtn.textContent = "Unduh DOCX";
         diDoExport();
@@ -8147,9 +8277,25 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           return navigator.clipboard.writeText(plain).then(function(){ return true; }, function(){ return diExecCopy(plain); });
         return Promise.resolve(diExecCopy(plain));
       }
+      /* D4.1: jenis peringatan yang relevan untuk permukaan SALIN HTML.
+         heading-style tidak termasuk (HTML tidak mengenal nama gaya —
+         tidak ada degradasi di permukaan ini) dan pdf-source tidak
+         termasuk (naskahnya spesifik berkas DOCX). clipboard-indent
+         khusus salin: indentasi tidak dibawa HTML, tetapi dipertahankan
+         DOCX — karena itu ia tidak masuk diExportWarnings. */
+      var DI_COPY_WARN_KINDS = { "protected-omml": 1, "protected-field": 1, "protected-object": 1,
+        "underline-style": 1, "nested-table": 1, "link-scheme": 1 };
       if(diCopyBtn) diCopyBtn.addEventListener("click", function(){
         if(!wiDocState || !diWork || diWorkEmpty()) return;
         var html = diModelToHtml(diWork), plain = diModelToPlainText(diWork);
+        /* Peringatan salin dihitung dari model kerja saat klik; jenis
+           yang sedang tampil di panel ekspor disaring keluar agar tidak
+           muncul dua kali di kartu yang sama. */
+        var copyWarn = diExportWarnings(diWork).filter(function(w){ return DI_COPY_WARN_KINDS[w.kind]; });
+        var indentCount = diModelIndentCount(diWork);
+        if(indentCount > 0) copyWarn.push({ kind: "clipboard-indent", count: indentCount,
+          message: "Indentasi paragraf tidak ikut tersalin ke format HTML (indentasi tetap dipertahankan pada unduhan DOCX)." });
+        copyWarn = copyWarn.filter(function(w){ return diExpWarnKinds.indexOf(w.kind) < 0; });
         var rich = null;
         if(navigator.clipboard && typeof navigator.clipboard.write === "function" && typeof window.ClipboardItem === "function"){
           try {
@@ -8161,7 +8307,15 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         }
         Promise.resolve(rich).then(function(okRich){
           if(okRich){
-            diShowBanner(diNoteEl, "Dokumen kerja disalin dengan format (judul, tebal/miring, daftar, tautan, dan tabel dipertahankan sebatas dukungan aplikasi tujuan) beserta teks biasa.");
+            var noteHtml = "Dokumen kerja disalin dengan format (judul, tebal/miring, daftar, tautan, dan tabel dipertahankan sebatas dukungan aplikasi tujuan) beserta teks biasa.";
+            if(copyWarn.length){
+              noteHtml += "<br><strong>Perhatikan untuk salinan ini:</strong><ul style=\"margin:6px 0 0; padding-left:18px;\">";
+              copyWarn.forEach(function(w){
+                noteHtml += "<li>" + escapeHtml(w.message) + " (" + fmtNumID(w.count) + ")</li>";
+              });
+              noteHtml += "</ul>";
+            }
+            diShowBanner(diNoteEl, noteHtml);
             return;
           }
           return diFallbackCopy(plain).then(function(okPlain){

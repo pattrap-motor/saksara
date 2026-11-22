@@ -20,11 +20,14 @@ new Function("sandbox", core +
   " sandbox.diBlockText = diBlockText; sandbox.DI_MAP_REASON_TEXT = DI_MAP_REASON_TEXT;" +
   " sandbox.diModelToHtml = diModelToHtml; sandbox.diModelToPlainText = diModelToPlainText;" +
   " sandbox.diExportWarnings = diExportWarnings; sandbox.diDiffModels = diDiffModels;" +
-  " sandbox.diDiffSegments = diDiffSegments; sandbox.diLinkSafe = diLinkSafe;")(sandbox);
+  " sandbox.diDiffSegments = diDiffSegments; sandbox.diLinkSafe = diLinkSafe;" +
+  " sandbox.diLinkScheme = diLinkScheme; sandbox.diHeadingStyleCustom = diHeadingStyleCustom;" +
+  " sandbox.diModelIndentCount = diModelIndentCount; sandbox.diScanPartFlags = diScanPartFlags;")(sandbox);
 const { diParseDocx, diAssembleText, diModelStats, diParseXml, diSerializeXml, DI_CAPS, DI_MAX_ANALYSIS_CHARS,
   diPdfPagesToModel, diPdfTextStats, diPdfErrorInfo, diSniffFormat,
   diSyncModel, diMapSuggestion, diMapAll, diApplyToModel, diCloneModel, diBlockText, DI_MAP_REASON_TEXT,
-  diModelToHtml, diModelToPlainText, diExportWarnings, diDiffModels, diDiffSegments, diLinkSafe } = sandbox;
+  diModelToHtml, diModelToPlainText, diExportWarnings, diDiffModels, diDiffSegments, diLinkSafe,
+  diLinkScheme, diHeadingStyleCustom, diModelIndentCount, diScanPartFlags } = sandbox;
 
 /* WI-CORE diekstrak juga (read-only) agar uji D3 dapat menegaskan saran
    sungguhan dari wiAnalyze atas teks rakitan dokumen. */
@@ -774,6 +777,127 @@ function blockText(b) { return b.runs.filter(r => !r.protected).map(r => r.text)
     check("dokumen besar bersih -> tanpa peringatan", eq(diExportWarnings(r.model), []));
     check("diff dokumen besar identik -> 0 berubah", diDiffModels(r.model, diCloneModel(r.model)).changedCount === 0);
     check("teks biasa dokumen besar == rakitan", diModelToPlainText(r.model) === asm.text);
+  }
+
+  console.log("39) D4.1 F3 — tabel bersarang: flag impor + peringatan nested-table");
+  {
+    const r = await parse("nested.docx");
+    check("parse ok", r.ok === true, r);
+    const m = r.model;
+    check("dua tabel tercatat (luar + dalam)", m.tables.length === 2, m.tables.length);
+    check("flags.nestedTables = 1", !!m.flags && m.flags.nestedTables === 1, m.flags);
+    check("peringatan persis [nested-table x1]", eq(diExportWarnings(m).map(w => [w.kind, w.count]), [["nested-table", 1]]), diExportWarnings(m));
+    const asm = diAssembleText(m);
+    check("teks sel dalam ikut rakitan", asm.text.includes("Sel dalam satu.") && asm.text.includes("Sel dalam dua."), asm.text);
+    const t = (await parse("table.docx")).model;
+    check("table.docx tanpa flag", t.flags === undefined, t.flags);
+    check("table.docx tanpa peringatan nested-table", !diExportWarnings(t).some(w => w.kind === "nested-table"));
+    const rt = (await parse("doc-roundtrip.docx")).model;
+    check("doc-roundtrip.docx tanpa peringatan nested-table", !diExportWarnings(rt).some(w => w.kind === "nested-table"));
+  }
+
+  console.log("40) D4.1 F4 — tautan skema non-aman: peringatan link-scheme");
+  {
+    const r = await parse("links-unsafe.docx");
+    check("parse ok", r.ok === true, r);
+    const m = r.model;
+    const links = [];
+    m.blocks.forEach(b => b.runs.forEach(x => { if (x.link) links.push(x.link); }));
+    check("tiga tautan tercatat", eq(links, ["https://saksara.vercel.app", "ftp://berkas.contoh.id/berkas.zip", "dokumen-relatif.docx"]), links);
+    check("peringatan persis [link-scheme x1] (hanya ftp)", eq(diExportWarnings(m).map(w => [w.kind, w.count]), [["link-scheme", 1]]), diExportWarnings(m));
+    const h = diModelToHtml(m);
+    check("https tetap dirender sebagai tautan", h.includes('<a href="https://saksara.vercel.app">'), h);
+    check("ftp TIDAK dirender sebagai tautan", !h.includes('href="ftp:'), h);
+    check("diLinkScheme: HTTPS besar -> https", diLinkScheme("HTTPS://a.b") === "https");
+    check("diLinkScheme: FTP besar -> ftp", diLinkScheme("FTP://x") === "ftp");
+    check("diLinkScheme: relatif -> null", diLinkScheme("dokumen-relatif.docx") === null);
+    check("diLinkScheme: jangkar -> null", diLinkScheme("#jangkar") === null);
+    check("diLinkScheme: mailto ber-spasi -> mailto", diLinkScheme("  mailto:a@b.id ") === "mailto");
+    check("diLinkScheme: javascript terdeteksi sebagai skema", diLinkScheme("javascript:alert(1)") === "javascript");
+    check("diLinkScheme: non-string -> null", diLinkScheme(42) === null && diLinkScheme(null) === null);
+    check("diLinkSafe tetap menolak ftp & javascript", diLinkSafe("ftp://x") === null && diLinkSafe("javascript:alert(1)") === null);
+  }
+
+  console.log("41) D4.1 F5 — nama gaya heading kustom: peringatan heading-style");
+  {
+    const r = await parse("heading-custom.docx");
+    check("parse ok", r.ok === true, r);
+    const m = r.model;
+    check("blok 0 heading kustom", m.blocks[0].type === "heading" && m.blocks[0].level === 1 &&
+      m.blocks[0].styleId === "BabKhusus" && m.blocks[0].styleName === "Bab Khusus", m.blocks[0]);
+    check("blok 2 heading bawaan", m.blocks[2].type === "heading" && m.blocks[2].level === 2 &&
+      m.blocks[2].styleId === "Heading2", m.blocks[2]);
+    check("peringatan persis [heading-style x1]", eq(diExportWarnings(m).map(w => [w.kind, w.count]), [["heading-style", 1]]), diExportWarnings(m));
+    const hd = (await parse("headings.docx")).model;
+    check("headings.docx styleId bawaan tercatat", hd.blocks[0].styleId === "Heading1", hd.blocks[0]);
+    check("headings.docx tanpa peringatan apa pun", eq(diExportWarnings(hd), []));
+    check("detektor: styleId bawaan -> bukan kustom", diHeadingStyleCustom({ type: "heading", styleId: "Heading3", styleName: "Apa Saja" }) === false);
+    check("detektor: nama 'judul 2' terlokalisasi -> bukan kustom", diHeadingStyleCustom({ type: "heading", styleName: "judul 2" }) === false);
+    check("detektor: nama 'heading 4' -> bukan kustom", diHeadingStyleCustom({ type: "heading", styleName: "heading 4" }) === false);
+    check("detektor: tanpa identitas gaya -> bukan kustom", diHeadingStyleCustom({ type: "heading", level: 1 }) === false);
+    check("detektor: gaya bernama sendiri -> kustom", diHeadingStyleCustom({ type: "heading", styleId: "GayaSaya", styleName: "Gaya Saya" }) === true);
+    check("detektor: paragraf bergaya apa pun -> bukan kustom", diHeadingStyleCustom({ type: "paragraph", styleId: "GayaSaya", styleName: "Gaya Saya" }) === false);
+  }
+
+  console.log("42) D4.1 F6 — indentasi: hitungan blok bukan-nol, khusus salin");
+  {
+    const r = await parse("indent.docx");
+    check("parse ok", r.ok === true, r);
+    const m = r.model;
+    check("indent left 720 tercatat", !!m.blocks[0].indent && m.blocks[0].indent.left === 720, m.blocks[0].indent);
+    check("indent firstLine 360 tercatat", !!m.blocks[1].indent && m.blocks[1].indent.firstLine === 360, m.blocks[1].indent);
+    check("diModelIndentCount = 2 (nol eksplisit tidak terhitung)", diModelIndentCount(m) === 2, diModelIndentCount(m));
+    check("indent.docx tanpa peringatan ekspor (F6 khusus salin)", eq(diExportWarnings(m), []), diExportWarnings(m));
+    const sm = (await parse("simple.docx")).model;
+    check("simple.docx indent count 0", diModelIndentCount(sm) === 0);
+    check("sintetis: {left:0} -> 0", diModelIndentCount({ format: "docx", tables: [], blocks: [{ id: "b0", type: "paragraph", indent: { left: 0 }, runs: [{ text: "x" }] }] }) === 0);
+    check("sintetis: {hanging:240} -> 1", diModelIndentCount({ format: "docx", tables: [], blocks: [{ id: "b0", type: "paragraph", indent: { hanging: 240 }, runs: [{ text: "x" }] }] }) === 1);
+    check("model PDF indent count 0", diModelIndentCount(diPdfPagesToModel([{ page: 1, items: [{ str: "Halo", x: 1, y: 2, width: 10, fontName: "Helvetica", fontSize: 12 }] }])) === 0);
+  }
+
+  console.log("43) D4.1 F7 — flag bagian pendamping: header/footer, catatan kaki, komentar, track changes");
+  {
+    const r = await parse("parts.docx");
+    check("parse ok", r.ok === true, r);
+    const m = r.model;
+    check("flags headerFooter+footnotes+comments terpasang", !!m.flags && m.flags.headerFooter === true && m.flags.footnotes === true && m.flags.comments === true, m.flags);
+    check("flags trackedChanges tidak terpasang", !(m.flags && m.flags.trackedChanges));
+    const asm = diAssembleText(m);
+    check("isi header/footer tidak ikut rakitan", !asm.text.includes("Kepala halaman") && !asm.text.includes("Kaki halaman"), asm.text);
+    check("isi catatan kaki/komentar tidak ikut rakitan", !asm.text.includes("Catatan kaki sungguhan") && !asm.text.includes("Komentar penguji pada"), asm.text);
+    check("isi utama tetap utuh", asm.text.includes("Bagian yang dikomentari penguji.") && asm.text.includes("Ada catatan kaki"), asm.text);
+    const tr = (await parse("tracked.docx")).model;
+    check("tracked.docx flags.trackedChanges terpasang", !!tr.flags && tr.flags.trackedChanges === true, tr.flags);
+    check("tracked.docx tanpa flag lain", !(tr.flags && (tr.flags.headerFooter || tr.flags.footnotes || tr.flags.comments || tr.flags.nestedTables)), tr.flags);
+    const sep = (await parse("footnotes-sep.docx")).model;
+    check("footnotes-sep.docx (separator saja) -> tanpa flags", sep.flags === undefined, sep.flags);
+    const sm = (await parse("simple.docx")).model;
+    check("simple.docx -> tanpa flags", sm.flags === undefined, sm.flags);
+    const pdfM = diPdfPagesToModel([{ page: 1, items: [{ str: "Halo dunia", x: 56, y: 700, width: 60, fontName: "Helvetica", fontSize: 12 }] }]);
+    check("model PDF -> tanpa flags", pdfM.flags === undefined, pdfM.flags);
+    const scan1 = diScanPartFlags(diParseXml('<w:document xmlns:w="urn:x"><w:body><w:p><w:ins><w:r><w:t>x</w:t></w:r></w:ins></w:p></w:body></w:document>'));
+    check("diScanPartFlags: ins -> trackedChanges", scan1.trackedChanges === true && scan1.commentRefs === false && scan1.footnoteRefs === false, scan1);
+    const scan2 = diScanPartFlags(diParseXml('<w:document xmlns:w="urn:x"><w:body><w:p><w:r><w:t>bersih</w:t></w:r></w:p></w:body></w:document>'));
+    check("diScanPartFlags: dokumen bersih -> semua false", scan2.trackedChanges === false && scan2.commentRefs === false && scan2.footnoteRefs === false, scan2);
+  }
+
+  console.log("44) D4.1 — peringatan tidak memutasi model + deterministik + flag konsisten antar-parse");
+  {
+    const m1 = (await parse("parts.docx")).model;
+    const m2 = (await parse("nested.docx")).model;
+    const s1 = JSON.stringify(m1), s2 = JSON.stringify(m2);
+    diExportWarnings(m1); diModelIndentCount(m1); diModelToHtml(m1);
+    diExportWarnings(m2); diModelIndentCount(m2); diModelToHtml(m2);
+    check("model parts.docx tidak berubah oleh peringatan", JSON.stringify(m1) === s1);
+    check("model nested.docx tidak berubah oleh peringatan", JSON.stringify(m2) === s2);
+    const p1 = (await parse("parts.docx")).model, p2 = (await parse("parts.docx")).model;
+    check("flags konsisten antar dua parse", eq(p1.flags, p2.flags), [p1.flags, p2.flags]);
+    const lu = (await parse("links-unsafe.docx")).model;
+    check("peringatan link-scheme deterministik", eq(diExportWarnings(lu), diExportWarnings(lu)));
+    const all = (await parse("heading-custom.docx")).model;
+    check("klon model mempertahankan styleId heading", diCloneModel(all).blocks[0].styleId === "BabKhusus");
+    const pc = diCloneModel(p1);
+    check("klon model parts.docx mempertahankan flags", eq(pc.flags, p1.flags), pc.flags);
   }
 
   console.log("\nDI-CORE: " + pass + " lulus, " + fail + " gagal, total " + (pass + fail));
