@@ -70,7 +70,10 @@
       a{ color:inherit; }
       ::selection{ background:var(--gold-soft); }
       /* ---------- top strip ---------- */
-      .topbar{ background:linear-gradient(90deg, var(--navy), var(--navy2)); color:#E8EDF5;
+      /* Latar topbar & footer diperdalam (F2): gradasi navy→navy2 lama gagal AA di
+         ujung terangnya; kedua ujung gradasi baru ≥4,5:1 untuk semua warna teks
+         di atasnya, pada tema cerah maupun gelap. */
+      .topbar{ background:linear-gradient(90deg, #0B3560, #0F4477); color:#E8EDF5;
         font-size:12.5px; font-weight:600; letter-spacing:.045em; text-align:center; padding:8px 20px; }
       .topbar .dot{ color:var(--gold); padding:0 7px; }
       /* ---------- sticky navigation ---------- */
@@ -135,10 +138,13 @@
       @media (max-width:860px){ .stats-strip{ grid-template-columns:1fr 1fr; } }
       /* ---------- section scaffolding ---------- */
       .kicker, .wf-kicker{ font-size:11.5px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--gold-ink); margin:0 0 7px; }
+      /* Paragraf pembuka tampilan: ukuran baca ±72 karakter per baris (F12) —
+         berlaku juga untuk .sub tanpa aturan tersendiri (tulis, forensik, metode). */
+      .sub{ max-width:72ch; line-height:1.65; }
       section.method h2, section.analyzer h2, section.report h2, section.posisi h2{ font-size:30px; letter-spacing:-.005em; }
       /* ---------- method ---------- */
       section.method{ margin-top:52px; background:var(--surface); border:1px solid var(--line); border-radius:var(--r-lg); padding:30px 30px 12px; box-shadow:var(--shadow); }
-      section.method .sub{ color:var(--muted); margin:0 0 20px; max-width:780px; }
+      section.method .sub{ color:var(--muted); margin:0 0 20px; max-width:72ch; }
       .steps{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:22px; }
       .step{ background:var(--surface2); border:1px solid var(--line-soft); border-radius:var(--r-sm); padding:16px 16px 14px; }
       .step .num{ font-family:"IBM Plex Mono", monospace; font-size:11.5px; font-weight:600; color:var(--gold-ink); letter-spacing:.07em; }
@@ -149,7 +155,7 @@
       .formula code{ font-family:"IBM Plex Mono", monospace; font-size:12.5px; color:var(--ink); background:var(--surface2); padding:2px 6px; border-radius:5px; }
       /* ---------- analyzer ---------- */
       section.analyzer{ margin-top:52px; }
-      section.analyzer .sub{ color:var(--muted); margin:0 0 16px; max-width:780px; }
+      section.analyzer .sub{ color:var(--muted); margin:0 0 16px; max-width:72ch; }
       .panel{ background:var(--surface); border:1px solid var(--line); border-radius:var(--r-lg); padding:var(--pad-panel); box-shadow:var(--shadow); }
       .panel > label{ font-size:15px; }
       textarea{ width:100%; min-height:250px; resize:vertical; border:1px solid var(--line); border-radius:12px;
@@ -178,12 +184,22 @@
       /* Input TIDAK di-opacity:0 — elemennya sendiri ber-opacity penuh & benar-benar ter-render;
          yang dibuat transparan hanya cat bawaannya (tombol & teks nama berkas bawaan peramban),
          supaya lapisan visual di bawahnya yang tampil. Kotak & area ketuknya tetap elemen input. */
-      #file-input{ position:absolute; inset:0; width:100%; height:100%; min-height:0; margin:0; padding:0;
+      .upload-wrap input[type="file"]{ position:absolute; inset:0; width:100%; height:100%; min-height:0; margin:0; padding:0;
         opacity:1; cursor:pointer; z-index:2; font-size:0; color:transparent;
         background:transparent; border:0; -webkit-appearance:none; appearance:none; }
-      #file-input::file-selector-button{ width:100%; height:100%; margin:0; padding:0;
+      .upload-wrap input[type="file"]::file-selector-button{ width:100%; height:100%; margin:0; padding:0;
         background:transparent; border:0; color:transparent; font-size:0; cursor:pointer; }
-      .upload-wrap.is-busy #file-input{ cursor:wait; }
+      .upload-wrap.is-busy input[type="file"]{ cursor:wait; }
+      /* Batch memakai input berkas polos tanpa pembungkus visual: tombol pilih
+         berkasnya diselaraskan dengan gaya tombol sekunder (.upload-visual). */
+      #batch-input{ font:inherit; font-size:14px; color:var(--muted); max-width:100%; }
+      #batch-input::file-selector-button{ font:inherit; font-size:14.5px; font-weight:600;
+        border-radius:10px; padding:9px 16px; min-height:42px; margin:0 12px 0 0;
+        border:1px solid var(--line); background:var(--surface2); color:var(--ink); cursor:pointer; }
+      #batch-input::-moz-file-upload-button{ font:inherit; font-size:14.5px; font-weight:600;
+        border-radius:10px; padding:9px 16px; min-height:42px; margin:0 12px 0 0;
+        border:1px solid var(--line); background:var(--surface2); color:var(--ink); cursor:pointer; }
+      #batch-input::file-selector-button:hover{ filter:brightness(1.04); }
       .panel.dragover{ outline:2px dashed var(--navy); outline-offset:-8px; }
       .examples{ margin-top:20px; border-top:1px dashed var(--line); padding-top:18px; }
       .examples .lbl{ font-size:12.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-bottom:11px; }
@@ -237,7 +253,7 @@
       details.deep .posisi-note{ margin:12px 18px 16px; }
       /* ---------- periksa banyak berkas (batch) ---------- */
       section.batch{ margin-top:56px; }
-      section.batch .sub{ color:var(--muted); margin:0 0 16px; max-width:780px; }
+      section.batch .sub{ color:var(--muted); margin:0 0 16px; max-width:72ch; }
       .batch-progress{ font-size:13.5px; font-weight:600; margin:14px 0 0; min-height:1.2em; }
       .batch-table{ width:100%; border-collapse:collapse; margin-top:14px; font-size:14px; }
       .batch-table th, .batch-table td{ border:1px solid var(--line); padding:8px 11px; text-align:left; vertical-align:top; }
@@ -349,7 +365,7 @@
       .sd-suggest ul{ color:var(--muted); }
       /* ---------- posisi & batasan ---------- */
       section.posisi{ margin-top:56px; }
-      section.posisi .sub{ color:var(--muted); margin:0 0 20px; max-width:780px; }
+      section.posisi .sub{ color:var(--muted); margin:0 0 20px; max-width:72ch; }
       .posisi-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
       .posisi-card{ background:var(--surface); border:1px solid var(--line); border-radius:var(--r-md); padding:22px 24px; box-shadow:var(--shadow-sm); }
       .posisi-card h3{ font-size:var(--fs-panel-title); margin:0 0 7px; }
@@ -363,7 +379,7 @@
       .honesty h3{ font-size:var(--fs-card-title); color:var(--accent); margin-bottom:5px; }
       .honesty p{ margin:0; font-size:14.5px; line-height:1.65; }
       /* ---------- footer ---------- */
-      footer.site-footer{ background:linear-gradient(180deg, var(--navy2), var(--navy)); color:#C7D2E4; margin-top:0; }
+      footer.site-footer{ background:linear-gradient(180deg, #0F4477, #0B3560); color:#C7D2E4; margin-top:0; }
       .footer-inner{ padding-top:38px; padding-bottom:34px; }
       .footer-brand{ display:flex; align-items:center; gap:10px; font-weight:800; color:#fff; font-size:16.5px; margin-bottom:12px; letter-spacing:-.01em; }
       .footer-brand .ai{ color:var(--gold); }
