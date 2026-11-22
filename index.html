@@ -3483,10 +3483,16 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
          cdnjs, hash sha512 byte yang sama cocok dengan yang diterbitkan
          cdnjs). Aset yang dimuat sebagai modul ES (import()) atau sebagai
          worker TIDAK dapat membawa SRI menurut spesifikasi — keduanya
-         didokumentasikan di laporan D7-A, tidak diberi proteksi palsu. */
+         didokumentasikan di laporan D7-A, tidak diberi proteksi palsu.
+         D7-B: entri pdf.js DIHAPUS dari tabel ini — sejak migrasi ke
+         PDF.js 4.10.38 (build legacy) pustaka itu dimuat lewat dynamic
+         import() sehingga SRI runtime tidak lagi dapat diterapkan pada
+         berkas utamanya. Hash sha384 berkas 4.10.38 dicatat sebagai
+         PROVENANCE saja di komentar pemuat bersama (saksaraLoadPdfJs),
+         BUKAN sebagai perlindungan SRI runtime. SRI jsPDF, docx, dan
+         Tesseract di bawah ini tetap berlaku penuh. */
       var SAKSARA_SRI = {
         "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js": "sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk",
-        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js": "sha384-/1qUCSGwTur9vjf/z9lmu/eCUYbpOTgSjmpbMQZ1/CtX2v/WcAIKqRv+U1DUCG6e",
         "https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js": "sha384-4xaIisuLEy2lo2HkB2C4rEf7v8jbTb2kuogX6TkuEt9feTWKBSFSOzsqNNbV+sKh",
         "https://cdn.jsdelivr.net/npm/tesseract.js@5.0.5/dist/tesseract.min.js": "sha384-sZlPHqJ8Pk1GMyFXfg9vOgDjyUZZe7wE2c0NoPg2z1vs2fmI4wOC0O1ONVyr73qa"
       };
@@ -8117,24 +8123,15 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         fileIn.value = "";
       }
       /* ================= Document Intelligence (D2): impor PDF =================
-         Memakai pdf.js 3.11.174 yang sama dengan route OCR — URL dan pola
-         worker disalin persis dari ocrEnable; tidak ada dependensi baru.
+         Memakai pdf.js yang sama dengan route OCR lewat SATU pemuat
+         bersama global (saksaraLoadPdfJs); tidak ada dependensi baru.
          Item teks pdf.js dinormalisasi menjadi data polos, lalu konversi
          ke DocModel dilakukan fungsi murni DI-CORE (diPdfPagesToModel). */
-      var diPdfJsPromise = null;
       function diLoadPdfJs(){
-        if(window.pdfjsLib){
-          if(!window.pdfjsLib.GlobalWorkerOptions.workerSrc)
-            window.pdfjsLib.GlobalWorkerOptions.workerSrc = OCR_PDFJS_WORKER;
-          return Promise.resolve(window.pdfjsLib);
-        }
-        if(!diPdfJsPromise){
-          diPdfJsPromise = p6LoadScript(OCR_PDFJS).then(function(){
-            window.pdfjsLib.GlobalWorkerOptions.workerSrc = OCR_PDFJS_WORKER;
-            return window.pdfjsLib;
-          });
-        }
-        return diPdfJsPromise;
+        /* Pemuat bersama global saksaraLoadPdfJs (D7-B) — didefinisikan
+           di scope global di samping p6LoadScript agar route OCR (di
+           luar IIFE ini) memakai jalur yang sama persis. */
+        return saksaraLoadPdfJs();
       }
       function diImportPdf(bytes){
         return diLoadPdfJs().then(function(pdfjsLib){
@@ -10121,6 +10118,51 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       });
     }
 
+    /* ================= PDF.js bersama (D7-B) =================
+       SATU jalur pemuatan PDF.js untuk Document Intelligence dan OCR.
+       PDF.js 4.10.38, build LEGACY, dari jsDelivr (satu CDN yang sama
+       untuk pustaka dan worker; versi ter-pin persis):
+         pustaka: https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/legacy/build/pdf.min.mjs
+         worker:  https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/legacy/build/pdf.worker.min.mjs
+       Sejak 4.x tidak ada lagi build UMD/<script> klasik — pustaka
+       dimuat malas (lazy) lewat dynamic import() dan namespace-nya
+       dipasang ke window.pdfjsLib agar kedua pemanggil tetap membaca
+       tempat yang sama. Panggilan bersamaan berbagi SATU promise yang
+       sedang berjalan (tanpa muat ulang / race). Bila import() gagal,
+       state pemuat DIBERSIHKAN sebelum galat diteruskan, sehingga
+       percobaan berikutnya dapat berhasil — state tidak teracuni
+       permanen. p6LoadScript di atas TIDAK diubah dan tetap dipakai
+       pustaka lain (jsPDF, docx, Tesseract) beserta SRI-nya.
+       SRI: dynamic import() tidak dapat membawa integrity, jadi
+       berkas utama pdf.js TIDAK lagi ber-SRI runtime (kehilangan ini
+       disetujui eksplisit oleh pemilik pada mandat D7-B). Hash berikut
+       dicatat sebagai PROVENANCE saja — dihitung dari dua unduhan
+       byte-identik pada 22 Nov 2026 — BUKAN perlindungan SRI runtime:
+         pdf.min.mjs        sha384-z/XbAtvhBXJoK+yvYimnFuTCF6/2wTCDSIFD09/HtIfwFtvDKOMdAe5Z3wOChkmW
+         pdf.worker.min.mjs sha384-vbNBYP03jHFPlgtK4qSXtazEmGfmpTWlSsfq9OiU20MroW/Q9TbaEXiM7PpeWg+6 */
+    var saksaraPdfJsPromise = null;
+    function saksaraLoadPdfJs(){
+      if(window.pdfjsLib){
+        if(!window.pdfjsLib.GlobalWorkerOptions.workerSrc)
+          window.pdfjsLib.GlobalWorkerOptions.workerSrc = OCR_PDFJS_WORKER;
+        return Promise.resolve(window.pdfjsLib);
+      }
+      if(!saksaraPdfJsPromise){
+        saksaraPdfJsPromise = import(OCR_PDFJS).then(function(mod){
+          var lib = (mod && typeof mod.getDocument === "function") ? mod
+            : (mod && mod.default && typeof mod.default.getDocument === "function") ? mod.default : null;
+          if(!lib) throw new Error("Modul PDF.js tidak lengkap");
+          window.pdfjsLib = lib;
+          lib.GlobalWorkerOptions.workerSrc = OCR_PDFJS_WORKER;
+          return lib;
+        }).catch(function(err){
+          saksaraPdfJsPromise = null; /* bersihkan state: izinkan percobaan ulang */
+          throw err;
+        });
+      }
+      return saksaraPdfJsPromise;
+    }
+
     /* ---------------- Riwayat (IndexedDB, opt-in) ---------------- */
     var HIST_LS_ON = "saksara-history-enabled", HIST_LS_TEXT = "saksara-history-text";
     function histEnabled(){ try { return localStorage.getItem(HIST_LS_ON) === "1"; } catch(e){ return false; } }
@@ -10527,8 +10569,11 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
     var OCR_TESS_WORKER = "https://cdn.jsdelivr.net/npm/tesseract.js@5.0.5/dist/worker.min.js";
     var OCR_TESS_CORE = "https://cdn.jsdelivr.net/npm/tesseract.js-core@5.0.0";
     var OCR_TESS_LANG = "https://tessdata.projectnaptha.com/4.0.0_fast";
-    var OCR_PDFJS = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
-    var OCR_PDFJS_WORKER = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    /* D7-B: PDF.js 4.10.38 build legacy (.mjs) — dimuat lewat pemuat
+       bersama saksaraLoadPdfJs (dynamic import), BUKAN <script> klasik.
+       Nama konstanta dipertahankan karena dipakai kedua fitur. */
+    var OCR_PDFJS = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/legacy/build/pdf.min.mjs";
+    var OCR_PDFJS_WORKER = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/legacy/build/pdf.worker.min.mjs";
     function ocrStatus(msg){ var el = $("ocr-enable-status"); if(el) el.textContent = msg; }
     function ocrProgress(msg, frac){
       var p = $("ocr-progress"); if(p) p.textContent = msg;
@@ -10554,10 +10599,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       try {
         ocrStatus("Mengunduh pustaka OCR…");
         if(!window.Tesseract) await p6LoadScript(OCR_TESS_JS);
-        if(!window.pdfjsLib){
-          await p6LoadScript(OCR_PDFJS);
-          window.pdfjsLib.GlobalWorkerOptions.workerSrc = OCR_PDFJS_WORKER;
-        }
+        if(!window.pdfjsLib) await saksaraLoadPdfJs();
         ocrStatus("Mengunduh model bahasa (Indonesia + Inggris) & menyiapkan mesin…");
         await ocrEnsureWorker();
         ocrState.ready = true;
