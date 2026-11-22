@@ -262,6 +262,63 @@ FIXTURES["doc-apply.docx"] = docx(
   { styles: true, numbering: true }
 );
 
+/* D4: dokumen round-trip (doc-roundtrip.docx) — struktur terpaku pada
+   di-test kelompok 37 dan dipakai QA peramban d4-qa.mjs untuk alur
+   impor -> terima saran -> ekspor -> impor ulang:
+   heading, paragraf berformat (tebal/miring/garis bawah/Georgia+tautan),
+   bullet x2, nomor x2, tabel (gridSpan + vMerge restart/continue),
+   unicode, OMML, dan satu paragraf pelanggaran baku pada run tunggal. */
+FIXTURES["doc-roundtrip.docx"] = docx(
+  '<w:p><w:pPr><w:pStyle w:val="Heading1"/></w:pPr>' + R("Laporan Kegiatan Penelitian") + "</w:p>" +
+  P(
+    R("Teks biasa ") +
+    '<w:r><w:rPr><w:b/></w:rPr><w:t xml:space="preserve">tebal</w:t></w:r>' +
+    R(" dan ") +
+    '<w:r><w:rPr><w:i/></w:rPr><w:t xml:space="preserve">miring</w:t></w:r>' +
+    R(" dan ") +
+    '<w:r><w:rPr><w:u w:val="single"/></w:rPr><w:t xml:space="preserve">garis bawah</w:t></w:r>' +
+    R(" serta ") +
+    '<w:r><w:rPr><w:rFonts w:ascii="Georgia" w:hAnsi="Georgia"/><w:sz w:val="24"/></w:rPr><w:t>Georgia dua belas poin</w:t></w:r>' +
+    R(" dan ") +
+    '<w:hyperlink r:id="rId5"><w:r><w:rPr><w:u w:val="single"/></w:rPr><w:t>situs Saksara</w:t></w:r></w:hyperlink>' +
+    R(".")
+  ) +
+  LI(1, "Butir pertama daftar bullet.") + LI(1, "Butir kedua daftar bullet.") +
+  LI(2, "Langkah pertama bernomor.") + LI(2, "Langkah kedua bernomor.") +
+  "<w:tbl>" +
+    "<w:tr>" +
+      '<w:tc><w:tcPr><w:gridSpan w:val="2"/></w:tcPr>' + P(R("Sel gabungan membentang dua kolom.")) + "</w:tc>" +
+    "</w:tr>" +
+    "<w:tr>" +
+      '<w:tc><w:tcPr><w:vMerge w:val="restart"/></w:tcPr>' + P(R("Sel vertikal.")) + "</w:tc>" +
+      "<w:tc>" + P(R("Baris satu kanan.")) + "</w:tc>" +
+    "</w:tr>" +
+    "<w:tr>" +
+      '<w:tc><w:tcPr><w:vMerge/></w:tcPr><w:p/></w:tc>' +
+      "<w:tc>" + P(R("Baris dua kanan.")) + "</w:tc>" +
+    "</w:tr>" +
+  "</w:tbl>" +
+  P(R("Simbol: ✓ → ± × dan “kutip lengkung” serta emoji 😀 selesai.")) +
+  P(R("Hasil perhitungan memakai rumus") + OMML_FRAC + R(" untuk setiap percobaan.")) +
+  P(R("Aktifitas ini di lakukan setiap hari Senin.")),
+  { styles: true, numbering: true, rels: true }
+);
+
+/* D4: dokumen besar mendekati batas analisis 50.000 karakter (big.docx).
+   Paragraf bersih yang sama diulang sampai total rakitan 48–50 ribu
+   karakter; seluruh entri ter-deflate agar berkas tetap kecil. */
+{
+  const SENT = "Paragraf ini berisi kalimat bersih untuk pengujian dokumen besar.";
+  const paras = [];
+  let total = 0;
+  for (;;) {
+    const need = SENT.length + (paras.length ? 2 : 0);
+    if (total + need > 49900) break;
+    paras.push(SENT); total += need;
+  }
+  FIXTURES["big.docx"] = docx(paras.map((t) => P(R(t))).join(""), { deflate: true });
+}
+
 /* Korup: simple.docx terpotong */
 FIXTURES["corrupt.docx"] = FIXTURES["simple.docx"].subarray(0, Math.floor(FIXTURES["simple.docx"].length * 0.55));
 
