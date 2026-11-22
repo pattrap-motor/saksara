@@ -7,8 +7,9 @@ const core = coreRaw.slice(coreRaw.indexOf("*/") + 2);
 
 const sandbox = {};
 new Function("sandbox", core +
-  "\nsandbox.wiAnalyze = wiAnalyze; sandbox.wiApply = wiApply; sandbox.WI_MAX_CHARS = WI_MAX_CHARS; sandbox.wiSentences = wiSentences;")(sandbox);
+  "\nsandbox.wiAnalyze = wiAnalyze; sandbox.wiApply = wiApply; sandbox.WI_MAX_CHARS = WI_MAX_CHARS; sandbox.wiSentences = wiSentences; sandbox.wiReadability = wiReadability; sandbox.wiSyllables = wiSyllables;")(sandbox);
 const wiAnalyze = sandbox.wiAnalyze, wiApply = sandbox.wiApply, wiSentences = sandbox.wiSentences;
+const wiReadability = sandbox.wiReadability, wiSyllables = sandbox.wiSyllables;
 
 let pass = 0, fail = 0;
 function check(name, cond, extra) {
@@ -358,6 +359,91 @@ check("korpus kutipan langsung: isi kutip tidak ditandai", wiAnalyze("Budi berka
 check("korpus teknis: istilah teknis -> nol saran", wiAnalyze("Data disimpan dalam format JSON dan diproses dengan Python 3.12 di server lokal.").suggestions.length === 0, kinds(wiAnalyze("Data disimpan dalam format JSON dan diproses dengan Python 3.12 di server lokal.")));
 check("korpus Unicode: emoji + diakritik + 1 kesalahan, offset & apply eksak", (() => { const r = wiAnalyze("Kafé itu menyajikan kopi ☕ yang nikmat, tetapi praktek pembayarannya masih tunai."); return r.suggestions.length === 1 && r.suggestions[0].kind === "kata-tidak-baku" && invariants83(r) === true && joinRes(r, wiApply(r.paragraphs, r.suggestions, r.suggestions.map(s => s.id))) === "Kafé itu menyajikan kopi ☕ yang nikmat, tetapi praktik pembayarannya masih tunai."; })(), kinds(wiAnalyze("Kafé itu menyajikan kopi ☕ yang nikmat, tetapi praktek pembayarannya masih tunai.")));
 check("korpus campuran ID-EN: bagian Inggris -> nol saran", wiAnalyze("Penelitian ini meneliti sistem irigasi modern. The team conducted a detailed analysis of the formal system. Hasilnya menunjukkan peningkatan hasil panen yang nyata.").suggestions.length === 0, kinds(wiAnalyze("Penelitian ini meneliti sistem irigasi modern. The team conducted a detailed analysis of the formal system. Hasilnya menunjukkan peningkatan hasil panen yang nyata.")));
+
+console.log("34) Phase 8.4 — Readability Analyzer: wiSyllables");
+check("8.4 suku kata: 'kata' -> 2", wiSyllables("kata") === 2, wiSyllables("kata"));
+check("8.4 suku kata: 'buku' -> 2", wiSyllables("buku") === 2, wiSyllables("buku"));
+check("8.4 suku kata: 'universitas' -> 5", wiSyllables("universitas") === 5, wiSyllables("universitas"));
+check("8.4 suku kata: 'a' -> 1", wiSyllables("a") === 1, wiSyllables("a"));
+check("8.4 suku kata: '123' -> 0 (bukan kata berhuruf)", wiSyllables("123") === 0, wiSyllables("123"));
+check("8.4 suku kata: 'sekolah' -> 3", wiSyllables("sekolah") === 3, wiSyllables("sekolah"));
+check("8.4 suku kata: 'ai' diftong -> 1 gugus", wiSyllables("main") === 1, wiSyllables("main"));
+
+console.log("35) Phase 8.4 — statistik kalimat eksak");
+const RD1 = "Satu dua tiga empat lima. Kucing itu tidur di atas tikar hangat. Penelitian ini mengkaji pengaruh media pembelajaran interaktif terhadap hasil belajar siswa sekolah dasar negeri.";
+const rd1 = wiReadability(RD1);
+check("8.4 rd1: tidak kosong", rd1.empty === false);
+check("8.4 rd1: 3 kalimat, 26 kata, 1 paragraf", rd1.sentences === 3 && rd1.words === 26 && rd1.paragraphs === 1, [rd1.sentences, rd1.words, rd1.paragraphs]);
+check("8.4 rd1: panjang kalimat [5,7,14]", JSON.stringify(rd1.sentenceLengths) === "[5,7,14]", rd1.sentenceLengths);
+check("8.4 rd1: rata-rata 8,7; min 5; maks 14", rd1.avgWordsPerSentence === 8.7 && rd1.minSentence === 5 && rd1.maxSentence === 14, [rd1.avgWordsPerSentence, rd1.minSentence, rd1.maxSentence]);
+check("8.4 rd1: bucket pendek 2, sedang 1, panjang 0", rd1.buckets.pendek === 2 && rd1.buckets.sedang === 1 && rd1.buckets.panjang === 0, rd1.buckets);
+check("8.4 rd1: longShare 0 (tidak ada kalimat > 40 kata)", rd1.longShare === 0, rd1.longShare);
+check("8.4 rd1: simpangan baku 3,86 & CV 0,45", rd1.sdSentence === 3.86 && rd1.cvSentence === 0.45, [rd1.sdSentence, rd1.cvSentence]);
+check("8.4 rd1: kalimat terpanjang adalah kalimat ketiga", rd1.longestSentenceWords === 14 && rd1.longestSentenceText.indexOf("Penelitian ini mengkaji") === 0, rd1.longestSentenceText);
+
+console.log("36) Phase 8.4 — statistik paragraf eksak");
+const RD2 = "Kucing tidur di tikar. Anjing berlari di halaman.\n\nBurung terbang tinggi.";
+const rd2 = wiReadability(RD2);
+check("8.4 rd2: 2 paragraf, 3 kalimat, 11 kata", rd2.paragraphs === 2 && rd2.sentences === 3 && rd2.words === 11, [rd2.paragraphs, rd2.sentences, rd2.words]);
+check("8.4 rd2: kata per paragraf [8,3], kalimat per paragraf [2,1]", JSON.stringify(rd2.paraWords) === "[8,3]" && JSON.stringify(rd2.paraSentences) === "[2,1]", [rd2.paraWords, rd2.paraSentences]);
+check("8.4 rd2: rata-rata 1,5 kalimat & 5,5 kata per paragraf", rd2.avgSentencesPerParagraph === 1.5 && rd2.avgWordsPerParagraph === 5.5, [rd2.avgSentencesPerParagraph, rd2.avgWordsPerParagraph]);
+check("8.4 rd2: bucket paragraf <=25 kata = 2, lainnya 0", rd2.paraBuckets.le25 === 2 && rd2.paraBuckets.le75 === 0 && rd2.paraBuckets.le150 === 0 && rd2.paraBuckets.gt150 === 0, rd2.paraBuckets);
+check("8.4 rd2: paragraf ke-2 sangat pendek, tidak ada yang padat", JSON.stringify(rd2.shortParas) === "[1]" && rd2.denseParas.length === 0, [rd2.shortParas, rd2.denseParas]);
+
+console.log("37) Phase 8.4 — paragraf padat & sangat pendek");
+const denseSent = "Kata satu dua tiga empat lima enam tujuh delapan sembilan sepuluh sebelas duabelas tigabelas empatbelas limabelas.";
+const RD3 = Array(10).fill(denseSent).join(" ");
+const rd3 = wiReadability(RD3);
+check("8.4 rd3: paragraf 160 kata / 10 kalimat terdeteksi padat", rd3.paraWords[0] === 160 && rd3.paraSentences[0] === 10 && JSON.stringify(rd3.denseParas) === "[0]", [rd3.paraWords, rd3.paraSentences, rd3.denseParas]);
+check("8.4 rd3: bucket paragraf >150 kata = 1", rd3.paraBuckets.gt150 === 1, rd3.paraBuckets);
+
+console.log("38) Phase 8.4 — input kosong & nyaris kosong");
+check("8.4 kosong: string kosong -> empty, tanpa lempar", (() => { const r = wiReadability(""); return r.empty === true && r.sentences === 0 && r.words === 0 && r.score === 0; })());
+check("8.4 kosong: hanya spasi/baris -> empty", wiReadability("   \n\n  ").empty === true);
+check("8.4 kosong: hanya tanda baca -> empty", wiReadability("!!! ???").empty === true);
+check("8.4 kosong: null -> empty, tanpa lempar", wiReadability(null).empty === true);
+
+console.log("39) Phase 8.4 — singkatan, sitasi, enumerasi, Unicode");
+const RD4 = "Kegiatan berlangsung s.d. selesai pada pkl. 09.00 di aula. Hasil penelitian ini signifikan (Rahman, 2020). Semua peserta hadir tepat waktu.";
+const rd4 = wiReadability(RD4);
+check("8.4 rd4: singkatan & sitasi -> tepat 3 kalimat, 22 kata", rd4.sentences === 3 && rd4.words === 22, [rd4.sentences, rd4.words, rd4.sentenceLengths]);
+const RD5 = "Siswa membawa buku, pena, penggaris, penghapus, dan tas ke sekolah setiap hari. Mereka pulang pukul dua.";
+check("8.4 rd5: enumerasi tidak memotong kalimat -> 2 kalimat", wiReadability(RD5).sentences === 2, wiReadability(RD5).sentenceLengths);
+const RD6 = "Kafé itu ramai ☀️ hari ini. Kami minum kopi ☕ bersama.";
+const rd6 = wiReadability(RD6);
+check("8.4 rd6: Unicode -> 2 kalimat, 9 kata, tanpa lempar", rd6.sentences === 2 && rd6.words === 9, [rd6.sentences, rd6.words]);
+
+console.log("40) Phase 8.4 — suku kata, kata panjang, determinisme");
+const rdS = wiReadability("Kata buku.");
+check("8.4 suku kata: rata-rata 'Kata buku.' = 2,00", rdS.avgSyllables === 2, rdS.avgSyllables);
+check("8.4 kata: rata-rata panjang kata 'Kata buku.' = 4,0 huruf", rdS.avgWordChars === 4, rdS.avgWordChars);
+check("8.4 kata panjang: 'Kata universitas.' -> longWordShare 50", wiReadability("Kata universitas.").longWordShare === 50, wiReadability("Kata universitas.").longWordShare);
+const RDM = "Penelitian ini mengkaji kinerja inkubator telur berbasis Arduino untuk peternak skala kecil. Sensor suhu membaca kondisi ruang penetasan setiap lima detik.\n\nHasil pengujian menunjukkan tingkat keberhasilan penetasan mencapai delapan puluh persen (Rahman, 2020). Temuan ini memberi dasar bagi pengembangan alat yang lebih murah.";
+check("8.4 determinisme: dua panggilan -> objek identik", JSON.stringify(wiReadability(RDM)) === JSON.stringify(wiReadability(RDM)));
+
+console.log("41) Phase 8.4 — komponen, skor, dan label");
+function bandOf(s) { return s >= 80 ? "Sangat mudah diikuti" : s >= 60 ? "Mudah diikuti" : s >= 40 ? "Cukup menuntut" : s >= 20 ? "Menuntut" : "Sangat menuntut"; }
+[rd1, rd2, rd3, rd4, wiReadability(RDM)].forEach(function(r, i) {
+  const cs = [r.components.sentence, r.components.variation, r.components.longWords, r.components.longSentences, r.components.paragraph];
+  check("8.4 komponen #" + i + ": semua integer 0..100", cs.every(v => Number.isInteger(v) && v >= 0 && v <= 100), cs);
+  check("8.4 skor #" + i + ": sama dengan rumus tertimbang komponen", r.score === Math.round(0.30 * r.components.sentence + 0.15 * r.components.variation + 0.20 * r.components.longWords + 0.20 * r.components.longSentences + 0.15 * r.components.paragraph), [r.score, r.components]);
+  check("8.4 label #" + i + ": sesuai rentang skor", r.band === bandOf(r.score), [r.score, r.band]);
+});
+const longSent45 = "Kata " + Array(44).fill("kata").join(" ") + ".";
+const rdL = wiReadability(Array(4).fill(longSent45).join(" "));
+check("8.4 kalimat sangat panjang: 4 kalimat x 45 kata", rdL.sentences === 4 && rdL.maxSentence === 45 && rdL.longShare === 100, [rdL.sentences, rdL.maxSentence, rdL.longShare]);
+check("8.4 kalimat sangat panjang: compLongSentences = 0 & skor di rentang bawah", rdL.components.longSentences === 0 && rdL.score <= 39 && (rdL.band === "Menuntut" || rdL.band === "Sangat menuntut"), [rdL.components, rdL.score, rdL.band]);
+const RD7 = "Kucing itu tidur di atas tikar yang hangat sepanjang siang hari ini dengan nyenyak sekali. Anjing kecil itu berlari mengelilingi halaman rumah sambil menggonggong riang kepada setiap orang yang lewat di jalan. Burung burung berkicau merdu di atas pohon mangga besar pagi ini.";
+const rd7 = wiReadability(RD7);
+check("8.4 kalimat nyaman: 3 kalimat & compSentence = 100", rd7.sentences === 3 && rd7.components.sentence === 100, [rd7.sentences, rd7.sentenceLengths, rd7.components]);
+
+console.log("42) Phase 8.4 — teks panjang mendekati batas 50.000 karakter");
+const repSent = "Penelitian ini mengkaji sistem irigasi modern untuk petani kecil.";
+const reps = Math.floor(49950 / (repSent.length + 1));
+const bigText = Array(reps).fill(repSent).join(" ");
+const rdB = wiReadability(bigText);
+check("8.4 teks besar: panjang <= 50.000", bigText.length <= 50000, bigText.length);
+check("8.4 teks besar: kalimat & kata berskala eksak, tanpa lempar", rdB.empty === false && rdB.sentences === reps && rdB.words === reps * 9, [rdB.sentences, rdB.words, reps]);
 
 console.log("\nWI TESTS:", pass, "passed,", fail, "failed");
 process.exit(fail ? 1 : 0);
