@@ -236,7 +236,7 @@
       .clf-progress-fill{ height:100%; width:0%; border-radius:999px; background:linear-gradient(90deg, var(--navy2), var(--navy)); transition:width .3s ease; }
       @media (prefers-color-scheme: dark){ .clf-progress-fill{ background:linear-gradient(90deg, var(--gold), #0284C7); } }
       /* ---------- zona eksklusi (bagian baku) ---------- */
-      .opt-exclude{ display:flex; gap:9px; align-items:flex-start; margin-top:12px; font-size:13.5px; color:var(--muted); line-height:1.55; cursor:pointer; }
+      .opt-exclude{ display:flex; gap:9px; align-items:flex-start; margin-top:12px; padding:10px 0; font-size:13.5px; color:var(--muted); line-height:1.55; cursor:pointer; }
       .opt-exclude input{ margin-top:3px; width:16px; height:16px; flex:none; accent-color:var(--navy); }
       /* ---------- perbandingan antar-analisis ---------- */
       .score-card .compare-line{ font-family:"IBM Plex Mono", monospace; font-size:12.5px; }
@@ -246,7 +246,6 @@
       details.deep > summary::-webkit-details-marker{ display:none; }
       details.deep > summary::after{ content:"▾"; margin-left:auto; color:var(--gold-ink); font-size:13px; transition:transform .2s ease; }
       details.deep[open] > summary::after{ transform:rotate(180deg); }
-      details.deep > summary:focus-visible{ outline:2px solid var(--gold-ink); outline-offset:2px; }
       details.deep .steps{ padding:2px 16px 0; }
       details.deep .formula{ margin:0 18px; }
       details.deep .posisi-grid{ padding:2px 16px 8px; }
@@ -506,14 +505,14 @@
       details.clf-more > summary::-webkit-details-marker{ display:none; }
       details.clf-more > summary::after{ content:" ▾"; }
       details.clf-more[open] > summary::after{ content:" ▴"; }
-      details.clf-more > summary:focus-visible{ outline:2px solid var(--gold-ink); outline-offset:2px; }
       details.clf-more p{ font-size:13.5px; color:var(--muted); margin:8px 0 0; line-height:1.65; }
       @media (prefers-reduced-motion: reduce){
-        [data-view]:not([hidden]){ animation:none; }
+        *, *::before, *::after{ transition:none !important; animation:none !important; }
+        html{ scroll-behavior:auto; }
         .strip-stat:hover, .step:hover, .posisi-card:hover, .stat:hover, .chip:hover{ transform:none; }
       }
       /* ---------- focus & motion ---------- */
-      button:focus-visible, .sent:focus-visible, a:focus-visible{ outline:2px solid var(--gold-ink); outline-offset:2px; }
+      button:focus-visible, .sent:focus-visible, a:focus-visible, details.deep > summary:focus-visible, details.clf-more > summary:focus-visible{ outline:2px solid var(--gold-ink); outline-offset:2px; }
       @media (max-width:860px){
         .steps{ grid-template-columns:1fr 1fr; }
         .report-grid{ grid-template-columns:1fr; }
@@ -528,11 +527,6 @@
         .score-num{ font-size:64px; }
         header.hero{ padding-top:40px; }
         .wrap{ padding:0 16px; }
-      }
-      @media (prefers-reduced-motion: reduce){
-        .sig-fill{ transition:none; }
-        html{ scroll-behavior:auto; }
-        .btn-primary, .btn-ghost, .nav-cta, button.primary, .examples button{ transition:none; }
       }
       /* ---------- Phase 2 (v0.10.0-beta): shell sidebar + dashboard ---------- */
       .sidebar{ display:none; }
@@ -577,7 +571,6 @@
       .det-note{ font-size:13px; color:var(--muted); margin:10px 0 0; }
       #input-teks{ min-height:280px; }
       @media (max-width:640px){ #input-teks{ min-height:200px; } }
-      @media (prefers-reduced-motion: reduce){ .qa-card{ transition:none; } }
       /* ---------- Phase 3 (v0.11.0-beta): Writing Forensic ---------- */
       .wf-cards{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin:14px 0 2px; }
       .wf-card{ background:var(--surface); border:1px solid var(--line); border-radius:var(--r-md); padding:12px 14px; box-shadow:var(--shadow-sm); }
@@ -619,9 +612,6 @@
       .badge-add{ color:#15803D; border-color:rgba(34,197,94,.5); }
       .badge-del{ color:#B91C1C; border-color:rgba(239,68,68,.5); }
       .badge-chg{ color:#1D4ED8; border-color:rgba(59,130,246,.5); }
-      html[data-theme="dark"] .badge-add{ color:#4ADE80; }
-      html[data-theme="dark"] .badge-del{ color:#F87171; }
-      html[data-theme="dark"] .badge-chg{ color:#60A5FA; }
       .cmp-sbs{ display:grid; grid-template-columns:1fr 1fr; gap:0 14px; }
       @media (max-width:760px){ .cmp-sbs{ grid-template-columns:1fr; } }
       .cmp-cell{ border:1px solid var(--line); border-radius:10px; padding:9px 12px; margin-bottom:8px; font-size:14.5px; line-height:1.65; overflow-wrap:anywhere; background:var(--surface); }
@@ -651,14 +641,11 @@
       .bn-cell.fn{ background:var(--warn-bg); }
       .bn-pill{ display:inline-block; font-size:12px; font-weight:800; letter-spacing:.03em; border-radius:999px; padding:2px 10px; border:1px solid var(--warn-line); background:var(--warn-bg); color:var(--warn-ink); }
       .bn-pill.ok{ border-color:rgba(34,197,94,.5); background:rgba(34,197,94,.14); color:#15803D; }
-      html[data-theme="dark"] .bn-pill.ok{ color:#4ADE80; }
-
       /* ---------- Phase 6 (v0.14.0-beta): Productivity (OCR, Riwayat, Batch 2.0) ---------- */
       .p6-chip{ display:inline-block; font-size:11.5px; font-weight:800; letter-spacing:.02em; border-radius:999px; padding:1px 9px; border:1px solid var(--line); background:var(--surface2); color:var(--muted); white-space:nowrap; }
       .p6-chip.run{ border-color:rgba(47,155,232,.55); background:rgba(47,155,232,.13); color:var(--gold-ink); }
       .p6-chip.ok{ border-color:rgba(34,197,94,.5); background:rgba(34,197,94,.13); color:#15803D; }
       .p6-chip.err{ border-color:rgba(220,60,50,.45); background:var(--red-bg); color:var(--red-ink); }
-      html[data-theme="dark"] .p6-chip.ok{ color:#4ADE80; }
       .hist-row{ border:1px solid var(--line); border-radius:12px; padding:12px 14px; margin-bottom:10px; background:var(--surface); }
       .hist-row .hist-head{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; justify-content:space-between; }
       .hist-row .hist-title{ font-weight:700; }
@@ -768,6 +755,10 @@
       .wi-style-ind-head{ display:flex; flex-wrap:wrap; gap:4px 12px; align-items:baseline; font-size:14px; }
       .wi-style-name{ font-weight:800; }
       .wi-style-label{ font-weight:700; color:var(--gold-ink); }
+      /* ---------- Stage D (UI/UX refinement): checkbox hit areas (F9) ---------- */
+      input[type="checkbox"]{ width:18px; height:18px; }
+      .opt-exclude input{ width:20px; height:20px; margin-top:1px; }
+      label:has(> #hist-c1), label:has(> #hist-c2){ padding-top:6px; padding-bottom:6px; }
     </style>
   </head>
   <body>
