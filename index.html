@@ -803,6 +803,41 @@
       input[type="checkbox"]{ width:18px; height:18px; }
       .opt-exclude input{ width:20px; height:20px; margin-top:1px; }
       label:has(> #hist-c1), label:has(> #hist-c2){ padding-top:6px; padding-bottom:6px; }
+      /* ---------- Editor Kaya Asisten Menulis (D8 Tahap 4) ---------- */
+      .wi-ed-mode{ display:flex; justify-content:flex-end; margin:0 0 8px; }
+      .wi-ed-mode-btn{ min-height:30px; padding:3px 12px; font-size:13px; border-radius:0; background:var(--surface); }
+      .wi-ed-mode-btn:first-child{ border-radius:8px 0 0 8px; }
+      .wi-ed-mode-btn:last-child{ border-radius:0 8px 8px 0; margin-left:-1px; }
+      .wi-ed-mode-btn.is-on{ background:var(--navy); color:var(--navy-ink); border-color:var(--navy); }
+      .wi-ed-bar{ display:flex; flex-wrap:wrap; gap:5px; align-items:center; padding:7px 8px;
+        background:var(--surface2); border:1px solid var(--line); border-bottom:none; border-radius:12px 12px 0 0; }
+      .wi-ed-bar[hidden], .wi-ed-surface[hidden]{ display:none; }
+      .wi-ed-bar button{ min-height:31px; padding:3px 9px; font-size:13.5px; border-radius:8px; background:var(--surface); }
+      .wi-ed-bar select{ font:inherit; font-size:13.5px; min-height:31px; padding:3px 5px; border:1px solid var(--line);
+        border-radius:8px; background:var(--surface); color:var(--ink); max-width:175px; }
+      .wi-ed-bar select:focus-visible, .wi-ed-color input:focus-visible{ outline:2px solid var(--gold-ink); outline-offset:2px; }
+      .wi-ed-sep{ width:1px; align-self:stretch; background:var(--line); margin:2px 3px; }
+      .wi-ed-color{ display:inline-flex; align-items:center; gap:3px; font-weight:700; font-size:13.5px;
+        border:1px solid var(--line); background:var(--surface); border-radius:8px; padding:2px 6px; cursor:pointer; min-height:31px; }
+      .wi-ed-color input{ width:20px; height:22px; border:none; padding:0; background:none; cursor:pointer; }
+      .wi-ed-hilite-mark{ background:var(--yel-bg); border-radius:3px; padding:0 3px; }
+      .wi-ed-surface{ position:relative; border:1px solid var(--line); border-radius:0 0 12px 12px; background:var(--surface);
+        color:var(--ink); font-size:15.5px; line-height:1.65; padding:15px 17px; min-height:250px; outline:none;
+        overflow-wrap:break-word; transition:border-color .15s ease, box-shadow .15s ease; }
+      .wi-ed-surface:focus{ border-color:var(--gold-ink); box-shadow:0 0 0 3px var(--gold-soft); }
+      .wi-ed-wrap.wi-ed-empty .wi-ed-surface::before{ content:attr(data-placeholder); position:absolute; top:15px; left:17px;
+        color:var(--muted); pointer-events:none; }
+      .wi-ed-surface p{ margin:0 0 10px; }
+      .wi-ed-surface h1{ font-size:24px; line-height:1.3; margin:14px 0 8px; }
+      .wi-ed-surface h2{ font-size:20px; line-height:1.35; margin:12px 0 7px; }
+      .wi-ed-surface h3{ font-size:17px; line-height:1.4; margin:10px 0 6px; }
+      .wi-ed-surface blockquote{ margin:0 0 10px; padding:4px 0 4px 14px; border-left:3px solid var(--line); color:var(--muted); }
+      .wi-ed-surface ul, .wi-ed-surface ol{ margin:0 0 10px; padding-left:26px; }
+      #wi-input.wi-ed-off{ display:none; }
+      @media (max-width:640px){
+        .wi-ed-surface{ min-height:200px; font-size:16px; }
+        .wi-ed-bar select{ max-width:140px; }
+      }
     </style>
   </head>
   <body>
@@ -858,7 +893,7 @@
         <a href="#/posisi" data-route="posisi">Privasi &amp; Batasan</a>
       </nav>
       <a class="btn-primary side-cta" href="#analisis">Mulai Memeriksa</a>
-      <div class="side-foot">Beta Terbuka · v0.17.1-beta<br />Seluruh analisis berjalan lokal di peramban ini — teks Anda tidak dikirim ke mana pun.</div>
+      <div class="side-foot">Beta Terbuka · v0.18.0-beta<br />Seluruh analisis berjalan lokal di peramban ini — teks Anda tidak dikirim ke mana pun.</div>
     </aside>
     <div class="wrap page">
       <header class="hero" data-view="home">
@@ -1225,6 +1260,11 @@
             <div class="wi-controls">
               <button type="button" id="wi-report-pdf">Ekspor PDF</button>
               <span class="file-status" id="wi-report-pdf-status" role="status" aria-live="polite"></span>
+              <button type="button" id="wi-report-annot">Ekspor PDF Beranotasi</button>
+              <span class="file-status" id="wi-report-annot-status" role="status" aria-live="polite"></span>
+              <button type="button" id="wi-faithful-docx" hidden>Unduh Dokumen Beranotasi (.docx)</button>
+              <button type="button" id="wi-faithful-pdf" hidden>Unduh PDF Beranotasi</button>
+              <span class="file-status" id="wi-faithful-status" role="status" aria-live="polite"></span>
             </div>
             <div id="wi-report-body"></div>
             <p class="wi-rep-note" id="wi-report-note" role="status" aria-live="polite"></p>
@@ -1668,12 +1708,19 @@
           <a href="#/posisi">Privasi &amp; Batasan</a>
         </nav>
         <p class="copy">© 2026 Saksara — Dikembangkan oleh Ciptanala Devs</p>
-        <p class="version-line">Versi <strong>v0.17.1-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
+        <p class="version-line">Versi <strong>v0.18.0-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
       </div>
     </footer>
 
     <dialog class="changelog" id="changelog-modal" aria-labelledby="changelog-title">
       <h2 id="changelog-title">Catatan Rilis — Saksara</h2>
+      <h3>v0.18.0-beta — 23 November 2026</h3>
+      <ul>
+        <li><strong>Laporan Beranotasi di Asisten Menulis:</strong> hasil pemeriksaan kini dapat diunduh sebagai PDF yang menampilkan dokumen Anda secara utuh — bagian yang perlu diperbaiki disorot dan diberi nomor, lalu setiap nomor dijelaskan pada bagian rekomendasi dengan kalimat aslinya serta usulan perbaikan yang lengkap per kalimat.</li>
+        <li><strong>Ekspor setia-asli untuk Word &amp; PDF:</strong> berkas Word (.docx) dan PDF yang Anda unggah kini dapat diunduh kembali dengan tampilan yang sama persis seperti aslinya — ditambah sorotan pada bagian yang perlu diperbaiki dan rekomendasi perbaikan lengkap di akhir dokumen.</li>
+        <li><strong>Editor ala Word di Asisten Menulis:</strong> area menulis kini dilengkapi bilah alat untuk mengatur jenis dan ukuran huruf, paragraf, spasi baris dan paragraf, indentasi (termasuk indentasi gantung), perataan, serta daftar poin dan nomor. Tersedia juga pilihan mode teks polos seperti sebelumnya.</li>
+        <li>Hasil analisis dan detektor <strong>tidak berubah</strong>: hasil Periksa Tulisan dan pemeriksaan Asisten Menulis sama persis seperti versi sebelumnya.</li>
+      </ul>
       <h3>v0.17.1-beta — 22 November 2026</h3>
       <ul>
         <li><strong>Navigasi dikelompokkan:</strong> menu kini tersusun dalam kelompok Deteksi, Menulis, Alat, dan Pelajari di sidebar, bilah atas, dan footer — dan tautan halaman Metode yang sebelumnya hilang kini ditambahkan.</li>
@@ -7803,6 +7850,1831 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
     }
     /* REPORT-CORE-END */
 
+    /* ANNOT-CORE-START — Lapisan presentasi laporan beranotasi (D8,
+       Tahap 1): fungsi MURNI pembangun model Laporan Beranotasi dari
+       hasil wiAnalyze yang sudah ada. Blok saudara REPORT-CORE: ia
+       TIDAK mengubah WI-CORE, DI-CORE, REPORT-CORE, model dokumen,
+       atau hasil analisis; ia hanya menurunkan data presentasi baru —
+       dokumen yang akan dirender beserta penanda temuannya, dan
+       daftar temuan bernomor dengan kalimat lengkap serta usulan
+       kalimat lengkap. Tanpa DOM, tanpa PDF, tanpa efek samping,
+       deterministik: masukan tidak pernah diubah, dan penomoran
+       temuan adalah urutan dokumen dari daftar saran sumber apa
+       adanya (wiAnalyze sudah mengurutkan per paragraf + offset).
+       Ketergantungan (fungsi murni yang sudah ada dan tidak diubah,
+       dalam scope <script> yang sama): wiSentences (WI-CORE) untuk
+       segmentasi kalimat penampung; diReportCategoryForKind,
+       diPdfEachChar, diPdfCpInRanges (REPORT-CORE) untuk kategori
+       dan inventaris karakter font; diBlockText, diSyncModel,
+       diMapAll (DI-CORE) untuk teks blok dan pemetaan dokumen.
+       Komposisi usulan = substitusi mekanis SATU temuan ke kalimat
+       penampungnya — operasi yang sama dengan wiApply, dibatasi
+       satu temuan, tanpa logika bahasa baru (kapitalisasi kata
+       pengganti sudah dicocokkan aturan sendiri lewat wiMatchCase).
+       Temuan penasihat tidak pernah diberi kalimat karangan:
+       proposedSentence = null dan manualReview = true. */
+    var ANNOT_MANUAL_REVIEW_LABEL = "Perlu ditinjau manual";
+    var ANNOT_UNANCHORED_NOTE = "Tidak dapat ditandai pada dokumen — teks berubah sesudah analisis.";
+    /* annotBuildReport(analysis, extras) — pembangun model beranotasi.
+       analysis: keluaran wiAnalyze apa adanya { paragraphs, separators,
+       suggestions, truncated }.
+       extras (semua opsional; data polos yang diserahkan lapisan UI):
+         acceptedIds: [id...], rejectedIds: [id...] — keadaan keputusan,
+           dihitung persis seperti diBuildReport (D-3: SEMUA temuan
+           ditampilkan, keadaan tercetak pada model);
+         kindLabels / certLabels: peta label presentasi yang sama
+           dengan yang diterima jahitan D6 (fallback: kunci mentah);
+         coverage: rentang codepoint font subset [[lo, hi], ...] —
+           bentuk yang sama dengan yang dikonsumsi diPdfPreflight —
+           untuk inventaris karakter di luar subset per blok (D-1);
+           tanpa coverage, inventaris bernilai null (tidak diketahui);
+         doc: { name, model, sync?, mapping?, assembly? } | null —
+           model adalah DocModel impor; sync (hasil diSyncModel) dan
+           mapping ({ id: hasil diMapAll }, bentuk yang dibangun
+           lapisan UI) dipakai apa adanya bila diserahkan, dan
+           diturunkan dengan fungsi DI-CORE yang sama bila tidak. */
+    function annotBuildReport(analysis, extras){
+      extras = extras || {};
+      var paras = (analysis && analysis.paragraphs) || [];
+      var seps = (analysis && analysis.separators) || [];
+      var suggestions = (analysis && analysis.suggestions) || [];
+      var kindLabels = extras.kindLabels || {};
+      var certLabels = extras.certLabels || {};
+      var coverage = Array.isArray(extras.coverage) ? extras.coverage : null;
+      var accepted = {};
+      (extras.acceptedIds || []).forEach(function(id){ accepted[id] = 1; });
+      var rejected = {};
+      (extras.rejectedIds || []).forEach(function(id){ rejected[id] = 1; });
+      var doc = extras.doc || null;
+      var model = doc && doc.model ? doc.model : null;
+      var mode = !model ? "paste" : (model.format === "pdf" ? "pdf" : "docx");
+      var sync = null, mapping = null;
+      if(model){
+        sync = doc.sync || diSyncModel(model, paras);
+        if(Array.isArray(doc.mapping)){
+          mapping = {};
+          doc.mapping.forEach(function(m, i){ if(suggestions[i]) mapping[suggestions[i].id] = m; });
+        } else if(doc.mapping){
+          mapping = doc.mapping;
+        }
+        if(!mapping){
+          var mappedArr = diMapAll(model, sync, suggestions);
+          mapping = {};
+          suggestions.forEach(function(s, i){ mapping[s.id] = mappedArr[i]; });
+        }
+      }
+      function mapFor(s){ return mapping ? (mapping[s.id] || null) : null; }
+      /* Inventaris D-1: karakter di luar subset font pada satu teks,
+         dalam urutan kemunculan pertama, dengan hitungan. Memakai
+         penjelajah codepoint REPORT-CORE yang sama dengan pra-cek D6
+         (aman karakter astral; \n \r \t dilewati sebagai whitespace
+         tata letak). null bila coverage tidak diserahkan. */
+      function annotInventory(text){
+        if(!coverage) return null;
+        var seen = {}, out = [];
+        diPdfEachChar([text], function(ch, cp){
+          if(diPdfCpInRanges(coverage, cp)) return;
+          var key = "U+" + cp.toString(16).toUpperCase();
+          if(seen[key]){ seen[key].count++; return; }
+          var e = { ch: ch, cp: "U+" + (cp < 0x10000 ? ("000" + cp.toString(16).toUpperCase()).slice(-4) : cp.toString(16).toUpperCase()), count: 1 };
+          seen[key] = e; out.push(e);
+        });
+        return out;
+      }
+      /* Kalimat penampung: span wiSentences yang memuat rentang saran.
+         wiSentences dipanggil tanpa argumen quotes — nilai bawaannya
+         (wiQuoteSpans) adalah sumber yang sama dengan yang dipakai
+         aturan saat analisis, jadi span identik. */
+      var sentCache = {};
+      function annotSentenceFor(s){
+        var p = paras[s.pIdx] || "";
+        var spans = sentCache[s.pIdx];
+        if(!spans){ spans = wiSentences(p); sentCache[s.pIdx] = spans; }
+        for(var i = 0; i < spans.length; i++){
+          if(spans[i].start <= s.start && s.end <= spans[i].end)
+            return { text: p.slice(spans[i].start, spans[i].end), start: s.start - spans[i].start, end: s.end - spans[i].start, key: s.pIdx + ":" + spans[i].start };
+        }
+        /* Cadangan jujur: rentang tidak termuat satu span kalimat
+           (wilayah yang dipangkas segmentasi) — penampung dinyatakan
+           sebagai seluruh paragraf, offset apa adanya. */
+        return { text: p, start: s.start, end: s.end, key: s.pIdx + ":para" };
+      }
+      var analyzedChars = 0;
+      paras.forEach(function(p, i){
+        analyzedChars += p.length + (i < seps.length ? String(seps[i] == null ? "" : seps[i]).length : 0);
+      });
+      /* ---------- Sisi dokumen: blok terender + penanda ---------- */
+      var renderBlocks = [], blockPosByIdx = {};
+      if(!model){
+        paras.forEach(function(p, idx){
+          renderBlocks.push({ key: "p" + (idx + 1), type: "paragraph", text: p, analyzed: true,
+            segments: p.length ? [{ start: 0, end: p.length }] : [], marks: [], unsupported: annotInventory(p) });
+          blockPosByIdx["p:" + idx] = renderBlocks.length - 1;
+        });
+      } else {
+        var matchedBlocks = {};
+        (sync.align || []).forEach(function(a){ if(a && a.status === "matched") matchedBlocks[a.blockIdx] = true; });
+        (model.blocks || []).forEach(function(b, bi){
+          var text = diBlockText(b);
+          var segments = [], pos = 0;
+          (b.runs || []).forEach(function(r){
+            if(r.protected){ segments.push({ start: pos, end: pos, protected: true, kind: r.kind || null }); return; }
+            var seg = { start: pos, end: pos + (r.text ? r.text.length : 0) };
+            if(r.bold) seg.bold = true;
+            if(r.italic) seg.italic = true;
+            if(r.underline) seg.underline = true;
+            segments.push(seg); pos = seg.end;
+          });
+          var rb = { key: b.id, type: b.type, text: text, analyzed: !!matchedBlocks[bi],
+            segments: segments, marks: [], unsupported: annotInventory(text) };
+          if(typeof b.level === "number") rb.level = b.level;
+          if(b.listKind) rb.listKind = b.listKind;
+          if(typeof b.page === "number") rb.page = b.page;
+          if(b.type === "table-cell")
+            rb.tableRef = { table: (typeof b.table === "number" ? b.table : null), r: (typeof b.r === "number" ? b.r : null), c: (typeof b.c === "number" ? b.c : null), cellPara: (typeof b.cellPara === "number" ? b.cellPara : null) };
+          renderBlocks.push(rb);
+          blockPosByIdx["b:" + bi] = renderBlocks.length - 1;
+        });
+      }
+      /* ---------- Sisi temuan: bernomor urutan dokumen ---------- */
+      var derived = suggestions.map(function(s){ return annotSentenceFor(s); });
+      var sentCounts = {};
+      derived.forEach(function(d){ sentCounts[d.key] = (sentCounts[d.key] || 0) + 1; });
+      var findings = [];
+      suggestions.forEach(function(s, i){
+        var no = i + 1;
+        var advisory = !!s.advisory;
+        var hasProposal = !advisory && typeof s.replacement === "string";
+        var sent = derived[i];
+        var state;
+        if(rejected[s.id]) state = advisory ? "read" : "rejected";
+        else if(!advisory && accepted[s.id]) state = "accepted";
+        else state = "pending";
+        var m = model ? mapFor(s) : null;
+        var anchor, rbPos = -1;
+        if(!model){
+          anchor = { type: "paragraph", paragraphIdx: s.pIdx };
+          rbPos = blockPosByIdx["p:" + s.pIdx];
+        } else {
+          var a = sync.align ? sync.align[s.pIdx] : null;
+          if(!a || a.status !== "matched"){
+            anchor = { type: "none", note: (m && (m.reasonText || (m.reason ? (DI_MAP_REASON_TEXT[m.reason] || m.reason) : null))) || ANNOT_UNANCHORED_NOTE };
+          } else if(m && m.reason === "text-mismatch"){
+            anchor = { type: "none", note: m.reasonText || ANNOT_UNANCHORED_NOTE };
+          } else {
+            var block = (model.blocks || [])[a.blockIdx];
+            anchor = { type: "block", blockIdx: a.blockIdx, blockId: block ? block.id : null };
+            if(block && typeof block.page === "number") anchor.page = block.page;
+            rbPos = blockPosByIdx["b:" + a.blockIdx];
+          }
+        }
+        if(typeof rbPos === "number" && rbPos >= 0 && renderBlocks[rbPos])
+          renderBlocks[rbPos].marks.push({ no: no, start: s.start, end: s.end, advisory: advisory });
+        findings.push({
+          no: no, id: s.id, kind: s.kind,
+          kindLabel: kindLabels[s.kind] || s.kind,
+          category: diReportCategoryForKind(s.kind),
+          certainty: s.certainty, certaintyLabel: certLabels[s.certainty] || s.certainty,
+          state: state, advisory: advisory, manualReview: !hasProposal,
+          paragraphNo: (typeof s.pIdx === "number" ? s.pIdx : 0) + 1,
+          original: s.original,
+          sentenceText: sent.text,
+          rangeInSentence: { start: sent.start, end: sent.end },
+          proposedSentence: hasProposal ? sent.text.slice(0, sent.start) + s.replacement + sent.text.slice(sent.end) : null,
+          explanation: s.explanation,
+          sharedSentence: (sentCounts[sent.key] || 0) > 1,
+          anchor: anchor,
+          mapStatus: m ? (m.status || null) : null,
+          mapReasonText: m ? (m.reasonText || null) : null
+        });
+      });
+      var totals = { findings: findings.length, withProposal: 0, manualReview: 0, advisory: 0, anchored: 0, unanchored: 0 };
+      findings.forEach(function(f){
+        if(f.proposedSentence != null) totals.withProposal++;
+        if(f.manualReview) totals.manualReview++;
+        if(f.advisory) totals.advisory++;
+        if(f.anchor.type === "none") totals.unanchored++; else totals.anchored++;
+      });
+      var unsupported = null;
+      if(coverage){
+        unsupported = [];
+        var useen = {};
+        renderBlocks.forEach(function(rb){
+          (rb.unsupported || []).forEach(function(e){
+            if(useen[e.cp]){ useen[e.cp].count += e.count; return; }
+            var c = { ch: e.ch, cp: e.cp, count: e.count };
+            useen[e.cp] = c; unsupported.push(c);
+          });
+        });
+      }
+      return {
+        source: { mode: mode, fileName: doc ? (doc.name || null) : null,
+          analyzedChars: analyzedChars,
+          analysisTruncated: !!(analysis && analysis.truncated),
+          docTruncated: doc && doc.assembly ? !!doc.assembly.truncated : false },
+        renderBlocks: renderBlocks,
+        findings: findings,
+        totals: totals,
+        unsupported: unsupported
+      };
+    }
+    /* ANNOT-CORE-END */
+
+    /* ANNOT-PDF-CORE-START — Lapisan presentasi Laporan Anotasi (D8,
+       Tahap 2): mesin tata letak MURNI satu-lintasan untuk PDF
+       beranotasi. Fungsi di blok ini TIDAK menggambar apa pun: ia
+       mengubah model beranotasi (annotBuildReport, ANNOT-CORE) menjadi
+       RENCANA gambar — daftar halaman berisi operasi teks/rect/garis/
+       nomor pada koordinat milimeter yang SUDAH FINAL.
+       Syarat C-2 audit dipenuhi menurut konstruksi: teks dipecah
+       menjadi fragmen pada gabungan batas gaya (run) dan batas
+       penanda; setiap fragmen diukur SATU KALI lewat opts.measure,
+       dan rect sorotan, garis penasihat, serta operasi teks fragmen
+       itu semuanya dibaca dari geometri fragmen yang sama di dalam
+       rencana. Pelaksana (lem UI) tidak pernah mengukur ulang — tidak
+       ada pengukuran kedua yang bisa membuat penanda bergeser dari
+       glifnya. Rentang yang melintasi baris/halaman terbelah per
+       fragmen baris secara alami; nomor temuan hanya ditempel pada
+       fragmen pertama penanda itu.
+       Kebijakan karakter D-1: bila opts.coverage (rentang codepoint
+       subset font) diserahkan, setiap karakter di luar cakupan — pada
+       teks dokumen MAUPUN string sisi temuan — diganti penanda
+       ANNOT_PDF_PLACEHOLDER pada string tampil, dengan pengukuran
+       dilakukan atas string tampil yang sama; tidak ada karakter yang
+       dihapus atau diganti diam-diam, dan pengungkapannya dicetak
+       (annotPdfDisclosure). Tanpa coverage, inventaris model bernilai
+       null dan blok ini tidak mengganti apa pun (jalur font cadangan
+       diatur lem UI dengan gerbang D6 yang sama).
+       Ketergantungan (fungsi murni yang sudah ada, tidak diubah):
+       diPdfCpInRanges + diReportFmtNum (REPORT-CORE);
+       ANNOT_MANUAL_REVIEW_LABEL + ANNOT_UNANCHORED_NOTE (ANNOT-CORE).
+       Masukan tidak pernah diubah; keluaran deterministik untuk
+       measure yang deterministik. */
+    var ANNOT_PDF_PLACEHOLDER = "\u2423"; /* ␣ OPEN BOX — termasuk cakupan subset font */
+    var ANNOT_PDF_CHIP_LABELS = { omml: "rumus", field: "kolom isian", object: "objek tertanam" };
+    var ANNOT_PDF_HL_FILL = [255, 238, 168];
+    var ANNOT_PDF_PROPOSAL_FILL = [203, 236, 203];
+    var ANNOT_PDF_NUM_COLOR = [29, 95, 209];
+    var ANNOT_PDF_ADV_COLOR = [166, 110, 0];
+    var ANNOT_PDF_ADV_LINE = [196, 132, 20];
+    /* Penjelajah codepoint yang menghasilkan SEMUA karakter (termasuk
+       whitespace tata letak) — berbeda dari diPdfEachChar yang melewati
+       \n \r \t karena pra-cek tidak memerlukannya; substitusi tidak
+       boleh membuang karakter apa pun. */
+    function annotPdfEachCp(text, fn){
+      var s = String(text == null ? "" : text);
+      for(var i = 0; i < s.length; i++){
+        var cp = s.codePointAt(i);
+        fn(String.fromCodePoint(cp), cp, i);
+        if(cp > 0xFFFF) i++;
+      }
+    }
+    function annotPdfCpArray(text){
+      var out = [];
+      annotPdfEachCp(text, function(ch, cp, start){ out.push({ ch: ch, start: start, end: start + ch.length }); });
+      return out;
+    }
+    /* Substitusi D-1: karakter di luar cakupan -> penanda, per
+       codepoint, urutan dan jumlah kemunculan dipertahankan. */
+    function annotPdfSubstitute(text, coverage){
+      if(!coverage) return String(text == null ? "" : text);
+      var out = "";
+      annotPdfEachCp(text, function(ch, cp){
+        if(cp === 0x0A || cp === 0x0D || cp === 0x09 || diPdfCpInRanges(coverage, cp)) out += ch;
+        else out += ANNOT_PDF_PLACEHOLDER;
+      });
+      return out;
+    }
+    function annotPdfFileName(date){
+      function p2(x){ return (x < 10 ? "0" : "") + x; }
+      return "saksara-laporan-anotasi-" + date.getFullYear() + "-" + p2(date.getMonth() + 1) + "-" + p2(date.getDate()) + ".pdf";
+    }
+    /* Pengungkapan D-1 dari model: total kemunculan + rincian per
+       karakter + lokasi per blok. null bila inventaris tidak tersedia
+       (coverage tidak diserahkan) atau tidak ada karakter di luar
+       cakupan. String rincian memuat karakter aslinya; perender
+       menampilkannya lewat substitusi yang sama, sehingga yang
+       tercetak adalah penanda + label codepoint-nya. */
+    function annotPdfDisclosure(model){
+      if(!model || !model.unsupported || !model.unsupported.length) return null;
+      var total = 0;
+      model.unsupported.forEach(function(u){ total += u.count; });
+      function fmtList(list){
+        return list.map(function(u){ return "'" + u.ch + "' (" + u.cp + ") \u00D7" + u.count; }).join(", ");
+      }
+      var lines = [];
+      lines.push("Sebanyak " + total + " kemunculan karakter di luar cakupan font laporan diganti dengan penanda " + ANNOT_PDF_PLACEHOLDER + " pada laporan ini, agar tidak ada isi yang hilang diam-diam: " + fmtList(model.unsupported) + ". Tanda " + ANNOT_PDF_PLACEHOLDER + " bukan bagian dari teks asli.");
+      (model.renderBlocks || []).forEach(function(rb, i){
+        if(rb.unsupported && rb.unsupported.length){
+          var loc;
+          if(model.source && model.source.mode === "paste") loc = "Paragraf ke-" + (i + 1);
+          else {
+            loc = "Blok ke-" + (i + 1) + (rb.type ? " (" + rb.type + ")" : "");
+            if(typeof rb.page === "number") loc += ", halaman asal " + rb.page;
+          }
+          lines.push(loc + ": " + fmtList(rb.unsupported));
+        }
+      });
+      return { total: total, lines: lines };
+    }
+    /* annotPdfLayout(model, opts) — rencana gambar seluruh laporan.
+       opts: { measure(textTampil, {size, bold}) -> lebar mm (WAJIB),
+               coverage: rentang codepoint | null,
+               display(text) -> text tampil (jalur font cadangan;
+                 hanya dipakai bila coverage null),
+               dateStr, editedNote: bool, fallbackNotice: string|null,
+               stateLabels: {accepted|pending|rejected|read -> label},
+               recommendations: [string], limitations: [string] }
+       Keluaran: { pages: [[op...]...], pageCount, disclosure }.
+       Op: {op:"text", x, y, text(tampil), size, bold, color, src}
+           {op:"rect", x, y, w, h, fill, mark, kind:"hl"|"proposal"}
+           {op:"rects", x, y, w, h, color, width}   (bingkai sel tabel)
+           {op:"line", x1, y1, x2, y2, color, width, dash, mark}
+           {op:"num", x, y, text, mark, color}      (nomor superskrip) */
+    function annotPdfLayout(model, opts){
+      opts = opts || {};
+      var measure = opts.measure;
+      var coverage = opts.coverage || null;
+      function disp(t){
+        t = String(t == null ? "" : t);
+        return coverage ? annotPdfSubstitute(t, coverage) : (opts.display ? opts.display(t) : t);
+      }
+      function wmeasure(raw, size, bold){ return measure(disp(raw), { size: size, bold: !!bold }); }
+      var M = 16, CW = 178, TOP = 18, BOT = 278, FIRST_BASE = 22;
+      var pages = [[]];
+      var Y = FIRST_BASE;
+      function ops(){ return pages[pages.length - 1]; }
+      function newPage(){ pages.push([]); Y = FIRST_BASE; }
+      function sizeMm(size){ return size * 25.4 / 72; }
+      function lhFor(size){ return sizeMm(size) * 1.5; }
+      function T(x, y, raw, size, bold, color, src){
+        var d = disp(raw);
+        if(!d) return;
+        ops().push({ op: "text", x: x, y: y, text: d, size: size, bold: !!bold, color: color || [0, 0, 0], src: src || null });
+      }
+      function RECT(x, y, w, h, fill, mark, kind, block){ ops().push({ op: "rect", x: x, y: y, w: w, h: h, fill: fill, mark: (mark == null ? null : mark), kind: kind || "hl", block: block || null }); }
+      function LINE(x1, y1, x2, y2, color, width, dash, mark, block){ ops().push({ op: "line", x1: x1, y1: y1, x2: x2, y2: y2, color: color, width: width, dash: dash || null, mark: (mark == null ? null : mark), block: block || null }); }
+      function NUM(x, y, n, color, block, markNo){ ops().push({ op: "num", x: x, y: y, text: String(n), mark: (markNo == null ? null : markNo), color: color, block: block || null }); }
+      /* Tokenisasi kata/spasi untuk pembungkusan teks polos. */
+      function tokensOf(text){
+        var out = [], i = 0, s = String(text == null ? "" : text);
+        while(i < s.length){
+          var ch = s.charAt(i);
+          if(ch === "\n"){ out.push({ t: "\n", brk: true }); i++; continue; }
+          var isSp = (ch === " " || ch === "\t");
+          var j = i + 1;
+          while(j < s.length){ var c2 = s.charAt(j); if(c2 === "\n") break; if((c2 === " " || c2 === "\t") !== isSp) break; j++; }
+          out.push({ t: s.slice(i, j), space: isSp });
+          i = j;
+        }
+        return out;
+      }
+      function wrapPlain(text, width, size, bold){
+        var lines = [], cur = "", curW = 0;
+        function flush(){ lines.push(cur); cur = ""; curW = 0; }
+        tokensOf(text).forEach(function(tk){
+          if(tk.brk){ flush(); return; }
+          var w = wmeasure(tk.t, size, bold);
+          if(tk.space){
+            if(curW + w <= width){ cur += tk.t; curW += w; }
+            else if(cur) flush();
+            return;
+          }
+          if(curW + w <= width){ cur += tk.t; curW += w; return; }
+          if(w <= width){ flush(); cur = tk.t; curW = w; return; }
+          annotPdfCpArray(tk.t).forEach(function(c){
+            var cw = wmeasure(c.ch, size, bold);
+            if(curW + cw > width && cur) flush();
+            cur += c.ch; curW += cw;
+          });
+        });
+        if(cur || !lines.length) lines.push(cur);
+        return lines;
+      }
+      function emitPlain(text, size, bold, o){
+        o = o || {};
+        var x = (o.x != null ? o.x : M), width = o.width || CW, lh = o.lh || lhFor(size);
+        wrapPlain(text, width, size, bold).forEach(function(ln){
+          if(Y > BOT) newPage();
+          T(x, Y, ln, size, bold, o.color);
+          Y += lh;
+        });
+        if(o.gap) Y += o.gap;
+      }
+      function emitHeading(text, size, gapBefore){
+        var lines = wrapPlain(text, CW, size, true);
+        var need = lines.length * lhFor(size) + lhFor(size);
+        if(Y > FIRST_BASE && Y + need > BOT) newPage();
+        else if(gapBefore) Y += gapBefore;
+        lines.forEach(function(ln){
+          if(Y > BOT) newPage();
+          T(M, Y, ln, size, true);
+          Y += lhFor(size);
+        });
+        Y += 1.2;
+      }
+      function emitKv(rows){
+        rows.forEach(function(row){
+          var vlines = wrapPlain(row[1], CW - 58, 10.5, false);
+          if(Y + Math.max(1, vlines.length) * lhFor(10.5) > BOT && Y > FIRST_BASE) newPage();
+          T(M, Y, row[0], 10.5, true);
+          vlines.forEach(function(vl, i){
+            if(i > 0){ Y += lhFor(10.5); if(Y > BOT) newPage(); }
+            T(72, Y, vl, 10.5, false);
+          });
+          Y += lhFor(10.5);
+        });
+        Y += 2;
+      }
+      /* ----- Mesin fragmen berpenanda (jantung satu-lintasan) -----
+         Memecah teks blok pada gabungan batas segmen gaya + batas
+         penanda, membungkusnya menjadi baris, dan untuk setiap baris
+         menghasilkan item teks + rect/garis/nomor dari geometri
+         fragmen yang sama. */
+      function blockLines(text, segments, marks, o){
+        var size = o.size, lh = o.lh || lhFor(size), smm = sizeMm(size);
+        text = String(text == null ? "" : text);
+        var len = text.length;
+        var boundMap = { 0: 1 };
+        if(len) boundMap[len] = 1;
+        (segments || []).forEach(function(sg){ boundMap[Math.max(0, Math.min(len, sg.start))] = 1; boundMap[Math.max(0, Math.min(len, sg.end))] = 1; });
+        (marks || []).forEach(function(mk){ boundMap[Math.max(0, Math.min(len, mk.start))] = 1; boundMap[Math.max(0, Math.min(len, mk.end))] = 1; });
+        var pts = Object.keys(boundMap).map(function(k){ return Number(k); }).sort(function(a, b){ return a - b; });
+        var chips = {};
+        (segments || []).forEach(function(sg){
+          if(sg.protected && sg.start === sg.end)
+            chips[sg.start] = "[" + (ANNOT_PDF_CHIP_LABELS[sg.kind] || "elemen terlindungi") + " \u2014 tidak dianalisis]";
+        });
+        function styleAt(pos){
+          var st = { bold: !!o.boldAll, italic: false, underline: false };
+          (segments || []).forEach(function(sg){
+            if(sg.protected) return;
+            if(sg.start <= pos && pos < sg.end){
+              if(sg.bold) st.bold = true;
+              if(sg.italic) st.italic = true;
+              if(sg.underline) st.underline = true;
+            }
+          });
+          return st;
+        }
+        function marksAt(s, e){
+          var out = [];
+          (marks || []).forEach(function(mk){ if(mk.start <= s && e <= mk.end) out.push(mk); });
+          return out;
+        }
+        var pieces = [];
+        for(var pi = 0; pi < pts.length; pi++){
+          var p = pts[pi];
+          if(chips[p] != null)
+            pieces.push({ start: p, end: p, chip: true, text: chips[p], marks: [], style: { bold: false, italic: false, underline: false }, space: false });
+          if(pi + 1 >= pts.length) break;
+          var s = p, e = pts[pi + 1];
+          if(e <= s) continue;
+          var st = styleAt(s), mk = marksAt(s, e);
+          var j = s;
+          while(j < e){
+            var ch = text.charAt(j);
+            if(ch === "\n"){ pieces.push({ start: j, end: j + 1, brk: true, text: "", marks: [], style: st, space: false }); j++; continue; }
+            var isSp = (ch === " " || ch === "\t");
+            var k = j + 1;
+            while(k < e){ var c2 = text.charAt(k); if(c2 === "\n") break; if((c2 === " " || c2 === "\t") !== isSp) break; k++; }
+            pieces.push({ start: j, end: k, text: text.slice(j, k), marks: mk, style: st, space: isSp });
+            j = k;
+          }
+        }
+        pieces.forEach(function(pc){ pc.w = pc.brk ? 0 : wmeasure(pc.text, size, pc.style.bold); });
+        var lines = [], cur = null, numbered = {};
+        function newLine(){ cur = { items: [], rects: [], ulines: [], nums: [], lh: lh, sizeMm: smm, size: size, w: 0, block: o.blockKey || null }; lines.push(cur); }
+        newLine();
+        function place(pc, x){
+          cur.items.push({ x: x, w: pc.w, text: pc.text, bold: pc.style.bold, italic: !!pc.style.italic,
+            color: pc.chip ? [96, 102, 110] : null, src: pc.chip ? null : { block: o.blockKey || null, start: pc.start, end: pc.end }, chip: !!pc.chip });
+          pc.marks.forEach(function(mk){
+            if(mk.kind === "proposal"){ cur.rects.push({ x: x, w: pc.w, mark: mk.no, kind: "proposal" }); return; }
+            if(mk.advisory) cur.ulines.push({ x: x, w: pc.w, mark: mk.no, dash: [0.8, 0.8], color: ANNOT_PDF_ADV_LINE });
+            else cur.rects.push({ x: x, w: pc.w, mark: mk.no, kind: "hl" });
+            if(!o.suppressNums && !numbered[mk.no]){
+              numbered[mk.no] = 1;
+              cur.nums.push({ x: x, text: String(mk.no), mark: mk.no, color: mk.advisory ? ANNOT_PDF_ADV_COLOR : ANNOT_PDF_NUM_COLOR });
+            }
+          });
+          if(pc.style.underline && !pc.space)
+            cur.ulines.push({ x: x, w: pc.w, mark: null, dash: null, color: [80, 80, 80] });
+          cur.w = Math.max(cur.w, x + pc.w);
+        }
+        var idx = 0;
+        while(idx < pieces.length){
+          var pc0 = pieces[idx];
+          if(pc0.brk){ newLine(); idx++; continue; }
+          if(pc0.space){
+            if(cur.w + pc0.w <= o.width || !cur.items.length){ place(pc0, cur.w); idx++; }
+            else { newLine(); if(pc0.marks.length) place(pc0, 0); idx++; }
+            continue;
+          }
+          var word = [], ww = 0, j2 = idx;
+          while(j2 < pieces.length && !pieces[j2].space && !pieces[j2].brk){ word.push(pieces[j2]); ww += pieces[j2].w; j2++; }
+          if(cur.w + ww <= o.width){
+            word.forEach(function(wp){ place(wp, cur.w); });
+            idx = j2;
+          } else if(ww <= o.width){
+            newLine();
+            word.forEach(function(wp){ place(wp, cur.w); });
+            idx = j2;
+          } else {
+            var rest = word.slice();
+            while(rest.length){
+              var avail = o.width - cur.w, first = rest[0];
+              if(first.w <= avail){ place(first, cur.w); rest = rest.slice(1); continue; }
+              var cps = annotPdfCpArray(first.text);
+              var acc = "", accW = 0, used = 0;
+              for(var ci = 0; ci < cps.length; ci++){
+                var cw2 = wmeasure(cps[ci].ch, size, first.style.bold);
+                if(accW + cw2 > avail && acc) break;
+                acc += cps[ci].ch; accW += cw2; used++;
+                if(accW > avail) break;
+              }
+              if(!acc){ newLine(); continue; }
+              var subEnd = first.start + cps[used - 1].end;
+              place({ start: first.start, end: subEnd, text: acc, marks: first.marks, style: first.style, space: false, chip: first.chip, w: accW }, cur.w);
+              var remainText = first.text.slice(cps[used - 1].end);
+              if(remainText)
+                rest = [{ start: subEnd, end: first.end, text: remainText, marks: first.marks, style: first.style, space: false, chip: first.chip, w: wmeasure(remainText, size, first.style.bold) }].concat(rest.slice(1));
+              else rest = rest.slice(1);
+              if(rest.length) newLine();
+            }
+            idx = j2;
+          }
+        }
+        /* Penanda nol-lebar (rentang sisipan): jangkar pada baris yang
+           memuat offset-nya, digambar sebagai sisipan tipis + nomor. */
+        (marks || []).forEach(function(mk){
+          if(mk.start !== mk.end) return;
+          var target = null, tx = 0;
+          for(var li = 0; li < lines.length; li++){
+            var its = lines[li].items, lo = null, hi = null;
+            its.forEach(function(it){
+              if(!it.src) return;
+              if(lo === null || it.src.start < lo) lo = it.src.start;
+              if(hi === null || it.src.end > hi) hi = it.src.end;
+            });
+            if(lo === null) continue;
+            if(mk.start >= lo && mk.start <= hi){
+              target = lines[li]; tx = 0;
+              its.forEach(function(it){ if(it.src && it.src.end <= mk.start) tx = Math.max(tx, it.x + it.w); });
+              break;
+            }
+          }
+          if(!target && lines.length) target = lines[lines.length - 1];
+          if(!target) return;
+          if(mk.kind === "proposal") return;
+          if(mk.advisory) target.ulines.push({ x: tx, w: 0.7, mark: mk.no, dash: [0.8, 0.8], color: ANNOT_PDF_ADV_LINE });
+          else target.rects.push({ x: tx, w: 0.7, mark: mk.no, kind: "hl" });
+          if(!o.suppressNums && !numbered[mk.no]){
+            numbered[mk.no] = 1;
+            target.nums.push({ x: tx, text: String(mk.no), mark: mk.no, color: mk.advisory ? ANNOT_PDF_ADV_COLOR : ANNOT_PDF_NUM_COLOR });
+          }
+        });
+        return { lines: lines, lh: lh, sizeMm: smm, size: size };
+      }
+      function pushLine(line, x0, base){
+        var smm = line.sizeMm;
+        line.rects.forEach(function(r){ RECT(x0 + r.x, base - smm * 0.80, r.w, smm * 1.04, r.kind === "proposal" ? ANNOT_PDF_PROPOSAL_FILL : ANNOT_PDF_HL_FILL, r.mark, r.kind, line.block); });
+        line.ulines.forEach(function(u){ LINE(x0 + u.x, base + smm * 0.30, x0 + u.x + u.w, base + smm * 0.30, u.color, u.dash ? 0.32 : 0.22, u.dash, u.mark, line.block); });
+        line.items.forEach(function(it){ T(x0 + it.x, base, it.text, line.size, it.bold, it.color, it.src); });
+        line.nums.forEach(function(n){ NUM(x0 + n.x, base - smm * 0.95, n.text, n.color, line.block, n.mark); });
+      }
+      function emitBlockLines(L, x0, gapAfter, prefix){
+        if(!L.lines.length){ Y += (gapAfter || 0); return; }
+        var first = true;
+        L.lines.forEach(function(line){
+          if(Y > BOT) newPage();
+          if(first && prefix) T(prefix.x, Y, prefix.text, L.size, false, [60, 60, 60]);
+          first = false;
+          pushLine(line, x0, Y);
+          Y += line.lh;
+        });
+        Y += (gapAfter || 0);
+      }
+      /* ----- Halaman 1: kepala + kejujuran + ringkasan ----- */
+      var src = model.source || {};
+      var totals = model.totals || { findings: 0, withProposal: 0, manualReview: 0, unanchored: 0 };
+      T(M, Y, "Saksara", 16, true, [29, 95, 209]);
+      Y += 8;
+      T(M, Y, "LAPORAN ANOTASI TULISAN", 13.5, true);
+      Y += 6.5;
+      emitPlain("Asisten Menulis \u00B7 Saksara", 9.5, false, { color: [110, 110, 110], lh: 4.6 });
+      emitPlain("Dibuat lokal di peramban \u00B7 " + (opts.dateStr || "") + " \u00B7 saksara.vercel.app", 9.5, false, { color: [110, 110, 110], lh: 4.6, gap: 1 });
+      LINE(M, Y, M + CW, Y, [160, 160, 160], 0.25, null, null);
+      Y += 5;
+      if(opts.fallbackNotice) emitPlain(opts.fallbackNotice, 10, false, { gap: 2 });
+      var honesty = "Teks di bawah adalah teks yang dianalisis, utuh dan tidak diubah. Sorotan dan nomor adalah penanda saran \u2014 bukan perubahan otomatis. Pemisahan halaman mengikuti tata letak laporan ini, bukan dokumen asli.";
+      if(src.mode === "pdf") honesty += " Untuk dokumen yang diimpor dari PDF, teks adalah hasil ekstraksi per halaman dan disusun ulang sebagai teks mengalir \u2014 bukan tampilan visual PDF asli.";
+      if(opts.editedNote) honesty += " Perhatian: teks pada kotak tulis telah berubah sejak analisis terakhir; laporan ini mencetak teks persis seperti yang dianalisis, sehingga penanda tetap tepat untuk teks yang tercetak di sini.";
+      if(src.analysisTruncated) honesty += " Cakupan: analisis internal terpotong pada batas 50.000 karakter.";
+      if(src.docTruncated) honesty += " Cakupan: dokumen dipotong pada batas blok; blok selebihnya belum dianalisis.";
+      emitPlain(honesty, 10, false, { gap: 3 });
+      emitHeading("Ringkasan", 12, 0);
+      var rows = [];
+      if(src.fileName) rows.push(["Dokumen", String(src.fileName)]);
+      rows.push(["Total temuan", diReportFmtNum(totals.findings || 0)]);
+      var certCounts = {}, certOrder = [];
+      (model.findings || []).forEach(function(f){
+        var lbl = f.certaintyLabel || f.certainty || "";
+        if(!(lbl in certCounts)){ certCounts[lbl] = 0; certOrder.push(lbl); }
+        certCounts[lbl]++;
+      });
+      certOrder.forEach(function(lbl){ rows.push([lbl, diReportFmtNum(certCounts[lbl])]); });
+      rows.push(["Dengan usulan perbaikan", diReportFmtNum(totals.withProposal || 0)]);
+      rows.push(["Perlu ditinjau manual", diReportFmtNum(totals.manualReview || 0)]);
+      if(totals.unanchored) rows.push(["Tanpa penanda pada dokumen", diReportFmtNum(totals.unanchored)]);
+      rows.push(["Karakter dianalisis", diReportFmtNum(src.analyzedChars || 0)]);
+      emitKv(rows);
+      var disclosure = coverage ? annotPdfDisclosure(model) : null;
+      if(disclosure){
+        emitHeading("Pengungkapan Karakter", 12, 2);
+        disclosure.lines.forEach(function(ln){ emitPlain(ln, 10, false, { gap: 1 }); });
+        Y += 2;
+      }
+      /* ----- Bagian A: Dokumen Bertanda ----- */
+      emitHeading("Dokumen Bertanda", 12, 3);
+      if(src.mode === "pdf")
+        emitPlain("Teks berikut adalah hasil ekstraksi per halaman dari berkas PDF asal, disusun ulang sebagai teks mengalir.", 9.5, false, { color: [110, 110, 110], gap: 2 });
+      var blocks = model.renderBlocks || [];
+      if(!blocks.length)
+        emitPlain("Tidak ada teks yang dianalisis.", 10.5, false, { gap: 2 });
+      var listCounter = 0, lastListKey = null, lastPage = null;
+      function renderFlowBlock(blk){
+        if(blk.type === "heading"){
+          var hsize = blk.level === 1 ? 15 : blk.level === 2 ? 13.5 : blk.level === 3 ? 12 : 11;
+          if(Y + lhFor(hsize) * 1.6 > BOT && Y > FIRST_BASE) newPage();
+          Y += 2.5;
+          emitBlockLines(blockLines(blk.text, blk.segments, blk.marks, { width: CW, size: hsize, lh: lhFor(hsize) * 1.15, boldAll: true, blockKey: blk.key }), M, 1.5);
+          listCounter = 0; lastListKey = null;
+        } else if(blk.type === "list-item"){
+          var key = (blk.listKind || "bullet") + ":" + (blk.level || 0);
+          if(key !== lastListKey){ listCounter = 0; lastListKey = key; }
+          var prefixText;
+          if(blk.listKind === "number"){ listCounter++; prefixText = listCounter + "."; }
+          else prefixText = "\u2022";
+          var indent = 7 + (blk.level || 0) * 5;
+          emitBlockLines(blockLines(blk.text, blk.segments, blk.marks, { width: CW - indent, size: 10.5, lh: 6.0, blockKey: blk.key }),
+            M + indent, 1.2, { text: prefixText, x: M + (blk.level || 0) * 5 });
+          /* listCounter/lastListKey sengaja TIDAK diatur ulang di sini:
+             butir berurutan harus meneruskan penomoran. */
+        } else {
+          emitBlockLines(blockLines(blk.text, blk.segments, blk.marks, { width: CW, size: 10.5, lh: 6.0, blockKey: blk.key }), M, 2.2);
+          listCounter = 0; lastListKey = null;
+        }
+      }
+      function renderTable(cellMap, ncols){
+        var colW = CW / ncols, pad = 1.6, tsize = 10, tlh = lhFor(tsize), tsmm = sizeMm(tsize);
+        var rowIdx = Object.keys(cellMap).map(function(k){ return Number(k); }).sort(function(a, b){ return a - b; });
+        rowIdx.forEach(function(r){
+          var cellLines = [], maxLines = 0, c;
+          for(c = 0; c < ncols; c++){
+            var cblocks = cellMap[r] && cellMap[r][c] ? cellMap[r][c] : [];
+            var ls = [];
+            cblocks.forEach(function(b, bi2){
+              var L = blockLines(b.text, b.segments, b.marks, { width: colW - 2 * pad, size: tsize, lh: tlh, blockKey: b.key });
+              L.lines.forEach(function(l){ ls.push(l); });
+              if(bi2 < cblocks.length - 1) ls.push(null);
+            });
+            if(!ls.length) ls = [null];
+            cellLines.push(ls);
+            if(ls.length > maxLines) maxLines = ls.length;
+          }
+          var done = 0;
+          while(done < maxLines){
+            var avail = BOT - Y;
+            var fit = Math.floor((avail - 2 * pad) / tlh);
+            if(fit <= 0){ newPage(); continue; }
+            var take = Math.min(fit, maxLines - done);
+            for(c = 0; c < ncols; c++)
+              ops().push({ op: "rects", x: M + c * colW, y: Y - tsmm - 0.6, w: colW, h: take * tlh + tsmm * 0.6, color: [170, 175, 182], width: 0.25 });
+            for(var s2 = 0; s2 < take; s2++){
+              var base = Y + s2 * tlh;
+              for(c = 0; c < ncols; c++){
+                var line = cellLines[c][done + s2];
+                if(line) pushLine(line, M + c * colW + pad, base);
+              }
+            }
+            Y += take * tlh + 1.2;
+            done += take;
+          }
+        });
+        Y += 2;
+        listCounter = 0; lastListKey = null;
+      }
+      var bi = 0;
+      while(bi < blocks.length){
+        var blk = blocks[bi];
+        if(typeof blk.page === "number" && blk.page !== lastPage){
+          lastPage = blk.page;
+          emitPlain("\u2014 Halaman " + blk.page + " pada dokumen asal \u2014", 8.5, false, { color: [120, 120, 120], lh: 4.4, gap: 1 });
+        }
+        if(blk.type === "table-cell" && blk.tableRef && typeof blk.tableRef.table === "number"){
+          var tIdx = blk.tableRef.table, cellMap = {}, maxCol = -1, bj = bi;
+          while(bj < blocks.length && blocks[bj].type === "table-cell" && blocks[bj].tableRef && blocks[bj].tableRef.table === tIdx){
+            var cb = blocks[bj], rr = cb.tableRef.r || 0, cc = cb.tableRef.c || 0;
+            if(!cellMap[rr]) cellMap[rr] = {};
+            if(!cellMap[rr][cc]) cellMap[rr][cc] = [];
+            cellMap[rr][cc].push(cb);
+            if(cc > maxCol) maxCol = cc;
+            bj++;
+          }
+          renderTable(cellMap, maxCol + 1);
+          bi = bj;
+          continue;
+        }
+        renderFlowBlock(blk);
+        bi++;
+      }
+      /* ----- Bagian B: Daftar Temuan ----- */
+      emitHeading("Daftar Temuan", 12, 5);
+      var stateLabels = opts.stateLabels || {};
+      function pad2n(n){ return (n < 10 ? "0" : "") + n; }
+      if(!(model.findings || []).length)
+        emitPlain("Tidak ditemukan saran untuk teks ini.", 10.5, false, { gap: 2 });
+      (model.findings || []).forEach(function(f){
+        if(BOT - Y < 34 && Y > FIRST_BASE) newPage();
+        emitPlain("TEMUAN " + pad2n(f.no) + " \u2014 " + f.kindLabel + " \u00B7 " + f.certaintyLabel, 10.5, true, { gap: 0.6 });
+        var loc = "Lokasi: Paragraf ke-" + f.paragraphNo;
+        if(f.anchor && f.anchor.type === "block" && typeof f.anchor.page === "number")
+          loc += " \u00B7 dari halaman " + f.anchor.page + " dokumen asal";
+        if(f.anchor && f.anchor.type === "none")
+          loc += " \u00B7 " + (f.anchor.note || ANNOT_UNANCHORED_NOTE);
+        else
+          loc += " \u00B7 penanda " + f.no + " pada Dokumen Bertanda";
+        emitPlain(loc, 9.5, false, { color: [90, 90, 90], lh: 4.8, gap: 1.2 });
+        emitPlain("Kalimat asli:", 10, true, { gap: 0.2 });
+        emitBlockLines(blockLines(f.sentenceText,
+          [{ start: 0, end: String(f.sentenceText || "").length }],
+          [{ no: f.no, start: f.rangeInSentence.start, end: f.rangeInSentence.end, advisory: !!f.advisory }],
+          { width: CW, size: 10.5, lh: 5.8, suppressNums: true, blockKey: "f" + f.no + "-kal" }), M, 1.2);
+        emitPlain("Mengapa perlu diperbaiki:", 10, true, { gap: 0.2 });
+        emitPlain(f.explanation || "", 10.5, false, { gap: 1.2 });
+        emitPlain("Usulan perbaikan:", 10, true, { gap: 0.2 });
+        if(f.manualReview || f.proposedSentence == null){
+          emitPlain(ANNOT_MANUAL_REVIEW_LABEL, 10.5, true, { gap: 0.4 });
+          emitPlain("Tidak ada usulan otomatis untuk temuan ini \u2014 periksalah kalimat di atas dan putuskan sendiri perbaikannya.", 10, false, { gap: 1.2 });
+        } else {
+          var rs = f.rangeInSentence.start;
+          var rl = f.proposedSentence.length - (f.sentenceText.length - (f.rangeInSentence.end - f.rangeInSentence.start));
+          emitBlockLines(blockLines(f.proposedSentence,
+            [{ start: 0, end: f.proposedSentence.length }],
+            [{ no: f.no, start: rs, end: rs + rl, kind: "proposal" }],
+            { width: CW, size: 10.5, lh: 5.8, suppressNums: true, blockKey: "f" + f.no + "-usulan" }), M, 1.2);
+        }
+        if(f.sharedSentence)
+          emitPlain("Catatan: kalimat ini memuat temuan lain; usulan di atas hanya menerapkan temuan ini.", 9.5, false, { gap: 0.8 });
+        emitPlain("Status: saran \u2014 bukan perubahan otomatis. Keputusan Anda: " + (stateLabels[f.state] || f.state) + ".", 9.5, false, { color: [90, 90, 90], lh: 4.8, gap: 3.5 });
+      });
+      /* ----- Bagian C: Penutup ----- */
+      emitHeading("Rekomendasi", 12, 5);
+      (opts.recommendations || []).forEach(function(r){ emitPlain("\u2022 " + r, 10.5, false, { lh: 5.6 }); });
+      emitHeading("Keterbatasan Analisis", 12, 4);
+      var lims = (opts.limitations || []).slice();
+      if(coverage)
+        lims.push("Karakter di luar cakupan font laporan diganti penanda " + ANNOT_PDF_PLACEHOLDER + " (lihat Pengungkapan Karakter) \u2014 tidak ada karakter yang dihapus diam-diam.");
+      lims.push("Run miring (italic) pada dokumen asal dicetak tegak; subset font laporan hanya menyediakan gaya normal dan tebal. Ketebalan run dan garis bawah dipertahankan.");
+      if(src.mode === "docx")
+        lims.push("Penomoran daftar pada Dokumen Bertanda digenerasi ulang secara berurutan; penomoran asli Word yang berlanjut atau mengulang antarblok dapat berbeda.");
+      lims.push("Sorotan dihitung dari tata letak laporan ini sendiri, sehingga posisi penanda selalu mengacu pada teks yang tercetak di halaman yang sama.");
+      lims.forEach(function(r){ emitPlain("\u2022 " + r, 10.5, false, { lh: 5.6 }); });
+      emitPlain("Laporan ini adalah bantuan analisis tulisan \u2014 bukan keputusan akademik yang mutlak.", 10.5, false, { gap: 2 });
+      return { pages: pages, pageCount: pages.length, disclosure: disclosure };
+    }
+    /* ANNOT-PDF-CORE-END */
+
+    /* FAITHFUL-CORE-START — Ekspor setia-asli (D8 Tahap 3): fungsi MURNI
+       pembangun ekspor yang mempertahankan berkas asal. Untuk dokumen
+       Word: bedah word/document.xml dari paket ASAL (sorotan +
+       nomor superskrip pada run yang tepat, bagian "Rekomendasi
+       Perbaikan" ditambahkan di akhir isi) lalu paket ditulis ulang
+       dengan semua bagian lain byte-identik. Untuk PDF: geometri
+       sorotan diturunkan dari item teks pdf.js yang SUDAH diekstrak
+       saat impor (dicerminkan dari fungsi DI-CORE yang sama dan
+       diverifikasi persis terhadap teks model sebelum dipercaya).
+       Blok ini tidak menggambar dan tidak menyentuh DOM; penggambaran
+       PDF (pdf-lib) dan unduhan berada di lem lapisan UI. WI-CORE,
+       DI-CORE, REPORT-CORE, ANNOT-CORE, dan ANNOT-PDF-CORE tidak
+       diubah; hasil analisis tidak pernah dihitung ulang di sini —
+       masukan adalah model annotBuildReport apa adanya. */
+    var DI_FAITHFUL_HL_MECH = "yellow";
+    var DI_FAITHFUL_HL_ADV = "cyan";
+
+    /* ---------- ZIP: direktori pusat lengkap + penulis minimal ----------
+       Pembaca menangkap crc/waktu/flags per entri (diZipRead DI-CORE
+       tidak menyimpannya) agar penulis dapat menyalin data terkompresi
+       entri yang tidak berubah PERSIS byte-per-byte. Entri pengganti
+       ditulis dengan metode store (0) + CRC32 yang dihitung di sini. */
+    function diFaithfulZipEntries(bytes){
+      if(!bytes || typeof bytes.length !== "number" || bytes.length < 22)
+        return diFail("zip-invalid", "Berkas terlalu kecil untuk menjadi dokumen .docx yang valid.");
+      var view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+      var len = bytes.length, eocd = -1, i;
+      var start = Math.max(0, len - 65557);
+      for(i = len - 22; i >= start; i--){
+        if(view.getUint32(i, true) === 0x06054b50){ eocd = i; break; }
+      }
+      if(eocd < 0)
+        return diFail("zip-invalid", "Struktur arsip ZIP tidak ditemukan.");
+      if(eocd >= 20 && (view.getUint32(eocd - 20, true) === 0x07064b50 || view.getUint32(eocd - 20, true) === 0x06064b50))
+        return diFail("zip64", "Dokumen memakai format ZIP64 yang belum didukung.");
+      var total = view.getUint16(eocd + 10, true);
+      var cdSize = view.getUint32(eocd + 12, true);
+      var cdOffset = view.getUint32(eocd + 16, true);
+      if(total === 0xFFFF || cdSize === 0xFFFFFFFF || cdOffset === 0xFFFFFFFF)
+        return diFail("zip64", "Dokumen memakai format ZIP64 yang belum didukung.");
+      if(total > DI_CAPS.maxEntries)
+        return diFail("zip-too-many-entries", "Dokumen memuat terlalu banyak bagian internal.");
+      var decoder = new TextDecoder("utf-8");
+      var entries = [], pos = cdOffset, e;
+      for(e = 0; e < total; e++){
+        if(pos + 46 > len || view.getUint32(pos, true) !== 0x02014b50)
+          return diFail("zip-invalid", "Struktur arsip dokumen rusak — direktori pusat tidak valid.");
+        var flags = view.getUint16(pos + 8, true);
+        if(flags & 0x0001)
+          return diFail("zip-encrypted", "Dokumen terenkripsi atau dilindungi kata sandi sehingga tidak dapat dibaca.");
+        var method = view.getUint16(pos + 10, true);
+        var time = view.getUint16(pos + 12, true);
+        var date = view.getUint16(pos + 14, true);
+        var crc = view.getUint32(pos + 16, true);
+        var compSize = view.getUint32(pos + 20, true);
+        var size = view.getUint32(pos + 24, true);
+        if(compSize === 0xFFFFFFFF || size === 0xFFFFFFFF)
+          return diFail("zip64", "Dokumen memakai format ZIP64 yang belum didukung.");
+        var nameLen = view.getUint16(pos + 28, true);
+        var extraLen = view.getUint16(pos + 30, true);
+        var commentLen = view.getUint16(pos + 32, true);
+        var localOffset = view.getUint32(pos + 42, true);
+        var name = decoder.decode(bytes.subarray(pos + 46, pos + 46 + nameLen));
+        if(localOffset + 30 > len || view.getUint32(localOffset, true) !== 0x04034b50)
+          return diFail("zip-invalid", "Struktur arsip dokumen rusak — header lokal tidak valid.");
+        var lNameLen = view.getUint16(localOffset + 26, true);
+        var lExtraLen = view.getUint16(localOffset + 28, true);
+        entries.push({ name: name, flags: flags, method: method, time: time, date: date,
+          crc: crc, compSize: compSize, size: size,
+          dataStart: localOffset + 30 + lNameLen + lExtraLen });
+        pos += 46 + nameLen + extraLen + commentLen;
+      }
+      return { ok: true, entries: entries };
+    }
+    var DI_FAITHFUL_CRC_TABLE = (function(){
+      var t = new Uint32Array(256);
+      for(var n = 0; n < 256; n++){
+        var c = n;
+        for(var k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+        t[n] = c >>> 0;
+      }
+      return t;
+    })();
+    function diFaithfulCrc32(bytes){
+      var c = 0xFFFFFFFF;
+      for(var i = 0; i < bytes.length; i++)
+        c = DI_FAITHFUL_CRC_TABLE[(c ^ bytes[i]) & 0xFF] ^ (c >>> 8);
+      return (c ^ 0xFFFFFFFF) >>> 0;
+    }
+    function diFaithfulConcatBytes(chunks){
+      var total = 0, i;
+      for(i = 0; i < chunks.length; i++) total += chunks[i].length;
+      var out = new Uint8Array(total), o = 0;
+      for(i = 0; i < chunks.length; i++){ out.set(chunks[i], o); o += chunks[i].length; }
+      return out;
+    }
+    /* replacements: { namaBagian: Uint8Array } — bagian lain disalin
+       sebagai data terkompresi mentah dari berkas asal (byte-identik). */
+    function diFaithfulZipWrite(bytes, entries, replacements){
+      var enc = new TextEncoder();
+      var chunks = [], centrals = [], offset = 0;
+      entries.forEach(function(en){
+        var nameBytes = enc.encode(en.name);
+        var isRep = replacements && Object.prototype.hasOwnProperty.call(replacements, en.name);
+        var method, crc, comp, size;
+        if(isRep){
+          var data = replacements[en.name];
+          method = 0; crc = diFaithfulCrc32(data); comp = data; size = data.length;
+        } else {
+          method = en.method; crc = en.crc; size = en.size;
+          comp = bytes.subarray(en.dataStart, en.dataStart + en.compSize);
+        }
+        var flags = en.flags & 0x0800; /* pertahankan hanya bit nama UTF-8 */
+        var lh = new DataView(new ArrayBuffer(30));
+        lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true);
+        lh.setUint16(6, flags, true); lh.setUint16(8, method, true);
+        lh.setUint16(10, en.time, true); lh.setUint16(12, en.date, true);
+        lh.setUint32(14, crc, true); lh.setUint32(18, comp.length, true);
+        lh.setUint32(22, size, true); lh.setUint16(26, nameBytes.length, true);
+        chunks.push(new Uint8Array(lh.buffer), nameBytes, comp);
+        var ch = new DataView(new ArrayBuffer(46));
+        ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true);
+        ch.setUint16(6, 20, true); ch.setUint16(8, flags, true);
+        ch.setUint16(10, method, true); ch.setUint16(12, en.time, true);
+        ch.setUint16(14, en.date, true); ch.setUint32(16, crc, true);
+        ch.setUint32(20, comp.length, true); ch.setUint32(24, size, true);
+        ch.setUint16(28, nameBytes.length, true); ch.setUint32(42, offset, true);
+        centrals.push(new Uint8Array(ch.buffer), nameBytes);
+        offset += 30 + nameBytes.length + comp.length;
+      });
+      var cd = diFaithfulConcatBytes(centrals);
+      var eocd = new DataView(new ArrayBuffer(22));
+      eocd.setUint32(0, 0x06054b50, true);
+      eocd.setUint16(8, entries.length, true); eocd.setUint16(10, entries.length, true);
+      eocd.setUint32(12, cd.length, true); eocd.setUint32(16, offset, true);
+      chunks.push(cd, new Uint8Array(eocd.buffer));
+      return diFaithfulConcatBytes(chunks);
+    }
+
+    /* ---------- Temuan yang disertakan + isi rekomendasi (bahasa sederhana) ----------
+       Temuan yang DITOLAK pengguna tidak disorot dan tidak didaftar —
+       pengguna sudah memutuskan. Temuan berjangkar diberi nomor urut
+       dokumen baru (1..M) yang konsisten antara sorotan dan daftar;
+       temuan tanpa jangkar didaftar di bagian akhir daftar tanpa nomor
+       dengan penjelasan sederhana. */
+    function diFaithfulIncluded(A){
+      var anchored = [], unanchored = [], marksByBlock = {};
+      var noByFindingNo = {};
+      ((A && A.findings) || []).forEach(function(f){
+        if(f.state === "rejected") return;
+        if(f.anchor && f.anchor.type !== "none"){ anchored.push(f); noByFindingNo[f.no] = anchored.length; }
+        else unanchored.push(f);
+      });
+      ((A && A.renderBlocks) || []).forEach(function(rb, bi){
+        (rb.marks || []).forEach(function(mk){
+          var no = noByFindingNo[mk.no];
+          if(!no) return;
+          (marksByBlock[bi] = marksByBlock[bi] || []).push(
+            { no: no, start: mk.start, end: mk.end, advisory: !!mk.advisory });
+        });
+      });
+      Object.keys(marksByBlock).forEach(function(k){
+        marksByBlock[k].sort(function(a, b){ return (a.start - b.start) || (a.end - b.end) || (a.no - b.no); });
+      });
+      return { anchored: anchored, unanchored: unanchored,
+        noByFindingNo: noByFindingNo, marksByBlock: marksByBlock };
+    }
+    function diFaithfulAppendix(A){
+      var inc = diFaithfulIncluded(A);
+      function item(f, no){
+        return { no: no, sentence: f.sentenceText, reason: f.explanation || "",
+          proposal: f.manualReview ? null : f.proposedSentence, manual: !!f.manualReview };
+      }
+      return {
+        heading: "Rekomendasi Perbaikan",
+        intro: "Bagian yang disorot kuning pada dokumen di atas adalah tulisan yang disarankan untuk diperbaiki. Sorotan biru muda artinya tulisan perlu ditinjau manual. Nomor kecil di samping sorotan merujuk ke rekomendasi di bawah ini.",
+        items: inc.anchored.map(function(f){ return item(f, inc.noByFindingNo[f.no]); }),
+        unanchoredIntro: inc.unanchored.length
+          ? "Rekomendasi berikut tidak dapat ditandai pada dokumen karena teksnya berubah sesudah analisis:"
+          : null,
+        unanchoredItems: inc.unanchored.map(function(f){ return item(f, null); }),
+        emptyNote: (inc.anchored.length + inc.unanchored.length) === 0
+          ? "Tidak ada rekomendasi perbaikan untuk dokumen ini." : null
+      };
+    }
+    function diFaithfulAppendixLines(A){
+      var app = diFaithfulAppendix(A);
+      var lines = [];
+      lines.push({ text: app.heading, bold: true, size: 15, gapAfter: 8 });
+      lines.push({ text: app.intro, bold: false, size: 10.5, gapAfter: 10 });
+      function pushItem(it){
+        lines.push({ text: (it.no != null ? it.no + ". " : "") + "Kalimat asli: \"" + it.sentence + "\"",
+          bold: false, size: 10.5, gapAfter: 2 });
+        lines.push({ text: "Alasan: " + it.reason, bold: false, size: 10.5, gapAfter: 2 });
+        if(it.manual) lines.push({ text: "Perlu ditinjau manual.", bold: true, size: 10.5, gapAfter: 8 });
+        else lines.push({ text: "Usulan perbaikan: \"" + it.proposal + "\"", bold: false, size: 10.5, gapAfter: 8 });
+      }
+      app.items.forEach(pushItem);
+      if(app.unanchoredIntro){
+        lines.push({ text: app.unanchoredIntro, bold: false, size: 10.5, gapAfter: 6 });
+        app.unanchoredItems.forEach(pushItem);
+      }
+      if(app.emptyNote) lines.push({ text: app.emptyNote, bold: false, size: 10.5, gapAfter: 4 });
+      return lines;
+    }
+    function diFaithfulFileName(name){
+      var n = String(name || "dokumen");
+      var dot = n.lastIndexOf(".");
+      var base = dot > 0 ? n.slice(0, dot) : n;
+      var ext = dot > 0 ? n.slice(dot) : "";
+      base = base.replace(/[^\p{L}\p{N}._-]+/gu, "-").replace(/^-+|-+$/g, "");
+      if(!base) base = "dokumen";
+      return base + "-beranotasi" + ext;
+    }
+
+    /* ---------- Rencana segmen satu paragraf (dipakai bedah DOCX + cadangan) ----------
+       Potongan = gabungan batas semua penanda; segmen tersorot kuning
+       bila memuat temuan mekanis, biru muda bila hanya penasihat.
+       inserts: offset akhir penanda -> nomor yang disisipkan di sana. */
+    function diFaithfulParaPlan(text, marks){
+      marks = marks || [];
+      var cutSet = { 0: 1 };
+      cutSet[text.length] = 1;
+      marks.forEach(function(m){ cutSet[m.start] = 1; cutSet[m.end] = 1; });
+      var pts = Object.keys(cutSet).map(Number).sort(function(a, b){ return a - b; });
+      var segments = [];
+      for(var i = 0; i + 1 < pts.length; i++){
+        var s = pts[i], e = pts[i + 1];
+        if(e <= s) continue;
+        var mech = false, adv = false;
+        marks.forEach(function(m){
+          if(m.start <= s && e <= m.end){ if(m.advisory) adv = true; else mech = true; }
+        });
+        segments.push({ start: s, end: e, hl: mech ? DI_FAITHFUL_HL_MECH : (adv ? DI_FAITHFUL_HL_ADV : null) });
+      }
+      var inserts = {};
+      marks.forEach(function(m){ (inserts[m.end] = inserts[m.end] || []).push(m.no); });
+      Object.keys(inserts).forEach(function(k){
+        inserts[k].sort(function(a, b){ return a - b; });
+      });
+      return { segments: segments, inserts: inserts };
+    }
+    /* Potongan run model menurut rencana segmen — untuk pembangun
+       cadangan berbasis model (docx). Menghasilkan potongan teks
+       ber-hl + sisipan nomor { insertNo } pada posisi yang benar. */
+    function diFaithfulBlockSegments(block, marks){
+      var text = diBlockText(block);
+      var plan = diFaithfulParaPlan(text, marks || []);
+      var pieces = [];
+      if(plan.inserts[0]) plan.inserts[0].forEach(function(no){ pieces.push({ insertNo: no }); });
+      var pos = 0;
+      (block.runs || []).forEach(function(r){
+        if(r.protected){ if(r.text) pieces.push({ text: r.text, prot: true, kind: r.kind || null }); return; }
+        var t = r.text || "";
+        var rEnd = pos + t.length;
+        plan.segments.forEach(function(sg){
+          var s = Math.max(sg.start, pos), e = Math.min(sg.end, rEnd);
+          if(e <= s) return;
+          pieces.push({ text: t.slice(s - pos, e - pos), hl: sg.hl,
+            bold: !!r.bold, italic: !!r.italic, underline: !!r.underline,
+            fontName: r.fontName || null,
+            fontSize: typeof r.fontSize === "number" ? r.fontSize : null,
+            link: r.link || null });
+          var ins = plan.inserts[e];
+          if(ins && e > 0) ins.forEach(function(no){ pieces.push({ insertNo: no }); });
+        });
+        pos = rEnd;
+      });
+      return pieces;
+    }
+
+    /* ---------- DOCX: pengumpulan paragraf & teks (cermin urutan model) ----------
+       Urutan pengumpulan menyalin persis diWalkBody/diTableBlock
+       DI-CORE (anak body: p/tbl/sdt; sel tabel: p/tbl bersarang), dan
+       teks paragraf dihitung dengan diWalkRuns/diRun yang sama dengan
+       pembangun model — kesetaraan keduanya ditegaskan sebelum bedah. */
+    var DI_FAITHFUL_RUN_CTX = { styles: {}, rels: {}, numbering: null };
+    function diFaithfulCollectParas(root){
+      var body = diFirst(root, "body") || root;
+      var out = [];
+      function fromTable(tbl){
+        diKids(tbl, "tr").forEach(function(tr){
+          diKids(tr, "tc").forEach(function(tc){
+            (tc.children || []).forEach(function(ch){
+              if(!ch.tag) return;
+              if(ch.local === "p") out.push(ch);
+              else if(ch.local === "tbl") fromTable(ch);
+            });
+          });
+        });
+      }
+      function fromChildren(kids){
+        (kids || []).forEach(function(el){
+          if(!el.tag) return;
+          if(el.local === "p") out.push(el);
+          else if(el.local === "tbl") fromTable(el);
+          else if(el.local === "sdt"){
+            var c = diFirst(el, "sdtContent");
+            if(c) fromChildren(c.children);
+          }
+        });
+      }
+      fromChildren(body.children);
+      return out;
+    }
+    function diFaithfulParaText(pEl){
+      var runs = [];
+      diWalkRuns(pEl, DI_FAITHFUL_RUN_CTX, { link: null }, runs);
+      var t = "";
+      runs.forEach(function(r){ if(!r.protected) t += r.text; });
+      return t;
+    }
+    /* Elemen w:r yang dikunjungi diWalkRuns, beserta induknya — cermin
+       traversal yang sama (wadah transparan dijelajahi; fldSimple dan
+       oMath/oMathPara adalah run terlindungi utuh, tidak diturunkan). */
+    function diFaithfulRunEls(pEl){
+      var out = [];
+      function walk(el){
+        var kids = el.children || [];
+        for(var i = 0; i < kids.length; i++){
+          var ch = kids[i];
+          if(!ch.tag) continue;
+          var ln = ch.local;
+          if(DI_SKIP_RUN_PARENT[ln]) continue;
+          if(ln === "r"){ out.push({ el: ch, parent: el }); continue; }
+          if(ln === "fldSimple" || ln === "oMath" || ln === "oMathPara") continue;
+          walk(ch);
+        }
+      }
+      walk(pEl);
+      return out;
+    }
+    function diFaithfulCloneEl(el){
+      if(!el.tag) return { text: el.text || "" };
+      var c = { tag: el.tag, local: el.local, attrs: {}, children: [] };
+      for(var k in el.attrs) c.attrs[k] = el.attrs[k];
+      c.children = (el.children || []).map(diFaithfulCloneEl);
+      return c;
+    }
+    function diFaithfulXEl(pfx, local, attrs, children){
+      return { tag: pfx + local, local: local, attrs: attrs || {}, children: children || [] };
+    }
+    function diFaithfulXText(t){ return { text: t }; }
+    function diFaithfulXVal(pfx, v){ var a = {}; a[pfx + "val"] = v; return a; }
+    function diFaithfulXNumRun(pfx, no){
+      return diFaithfulXEl(pfx, "r", {}, [
+        diFaithfulXEl(pfx, "rPr", {}, [
+          diFaithfulXEl(pfx, "vertAlign", diFaithfulXVal(pfx, "superscript"), []),
+          diFaithfulXEl(pfx, "sz", diFaithfulXVal(pfx, "16"), []),
+          diFaithfulXEl(pfx, "color", diFaithfulXVal(pfx, "1D5FD1"), [])
+        ]),
+        diFaithfulXEl(pfx, "t", {}, [diFaithfulXText(String(no))])
+      ]);
+    }
+    function diFaithfulXTextRun(pfx, text, opts){
+      opts = opts || {};
+      var kids = [];
+      if(opts.bold) kids.push(diFaithfulXEl(pfx, "b", {}, []));
+      if(opts.italic) kids.push(diFaithfulXEl(pfx, "i", {}, []));
+      if(opts.sz) kids.push(diFaithfulXEl(pfx, "sz", diFaithfulXVal(pfx, String(opts.sz)), []));
+      var runKids = [];
+      if(kids.length) runKids.push(diFaithfulXEl(pfx, "rPr", {}, kids));
+      runKids.push(diFaithfulXEl(pfx, "t", { "xml:space": "preserve" }, [diFaithfulXText(text)]));
+      return diFaithfulXEl(pfx, "r", {}, runKids);
+    }
+    function diFaithfulXPara(pfx, runs){ return diFaithfulXEl(pfx, "p", {}, runs); }
+    /* Run "sederhana" = teksnya hanya berasal dari anak w:t (selain
+       rPr) sehingga aman dibelah pada batas karakter mana pun. Run
+       yang memuat tab/br/sym/dll. adalah "rumit": hanya boleh utuh
+       di dalam satu segmen (ditegaskan pemanggil). */
+    function diFaithfulRunIsSimple(rEl){
+      var kids = rEl.children || [];
+      for(var i = 0; i < kids.length; i++){
+        var ch = kids[i];
+        if(!ch.tag) continue;
+        if(ch.local === "rPr") continue;
+        if(ch.local !== "t") return false;
+      }
+      return true;
+    }
+    function diFaithfulSetHighlight(rEl, pfx, color){
+      var rPr = diFirst(rEl, "rPr");
+      if(!rPr){ rPr = diFaithfulXEl(pfx, "rPr", {}, []); rEl.children.unshift(rPr); }
+      var hl = null;
+      (rPr.children || []).forEach(function(c){ if(c.tag && c.local === "highlight") hl = c; });
+      if(!hl){ hl = diFaithfulXEl(pfx, "highlight", {}, []); rPr.children.push(hl); }
+      hl.attrs = diFaithfulXVal(pfx, color);
+    }
+    function diFaithfulStripHighlights(pEl){
+      diFaithfulRunEls(pEl).forEach(function(re){
+        var rPr = diFirst(re.el, "rPr");
+        if(rPr) rPr.children = (rPr.children || []).filter(function(c){
+          return !(c.tag && c.local === "highlight");
+        });
+      });
+    }
+    function diFaithfulSplitRun(sp, plan, pfx){
+      /* Kembalikan daftar {node, end}: klon run per potongan segmen,
+         end = offset global akhir potongan (untuk sisipan nomor). */
+      var nodes = [];
+      plan.segments.forEach(function(sg){
+        var s = Math.max(sg.start, sp.start), e = Math.min(sg.end, sp.end);
+        if(e <= s) return;
+        var clone = diFaithfulCloneEl(sp.re.el);
+        var kept = [];
+        var rPr = diFirst(clone, "rPr");
+        if(rPr) kept.push(rPr);
+        kept.push(diFaithfulXEl(pfx, "t", { "xml:space": "preserve" },
+          [diFaithfulXText(sp.run.text.slice(s - sp.start, e - sp.start))]));
+        clone.children = kept;
+        if(sg.hl) diFaithfulSetHighlight(clone, pfx, sg.hl);
+        nodes.push({ node: clone, end: e });
+      });
+      return nodes;
+    }
+    /* Terapkan rencana ke satu elemen paragraf. Mengembalikan false
+       (bedah dibatalkan -> cadangan) bila ada batas segmen yang
+       memotong bagian dalam run rumit. Pada paragraf yang ditandai,
+       sorotan lama penulis dibersihkan dulu agar warna sorotan pada
+       hasil adalah lapisan anotasi Saksara yang utuh dan dapat
+       diverifikasi persis. */
+    function diFaithfulApplyPara(pEl, text, marks, pfx){
+      var plan = diFaithfulParaPlan(text, marks);
+      var runEls = diFaithfulRunEls(pEl);
+      var spans = [], pos = 0, i;
+      for(i = 0; i < runEls.length; i++){
+        var r = diRun(runEls[i].el, null);
+        var len = (!r || r.protected) ? 0 : r.text.length;
+        spans.push({ re: runEls[i], run: r, start: pos, end: pos + len,
+          simple: len === 0 ? true : diFaithfulRunIsSimple(runEls[i].el) });
+        pos += len;
+      }
+      if(pos !== text.length) return false;
+      var cutSet = {};
+      plan.segments.forEach(function(sg){ cutSet[sg.start] = 1; cutSet[sg.end] = 1; });
+      for(i = 0; i < spans.length; i++){
+        var sp = spans[i];
+        if(sp.end - sp.start > 0 && !sp.simple){
+          for(var c in cutSet){
+            var cn = +c;
+            if(sp.start < cn && cn < sp.end) return false;
+          }
+        }
+      }
+      diFaithfulStripHighlights(pEl);
+      /* Sisipan pada offset 0 diletakkan sebelum run teks pertama. */
+      if(plan.inserts[0] && spans.length){
+        var first = null;
+        for(i = 0; i < spans.length; i++) if(spans[i].end > spans[i].start){ first = spans[i]; break; }
+        if(first){
+          var at = first.re.parent.children.indexOf(first.re.el);
+          if(at >= 0){
+            var pre = plan.inserts[0].map(function(no){ return diFaithfulXNumRun(pfx, no); });
+            first.re.parent.children.splice.apply(first.re.parent.children, [at, 0].concat(pre));
+          }
+        }
+      }
+      for(i = 0; i < spans.length; i++){
+        var sp2 = spans[i];
+        var nodes;
+        if(sp2.end - sp2.start === 0){ nodes = [sp2.re.el]; }
+        else if(sp2.simple){
+          var pieces = diFaithfulSplitRun(sp2, plan, pfx);
+          if(!pieces.length) return false;
+          nodes = [];
+          pieces.forEach(function(pc){
+            nodes.push(pc.node);
+            /* Nomor temuan yang berakhir DI TENGAH span disisipkan
+               tepat sesudah potongan yang berakhir pada offset itu;
+               yang berakhir pada akhir span ditangani extra di bawah. */
+            var pn = plan.inserts[pc.end];
+            if(pn && pc.end > sp2.start && pc.end < sp2.end)
+              pn.forEach(function(no){ nodes.push(diFaithfulXNumRun(pfx, no)); });
+          });
+        }
+        else {
+          var seg = null;
+          plan.segments.forEach(function(sg){ if(sg.start <= sp2.start && sp2.end <= sg.end) seg = sg; });
+          if(seg && seg.hl) diFaithfulSetHighlight(sp2.re.el, pfx, seg.hl);
+          nodes = [sp2.re.el];
+        }
+        var parent = sp2.re.parent;
+        var idx = parent.children.indexOf(sp2.re.el);
+        if(idx < 0) return false;
+        var extra = [];
+        var insNos = plan.inserts[sp2.end];
+        if(insNos && sp2.end > sp2.start){
+          /* Hanya span teks TERAKHIR yang berakhir pada offset ini
+             yang menerima sisipan (span diurutkan; yang lain yang
+             berakhir sama adalah span nol-lebar terlindungi). */
+          var isLast = true;
+          for(var j = i + 1; j < spans.length; j++)
+            if(spans[j].end === sp2.end && spans[j].end > spans[j].start) isLast = false;
+          if(isLast) insNos.forEach(function(no){ extra.push(diFaithfulXNumRun(pfx, no)); });
+        }
+        parent.children.splice.apply(parent.children, [idx, 1].concat(nodes).concat(extra));
+      }
+      return true;
+    }
+    function diFaithfulAppendixParas(A, pfx){
+      var app = diFaithfulAppendix(A);
+      var out = [];
+      out.push(diFaithfulXPara(pfx, [diFaithfulXTextRun(pfx, app.heading, { bold: true, sz: 32 })]));
+      out.push(diFaithfulXPara(pfx, [diFaithfulXTextRun(pfx, app.intro, {})]));
+      function itemParas(it){
+        var head = [];
+        if(it.no != null) head.push(diFaithfulXTextRun(pfx, it.no + ". ", { bold: true }));
+        head.push(diFaithfulXTextRun(pfx, "Kalimat asli: ", { bold: true }));
+        head.push(diFaithfulXTextRun(pfx, "\"" + it.sentence + "\"", {}));
+        out.push(diFaithfulXPara(pfx, head));
+        out.push(diFaithfulXPara(pfx, [
+          diFaithfulXTextRun(pfx, "Alasan: ", { bold: true }),
+          diFaithfulXTextRun(pfx, it.reason, {})]));
+        if(it.manual){
+          out.push(diFaithfulXPara(pfx, [diFaithfulXTextRun(pfx, "Perlu ditinjau manual.", { bold: true })]));
+        } else {
+          out.push(diFaithfulXPara(pfx, [
+            diFaithfulXTextRun(pfx, "Usulan perbaikan: ", { bold: true }),
+            diFaithfulXTextRun(pfx, "\"" + it.proposal + "\"", {})]));
+        }
+      }
+      app.items.forEach(itemParas);
+      if(app.unanchoredIntro){
+        out.push(diFaithfulXPara(pfx, [diFaithfulXTextRun(pfx, app.unanchoredIntro, { italic: true })]));
+        app.unanchoredItems.forEach(itemParas);
+      }
+      if(app.emptyNote) out.push(diFaithfulXPara(pfx, [diFaithfulXTextRun(pfx, app.emptyNote, {})]));
+      return out;
+    }
+    /* Bedah utama: bytes asal + model impor + model beranotasi ->
+       Promise<{ ok:true, bytes, xml } | { ok:false, code, message }>. */
+    function diFaithfulDocxSurgery(bytes, model, A, opts){
+      opts = opts || {};
+      var caps = diCapsWith(opts);
+      var zr = diFaithfulZipEntries(bytes);
+      if(!zr.ok) return Promise.resolve(zr);
+      var docEntry = null;
+      zr.entries.forEach(function(en){ if(en.name === "word/document.xml") docEntry = en; });
+      if(!docEntry)
+        return Promise.resolve(diFail("faithful-no-document", "Isi utama dokumen (word/document.xml) tidak ditemukan."));
+      var inflateRaw = typeof opts.inflateRaw === "function" ? opts.inflateRaw : diInflateRawDefault;
+      return diZipExtract(bytes, docEntry, caps, inflateRaw).then(function(x){
+        if(!x.ok) return x;
+        try {
+          return diFaithfulDocxSurgeryXml(bytes, zr.entries, x.data, model, A);
+        } catch(e){
+          return diFail("faithful-surgery", "Penandaan dokumen tidak dapat dilakukan: " + (e && e.message ? e.message : e));
+        }
+      });
+    }
+    function diFaithfulDocxSurgeryXml(bytes, entries, docData, model, A){
+      var xml = new TextDecoder("utf-8").decode(docData);
+      var root = diParseXml(xml);
+      var paras = diFaithfulCollectParas(root);
+      var blocks = (model && model.blocks) || [];
+      if(paras.length !== blocks.length)
+        return diFail("faithful-align", "Jumlah paragraf dokumen tidak cocok dengan hasil impor — penandaan aman tidak dapat dilakukan.");
+      var inc = diFaithfulIncluded(A);
+      var pfx = "w:";
+      if(paras.length){
+        var t0 = paras[0].tag;
+        pfx = t0.slice(0, t0.length - paras[0].local.length) || "w:";
+      }
+      for(var i = 0; i < blocks.length; i++){
+        var text = diBlockText(blocks[i]);
+        if(diFaithfulParaText(paras[i]) !== text)
+          return diFail("faithful-align", "Teks paragraf dokumen tidak cocok dengan hasil impor — penandaan aman tidak dapat dilakukan.");
+        var marks = inc.marksByBlock[i] || [];
+        if(marks.length && !diFaithfulApplyPara(paras[i], text, marks, pfx))
+          return diFail("faithful-complex", "Sebagian tulisan memakai susunan run yang rumit sehingga penandaan aman tidak dapat dilakukan.");
+      }
+      var body = diFirst(root, "body") || root;
+      var appParas = diFaithfulAppendixParas(A, pfx);
+      var sectIdx = -1;
+      (body.children || []).forEach(function(c, ci){ if(c.tag && c.local === "sectPr") sectIdx = ci; });
+      if(sectIdx >= 0) body.children.splice.apply(body.children, [sectIdx, 0].concat(appParas));
+      else body.children.push.apply(body.children, appParas);
+      var decl = xml.slice(0, 5) === "<?xml"
+        ? xml.slice(0, xml.indexOf("?>") + 2) + "\n"
+        : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n";
+      var newXml = decl + diSerializeXml(root);
+      var repl = {};
+      repl["word/document.xml"] = new TextEncoder().encode(newXml);
+      return { ok: true, bytes: diFaithfulZipWrite(bytes, entries, repl), xml: newXml };
+    }
+    /* Teks paragraf yang diharapkan sesudah bedah: teks asal dengan
+       nomor sisipan pada akhir setiap penanda (urutan menaik). */
+    function diFaithfulExpectedText(text, marks){
+      var byOff = {};
+      (marks || []).forEach(function(m){ (byOff[m.end] = byOff[m.end] || []).push(m.no); });
+      var offs = Object.keys(byOff).map(Number).sort(function(a, b){ return b - a; });
+      var out = text;
+      offs.forEach(function(off){
+        var s = byOff[off].slice().sort(function(a, b){ return a - b; }).join("");
+        out = out.slice(0, off) + s + out.slice(off);
+      });
+      return out;
+    }
+    function diFaithfulHighlightedTexts(pEl){
+      var yellow = "", cyan = "";
+      diFaithfulRunEls(pEl).forEach(function(re){
+        var r = diRun(re.el, null);
+        if(!r || r.protected) return;
+        var rPr = diFirst(re.el, "rPr");
+        var hl = rPr ? diFirst(rPr, "highlight") : null;
+        var val = hl ? diAttr(hl, "val") : null;
+        if(val === DI_FAITHFUL_HL_MECH) yellow += r.text;
+        else if(val === DI_FAITHFUL_HL_ADV) cyan += r.text;
+      });
+      return { yellow: yellow, cyan: cyan };
+    }
+    /* Verifikasi hasil bedah: (1) semua bagian selain document.xml
+       byte-identik; (2) impor ulang dengan pengurai aplikasi sendiri
+       menghasilkan teks yang persis diharapkan (asal + nomor sisipan
+       + bagian rekomendasi); (3) teks tersorot per warna pada XML
+       hasil persis sama dengan gabungan segmen rencana. */
+    function diFaithfulVerifyDocx(origBytes, outBytes, model, A, opts){
+      var failures = [];
+      var zo = diFaithfulZipEntries(origBytes), zn = diFaithfulZipEntries(outBytes);
+      if(!zo.ok || !zn.ok) return Promise.resolve({ ok: false, failures: ["arsip hasil tidak terbaca"] });
+      if(zo.entries.length !== zn.entries.length){
+        failures.push("jumlah bagian arsip berubah");
+      } else {
+        zo.entries.forEach(function(eo, i){
+          var en = zn.entries[i];
+          if(eo.name !== en.name){ failures.push("nama bagian berubah: " + eo.name); return; }
+          if(eo.name === "word/document.xml") return;
+          if(eo.crc !== en.crc || eo.compSize !== en.compSize){ failures.push("bagian berubah: " + eo.name); return; }
+          var a = origBytes.subarray(eo.dataStart, eo.dataStart + eo.compSize);
+          var b = outBytes.subarray(en.dataStart, en.dataStart + en.compSize);
+          for(var j = 0; j < a.length; j++) if(a[j] !== b[j]){ failures.push("byte bagian berubah: " + eo.name); break; }
+        });
+      }
+      var inc = diFaithfulIncluded(A);
+      var blocks = (model && model.blocks) || [];
+      /* (3) cakupan sorotan dari XML hasil */
+      var docEntry = null;
+      zn.entries.forEach(function(en){ if(en.name === "word/document.xml") docEntry = en; });
+      var hlInflate = typeof (opts || {}).inflateRaw === "function" ? opts.inflateRaw : diInflateRawDefault;
+      var hlCheck = docEntry ? diZipExtract(outBytes, docEntry, diCapsWith(opts || {}), hlInflate).then(function(x){
+        if(!x.ok){ failures.push("document.xml hasil tidak terbaca"); return; }
+        var root;
+        try { root = diParseXml(new TextDecoder("utf-8").decode(x.data)); }
+        catch(e){ failures.push("document.xml hasil tidak terurai"); return; }
+        var paras = diFaithfulCollectParas(root);
+        for(var i = 0; i < blocks.length; i++){
+          var marks = inc.marksByBlock[i] || [];
+          if(!marks.length) continue;
+          if(!paras[i]){ failures.push("paragraf hasil hilang: " + i); continue; }
+          var plan = diFaithfulParaPlan(diBlockText(blocks[i]), marks);
+          var expY = "", expC = "";
+          plan.segments.forEach(function(sg){
+            var t = diBlockText(blocks[i]).slice(sg.start, sg.end);
+            if(sg.hl === DI_FAITHFUL_HL_MECH) expY += t;
+            else if(sg.hl === DI_FAITHFUL_HL_ADV) expC += t;
+          });
+          var got = diFaithfulHighlightedTexts(paras[i]);
+          if(got.yellow !== expY) failures.push("cakupan sorotan kuning paragraf " + i + " tidak persis");
+          if(got.cyan !== expC) failures.push("cakupan sorotan biru muda paragraf " + i + " tidak persis");
+        }
+      }) : Promise.resolve();
+      return hlCheck.then(function(){
+        /* (2) impor ulang */
+        return diParseDocx(outBytes, opts || {}).then(function(res){
+          if(!res.ok){ failures.push("impor ulang gagal: " + res.message); return { ok: false, failures: failures }; }
+          var m2 = res.model;
+          if(m2.blocks.length < blocks.length){ failures.push("blok hasil lebih sedikit dari asal"); return { ok: false, failures: failures }; }
+          for(var i = 0; i < blocks.length; i++){
+            var expected = diFaithfulExpectedText(diBlockText(blocks[i]), inc.marksByBlock[i] || []);
+            if(diBlockText(m2.blocks[i]) !== expected) failures.push("teks blok " + i + " tidak sesuai harapan");
+          }
+          var tail = m2.blocks.slice(blocks.length).map(function(b){ return diBlockText(b); }).join("\n");
+          var app = diFaithfulAppendix(A);
+          if(tail.indexOf(app.heading) < 0) failures.push("bagian rekomendasi tidak ditemukan");
+          app.items.concat(app.unanchoredItems).forEach(function(it){
+            if(tail.indexOf(it.sentence) < 0) failures.push("kalimat rekomendasi hilang (no " + it.no + ")");
+            if(it.manual){ if(tail.indexOf("Perlu ditinjau manual") < 0) failures.push("label tinjau manual hilang"); }
+            else if(it.proposal && tail.indexOf(it.proposal) < 0) failures.push("usulan perbaikan hilang (no " + it.no + ")");
+          });
+          return { ok: failures.length === 0, failures: failures };
+        });
+      });
+    }
+
+    /* ---------- PDF: gerbang kejujuran + geometri cermin terverifikasi ----------
+       Geometri dibangun dengan MENCERMINKAN diPdfPageLines /
+       diPdfLineRuns / diPdfAppendRun / diPdfPagesToModel DI-CORE
+       langkah demi langkah, sambil mencatat asal-usul setiap karakter
+       (item pdf.js + indeks karakter di dalam item). Cermin hanya
+       DIPERCAYA bila teks + halaman setiap bloknya persis sama dengan
+       DocModel hasil impor; selisih apa pun -> gerbang menolak. */
+    function diFaithfulPdfGarble(pagesData){
+      var total = 0, bad = 0;
+      (pagesData || []).forEach(function(pg){
+        ((pg && pg.items) || []).forEach(function(it){
+          if(!it || typeof it.str !== "string") return;
+          for(var i = 0; i < it.str.length; i++){
+            var cp = it.str.codePointAt(i);
+            if(cp > 0xFFFF) i++;
+            if(cp === 0x20 || cp === 0x09 || cp === 0x0A || cp === 0x0D) continue;
+            total++;
+            if((cp >= 0xE000 && cp <= 0xF8FF) || cp === 0xFFFD || cp < 0x20 || cp === 0x7F) bad++;
+          }
+        });
+      });
+      return { total: total, bad: bad, ratio: total ? bad / total : 0 };
+    }
+    /* Himpunan karakter yang benar-benar dapat dikodekan font standar
+       Helvetica pdf-lib (WinAnsiEncoding): ASCII tercetak + Latin-1 +
+       tanda baca WinAnsi. Halaman rekomendasi tambahan digambar dengan
+       font itu, jadi seluruh teksnya wajib lolos gerbang ini. */
+    var DI_FAITHFUL_WINANSI_EXTRA = { 0x20AC: 1, 0x201A: 1, 0x0192: 1, 0x201E: 1, 0x2026: 1,
+      0x2020: 1, 0x2021: 1, 0x02C6: 1, 0x2030: 1, 0x0160: 1, 0x2039: 1, 0x0152: 1, 0x017D: 1,
+      0x2018: 1, 0x2019: 1, 0x201C: 1, 0x201D: 1, 0x2022: 1, 0x2013: 1, 0x2014: 1, 0x02DC: 1,
+      0x2122: 1, 0x0161: 1, 0x203A: 1, 0x0153: 1, 0x017E: 1, 0x0178: 1 };
+    function diFaithfulWinAnsiSafeChar(cp){
+      if(cp >= 0x20 && cp <= 0x7E) return true;
+      if(cp >= 0xA0 && cp <= 0xFF) return true;
+      return !!DI_FAITHFUL_WINANSI_EXTRA[cp];
+    }
+    function diFaithfulWinAnsiSafe(text){
+      var s = String(text == null ? "" : text);
+      for(var i = 0; i < s.length; i++){
+        var cp = s.codePointAt(i);
+        if(cp > 0xFFFF) i++;
+        if(!diFaithfulWinAnsiSafeChar(cp)) return false;
+      }
+      return true;
+    }
+    function diFaithfulLineRuns(entries, pageNo){
+      var runs = [], prev = null;
+      entries.forEach(function(d){
+        var it = d.it;
+        var size = diPdfItemSize(it);
+        var flags = diPdfFontFlags(it.fontName);
+        var run = { text: String(it.str), chars: [] };
+        if(it.fontName) run.fontName = String(it.fontName);
+        run.fontSize = Math.round(size * 10) / 10;
+        if(flags.bold) run.bold = true;
+        if(flags.italic) run.italic = true;
+        for(var ci = 0; ci < it.str.length; ci++){
+          run.chars.push({ page: pageNo, item: d.idx, ci: ci,
+            x: d.x, y: d.y, width: typeof it.width === "number" ? it.width : 0,
+            len: it.str.length, fs: size });
+        }
+        var x = d.x, w = typeof it.width === "number" ? it.width : 0;
+        if(prev){
+          var gap = x - (prev.x + prev.width);
+          var space = gap > 0.22 * size && !/\s$/.test(prev.run.text) && !/^\s/.test(run.text);
+          if(diPdfSameRun(prev.run, run)){
+            if(space){ prev.run.text += " "; prev.run.chars.push({ ins: true, page: pageNo }); }
+            prev.run.text += run.text;
+            prev.run.chars = prev.run.chars.concat(run.chars);
+            prev.x = x; prev.width = w;
+            return;
+          }
+          if(space){ run.text = " " + run.text; run.chars = [{ ins: true, page: pageNo }].concat(run.chars); }
+        }
+        runs.push(run);
+        prev = { x: x, width: w, run: run };
+      });
+      return runs;
+    }
+    function diFaithfulPdfLines(items, pageNo){
+      var deco = [];
+      (items || []).forEach(function(it, i){
+        if(!it || typeof it.str !== "string" || !it.str.length) return;
+        deco.push({ it: it, idx: i, x: typeof it.x === "number" ? it.x : 0,
+          y: typeof it.y === "number" ? it.y : 0, size: diPdfItemSize(it) });
+      });
+      deco.sort(function(a, b){ return (b.y - a.y) || (a.x - b.x) || (a.idx - b.idx); });
+      var lines = [];
+      deco.forEach(function(d){
+        var line = lines[lines.length - 1];
+        var tol = line ? Math.max(1.25, 0.45 * Math.min(d.size, line.size)) : 0;
+        if(line && Math.abs(d.y - line.y) <= tol){
+          line.items.push(d);
+          if(d.size > line.size) line.size = d.size;
+        } else {
+          lines.push({ y: d.y, size: d.size, items: [d] });
+        }
+      });
+      return lines.map(function(line){
+        var sorted = line.items.slice().sort(function(a, b){ return (a.x - b.x) || (a.idx - b.idx); });
+        return { y: line.y, height: line.size, runs: diFaithfulLineRuns(sorted, pageNo) };
+      });
+    }
+    function diFaithfulAppendRun(runs, run, spaceBefore){
+      if(!run || !run.text) return;
+      var last = runs[runs.length - 1];
+      if(last && spaceBefore && !/[\s\-]$/.test(last.text) && !/^\s/.test(run.text)){
+        if(diPdfSameRun(last, run)){
+          last.text += " " + run.text;
+          last.chars.push({ ins: true, page: run.chars.length ? run.chars[0].page : 0 });
+          last.chars = last.chars.concat(run.chars);
+          return;
+        }
+        runs.push({ text: " ", chars: [{ ins: true, page: run.chars.length ? run.chars[0].page : 0 }] });
+        last = runs[runs.length - 1];
+      }
+      if(last && diPdfSameRun(last, run)){
+        last.text += run.text;
+        last.chars = last.chars.concat(run.chars);
+        return;
+      }
+      var copy = { text: run.text, chars: run.chars.slice() };
+      if(run.fontName) copy.fontName = run.fontName;
+      if(typeof run.fontSize === "number") copy.fontSize = run.fontSize;
+      if(run.bold) copy.bold = true;
+      if(run.italic) copy.italic = true;
+      runs.push(copy);
+    }
+    function diFaithfulPdfGeometry(pagesData){
+      var blocks = [];
+      (pagesData || []).forEach(function(pg, pi){
+        var pageNo = (pg && typeof pg.page === "number") ? pg.page : pi + 1;
+        var lines = diFaithfulPdfLines(pg ? pg.items : [], pageNo);
+        var curRuns = null, lastY = 0, lastHeight = 0;
+        function flush(){
+          if(curRuns && curRuns.some(function(r){ return /\S/.test(r.text); })){
+            var text = "", chars = [];
+            curRuns.forEach(function(r){ text += r.text; chars = chars.concat(r.chars); });
+            blocks.push({ page: pageNo, text: text, chars: chars });
+          }
+          curRuns = null;
+        }
+        lines.forEach(function(line){
+          if(!line.runs.length) return;
+          if(curRuns && (lastY - line.y) > 1.5 * lastHeight) flush();
+          if(!curRuns) curRuns = [];
+          line.runs.forEach(function(run, ri){
+            diFaithfulAppendRun(curRuns, run, ri === 0 && curRuns.length > 0);
+          });
+          lastY = line.y; lastHeight = line.height;
+        });
+        flush();
+      });
+      return blocks;
+    }
+    /* Rect per fragmen item untuk rentang [start, end) pada blok
+       geometri. Posisi-x di dalam item diinterpolasi proporsional
+       terhadap lebar item dari pdf.js; y adalah garis dasar item
+       (asal kiri-bawah, satuan poin PDF — ruang yang sama dengan
+       pdf-lib). Karakter sisipan (spasi antar-item) menempel ke
+       fragmen tetangganya; fragmen yang seluruhnya sisipan dilewati. */
+    function diFaithfulRangeRects(gb, start, end){
+      var groups = [], cur = null;
+      for(var k = start; k < end; k++){
+        var ch = gb.chars[k];
+        if(!ch) continue;
+        if(ch.ins){ if(cur) cur.chars.push(ch); continue; }
+        if(cur && cur.item === ch.item && cur.page === ch.page) cur.chars.push(ch);
+        else { cur = { item: ch.item, page: ch.page, chars: [ch] }; groups.push(cur); }
+      }
+      var rects = [];
+      groups.forEach(function(g){
+        var first = null, last = null;
+        g.chars.forEach(function(c){ if(!c.ins){ if(!first) first = c; last = c; } });
+        if(!first) return;
+        var fs = first.fs || 12;
+        var x0 = first.x + (first.ci / Math.max(1, first.len)) * first.width;
+        var x1 = last.x + ((last.ci + 1) / Math.max(1, last.len)) * last.width;
+        rects.push({ page: first.page, x: x0 - 0.6, y: first.y - 0.25 * fs,
+          w: Math.max(1, (x1 - x0) + 1.2), h: 1.18 * fs, baseline: first.y, fs: fs });
+      });
+      return rects;
+    }
+    /* Rencana overlay lengkap. Urutan gerbang: data halaman -> teks
+       rusak (CID/PUA) -> geometri cermin == model -> rotasi halaman
+       -> karakter halaman rekomendasi. Kegagalan apa pun berarti
+       TIDAK ADA overlay (pemanggil menawarkan PDF susun-ulang D8). */
+    function diFaithfulPdfPlan(pagesData, model, A, pageDims){
+      if(!pagesData || !pagesData.length) return { ok: false, reason: "no-pages" };
+      var garble = diFaithfulPdfGarble(pagesData);
+      if(garble.bad >= 3 && garble.ratio > 0.02) return { ok: false, reason: "garbled", garble: garble };
+      var geo = diFaithfulPdfGeometry(pagesData);
+      var blocks = (model && model.blocks) || [];
+      if(geo.length !== blocks.length) return { ok: false, reason: "geometry-mismatch" };
+      for(var i = 0; i < blocks.length; i++){
+        if(geo[i].text !== diBlockText(blocks[i]) || geo[i].page !== blocks[i].page)
+          return { ok: false, reason: "geometry-mismatch" };
+      }
+      var inc = diFaithfulIncluded(A);
+      var rects = [], labels = [];
+      var blockIdxs = Object.keys(inc.marksByBlock);
+      for(var bi = 0; bi < blockIdxs.length; bi++){
+        var gb = geo[+blockIdxs[bi]];
+        if(!gb) return { ok: false, reason: "geometry-mismatch" };
+        var dim = pageDims ? pageDims[gb.page] : null;
+        if(!dim) return { ok: false, reason: "no-pages" };
+        if(dim.rotation) return { ok: false, reason: "rotation" };
+        var marks = inc.marksByBlock[blockIdxs[bi]];
+        for(var mi = 0; mi < marks.length; mi++){
+          var mk = marks[mi];
+          var rs = diFaithfulRangeRects(gb, mk.start, mk.end);
+          if(!rs.length) return { ok: false, reason: "geometry-mismatch" };
+          rs.forEach(function(r){ r.no = mk.no; r.advisory = !!mk.advisory; rects.push(r); });
+          labels.push({ page: rs[0].page, x: rs[0].x, y: rs[0].baseline + rs[0].fs * 1.05,
+            no: mk.no, advisory: !!mk.advisory });
+        }
+      }
+      var appendixLines = diFaithfulAppendixLines(A);
+      for(var li = 0; li < appendixLines.length; li++){
+        if(!diFaithfulWinAnsiSafe(appendixLines[li].text))
+          return { ok: false, reason: "appendix-chars" };
+      }
+      return { ok: true, rects: rects, labels: labels, appendixLines: appendixLines, garble: garble };
+    }
+    /* FAITHFUL-CORE-END */
+    /* ED-CORE-START — Editor kaya Asisten Menulis (D8 Tahap 4): fungsi
+       MURNI serialisasi dua arah antara teks polos (tulang punggung
+       #wi-input) dan pohon simpul editor (contenteditable). Blok ini
+       tidak menyentuh DOM nyata: ia bekerja pada antarmuka simpul
+       minimal (nodeType, tagName, childNodes, nodeValue) sehingga
+       dapat diekstrak dan diuji di Node dengan pohon tiruan.
+       KONTRAK SERIALISASI (beku; dibuktikan editor-test.cjs):
+       1. Elemen blok (P, DIV, H1–H6, LI, BLOCKQUOTE, PRE, TD, TH)
+          adalah satu unit paragraf; unit-unit digabung "\n\n".
+       2. <br> di dalam unit berarti "\n" (baris baru intra-paragraf).
+       3. Format sebaris (b, i, span, font, a, …) hanya menyumbang
+          teksnya; atribut dan gaya tidak masuk teks tulang punggung.
+       4. Item daftar (LI) adalah unit sendiri-sendiri; wadah (UL, OL,
+          TABLE, SECTION, …) diteruskan ke anak-anaknya mengikuti
+          urutan dokumen.
+       5. Teks liar di tingkat akar (tidak dibungkus blok) membentuk
+          unit sendiri hanya bila memuat karakter non-spasi.
+       6. Penyesuaian artefak peramban (terukur pada Firefox):
+          (a) <br> yang menjadi anak terakhir sebuah blok dibuang satu
+          — itu br bantalan karet peramban (blok kosong <p><br></p>,
+          dan <p>teks<br><br></p> sesudah Shift+Enter di akhir blok);
+          (b) U+00A0 (nbsp yang disisipkan peramban di awal blok hasil
+          belah paragraf) dinormalkan menjadi spasi biasa;
+          (c) U+200B (penanda ketik span gaya editor) dibuang.
+       7. wiEdSplitBlocks adalah invers persis serialisasi untuk teks
+          polos: teks.split("\n\n"), lalu tiap unit .split("\n") —
+          serialize(render(teks)) === teks untuk semua teks polos. */
+    var WI_ED_BLOCK_TAGS = { P:1, DIV:1, H1:1, H2:1, H3:1, H4:1, H5:1, H6:1, LI:1, BLOCKQUOTE:1, PRE:1, TD:1, TH:1 };
+    var WI_ED_CONTAINER_TAGS = { UL:1, OL:1, TABLE:1, THEAD:1, TBODY:1, TFOOT:1, TR:1, SECTION:1, ARTICLE:1, FIGURE:1, FIGCAPTION:1, MAIN:1, HEADER:1, FOOTER:1, FORM:1, FIELDSET:1 };
+    function wiEdSplitBlocks(text){
+      return String(text == null ? "" : text).split("\n\n").map(function(u){ return u.split("\n"); });
+    }
+    function wiEdIsBlock(node){
+      return !!node && node.nodeType === 1 && !!(WI_ED_BLOCK_TAGS[node.tagName] || WI_ED_CONTAINER_TAGS[node.tagName]);
+    }
+    /* Jalani simpul-simpul sebaris, menambahkan teks ke array baris
+       (baris terakhir adalah baris yang sedang diisi; <br> membuka
+       baris baru). Elemen blok yang terselip di dalam sebaris
+       diratakan: teksnya tetap dihitung, strukturnya tidak. */
+    function wiEdWalkInline(nodes, lines){
+      for(var i=0;i<nodes.length;i++){
+        var k = nodes[i];
+        if(!k) continue;
+        if(k.nodeType === 3){ lines[lines.length-1] += (k.nodeValue || ""); }
+        else if(k.nodeType === 1){
+          if(k.tagName === "BR"){ lines.push(""); }
+          else wiEdWalkInline(k.childNodes || [], lines);
+        }
+      }
+      return lines;
+    }
+    function wiEdBlockUnits(block, units){
+      var kids = block.childNodes || [];
+      var hasBlockChild = false;
+      for(var i=0;i<kids.length;i++){ if(wiEdIsBlock(kids[i])){ hasBlockChild = true; break; } }
+      if(hasBlockChild){ wiEdCollectUnits(block, units); return; }
+      var lines = wiEdWalkInline(kids, [""]);
+      var last = kids[kids.length-1];
+      if(last && last.nodeType === 1 && last.tagName === "BR" && lines.length > 1 && lines[lines.length-1] === "")
+        lines.pop();
+      units.push(lines.join("\n"));
+    }
+    function wiEdCollectUnits(node, units){
+      var kids = node.childNodes || [];
+      var stray = null;
+      function flushStray(){
+        if(stray){
+          var t = stray.join("\n");
+          if(/\S/.test(t)) units.push(t);
+          stray = null;
+        }
+      }
+      for(var i=0;i<kids.length;i++){
+        var k = kids[i];
+        if(wiEdIsBlock(k)){
+          flushStray();
+          if(WI_ED_CONTAINER_TAGS[k.tagName] && !WI_ED_BLOCK_TAGS[k.tagName]) wiEdCollectUnits(k, units);
+          else wiEdBlockUnits(k, units);
+        } else {
+          if(!stray) stray = [""];
+          wiEdWalkInline([k], stray);
+        }
+      }
+      flushStray();
+      return units;
+    }
+    function wiEdUnits(root){
+      return wiEdCollectUnits(root, []);
+    }
+    function wiEdSerialize(root){
+      return wiEdUnits(root).join("\n\n").replace(/\u00A0/g, " ").replace(/\u200B/g, "");
+    }
+    /* Penyaring gaya tempel: hanya properti aman yang dipertahankan.
+       kind "inline" untuk span/font; kind "block" untuk elemen blok. */
+    var WI_ED_STYLE_INLINE = { "color":1, "background-color":1, "font-family":1, "font-size":1, "font-weight":1, "font-style":1, "text-decoration":1, "text-decoration-line":1, "vertical-align":1 };
+    var WI_ED_STYLE_BLOCK = { "text-align":1, "line-height":1, "margin-left":1, "margin-top":1, "margin-bottom":1, "text-indent":1 };
+    function wiEdFilterStyle(styleText, kind){
+      var allow = kind === "block" ? WI_ED_STYLE_BLOCK : WI_ED_STYLE_INLINE;
+      var out = [];
+      String(styleText || "").split(";").forEach(function(decl){
+        var idx = decl.indexOf(":");
+        if(idx < 0) return;
+        var prop = decl.slice(0, idx).trim().toLowerCase();
+        var val = decl.slice(idx + 1).trim();
+        if(!allow[prop] || !val) return;
+        if(/url\s*\(|expression\s*\(|javascript:|[<>\\]|@import/i.test(val)) return;
+        out.push(prop + ": " + val);
+      });
+      return out.join("; ");
+    }
+    /* Panjang CSS (px/pt/tanpa satuan) menjadi angka piksel. */
+    function wiEdPxLen(v){
+      var m = /^(-?[\d.]+)\s*(px|pt)?$/.exec(String(v == null ? "" : v).trim());
+      if(!m) return 0;
+      var n = parseFloat(m[1]);
+      if(m[2] === "pt") n = n * 96 / 72;
+      return n;
+    }
+    /* ED-CORE-END */
+
     /* Writing Intelligence — render & interaksi (DOM). */
     var WI_KIND_LABEL = { "repeated-word": "Kata berulang", "double-space": "Spasi tidak rapi", "missing-space-after-punctuation": "Spasi hilang setelah tanda baca", "sentence-capital": "Huruf awal kalimat", "kata-tidak-baku": "Kata tidak baku", "kata-depan": "Kata depan di/ke", "imbuhan": "Imbuhan di-/ke-", "tanda-baca": "Tanda baca", "huruf-kapital": "Huruf kapital", "kata-ulang": "Kata ulang", "pemisahan-kata": "Pemisahan kata", "ejaan-mekanis": "Ejaan", "kalimat-mubazir": "Kata mubazir", "kalimat-pengulangan-frasa": "Pengulangan frasa", "kalimat-kompleks": "Kalimat kompleks", "kalimat-panjang": "Kalimat panjang", "transisi-awalan": "Transisi antarkalimat" };
     var WI_CERT_LABEL = { "pasti": "Aturan pasti", "saran": "Saran", "potensial": "Masalah potensial", "gaya": "Saran gaya" };
@@ -8158,6 +10030,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         else { el.innerHTML = ""; el.classList.remove("show"); }
       }
       function diResetCard(){
+        diFaithfulReset();
         wiDocState = null;
         statusEl.innerHTML = ""; statusEl.className = "file-status";
         diShowBanner(errEl, ""); diShowBanner(coverEl, ""); diShowBanner(warnEl, "");
@@ -8196,6 +10069,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
                       fontSize: Math.abs(t[3]) || Math.abs(t[0]) || 0 });
                   });
                   pagesData.push({ page: n, items: items });
+                    diFaithfulNotePdfPage(n, page);
                   if(typeof page.cleanup === "function") page.cleanup();
                 });
               });
@@ -8206,6 +10080,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
             return chain.then(function(){
               if(typeof doc.destroy === "function") doc.destroy();
               var tstats = diPdfTextStats(pagesData);
+              diFaithfulNotePdfPages(pagesData);
               if(tstats.scanLike) return { ok: false, code: "pdf-scan", pdfStats: tstats };
               return { ok: true, model: diPdfPagesToModel(pagesData), pdfStats: tstats };
             });
@@ -8241,6 +10116,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         setTimeout(function(){
           f.arrayBuffer().then(function(ab){
             var bytes = new Uint8Array(ab);
+            diFaithfulCapture(f.name, bytes);
             /* Pilihan jalur berdasar ISI berkas (tanda tangan %PDF-), bukan ekstensi. */
             if(diSniffFormat(bytes) === "pdf") return diImportPdf(bytes);
             return diParseDocx(bytes);
@@ -9332,6 +11208,473 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         }
       }
       if(diPdfBtn) diPdfBtn.addEventListener("click", function(){ diExportReportPdf(); });
+
+      /* ================= Document Intelligence (D8): Ekspor PDF Beranotasi =================
+         Tombol "Ekspor PDF Beranotasi" pada panel #wi-report MELENGKAPI
+         ekspor ringkasan D6 (keputusan D-2) — tidak menggantikannya.
+         Sumber data: model beranotasi murni annotBuildReport
+         (ANNOT-CORE) dari wiResult yang sama + keadaan dokumen D3 yang
+         sama dengan panel; tata letak dihitung SATU KALI oleh mesin
+         murni annotPdfLayout (ANNOT-PDF-CORE, syarat C-2) menjadi
+         rencana operasi berkoordinat final, dan pelaksana di bawah
+         hanya menggambar rencana itu — tidak ada pengukuran ulang,
+         jadi rect penanda tidak dapat bergeser dari glifnya.
+         Font subset yang sama dengan D6 (diLoadReportFonts, malas,
+         same-origin); tidak ada isi dokumen yang dikirim ke mana pun.
+         Kebijakan karakter D-1 (keputusan pemilik): dengan font subset
+         termuat, karakter di luar cakupan TIDAK menghentikan ekspor —
+         ia diganti penanda tercetak + pengungkapan (lihat model
+         unsupported + annotPdfDisclosure). Bila font GAGAL dimuat,
+         gerbang cadangan D6 berlaku apa adanya: fallback Helvetica
+         hanya bila tidak ada karakter yang akan dihapus pdfSafe.
+         Gerbang kejujuran C-4: bila teks kotak tulis sudah berubah
+         sejak analisis, laporan tetap mencetak teks persis seperti
+         yang dianalisis dan perubahan itu diungkapkan tercetak pada
+         halaman pertama + status; temuan yang jangkarnya putus tampil
+         tanpa penanda dengan catatannya (dari model). */
+      var diAnnotBtn = $("wi-report-annot"), diAnnotStatusEl = $("wi-report-annot-status");
+      function diAnnotSetStatus(msg){ if(diAnnotStatusEl) diAnnotStatusEl.textContent = msg || ""; }
+      function diAnnotExecOp(R, op){
+        var doc = R.doc;
+        if(op.op === "rect"){
+          doc.setFillColor(op.fill[0], op.fill[1], op.fill[2]);
+          doc.rect(op.x, op.y, op.w, op.h, "F");
+        } else if(op.op === "rects"){
+          doc.setDrawColor(op.color[0], op.color[1], op.color[2]);
+          doc.setLineWidth(op.width || 0.25);
+          doc.rect(op.x, op.y, op.w, op.h, "S");
+        } else if(op.op === "line"){
+          doc.setDrawColor(op.color[0], op.color[1], op.color[2]);
+          doc.setLineWidth(op.width || 0.25);
+          if(op.dash) doc.setLineDashPattern(op.dash, 0);
+          doc.line(op.x1, op.y1, op.x2, op.y2);
+          if(op.dash) doc.setLineDashPattern([], 0);
+        } else if(op.op === "text"){
+          doc.setFont(R.font, op.bold ? "bold" : "normal");
+          doc.setFontSize(op.size);
+          doc.setTextColor(op.color[0], op.color[1], op.color[2]);
+          doc.text(op.text, op.x, op.y);
+          doc.setTextColor(0);
+        } else if(op.op === "num"){
+          doc.setFont(R.font, "bold");
+          doc.setFontSize(6.5);
+          doc.setTextColor(op.color[0], op.color[1], op.color[2]);
+          doc.text(op.text, op.x, op.y);
+          doc.setTextColor(0);
+        }
+      }
+      function diAnnotStamp(R, dateStr){
+        var n = R.doc.getNumberOfPages();
+        var left = "Saksara \u00B7 Laporan Anotasi Tulisan \u00B7 dibuat lokal di peramban ini \u00B7 " + dateStr;
+        for(var i = 1; i <= n; i++){
+          R.doc.setPage(i);
+          R.doc.setFont(R.font, "normal");
+          R.doc.setFontSize(8);
+          R.doc.setTextColor(120);
+          R.doc.text(diPdfTxt(R, left), DI_PDF_M, 290);
+          R.doc.text(diPdfTxt(R, "Halaman " + i + " dari " + n), DI_PDF_W - DI_PDF_M, 290, { align: "right" });
+        }
+        R.doc.setTextColor(0);
+      }
+      async function diExportAnnotatedPdf(){
+        if(!wiResult){
+          diAnnotSetStatus("Belum ada laporan \u2014 jalankan analisis terlebih dahulu, lalu ekspor PDF beranotasi-nya.");
+          return;
+        }
+        diAnnotBtn.disabled = true;
+        diAnnotSetStatus("Menyiapkan PDF beranotasi\u2026");
+        try {
+          var jsPDF = await loadJsPdf();
+          var fonts = null;
+          try { fonts = await diLoadReportFonts(); } catch(eFont) { fonts = null; }
+          var useFont = !!fonts;
+          var coverage = useFont ? fonts.coverage : null;
+          var edited = ta.value !== wiJoin(wiResult.paragraphs, wiResult.separators);
+          var ex = { acceptedIds: wiAccepted.slice(), rejectedIds: Object.keys(wiRejected),
+            kindLabels: WI_KIND_LABEL, certLabels: WI_CERT_LABEL, coverage: coverage };
+          if(wiDocState){
+            diEnsureMapping();
+            ex.doc = { name: wiDocState.name, model: wiDocState.model, mapping: diMapping };
+          }
+          var A = annotBuildReport(wiResult, ex);
+          var dateStr = new Date().toLocaleString("id-ID");
+          var recs = diReportModel ? (diReportModel.recommendations || []) : [];
+          var lims = diReportModel ? (diReportModel.limitations || []) : [];
+          var kit = p6PdfKit(jsPDF, "Laporan Anotasi Tulisan \u2014 Saksara");
+          var doc = kit.doc;
+          if(useFont){
+            doc.addFileToVFS(DI_PDF_FONT_VFS.normal, fonts.normal);
+            doc.addFont(DI_PDF_FONT_VFS.normal, DI_PDF_FONT_FAMILY, "normal");
+            doc.addFileToVFS(DI_PDF_FONT_VFS.bold, fonts.bold);
+            doc.addFont(DI_PDF_FONT_VFS.bold, DI_PDF_FONT_FAMILY, "bold");
+          }
+          var R = { doc: doc, kit: kit, font: useFont ? DI_PDF_FONT_FAMILY : "helvetica", safe: !useFont };
+          if(!useFont){
+            var texts = ["Saksara", "LAPORAN ANOTASI TULISAN", DI_PDF_FALLBACK_NOTICE, ANNOT_MANUAL_REVIEW_LABEL];
+            A.renderBlocks.forEach(function(b){ texts.push(b.text); });
+            A.findings.forEach(function(f){
+              texts.push(f.kindLabel); texts.push(f.certaintyLabel);
+              texts.push(f.sentenceText); texts.push(f.explanation || "");
+              if(f.proposedSentence) texts.push(f.proposedSentence);
+              if(f.anchor && f.anchor.note) texts.push(f.anchor.note);
+            });
+            recs.concat(lims).forEach(function(s){ texts.push(s); });
+            if(A.source.fileName) texts.push(A.source.fileName);
+            var deleted = diPdfHelveticaDeleted(texts);
+            if(deleted.length){
+              diAnnotSetStatus("Ekspor dihentikan: font laporan (Noto Sans) gagal dimuat, dan karakter berikut akan hilang bila dicetak dengan font cadangan: " + diPdfUnsupportedText(deleted) + ". PDF tidak dibuat \u2014 periksa koneksi internet lalu coba lagi.");
+              return;
+            }
+          }
+          var measure = function(text, style){
+            doc.setFont(R.font, style.bold ? "bold" : "normal");
+            doc.setFontSize(style.size);
+            return doc.getTextWidth(text);
+          };
+          var plan = annotPdfLayout(A, {
+            measure: measure, coverage: coverage,
+            display: useFont ? null : function(t){ return pdfSafe(t); },
+            dateStr: dateStr, editedNote: edited,
+            stateLabels: DI_REPORT_STATE_TEXT,
+            recommendations: recs, limitations: lims,
+            fallbackNotice: useFont ? null : DI_PDF_FALLBACK_NOTICE
+          });
+          plan.pages.forEach(function(pageOps, pi){
+            if(pi > 0) doc.addPage();
+            pageOps.forEach(function(op){ diAnnotExecOp(R, op); });
+          });
+          diAnnotStamp(R, dateStr);
+          var fileName = annotPdfFileName(new Date());
+          doc.save(fileName);
+          var msg;
+          if(useFont){
+            msg = "PDF beranotasi dibuat: " + fileName + " \u2014 dicetak dengan font Noto Sans subset.";
+            if(plan.disclosure) msg += " Sebanyak " + plan.disclosure.total + " kemunculan karakter di luar cakupan font diganti penanda " + ANNOT_PDF_PLACEHOLDER + " dengan pengungkapan tercetak di dalam laporan.";
+          } else {
+            msg = "PDF beranotasi dibuat dengan font cadangan (Helvetica) karena font utama gagal dimuat: " + fileName + " \u2014 beberapa karakter tipografis disederhanakan.";
+          }
+          if(edited) msg += " Catatan: teks telah berubah sejak analisis terakhir \u2014 laporan mencetak teks persis seperti yang dianalisis.";
+          diAnnotSetStatus(msg);
+        } catch(e){
+          diAnnotSetStatus("Ekspor PDF beranotasi gagal: " + (e && e.message ? e.message : e));
+        } finally {
+          diAnnotBtn.disabled = false;
+        }
+      }
+      if(diAnnotBtn) diAnnotBtn.addEventListener("click", function(){ diExportAnnotatedPdf(); });
+
+      /* ================= Document Intelligence (D8 Tahap 3): Ekspor setia-asli =================
+         Untuk dokumen yang diimpor, ekspor utama kini adalah BERKAS
+         ASAL itu sendiri: DOCX dibedah pada word/document.xml-nya
+         (sorotan + nomor pada run asal, rekomendasi ditambahkan di
+         akhir isi; hasil diverifikasi sebelum diunduh, cadangan =
+         bangun ulang dari model dengan sorotan yang sama), dan PDF
+         digambari sorotan tepat di atas halaman asalnya dengan
+         pdf-lib (halaman asal tidak digambar ulang) + halaman
+         rekomendasi di belakang. Gerbang kejujuran PDF (teks rusak,
+         halaman terputar, geometri tidak pasti, karakter halaman
+         rekomendasi) menolak overlay dan menawarkan PDF Beranotasi
+         susun-ulang yang sudah ada, dengan alasan sederhana.
+         Byte asal hanya hidup di memori halaman ini (salinan, karena
+         pdf.js dapat memindahkan buffer yang diserahkan kepadanya);
+         tidak diunggah dan tidak disimpan — sikap privasi yang sama
+         dengan model dokumen. Ekspor lama tidak diubah. */
+      var DI_PDFLIB_URL = "https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js";
+      var DI_PDFLIB_SRI = "sha384-weMABwrltA6jWR8DDe9Jp5blk+tZQh7ugpCsF3JwSA53WZM9/14PjS5LAJNHNjAI";
+      if(typeof SAKSARA_SRI !== "undefined" && SAKSARA_SRI && !SAKSARA_SRI[DI_PDFLIB_URL])
+        SAKSARA_SRI[DI_PDFLIB_URL] = DI_PDFLIB_SRI;
+      var diPdfLibPromise = null;
+      function diLoadPdfLib(){
+        if(window.PDFLib && window.PDFLib.PDFDocument) return Promise.resolve(window.PDFLib);
+        if(!diPdfLibPromise){
+          diPdfLibPromise = p6LoadScript(DI_PDFLIB_URL).then(function(){
+            if(!window.PDFLib || !window.PDFLib.PDFDocument)
+              throw new Error("global PDFLib tidak lengkap");
+            return window.PDFLib;
+          });
+          diPdfLibPromise.catch(function(){ diPdfLibPromise = null; });
+        }
+        return diPdfLibPromise;
+      }
+      var diFaithfulState = { name: null, kind: null, bytes: null, pagesData: null, pageDims: null };
+      function diFaithfulReset(){
+        diFaithfulState = { name: null, kind: null, bytes: null, pagesData: null, pageDims: null };
+        diFaithfulRefresh();
+      }
+      function diFaithfulCapture(name, bytes){
+        diFaithfulState = { name: name, kind: diSniffFormat(bytes) === "pdf" ? "pdf" : "docx",
+          bytes: bytes.slice(), pagesData: null, pageDims: null };
+      }
+      function diFaithfulNotePdfPage(n, page){
+        try {
+          var view = page.view || [0, 0, 612, 842];
+          if(!diFaithfulState.pageDims) diFaithfulState.pageDims = {};
+          diFaithfulState.pageDims[n] = { width: view[2] - view[0], height: view[3] - view[1],
+            rotation: page.rotate || 0 };
+        } catch(e){ /* dimensi tak tersedia — gerbang ekspor menolak dengan jujur */ }
+      }
+      function diFaithfulNotePdfPages(pagesData){ diFaithfulState.pagesData = pagesData; }
+      var diFaithDocxBtn = $("wi-faithful-docx"), diFaithPdfBtn = $("wi-faithful-pdf"),
+          diFaithStatusEl = $("wi-faithful-status");
+      function diFaithSetStatus(msg){ if(diFaithStatusEl) diFaithStatusEl.textContent = msg || ""; }
+      function diFaithfulRefresh(){
+        var kind = (wiDocState && diFaithfulState.bytes && diFaithfulState.name === wiDocState.name)
+          ? diFaithfulState.kind : null;
+        if(diFaithDocxBtn) diFaithDocxBtn.hidden = kind !== "docx";
+        if(diFaithPdfBtn) diFaithPdfBtn.hidden = kind !== "pdf";
+      }
+      if(typeof MutationObserver === "function"){
+        if(statusEl) new MutationObserver(diFaithfulRefresh).observe(statusEl, { childList: true, characterData: true });
+        if(diCountEl) new MutationObserver(diFaithfulRefresh).observe(diCountEl, { childList: true, characterData: true, subtree: true });
+      }
+      function diFaithfulBuildAnnot(){
+        if(!wiResult || !wiDocState) return null;
+        diEnsureMapping();
+        return annotBuildReport(wiResult, { acceptedIds: wiAccepted.slice(),
+          rejectedIds: Object.keys(wiRejected), kindLabels: WI_KIND_LABEL,
+          certLabels: WI_CERT_LABEL,
+          doc: { name: wiDocState.name, model: wiDocState.model, mapping: diMapping } });
+      }
+      function diFaithfulDownload(blob, name){
+        var a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = name;
+        document.body.appendChild(a); a.click();
+        setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 400);
+      }
+      var diFaithBusy = false;
+      /* ----- DOCX setia-asli ----- */
+      function diFaithfulDocxRunsMarked(dx, block, marks){
+        var out = [];
+        diFaithfulBlockSegments(block, marks).forEach(function(p){
+          if(p.insertNo != null){
+            out.push(new dx.TextRun({ text: String(p.insertNo), superScript: true, bold: true, color: "1D5FD1", size: 16 }));
+            return;
+          }
+          if(p.prot){ if(p.kind !== "object" && p.text) out.push(new dx.TextRun({ text: p.text })); return; }
+          var props = {};
+          if(p.bold) props.bold = true;
+          if(p.italic) props.italics = true;
+          if(p.underline) props.underline = {};
+          if(p.fontName) props.font = { name: p.fontName };
+          if(typeof p.fontSize === "number" && p.fontSize > 0) props.size = Math.round(p.fontSize * 2);
+          if(p.hl) props.highlight = p.hl;
+          var safe = p.link ? diLinkSafe(p.link) : null;
+          String(p.text).split("\n").forEach(function(seg, i){
+            var pr = {};
+            for(var k in props) pr[k] = props[k];
+            pr.text = seg;
+            if(i > 0) pr.break = 1;
+            var tr = new dx.TextRun(pr);
+            out.push(safe ? new dx.ExternalHyperlink({ link: safe, children: [tr] }) : tr);
+          });
+        });
+        return out;
+      }
+      function diFaithfulDocxPara(dx, b, marks){
+        if(b.type === "heading"){
+          var lv = Math.min(6, Math.max(1, b.level || 1));
+          return new dx.Paragraph({ heading: dx.HeadingLevel["HEADING_" + lv], outlineLevel: lv - 1,
+            alignment: diDocxAlign(dx, b), indent: diDocxIndent(b),
+            children: diFaithfulDocxRunsMarked(dx, b, marks) });
+        }
+        if(b.type === "list-item"){
+          return new dx.Paragraph({ alignment: diDocxAlign(dx, b),
+            indent: { left: 360 * ((b.level || 0) + 1), hanging: 260 },
+            children: diFaithfulDocxRunsMarked(dx, b, marks) });
+        }
+        return new dx.Paragraph({ alignment: diDocxAlign(dx, b), indent: diDocxIndent(b),
+          children: diFaithfulDocxRunsMarked(dx, b, marks) });
+      }
+      function diFaithfulDocxTable(dx, model, tIdx, idxById, inc){
+        var table = (model.tables || [])[tIdx];
+        if(!table) return null;
+        var byId = {};
+        (model.blocks || []).forEach(function(b){ byId[b.id] = b; });
+        var rows = (table.rows || []).map(function(row){
+          var cells = (row.cells || []).map(function(cell){
+            var opts = {};
+            if(cell.gridSpan > 1) opts.columnSpan = cell.gridSpan;
+            if(cell.vMerge === "restart") opts.verticalMerge = dx.VerticalMergeType.RESTART;
+            else if(cell.vMerge === "continue") opts.verticalMerge = dx.VerticalMergeType.CONTINUE;
+            var cbs = (cell.blockIds || []).map(function(id){ return byId[id]; }).filter(Boolean)
+              .sort(function(x, y){ return (x.cellPara || 0) - (y.cellPara || 0); });
+            opts.children = cbs.length
+              ? cbs.map(function(b){
+                  return new dx.Paragraph({ children: diFaithfulDocxRunsMarked(dx, b, inc.marksByBlock[idxById[b.id]] || []) });
+                })
+              : [new dx.Paragraph("")];
+            return new dx.TableCell(opts);
+          });
+          return new dx.TableRow({ children: cells });
+        });
+        return new dx.Table({ rows: rows });
+      }
+      function diFaithfulAppendixParasDx(dx, children, it){
+        var head = [];
+        if(it.no != null) head.push(new dx.TextRun({ text: it.no + ". ", bold: true }));
+        head.push(new dx.TextRun({ text: "Kalimat asli: ", bold: true }));
+        head.push(new dx.TextRun({ text: "\"" + it.sentence + "\"" }));
+        children.push(new dx.Paragraph({ children: head }));
+        children.push(new dx.Paragraph({ children: [
+          new dx.TextRun({ text: "Alasan: ", bold: true }), new dx.TextRun({ text: it.reason })] }));
+        if(it.manual){
+          children.push(new dx.Paragraph({ children: [new dx.TextRun({ text: "Perlu ditinjau manual.", bold: true })] }));
+        } else {
+          children.push(new dx.Paragraph({ children: [
+            new dx.TextRun({ text: "Usulan perbaikan: ", bold: true }),
+            new dx.TextRun({ text: "\"" + it.proposal + "\"" })] }));
+        }
+      }
+      function diFaithfulFallbackDocx(A, fileName){
+        return diLoadDocx().then(function(dx){
+          var model = wiDocState.model;
+          var inc = diFaithfulIncluded(A);
+          var idxById = {};
+          (model.blocks || []).forEach(function(b, bi){ idxById[b.id] = bi; });
+          var children = [], emitted = {};
+          (model.blocks || []).forEach(function(b, bi){
+            if(b.type === "table-cell"){
+              if(!emitted[b.table]){
+                emitted[b.table] = true;
+                var t = diFaithfulDocxTable(dx, model, b.table, idxById, inc);
+                if(t) children.push(t);
+              }
+              return;
+            }
+            children.push(diFaithfulDocxPara(dx, b, inc.marksByBlock[bi] || []));
+          });
+          var app = diFaithfulAppendix(A);
+          children.push(new dx.Paragraph({ spacing: { before: 360 },
+            children: [new dx.TextRun({ text: app.heading, bold: true, size: 32 })] }));
+          children.push(new dx.Paragraph({ children: [new dx.TextRun({ text: app.intro })] }));
+          app.items.forEach(function(it){ diFaithfulAppendixParasDx(dx, children, it); });
+          if(app.unanchoredIntro){
+            children.push(new dx.Paragraph({ children: [new dx.TextRun({ text: app.unanchoredIntro, italics: true })] }));
+            app.unanchoredItems.forEach(function(it){ diFaithfulAppendixParasDx(dx, children, it); });
+          }
+          if(app.emptyNote) children.push(new dx.Paragraph({ children: [new dx.TextRun({ text: app.emptyNote })] }));
+          return dx.Packer.toBlob(new dx.Document({ sections: [{ children: children }] }));
+        }).then(function(blob){ diFaithfulDownload(blob, fileName); });
+      }
+      async function diExportFaithfulDocx(){
+        if(diFaithBusy) return;
+        if(!wiResult){ diFaithSetStatus("Jalankan analisis terlebih dahulu, lalu unduh dokumen beranotasinya."); return; }
+        if(!wiDocState || !diFaithfulState.bytes || diFaithfulState.kind !== "docx"){
+          diFaithSetStatus("Dokumen Word asal tidak tersedia — impor ulang berkas .docx-nya, lalu coba lagi.");
+          return;
+        }
+        diFaithBusy = true;
+        if(diFaithDocxBtn) diFaithDocxBtn.disabled = true;
+        diFaithSetStatus("Menyiapkan dokumen beranotasi…");
+        try {
+          var A = diFaithfulBuildAnnot();
+          var fileName = diFaithfulFileName(wiDocState.name);
+          var surgery = await diFaithfulDocxSurgery(diFaithfulState.bytes, wiDocState.model, A, {});
+          if(surgery.ok){
+            var verify = await diFaithfulVerifyDocx(diFaithfulState.bytes, surgery.bytes, wiDocState.model, A, {});
+            if(!verify.ok){
+              if(window.console && console.warn) console.warn("Saksara: verifikasi bedah DOCX gagal", verify.failures);
+              surgery = { ok: false, reason: "verify" };
+            }
+          }
+          if(surgery.ok){
+            diFaithfulDownload(new Blob([surgery.bytes],
+              { type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" }), fileName);
+            diFaithSetStatus("Dokumen beranotasi dibuat: " + fileName + " — dokumen asli Anda dengan sorotan dan rekomendasi di bagian akhir.");
+          } else {
+            await diFaithfulFallbackDocx(A, fileName);
+            diFaithSetStatus("Dokumen beranotasi dibuat: " + fileName + " — catatan: untuk berkas ini dokumen dibangun ulang dari hasil impor, jadi tampilannya mungkin sedikit berbeda dari berkas asli.");
+          }
+        } catch(e){
+          if(window.console && console.warn) console.warn("Saksara: ekspor setia-asli DOCX gagal", e && e.message);
+          diFaithSetStatus("Unduhan gagal — coba lagi. Bila tetap gagal, gunakan tombol Ekspor PDF Beranotasi.");
+        } finally {
+          diFaithBusy = false;
+          if(diFaithDocxBtn) diFaithDocxBtn.disabled = false;
+        }
+      }
+      if(diFaithDocxBtn) diFaithDocxBtn.addEventListener("click", function(){ diExportFaithfulDocx(); });
+      /* ----- PDF setia-asli (overlay pdf-lib) ----- */
+      function diFaithfulWrap(font, text, size, maxW){
+        var words = String(text).split(/\s+/), lines = [], cur = "";
+        words.forEach(function(w){
+          var t = cur ? cur + " " + w : w;
+          if(cur && font.widthOfTextAtSize(t, size) > maxW){ lines.push(cur); cur = w; }
+          else cur = t;
+        });
+        if(cur) lines.push(cur);
+        return lines.length ? lines : [""];
+      }
+      function diFaithfulDrawAppendix(PL, pdfDoc, helv, helvB, lines, size){
+        var M = 56, W = size.width, H = size.height, TOP = H - 64, BOT = 56;
+        var page = null, y = 0;
+        function newPage(){ page = pdfDoc.addPage([W, H]); y = TOP; }
+        newPage();
+        lines.forEach(function(ln){
+          var font = ln.bold ? helvB : helv;
+          diFaithfulWrap(font, ln.text, ln.size, W - 2 * M).forEach(function(wl){
+            if(y < BOT) newPage();
+            page.drawText(wl, { x: M, y: y, size: ln.size, font: font, color: PL.rgb(0.1, 0.1, 0.1) });
+            y -= ln.size * 1.45;
+          });
+          y -= ln.gapAfter || 4;
+        });
+      }
+      async function diExportFaithfulPdf(){
+        if(diFaithBusy) return;
+        if(!wiResult){ diFaithSetStatus("Jalankan analisis terlebih dahulu, lalu unduh PDF beranotasinya."); return; }
+        if(!wiDocState || !diFaithfulState.bytes || diFaithfulState.kind !== "pdf"){
+          diFaithSetStatus("PDF asal tidak tersedia — impor ulang berkas .pdf-nya, lalu coba lagi.");
+          return;
+        }
+        diFaithBusy = true;
+        if(diFaithPdfBtn) diFaithPdfBtn.disabled = true;
+        diFaithSetStatus("Menyiapkan PDF beranotasi…");
+        try {
+          var A = diFaithfulBuildAnnot();
+          var plan = diFaithfulPdfPlan(diFaithfulState.pagesData, wiDocState.model, A, diFaithfulState.pageDims);
+          if(!plan.ok){
+            var why = { "garbled": "lapisan teks PDF ini tidak terbaca dengan utuh",
+              "rotation": "halaman PDF ini terputar",
+              "geometry-mismatch": "posisi teks PDF ini tidak dapat dipastikan",
+              "appendix-chars": "sebagian tulisan memakai karakter yang tidak dapat dicetak pada halaman rekomendasi",
+              "no-pages": "data halaman PDF tidak tersedia" }[plan.reason] || "posisi teks PDF ini tidak dapat dipastikan";
+            diFaithSetStatus("Sorotan tidak dapat digambar tepat di atas PDF asli karena " + why + ". Sebagai gantinya dibuat laporan beranotasi (susunan Saksara).");
+            await diExportAnnotatedPdf();
+            return;
+          }
+          var PL = await diLoadPdfLib();
+          var pdfDoc = await PL.PDFDocument.load(diFaithfulState.bytes);
+          var helv = await pdfDoc.embedFont(PL.StandardFonts.Helvetica);
+          var helvB = await pdfDoc.embedFont(PL.StandardFonts.HelveticaBold);
+          var pages = pdfDoc.getPages();
+          plan.rects.forEach(function(r){
+            var page = pages[r.page - 1];
+            if(!page) return;
+            page.drawRectangle({ x: r.x, y: r.y, width: r.w, height: r.h,
+              color: r.advisory ? PL.rgb(0.62, 0.84, 1) : PL.rgb(1, 0.93, 0.55), opacity: 0.5 });
+          });
+          plan.labels.forEach(function(l){
+            var page = pages[l.page - 1];
+            if(!page) return;
+            page.drawText(String(l.no), { x: l.x, y: l.y, size: 7, font: helvB, color: PL.rgb(0.11, 0.37, 0.82) });
+          });
+          var firstSize = pages.length ? pages[0].getSize() : { width: 595, height: 842 };
+          diFaithfulDrawAppendix(PL, pdfDoc, helv, helvB, plan.appendixLines, firstSize);
+          var outBytes = await pdfDoc.save();
+          var fileName = diFaithfulFileName(wiDocState.name);
+          diFaithfulDownload(new Blob([outBytes], { type: "application/pdf" }), fileName);
+          diFaithSetStatus("PDF beranotasi dibuat: " + fileName + " — halaman asli PDF Anda dengan sorotan dan rekomendasi di halaman akhir.");
+        } catch(e){
+          if(window.console && console.warn) console.warn("Saksara: ekspor setia-asli PDF gagal", e && e.message);
+          diFaithSetStatus("Unduhan gagal — coba lagi. Bila tetap gagal, gunakan tombol Ekspor PDF Beranotasi.");
+        } finally {
+          diFaithBusy = false;
+          if(diFaithPdfBtn) diFaithPdfBtn.disabled = false;
+        }
+      }
+      if(diFaithPdfBtn) diFaithPdfBtn.addEventListener("click", function(){ diExportFaithfulPdf(); });
     })();
 
     /* ================= Compare Writing (Phase 4) =================
@@ -10941,6 +13284,563 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       }
       window.addEventListener("hashchange", route);
       route();
+    })();
+    /* ================= Editor Kaya Asisten Menulis (D8 Tahap 4) =================
+       Permukaan tulis contenteditable bergaya pengolah kata di atas
+       tulang punggung teks polos #wi-input. #wi-input TETAP satu-satunya
+       sumber kebenaran: setiap alur lama (impor DOCX/PDF, penghitung,
+       batas 50.000 karakter, analisis, pemetaan saran, deteksi teks
+       berubah, semua ekspor) membaca/menulis #wi-input.value persis
+       seperti sebelumnya. Editor hanya permukaan: suntingannya
+       diserialkan ke teks polos oleh ED-CORE (kontrak beku di sana)
+       dan ditulis ke #wi-input; sebaliknya setiap penulisan
+       programatis ke #wi-input.value (impor, reset, alur lain)
+       ditangkap lewat kait setter nilai dan digambar ulang ke editor.
+       Format (tebal, warna, spasi, indentasi) adalah alat bantu
+       menulis untuk teks yang diketik/ditempel di editor — ia tidak
+       disimpan di tulang punggung dan tidak digambar ulang dari teks
+       polos (impor menggambar paragraf polos). Mode "Teks polos"
+       menyembunyikan editor dan menampilkan #wi-input apa adanya:
+       perilaku persis seperti sebelum tahap ini. Bila inisialisasi
+       gagal di tengah, seluruh tambahan dilepas dan kotak teks lama
+       tetap bekerja (blok ini tidak boleh mematahkan halaman). */
+    (function(){
+      var ta = $("wi-input");
+      if(!ta || !ta.parentNode || !window.getSelection || !document.createRange) return;
+      var ED_HTML = `
+      <div class="wi-ed-mode" role="group" aria-label="Mode kotak teks">
+        <button type="button" class="wi-ed-mode-btn is-on" data-wied-mode="editor" aria-pressed="true">Editor</button>
+        <button type="button" class="wi-ed-mode-btn" data-wied-mode="plain" aria-pressed="false">Teks polos</button>
+      </div>
+      <div class="wi-ed-bar" role="toolbar" aria-label="Bilah format teks">
+        <button type="button" data-cmd="undo" title="Urungkan">↩</button>
+        <button type="button" data-cmd="redo" title="Ulangi">↪</button>
+        <span class="wi-ed-sep"></span>
+        <select data-wied="style" aria-label="Gaya paragraf" title="Gaya paragraf">
+          <option value="" selected>Gaya</option>
+          <option value="P">Paragraf</option>
+          <option value="H1">Judul 1</option>
+          <option value="H2">Judul 2</option>
+          <option value="H3">Judul 3</option>
+          <option value="BLOCKQUOTE">Kutipan</option>
+        </select>
+        <select data-wied="font" aria-label="Jenis huruf" title="Jenis huruf">
+          <option value="" selected>Huruf</option>
+          <option value="'Plus Jakarta Sans', sans-serif">Bawaan (Plus Jakarta Sans)</option>
+          <option value="Arial, sans-serif">Arial</option>
+          <option value="Calibri, sans-serif">Calibri</option>
+          <option value="Georgia, serif">Georgia</option>
+          <option value="'Times New Roman', serif">Times New Roman</option>
+          <option value="Verdana, sans-serif">Verdana</option>
+          <option value="'Courier New', monospace">Courier New</option>
+        </select>
+        <select data-wied="size" aria-label="Ukuran huruf" title="Ukuran huruf">
+          <option value="" selected>Ukuran</option>
+          <option value="10">10 pt</option>
+          <option value="11">11 pt</option>
+          <option value="12">12 pt</option>
+          <option value="13">13 pt</option>
+          <option value="14">14 pt</option>
+          <option value="16">16 pt</option>
+          <option value="18">18 pt</option>
+          <option value="20">20 pt</option>
+          <option value="22">22 pt</option>
+          <option value="24">24 pt</option>
+        </select>
+        <span class="wi-ed-sep"></span>
+        <button type="button" data-cmd="bold" title="Tebal"><b>B</b></button>
+        <button type="button" data-cmd="italic" title="Miring"><i>I</i></button>
+        <button type="button" data-cmd="underline" title="Garis bawah"><u>U</u></button>
+        <button type="button" data-cmd="strikeThrough" title="Coret"><s>S</s></button>
+        <button type="button" data-cmd="subscript" title="Subskrip (tulis kecil di bawah)">x<sub>2</sub></button>
+        <button type="button" data-cmd="superscript" title="Superskrip (tulis kecil di atas)">x<sup>2</sup></button>
+        <label class="wi-ed-color" title="Warna teks">A<input type="color" data-wied="fore" value="#14304f" aria-label="Warna teks"></label>
+        <label class="wi-ed-color" title="Warna sorotan teks"><span class="wi-ed-hilite-mark">A</span><input type="color" data-wied="hilite" value="#fbeec3" aria-label="Warna sorotan teks"></label>
+        <button type="button" data-cmd="removeFormat" title="Hapus format pada teks/blok terpilih">Hapus format</button>
+        <span class="wi-ed-sep"></span>
+        <button type="button" data-cmd="justifyLeft" title="Rata kiri">Kiri</button>
+        <button type="button" data-cmd="justifyCenter" title="Rata tengah">Tengah</button>
+        <button type="button" data-cmd="justifyRight" title="Rata kanan">Kanan</button>
+        <button type="button" data-cmd="justifyFull" title="Rata kiri-kanan">Rata</button>
+        <span class="wi-ed-sep"></span>
+        <select data-wied="leading" aria-label="Spasi baris" title="Spasi baris">
+          <option value="" selected>Spasi baris</option>
+          <option value="1">1.0</option>
+          <option value="1.15">1.15</option>
+          <option value="1.5">1.5</option>
+          <option value="2">2.0</option>
+        </select>
+        <select data-wied="spaceBefore" aria-label="Spasi sebelum paragraf" title="Spasi sebelum paragraf">
+          <option value="" selected>Sebelum</option>
+          <option value="0">0 pt</option>
+          <option value="6">6 pt</option>
+          <option value="12">12 pt</option>
+        </select>
+        <select data-wied="spaceAfter" aria-label="Spasi sesudah paragraf" title="Spasi sesudah paragraf">
+          <option value="" selected>Sesudah</option>
+          <option value="0">0 pt</option>
+          <option value="6">6 pt</option>
+          <option value="12">12 pt</option>
+        </select>
+        <button type="button" data-cmd="indentOut" title="Kurangi indentasi">Geser kiri</button>
+        <button type="button" data-cmd="indentIn" title="Tambah indentasi">Geser kanan</button>
+        <button type="button" data-cmd="hanging" title="Indentasi gantung (baris pertama menjorok keluar)">Indentasi gantung</button>
+        <span class="wi-ed-sep"></span>
+        <button type="button" data-cmd="insertUnorderedList" title="Daftar berpoin">Poin</button>
+        <button type="button" data-cmd="insertOrderedList" title="Daftar bernomor">Nomor</button>
+      </div>
+      <div class="wi-ed-surface" id="wi-ed-surface" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Teks yang ingin dirapikan" data-placeholder="Tempel atau ketik teks di sini…"></div>`;
+      var wrap = null, ed = null, bar = null;
+      var mode = "editor";
+      var syncing = false;
+      var savedRange = null;
+      var nativeGet = null, nativeSet = null;
+      function edFail(){
+        try { if(wrap && wrap.parentNode) wrap.parentNode.removeChild(wrap); } catch(e) {}
+        try { ta.classList.remove("wi-ed-off"); } catch(e) {}
+        if(window.console && console.warn) console.warn("Saksara: editor kaya gagal dimulai; kotak teks polos tetap dipakai.");
+      }
+      try {
+        wrap = document.createElement("div");
+        wrap.className = "wi-ed-wrap";
+        wrap.innerHTML = ED_HTML;
+        ta.parentNode.insertBefore(wrap, ta);
+        ed = wrap.querySelector(".wi-ed-surface");
+        bar = wrap.querySelector(".wi-ed-bar");
+        if(!ed || !bar) throw new Error("wi-ed-dom");
+        /* Kait nilai tulang punggung: penulisan programatis apa pun ke
+           #wi-input.value (impor, reset, alur cepat) digambar ulang ke
+           editor; penulisan dari editor sendiri ditandai syncing agar
+           tidak menggambar ulang di tengah mengetik. */
+        var proto = window.HTMLTextAreaElement && window.HTMLTextAreaElement.prototype;
+        var desc = proto ? Object.getOwnPropertyDescriptor(proto, "value") : null;
+        if(!desc || !desc.get || !desc.set) throw new Error("wi-ed-desc");
+        nativeGet = desc.get; nativeSet = desc.set;
+        Object.defineProperty(ta, "value", {
+          configurable: true, enumerable: true,
+          get: function(){ return nativeGet.call(ta); },
+          set: function(v){
+            nativeSet.call(ta, v);
+            if(!syncing && mode === "editor"){ try { renderFromBackbone(); } catch(e) {} }
+          }
+        });
+        /* Fokus programatis ke textarea (alur lama: Bersihkan, Analisis
+           pada teks kosong, Lihat lokasi) dialihkan ke editor. */
+        var nativeFocus = ta.focus;
+        ta.focus = function(){
+          if(mode === "editor"){ try { ed.focus(); return; } catch(e) {} }
+          return nativeFocus.apply(ta, arguments);
+        };
+      } catch(e) { edFail(); return; }
+
+      function updateEmpty(){
+        wrap.classList.toggle("wi-ed-empty", wiEdSerialize(ed) === "");
+      }
+      function renderFromBackbone(){
+        var text = nativeGet.call(ta);
+        ed.innerHTML = "";
+        wiEdSplitBlocks(text).forEach(function(lines){
+          var p = document.createElement("p");
+          lines.forEach(function(line, i){
+            if(i > 0) p.appendChild(document.createElement("br"));
+            /* Unit kosong tunggal dirender sebagai <p><br></p>:
+               paragraf tanpa anak membuat Firefox membuang ketikan ke
+               luar paragraf (terukur di QA Tahap 4 — <p></p> dan <p>
+               berisi simpul teks kosong sama-sama lolos ke akar),
+               sedangkan <br> bantalan memberi paragraf tinggi baris
+               dan ketikan masuk ke dalamnya dari posisi klik mana pun;
+               serialisasi ED-CORE membuang br bantalan itu kembali
+               menjadi unit kosong. */
+            if(line === "" && lines.length === 1){
+              p.appendChild(document.createElement("br"));
+              return;
+            }
+            p.appendChild(document.createTextNode(line));
+          });
+          ed.appendChild(p);
+        });
+        updateEmpty();
+      }
+      function syncFromEditor(){
+        var text = wiEdSerialize(ed);
+        if(text !== nativeGet.call(ta)){
+          syncing = true;
+          try { nativeSet.call(ta, text); } finally { syncing = false; }
+          ta.dispatchEvent(new Event("input", { bubbles: true }));
+        }
+        updateEmpty();
+      }
+      function saveRange(){
+        var sel = window.getSelection();
+        if(sel && sel.rangeCount){
+          var r = sel.getRangeAt(0);
+          if(ed.contains(r.commonAncestorContainer)) savedRange = r.cloneRange();
+        }
+      }
+      function restoreRange(){
+        ed.focus();
+        if(!savedRange) return;
+        try {
+          var sel = window.getSelection();
+          sel.removeAllRanges(); sel.addRange(savedRange);
+        } catch(e) {}
+      }
+      function cmd(name, val){
+        restoreRange();
+        try { document.execCommand(name, false, val == null ? null : val); } catch(e) {}
+        syncFromEditor(); saveRange();
+      }
+      function cmdCss(name, val){
+        restoreRange();
+        try {
+          document.execCommand("styleWithCSS", false, true);
+          document.execCommand(name, false, val);
+          document.execCommand("styleWithCSS", false, false);
+        } catch(e) {}
+        syncFromEditor(); saveRange();
+      }
+      /* Ukuran huruf memakai span bergaya sendiri: execCommand
+         fontSize Firefox hanya mengenal skala lama 1–7, bukan pt. */
+      function applyFontSize(pt){
+        restoreRange();
+        var sel = window.getSelection();
+        if(!sel || !sel.rangeCount) return;
+        var range = sel.getRangeAt(0);
+        var span = document.createElement("span");
+        span.style.fontSize = pt + "pt";
+        try {
+          if(range.collapsed){
+            span.appendChild(document.createTextNode("\u200B"));
+            range.insertNode(span);
+            var r2 = document.createRange();
+            r2.setStart(span.firstChild, 1); r2.collapse(true);
+            sel.removeAllRanges(); sel.addRange(r2);
+          } else {
+            span.appendChild(range.extractContents());
+            range.insertNode(span);
+            var r3 = document.createRange();
+            r3.selectNodeContents(span);
+            sel.removeAllRanges(); sel.addRange(r3);
+          }
+        } catch(e) { return; }
+        syncFromEditor(); saveRange();
+      }
+      function leafBlocks(){
+        var out = [];
+        var sel = window.getSelection();
+        if(!sel || !sel.rangeCount) return out;
+        var range = sel.getRangeAt(0);
+        var all = ed.querySelectorAll("p,div,h1,h2,h3,h4,h5,h6,li,blockquote,pre,td,th");
+        for(var i=0;i<all.length;i++){
+          var b = all[i];
+          var hit = false;
+          try { hit = range.intersectsNode(b); } catch(e) { hit = false; }
+          if(!hit) continue;
+          if(b.querySelector("p,div,h1,h2,h3,h4,h5,h6,li,blockquote,pre,td,th")) continue;
+          out.push(b);
+        }
+        return out;
+      }
+      function blockStyle(fn){
+        restoreRange();
+        leafBlocks().forEach(fn);
+        syncFromEditor(); saveRange();
+      }
+      function edIndent(delta){
+        blockStyle(function(b){
+          var ml = Math.max(0, wiEdPxLen(b.style.marginLeft) + delta);
+          b.style.marginLeft = ml ? ml + "px" : "";
+          if(ml === 0 && b.getAttribute("data-wied-hang")){
+            b.removeAttribute("data-wied-hang");
+            b.style.textIndent = "";
+          }
+        });
+      }
+      function edHangToggle(){
+        blockStyle(function(b){
+          var ml = wiEdPxLen(b.style.marginLeft);
+          if(b.getAttribute("data-wied-hang")){
+            b.removeAttribute("data-wied-hang");
+            b.style.textIndent = "";
+            ml = Math.max(0, ml - 24);
+            b.style.marginLeft = ml ? ml + "px" : "";
+          } else {
+            b.setAttribute("data-wied-hang", "1");
+            b.style.marginLeft = (ml + 24) + "px";
+            b.style.textIndent = "-24px";
+          }
+        });
+      }
+      function edRemoveFormat(){
+        var blocks = leafBlocks();
+        cmd("removeFormat");
+        blocks.forEach(function(b){
+          b.style.lineHeight = ""; b.style.marginTop = ""; b.style.marginBottom = "";
+          b.style.marginLeft = ""; b.style.textIndent = ""; b.style.textAlign = "";
+          b.removeAttribute("data-wied-hang");
+        });
+        syncFromEditor();
+      }
+      /* ---------- Pembersih tempelan (daftar putih) ---------- */
+      var ED_OK_TAGS = { P:1, DIV:1, BR:1, B:1, STRONG:1, I:1, EM:1, U:1, S:1, STRIKE:1, SUB:1, SUP:1, SPAN:1, UL:1, OL:1, LI:1, H1:1, H2:1, H3:1, H4:1, H5:1, H6:1, BLOCKQUOTE:1, PRE:1, A:1 };
+      var ED_DROP_TAGS = { SCRIPT:1, STYLE:1, IFRAME:1, OBJECT:1, EMBED:1, LINK:1, META:1, TITLE:1, IMG:1, VIDEO:1, AUDIO:1, SOURCE:1, TRACK:1, CANVAS:1, SVG:1, MATH:1, FORM:1, INPUT:1, BUTTON:1, TEXTAREA:1, SELECT:1, OPTION:1, HEAD:1, HR:1, AREA:1, BASE:1, PARAM:1 };
+      function edUnwrap(el){
+        var parent = el.parentNode;
+        if(!parent) return;
+        while(el.firstChild) parent.insertBefore(el.firstChild, el);
+        parent.removeChild(el);
+      }
+      function edCleanChildren(node){
+        Array.prototype.slice.call(node.childNodes).forEach(function(k){
+          if(k.nodeType === 8){ node.removeChild(k); return; }
+          if(k.nodeType !== 1) return;
+          var tag = k.tagName;
+          if(ED_DROP_TAGS[tag]){ node.removeChild(k); return; }
+          var styleAttr = k.getAttribute("style") || "";
+          var hrefAttr = k.getAttribute("href") || "";
+          var faceAttr = k.getAttribute("face") || "";
+          edCleanChildren(k);
+          if(tag === "FONT"){
+            var sp = document.createElement("span");
+            var st = wiEdFilterStyle(styleAttr, "inline");
+            if(faceAttr && /^[A-Za-z0-9 ,\-']+$/.test(faceAttr))
+              st = (st ? st + "; " : "") + "font-family: " + faceAttr;
+            if(st) sp.setAttribute("style", st);
+            while(k.firstChild) sp.appendChild(k.firstChild);
+            k.parentNode.replaceChild(sp, k);
+            return;
+          }
+          if(!ED_OK_TAGS[tag]){ edUnwrap(k); return; }
+          var keep = "";
+          if(tag === "SPAN") keep = wiEdFilterStyle(styleAttr, "inline");
+          else if(WI_ED_BLOCK_TAGS[tag]) keep = wiEdFilterStyle(styleAttr, "block");
+          while(k.attributes && k.attributes.length) k.removeAttribute(k.attributes[0].name);
+          if(keep) k.setAttribute("style", keep);
+          if(tag === "A"){
+            if(/^(https?:|mailto:)/i.test(hrefAttr)){
+              k.setAttribute("href", hrefAttr);
+              k.setAttribute("rel", "noopener");
+            } else edUnwrap(k);
+          }
+        });
+      }
+      function edCleanFragment(holder){
+        Array.prototype.slice.call(holder.querySelectorAll("table")).forEach(function(tbl){
+          Array.prototype.slice.call(tbl.querySelectorAll("td,th")).forEach(function(cell){
+            var p = document.createElement("p");
+            while(cell.firstChild) p.appendChild(cell.firstChild);
+            if(cell.parentNode) cell.parentNode.replaceChild(p, cell);
+          });
+          edUnwrap(tbl);
+        });
+        edCleanChildren(holder);
+      }
+      ed.addEventListener("paste", function(e){
+        e.preventDefault();
+        var cd = e.clipboardData || window.clipboardData;
+        var html = "", text = "";
+        try {
+          if(cd){ html = cd.getData("text/html") || ""; text = cd.getData("text/plain") || ""; }
+        } catch(err) {}
+        ed.focus();
+        if(html){
+          try {
+            var holder = document.createElement("div");
+            holder.innerHTML = html;
+            edCleanFragment(holder);
+            var clean = holder.innerHTML;
+            if(clean) document.execCommand("insertHTML", false, clean);
+            else if(text) document.execCommand("insertText", false, text);
+          } catch(err) {
+            if(text) document.execCommand("insertText", false, text);
+          }
+        } else if(text){
+          try { document.execCommand("insertText", false, text); } catch(err) {}
+        }
+        syncFromEditor(); saveRange();
+      });
+      ed.addEventListener("input", function(){ syncFromEditor(); });
+      document.addEventListener("selectionchange", function(){
+        var sel = window.getSelection();
+        if(sel && sel.rangeCount && ed.contains(sel.getRangeAt(0).commonAncestorContainer)) saveRange();
+      });
+      /* Bilah alat: mousedown tombol tidak boleh mencuri seleksi editor;
+         seleksi selalu disnapshot agar perintah berlaku pada teks yang
+         dipilih pengguna, termasuk sesudah fokus berpindah ke select. */
+      bar.addEventListener("mousedown", function(e){
+        saveRange();
+        var t = e.target;
+        if(t && t.closest && t.closest("button")) e.preventDefault();
+      });
+      bar.addEventListener("click", function(e){
+        var t = e.target;
+        var b = (t && t.closest) ? t.closest("button[data-cmd]") : null;
+        if(!b) return;
+        var c = b.getAttribute("data-cmd");
+        if(c === "indentIn") edIndent(24);
+        else if(c === "indentOut") edIndent(-24);
+        else if(c === "hanging") edHangToggle();
+        else if(c === "removeFormat") edRemoveFormat();
+        else if(c.indexOf("justify") === 0){
+          /* Firefox (styleWithCSS mati) menulis perataan sebagai
+             atribut align=; normalkan ke style text-align agar
+             seragam dengan perintah blok lain dan dipertahankan
+             penyaring tempel (text-align ada di daftar putih blok). */
+          var blocks = leafBlocks();
+          cmd(c);
+          blocks.forEach(function(bl){
+            var al = bl.getAttribute("align");
+            if(al){ bl.style.textAlign = al; bl.removeAttribute("align"); }
+          });
+          syncFromEditor();
+        }
+        else cmd(c);
+      });
+      bar.addEventListener("change", function(e){
+        var t = e.target;
+        if(!t || !t.getAttribute) return;
+        var k = t.getAttribute("data-wied");
+        var v = t.value;
+        if(!k || !v) return;
+        if(k === "style"){ cmd("formatBlock", v); t.value = ""; }
+        else if(k === "font"){ cmdCss("fontName", v); }
+        else if(k === "size"){ applyFontSize(v); }
+        else if(k === "leading"){ blockStyle(function(b){ b.style.lineHeight = v; }); t.value = ""; }
+        else if(k === "spaceBefore"){ blockStyle(function(b){ b.style.marginTop = v + "pt"; }); t.value = ""; }
+        else if(k === "spaceAfter"){ blockStyle(function(b){ b.style.marginBottom = v + "pt"; }); t.value = ""; }
+        else if(k === "fore"){ cmdCss("foreColor", v); }
+        else if(k === "hilite"){ cmdCss("hiliteColor", v); }
+      });
+      /* ---------- "Lihat lokasi" (D5) di mode editor ----------
+         Penangan lama tetap berjalan (gerbang kejujuran + catatan +
+         kedip kartu); penangan ini menambahkan seleksi yang terlihat
+         di permukaan editor. Pemetaan offset global -> titik DOM
+         meniru persis serialisasi ED-CORE (unit, pemisah "\n\n",
+         br bantalan tidak dihitung, U+200B tidak dihitung). */
+      function edUnitNodes(){
+        var units = [];
+        var strayNodes = null;
+        function flushStray(){
+          if(strayNodes){
+            var lines = wiEdWalkInline(strayNodes, [""]);
+            if(/\S/.test(lines.join("\n"))) units.push({ nodes: strayNodes, phantomBr: null });
+            strayNodes = null;
+          }
+        }
+        function collect(node){
+          var kids = node.childNodes || [];
+          for(var i=0;i<kids.length;i++){
+            var k = kids[i];
+            if(wiEdIsBlock(k)){
+              flushStray();
+              if(WI_ED_CONTAINER_TAGS[k.tagName] && !WI_ED_BLOCK_TAGS[k.tagName]){ collect(k); continue; }
+              var sub = k.childNodes || [];
+              var hasBlock = false;
+              for(var j=0;j<sub.length;j++){ if(wiEdIsBlock(sub[j])){ hasBlock = true; break; } }
+              if(hasBlock){ collect(k); continue; }
+              var last = sub[sub.length-1];
+              units.push({ nodes: [k], phantomBr: (last && last.nodeType === 1 && last.tagName === "BR") ? last : null });
+            } else {
+              if(!strayNodes) strayNodes = [];
+              strayNodes.push(k);
+            }
+          }
+        }
+        collect(ed);
+        flushStray();
+        return units;
+      }
+      function edStreamSlots(){
+        var units = edUnitNodes();
+        var slots = [];
+        var endPoint = null;
+        function walkNode(n, phantom){
+          if(n.nodeType === 3){
+            var v = n.nodeValue || "";
+            for(var j=0;j<v.length;j++){
+              if(v.charAt(j) === "\u200B") continue;
+              slots.push({ node: n, off: j });
+            }
+            if(v.length) endPoint = { node: n, off: v.length };
+            return;
+          }
+          if(n.nodeType !== 1) return;
+          if(n.tagName === "BR"){
+            if(n === phantom) return;
+            var parent = n.parentNode;
+            if(!parent) return;
+            var idx = Array.prototype.indexOf.call(parent.childNodes, n);
+            slots.push({ node: parent, off: idx });
+            endPoint = { node: parent, off: idx + 1 };
+            return;
+          }
+          var kids = n.childNodes;
+          for(var i=0;i<kids.length;i++) walkNode(kids[i], phantom);
+        }
+        units.forEach(function(u, ui){
+          if(ui > 0 && endPoint) slots.push(endPoint, endPoint);
+          u.nodes.forEach(function(n){ walkNode(n, u.phantomBr); });
+          if(!endPoint && u.nodes.length) endPoint = { node: u.nodes[0], off: 0 };
+        });
+        slots.push(endPoint);
+        return slots;
+      }
+      function edLocate(id){
+        if(mode !== "editor") return;
+        if(typeof wiResult === "undefined" || !wiResult) return;
+        var s = null;
+        wiResult.suggestions.forEach(function(x){ if(x.id === id) s = x; });
+        if(!s) return;
+        if(ta.value !== wiJoin(wiResult.paragraphs, wiResult.separators)) return;
+        var base = 0;
+        for(var i=0;i<s.pIdx;i++)
+          base += wiResult.paragraphs[i].length + (wiResult.separators[i] ? wiResult.separators[i].length : 0);
+        var slots = edStreamSlots();
+        var a = slots[base + s.start], b = slots[base + s.end];
+        if(!a || !b) return;
+        var range = document.createRange();
+        try { range.setStart(a.node, a.off); range.setEnd(b.node, b.off); } catch(e) { return; }
+        var sel = window.getSelection();
+        sel.removeAllRanges(); sel.addRange(range);
+        var el = range.startContainer;
+        if(el && el.nodeType !== 1) el = el.parentNode;
+        while(el && el !== ed && !(el.nodeType === 1 && WI_ED_BLOCK_TAGS[el.tagName])) el = el.parentNode;
+        if(el && el.scrollIntoView) el.scrollIntoView({ block: "center" });
+        saveRange();
+      }
+      var reportEl = $("wi-report");
+      if(reportEl){
+        reportEl.addEventListener("click", function(e){
+          var t = e.target;
+          var b = (t && t.closest) ? t.closest("[data-wi-locate]") : null;
+          if(b) edLocate(b.getAttribute("data-wi-locate"));
+        });
+      }
+      /* ---------- Mode Editor | Teks polos ---------- */
+      var modeBtns = Array.prototype.slice.call(wrap.querySelectorAll("[data-wied-mode]"));
+      function setMode(m){
+        if(m === mode) return;
+        if(m === "plain") syncFromEditor();
+        mode = m;
+        var edOn = m === "editor";
+        bar.hidden = !edOn;
+        ed.hidden = !edOn;
+        ta.classList.toggle("wi-ed-off", edOn);
+        modeBtns.forEach(function(b){
+          var on = b.getAttribute("data-wied-mode") === m;
+          b.classList.toggle("is-on", on);
+          b.setAttribute("aria-pressed", on ? "true" : "false");
+        });
+        if(edOn){ renderFromBackbone(); ed.focus(); }
+        else ta.focus();
+      }
+      modeBtns.forEach(function(b){
+        b.addEventListener("click", function(){ setMode(b.getAttribute("data-wied-mode")); });
+      });
+      /* ---------- Mulai ---------- */
+      try { document.execCommand("styleWithCSS", false, false); } catch(e) {}
+      renderFromBackbone();
+      ta.classList.add("wi-ed-off");
     })();
   </script>
   </body>
