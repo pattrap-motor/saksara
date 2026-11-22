@@ -37,6 +37,16 @@ const wiSandbox = {};
 new Function("sandbox", wiCore + "\nsandbox.wiAnalyze = wiAnalyze;")(wiSandbox);
 const { wiAnalyze } = wiSandbox;
 
+/* REPORT-CORE (D5) diekstrak juga — lapisan presentasi laporan: fungsi
+   murni diBuildReport + peta kategori presentasi kind -> kategori. */
+const repRaw = html.split("REPORT-CORE-START")[1].split("/* REPORT-CORE-END */")[0];
+const repCore = repRaw.slice(repRaw.indexOf("*/") + 2);
+const repSandbox = {};
+new Function("sandbox", repCore +
+  "\nsandbox.diBuildReport = diBuildReport; sandbox.diReportCategoryForKind = diReportCategoryForKind;" +
+  " sandbox.DI_REPORT_CATEGORIES = DI_REPORT_CATEGORIES; sandbox.DI_REPORT_FALLBACK_CATEGORY = DI_REPORT_FALLBACK_CATEGORY;")(repSandbox);
+const { diBuildReport, diReportCategoryForKind, DI_REPORT_CATEGORIES, DI_REPORT_FALLBACK_CATEGORY } = repSandbox;
+
 const inflateRaw = (data) => zlib.inflateRawSync(Buffer.from(data.buffer, data.byteOffset, data.byteLength));
 const OPTS = { inflateRaw };
 const fx = (name) => new Uint8Array(fs.readFileSync(path.join(__dirname, "fixtures", name)));
@@ -898,6 +908,91 @@ function blockText(b) { return b.runs.filter(r => !r.protected).map(r => r.text)
     check("klon model mempertahankan styleId heading", diCloneModel(all).blocks[0].styleId === "BabKhusus");
     const pc = diCloneModel(p1);
     check("klon model parts.docx mempertahankan flags", eq(pc.flags, p1.flags), pc.flags);
+  }
+
+  console.log("45) D5 REPORT-CORE — diBuildReport: hitungan == sumber, kategori, kemurnian, lokasi, rekomendasi tertelusur");
+  {
+    const sug = (id, kind, certainty, pIdx, start, end, extra) =>
+      Object.assign({ id, kind, certainty, pIdx, start, end, original: "x", replacement: "y", explanation: "e" }, extra || {});
+    const analysis = {
+      paragraphs: ["Paragraf satu.", "Paragraf dua lebih panjang."],
+      separators: ["\n\n"],
+      truncated: false,
+      suggestions: [
+        sug("wi-1", "ejaan-mekanis", "pasti", 0, 0, 3),
+        sug("wi-2", "double-space", "pasti", 0, 5, 7),
+        sug("wi-3", "kata-depan", "saran", 1, 0, 2),
+        sug("wi-4", "kalimat-panjang", "gaya", 1, 0, 10, { replacement: null, advisory: true }),
+        sug("wi-5", "transisi-awalan", "gaya", 1, 12, 15, { replacement: null, advisory: true })
+      ]
+    };
+    const snapA = JSON.stringify(analysis);
+    const R = diBuildReport(analysis, {});
+    check("total == jumlah saran sumber", R.total === 5, R.total);
+    check("byCertainty [pasti,saran,potensial,gaya] == [2,1,0,2]", eq(R.byCertainty.map(c => c.count), [2, 1, 0, 2]), R.byCertainty);
+    check("tanpa keputusan: semua pending", eq(R.decisions, { accepted: 0, pending: 5, rejected: 0, read: 0 }), R.decisions);
+    check("kategori berurutan [Ejaan, Tata bahasa, Tanda baca & spasi, Kalimat]", eq(R.categories.map(c => c.name), ["Ejaan", "Tata bahasa", "Tanda baca & spasi", "Kalimat"]), R.categories.map(c => c.name));
+    check("jumlah per kategori == [1,1,1,2], total kategori == total", eq(R.categories.map(c => c.count), [1, 1, 1, 2]) && R.categories.reduce((a, c) => a + c.count, 0) === R.total);
+    const allItems = R.categories.reduce((a, c) => a.concat(c.items), []);
+    check("setiap saran muncul tepat satu kali (multiset id sama)", eq(allItems.map(i => i.id).sort(), ["wi-1", "wi-2", "wi-3", "wi-4", "wi-5"]));
+    const kalimat = R.categories.find(c => c.name === "Kalimat");
+    check("urutan sumber dipertahankan di dalam kategori", eq(kalimat.items.map(i => i.id), ["wi-4", "wi-5"]));
+    const it3 = allItems.find(i => i.id === "wi-3");
+    check("lokasi: paragraf dari pIdx (wi-3 -> Paragraf ke-2)", it3.paragraph === 2, it3.paragraph);
+    check("offset global = awal paragraf + start/end (wi-3 -> 16..18)", it3.globalStart === 16 && it3.globalEnd === 18, [it3.globalStart, it3.globalEnd]);
+    const it1 = allItems.find(i => i.id === "wi-1"), it4 = allItems.find(i => i.id === "wi-4");
+    check("canApply: non-penasihat true, penasihat false", it1.canApply === true && it4.canApply === false && it4.advisory === true);
+    check("rekomendasi Aturan pasti tertelusur ke hitungan (2 menunggu)", R.recommendations.some(r => r.indexOf("2 temuan Aturan pasti") === 12 || /Mulai dari 2 temuan Aturan pasti/.test(r)), R.recommendations);
+    check("rekomendasi penasihat tertelusur ke hitungan (2 saran)", R.recommendations.some(r => /^2 saran bersifat penasihat/.test(r)), R.recommendations);
+    check("masukan tidak berubah oleh builder (kemurnian)", JSON.stringify(analysis) === snapA);
+    check("deterministik: dua pembangunan deep-equal", eq(diBuildReport(analysis, {}), R));
+    const RB = diBuildReport(analysis, { acceptedIds: ["wi-1"], rejectedIds: ["wi-2", "wi-4"] });
+    check("keputusan: 1 diterima, 2 menunggu, 1 ditolak, 1 dibaca", eq(RB.decisions, { accepted: 1, pending: 2, rejected: 1, read: 1 }), RB.decisions);
+    const stB = {};
+    RB.categories.forEach(c => c.items.forEach(i => { stB[i.id] = i.state; }));
+    check("state per item meniru wiRender (accepted/rejected/read/pending)", stB["wi-1"] === "accepted" && stB["wi-2"] === "rejected" && stB["wi-4"] === "read" && stB["wi-3"] === "pending" && stB["wi-5"] === "pending", stB);
+    const kinds17 = ["repeated-word", "double-space", "missing-space-after-punctuation", "sentence-capital", "kata-tidak-baku", "kata-depan", "imbuhan", "tanda-baca", "huruf-kapital", "kata-ulang", "pemisahan-kata", "ejaan-mekanis", "kalimat-mubazir", "kalimat-pengulangan-frasa", "kalimat-kompleks", "kalimat-panjang", "transisi-awalan"];
+    const mapped = DI_REPORT_CATEGORIES.reduce((a, c) => a.concat(c.kinds), []);
+    check("peta presentasi memuat tepat 17 kind unik", mapped.length === 17 && new Set(mapped).size === 17, mapped.length);
+    check("ke-17 kind wiAnalyze terpetakan ke kategori bernama (bukan Lainnya)", kinds17.every(k => mapped.indexOf(k) >= 0 && diReportCategoryForKind(k) !== DI_REPORT_FALLBACK_CATEGORY));
+    check("kind asing -> kategori cadangan Lainnya", diReportCategoryForKind("jenis-belum-ada") === "Lainnya");
+    const R2 = diBuildReport({ paragraphs: ["A."], separators: [], truncated: false, suggestions: [sug("wi-9", "jenis-belum-ada", "saran", 0, 0, 1)] }, {});
+    check("laporan memuat Lainnya (terakhir) untuk kind asing", R2.categories.length === 1 && R2.categories[0].name === "Lainnya" && R2.categories[0].count === 1, R2.categories.map(c => c.name));
+    const docEx = { doc: {
+      name: "uji.docx",
+      stats: { blocks: 3, paragraphs: 3, headings: 0, listItems: 0, cells: 0, tables: 0, words: 20, chars: 100, protected: 1 },
+      assembly: { truncated: true, keptBlocks: 2, totalBlocks: 3 },
+      mapping: { "wi-1": { status: "applicable", blockIdx: 0 }, "wi-3": { status: "readonly", reason: "cross-run", reasonText: "saran melintasi batas potongan teks (run) di dalam dokumen" } },
+      appliedIds: ["wi-1"], refused: {}
+    } };
+    const snapDoc = JSON.stringify(docEx);
+    const RD = diBuildReport(analysis, docEx);
+    check("mode dokumen: coverage doc + terpotong + readonly 1 + diterapkan 1", RD.coverage.mode === "doc" && RD.coverage.docTruncated === true && RD.coverage.readonlyCount === 1 && RD.coverage.appliedToDoc === 1, RD.coverage);
+    const dItems = RD.categories.reduce((a, c) => a.concat(c.items), []);
+    const d1 = dItems.find(i => i.id === "wi-1"), d3 = dItems.find(i => i.id === "wi-3"), d4 = dItems.find(i => i.id === "wi-4");
+    check("status D3 diteruskan apa adanya (applicable/blockIdx/applied)", d1.doc.status === "applicable" && d1.doc.blockIdx === 0 && d1.doc.applied === true, d1.doc);
+    check("status D3 readonly + reasonText diteruskan apa adanya", d3.doc.status === "readonly" && d3.doc.reasonText.indexOf("melintasi batas") >= 0, d3.doc);
+    check("saran tanpa entri peta -> doc.status null (tidak dikarang)", d4.doc !== null && d4.doc.status === null, d4.doc);
+    check("rekomendasi readonly tertelusur (1 saran + alasan terbanyak)", RD.recommendations.some(r => /^Sebanyak 1 saran tidak dapat diterapkan otomatis/.test(r) && r.indexOf("melintasi batas") >= 0), RD.recommendations);
+    check("rekomendasi cakupan tertelusur (2 dari 3 blok)", RD.recommendations.some(r => r.indexOf("2 dari 3 blok") >= 0), RD.recommendations);
+    check("keterbatasan menyebut elemen terlindungi dari statistik (1)", RD.limitations.some(r => /^Sebanyak 1 elemen terlindungi/.test(r)), RD.limitations);
+    check("extras tidak berubah oleh builder", JSON.stringify(docEx) === snapDoc);
+    const R0 = diBuildReport({ paragraphs: [], separators: [], suggestions: [], truncated: false }, {});
+    check("analisis kosong -> laporan kosong yang sah", R0.total === 0 && R0.categories.length === 0 && eq(R0.byCertainty.map(c => c.count), [0, 0, 0, 0]) && R0.recommendations.length === 1 && R0.recommendations[0].indexOf("Tidak ada temuan") === 0, R0);
+    const shuffled = { paragraphs: analysis.paragraphs, separators: analysis.separators, truncated: false,
+      suggestions: [analysis.suggestions[4], analysis.suggestions[3]] };
+    const orderBefore = shuffled.suggestions.map(s => s.id).join(",");
+    const RS = diBuildReport(shuffled, {});
+    check("builder tidak mengurutkan ulang array sumber", shuffled.suggestions.map(s => s.id).join(",") === orderBefore &&
+      eq(RS.categories[0].items.map(i => i.id), ["wi-5", "wi-4"]), RS.categories.map(c => c.items.map(i => i.id)));
+    const real = wiAnalyze("Aktifitas ini di lakukan  setiap hari Senin.", {});
+    const RR = diBuildReport(real, {});
+    const joined = real.paragraphs.map((p, i) => p + (i < real.separators.length ? real.separators[i] : "")).join("");
+    check("integrasi wiAnalyze: total laporan == total saran nyata", RR.total === real.suggestions.length && RR.total > 0, [RR.total, real.suggestions.length]);
+    check("integrasi wiAnalyze: jumlah kategori == total", RR.categories.reduce((a, c) => a + c.count, 0) === RR.total);
+    check("integrasi wiAnalyze: rentang global menunjuk original persis", RR.categories.reduce((a, c) => a.concat(c.items), []).every(it => joined.slice(it.globalStart, it.globalEnd) === it.original));
+    const readEx = { score: 62, band: "Uji", words: 7, sentences: 1, paragraphs: 1, avgWordsPerSentence: 7, longShare: 0, denseParas: 0 };
+    check("readability diteruskan apa adanya (bukan skor baru)", eq(diBuildReport(real, { readability: readEx }).readability, readEx));
   }
 
   console.log("\nDI-CORE: " + pass + " lulus, " + fail + " gagal, total " + (pass + fail));

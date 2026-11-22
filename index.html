@@ -776,6 +776,22 @@
       .di-diff-tag{ display:inline-block; font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); margin-right:8px; }
       .wi-doc-diff del{ background:var(--red-bg); color:var(--red-ink); text-decoration:line-through; border-radius:3px; padding:0 2px; }
       .wi-doc-diff ins{ background:var(--grn-bg); color:var(--grn-ink); text-decoration:none; border-radius:3px; padding:0 2px; }
+      /* ---------- Document Intelligence (D5): Laporan Analisis terstruktur ---------- */
+      .wi-rep-sec{ margin-top:14px; }
+      .wi-rep-sec > h4{ margin:0 0 6px; font-size:15px; }
+      .wi-rep-details{ border-top:1px solid var(--line); padding:8px 0 2px; font-size:13.5px; }
+      .wi-rep-details summary{ cursor:pointer; font-weight:700; }
+      .wi-rep-row{ display:flex; flex-wrap:wrap; gap:4px 10px; align-items:baseline; padding:7px 0 7px 14px; border-bottom:1px solid var(--line-soft); font-size:13.5px; line-height:1.5; }
+      .wi-rep-row:last-child{ border-bottom:none; }
+      .wi-rep-loc{ color:var(--muted); font-size:12.5px; }
+      .wi-rep-state{ font-size:12.5px; font-weight:700; color:var(--gold-ink); }
+      .wi-rep-quote{ flex-basis:100%; font-family:"IBM Plex Mono", monospace; font-size:12.5px; background:var(--surface2); border:1px solid var(--line); border-radius:8px; padding:5px 9px; white-space:pre-wrap; word-break:break-word; }
+      .wi-rep-locate{ font-size:12.5px; padding:4px 12px; }
+      .wi-rep-note{ margin-top:10px; font-size:13.5px; color:var(--warn-ink); }
+      .wi-rep-note:empty{ display:none; }
+      .wi-rep-list{ margin:6px 0 0; padding-left:20px; }
+      .wi-rep-list li{ margin:5px 0; font-size:13.5px; line-height:1.6; }
+      .wi-card.flash{ outline:2px solid var(--gold-ink); outline-offset:2px; }
     </style>
   </head>
   <body>
@@ -1145,7 +1161,7 @@
       </section>
 
       <section class="tulis" id="tulis" data-view="tulis" hidden aria-labelledby="wi-judul">
-        <div class="kicker">Writing Intelligence</div>
+        <div class="kicker">Asisten Menulis Cerdas</div>
         <h2 id="wi-judul">Asisten Menulis</h2>
         <p class="sub">Rapikan tulisan Anda — kata yang terketik ganda, spasi dan tanda baca yang tidak rapi, huruf kapital, kata tidak baku, penulisan kata depan <em>di/ke</em> dan imbuhan <em>di-/ke-</em>, kata ulang, dan salah ketik mekanis — satu saran dalam satu waktu, dan <strong>Anda yang memutuskan</strong> saran mana yang diterima. Daftar kata bakunya merujuk <strong>EYD V dan KBBI</strong>. Pemeriksaan ini berbasis aturan dan daftar kata tertutup — <strong>bukan setara editor profesional</strong>: ia tidak memahami maksud kalimat secara mendalam, sehingga nama orang, tempat, merek, atau istilah asing kadang masih tertandai; untuk kata yang memang disengaja ada tombol <strong>Abaikan kata ini</strong> (hanya berlaku selama sesi ini, tidak disimpan). Saran adalah <strong>rekomendasi, bukan jaminan kebenaran</strong>: baca kembali hasil revisi sebelum memakainya. Teks diproses <strong>sepenuhnya di peramban ini</strong> — tidak dikirim ke server dan tidak disimpan, dan teks asli Anda tidak pernah ditimpa. Saran tingkat kalimat — kata mubazir, kalimat yang panjang atau kompleks, pengulangan frasa, dan awalan kalimat yang monoton — bersifat <strong>heuristik pola</strong>: pemeriksa <strong>tidak memahami makna</strong> kalimat Anda, dan kalimat panjang <strong>tidak otomatis salah</strong>. Saran kata mubazir hanya menghapus kata yang terbukti berlebih atau menukar frasa <em>melakukan …</em> menjadi kata kerja satu akarnya; istilah, nama, angka, kutipan, dan sitasi tidak pernah diubah oleh saran mana pun.</p>
         <div class="panel" id="wi-panel-input">
@@ -1185,6 +1201,11 @@
         </div>
 
         <div id="wi-results" hidden>
+          <div class="wf-panel" id="wi-report" hidden>
+            <h3>Laporan Analisis</h3>
+            <div id="wi-report-body"></div>
+            <p class="wi-rep-note" id="wi-report-note" role="status" aria-live="polite"></p>
+          </div>
           <div class="wf-panel">
             <h3>Saran perbaikan</h3>
             <div class="file-status" id="wi-status" role="status" aria-live="polite"></div>
@@ -1227,7 +1248,7 @@
         </div>
 
         <div class="wf-panel wi-style-panel">
-          <h3>Kontrol Gaya Tulisan</h3>
+          <h3>Pengaturan Gaya Tulisan</h3>
           <p class="wf-note">Pilih profil sebagai <strong>konteks pemeriksaan</strong> — bukan klasifikasi: satu tulisan dapat menunjukkan karakteristik beberapa gaya sekaligus, dan <strong>tidak ada gaya yang lebih baik dari gaya lainnya</strong>. Analisis ini bekerja dengan <strong>pencocokan pola terhadap daftar kata dan frasa kurasi</strong>, bukan pemahaman makna: hasilnya adalah temuan untuk Anda pertimbangkan sendiri. Tidak ada kata yang diganti otomatis, tidak ada teks yang diubah, dan teks tidak dikirim ke server maupun disimpan.</p>
           <div class="wi-controls">
             <label for="wi-style-profile">Profil acuan</label>
@@ -1247,7 +1268,7 @@
       </section>
 
       <section class="forensik" id="forensik" data-view="forensik" hidden aria-labelledby="wf-judul">
-        <div class="kicker">Writing Forensic</div>
+        <div class="kicker">Analisis Forensik Tulisan</div>
         <h2 id="wf-judul">Kenali gaya tulisan Anda</h2>
         <div class="mode-toggle" role="group" aria-label="Tingkat tampilan"><span>Tampilan:</span><button type="button" class="mt-btn" data-mode="simple" aria-pressed="true">Sederhana</button><button type="button" class="mt-btn" data-mode="deep" aria-pressed="false">Mendalam</button><span class="mt-note">Mode Mendalam menampilkan seluruh angka &amp; rincian teknis.</span></div>
         <p class="sub">Ukur karakteristik gaya sebuah teks — keragaman kosakata, ritme kalimat, kompleksitas struktur, konsistensi paragraf, kata transisi, dan pengulangan — dihitung sepenuhnya di peramban ini. Modul ini <strong>bukan detektor AI</strong>: hasilnya adalah statistik deskriptif untuk penyuntingan dan pembelajaran menulis, <strong>bukan bukti siapa penulisnya</strong>, dan tidak memengaruhi skor Detector.</p>
@@ -1307,9 +1328,9 @@
       </section>
 
       <section class="compare" id="compare" data-view="compare" hidden aria-labelledby="cmp-judul">
-        <p class="wf-kicker">Compare Writing</p>
+        <p class="wf-kicker">Bandingkan Tulisan</p>
         <h2 id="cmp-judul">Bandingkan dua tulisan</h2>
-        <p class="wf-lede">Lihat persis apa yang berubah antara dua versi teks — kata, kalimat, dan paragraf yang ditambah, dihapus, berubah, atau berpindah urutan — beserta perbandingan karakteristik Writing Forensic keduanya. Perbandingan ini <strong>deskriptif</strong>: kemiripan tekstual <strong>bukan</strong> bukti penulis yang sama, dan perubahan karakteristik <strong>bukan</strong> bukti AI atau bukti mengakali deteksi. Halaman ini tidak menjalankan Detector dan tidak menampilkan skor deteksi apa pun.</p>
+        <p class="wf-lede">Lihat persis apa yang berubah antara dua versi teks — kata, kalimat, dan paragraf yang ditambah, dihapus, berubah, atau berpindah urutan — beserta perbandingan karakteristik Analisis Forensik Tulisan keduanya. Perbandingan ini <strong>deskriptif</strong>: kemiripan tekstual <strong>bukan</strong> bukti penulis yang sama, dan perubahan karakteristik <strong>bukan</strong> bukti AI atau bukti mengakali deteksi. Halaman ini tidak menjalankan Detector dan tidak menampilkan skor deteksi apa pun.</p>
         <div class="cmp-grid">
           <div class="wf-panel cmp-panel">
             <h3>Dokumen A</h3>
@@ -1361,8 +1382,8 @@
               <div class="cmp-legend"><span><span class="d-badge badge-add">＋ TAMBAH</span> kata/kalimat/paragraf baru di B</span><span><span class="d-badge badge-del">− HAPUS</span> ada di A, hilang di B</span><span><span class="d-badge badge-chg">≈ BERUBAH</span> pasangan yang berbeda isi</span></div>
             </div>
             <div class="wf-panel">
-              <h3>Perbandingan karakteristik (Writing Forensic)</h3>
-              <p class="wf-note">Angka dihitung dengan fungsi Writing Forensic yang sama persis. Kolom selisih bersifat deskriptif netral — naik/turunnya sebuah angka bukan penilaian baik-buruk dan bukan bukti perbedaan penulis.</p>
+              <h3>Perbandingan karakteristik (Analisis Forensik Tulisan)</h3>
+              <p class="wf-note">Angka dihitung dengan fungsi Analisis Forensik Tulisan yang sama persis. Kolom selisih bersifat deskriptif netral — naik/turunnya sebuah angka bukan penilaian baik-buruk dan bukan bukti perbedaan penulis.</p>
               <div id="cmp-forensic"></div>
             </div>
             <div class="wf-panel">
@@ -7291,11 +7312,174 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
     }
     /* DI-CORE-END */
 
+    /* REPORT-CORE-START — Lapisan presentasi laporan (D5): fungsi MURNI
+       pembangun model Laporan Analisis dari hasil wiAnalyze yang sudah
+       ada. Blok ini berdiri di lapisan presentasi, BUKAN bagian inti
+       dokumen dan BUKAN bagian inti penulisan: ia tidak mengubah model
+       dokumen, pemetaan saran D3, penerapan aman, atau hasil analisis;
+       ia hanya menyusun ulang data yang sudah dihitung menjadi data
+       presentasi (hitungan, kelompok kategori, lokasi, rekomendasi
+       turunan hitungan). Tanpa DOM, tanpa efek samping, deterministik:
+       masukan tidak pernah diubah, urutan saran sumber tidak pernah
+       diurutkan ulang, dan setiap saran muncul tepat satu kali pada
+       keluarannya. */
+    var DI_REPORT_CATEGORIES = [
+      { name: "Ejaan", kinds: ["ejaan-mekanis", "kata-tidak-baku", "huruf-kapital", "sentence-capital"] },
+      { name: "Tata bahasa", kinds: ["kata-depan", "imbuhan", "pemisahan-kata", "kata-ulang"] },
+      { name: "Tanda baca & spasi", kinds: ["tanda-baca", "double-space", "missing-space-after-punctuation"] },
+      { name: "Redundansi", kinds: ["repeated-word", "kalimat-mubazir"] },
+      { name: "Kalimat", kinds: ["kalimat-kompleks", "kalimat-panjang", "kalimat-pengulangan-frasa", "transisi-awalan"] }
+    ];
+    var DI_REPORT_FALLBACK_CATEGORY = "Lainnya";
+    var DI_REPORT_CERTAINTIES = ["pasti", "saran", "potensial", "gaya"];
+    function diReportCategoryForKind(kind){
+      for(var i = 0; i < DI_REPORT_CATEGORIES.length; i++)
+        if(DI_REPORT_CATEGORIES[i].kinds.indexOf(kind) >= 0) return DI_REPORT_CATEGORIES[i].name;
+      return DI_REPORT_FALLBACK_CATEGORY;
+    }
+    /* diBuildReport(analysis, extras) — pembangun model laporan.
+       analysis: keluaran wiAnalyze apa adanya { paragraphs, separators,
+       suggestions, truncated }.
+       extras (semua opsional; data polos yang diserahkan lapisan UI):
+         acceptedIds: [id...], rejectedIds: [id...],
+         readability: { score, band, words, sentences, paragraphs,
+           avgWordsPerSentence, longShare, denseParas } | null,
+         doc: { name, stats, assembly: { truncated, keptBlocks,
+           totalBlocks }, mapping: { id: hasil pemetaan D3 },
+           appliedIds: [id...], refused: { id: teks alasan } } | null.
+       Keadaan keputusan meniru persis penghitungan wiRender: saran yang
+       ditolak terhitung "rejected" (atau "read" bila penasihat); saran
+       non-penasihat yang diterima terhitung "accepted"; sisanya
+       "pending". Rekomendasi HANYA diturunkan dari hitungan yang ada. */
+    function diBuildReport(analysis, extras){
+      extras = extras || {};
+      var suggestions = (analysis && analysis.suggestions) || [];
+      var paras = (analysis && analysis.paragraphs) || [];
+      var seps = (analysis && analysis.separators) || [];
+      var accepted = {};
+      (extras.acceptedIds || []).forEach(function(id){ accepted[id] = 1; });
+      var rejected = {};
+      (extras.rejectedIds || []).forEach(function(id){ rejected[id] = 1; });
+      var doc = extras.doc || null;
+      var mapping = doc && doc.mapping ? doc.mapping : null;
+      var applied = {};
+      if(doc && doc.appliedIds) doc.appliedIds.forEach(function(id){ applied[id] = 1; });
+      /* Offset global tiap paragraf di dalam teks gabungan: penggabungan
+         paragraf+pemisah mereproduksi persis string yang dianalisis,
+         jadi rentang global saran = awal paragraf + (start..end) saran. */
+      var paraStart = [], acc = 0;
+      paras.forEach(function(p, i){
+        paraStart.push(acc);
+        acc += p.length + (i < seps.length ? String(seps[i] == null ? "" : seps[i]).length : 0);
+      });
+      var byCertainty = { "pasti": 0, "saran": 0, "potensial": 0, "gaya": 0 };
+      var pendingCertainty = { "pasti": 0, "saran": 0, "potensial": 0, "gaya": 0 };
+      var decisions = { accepted: 0, pending: 0, rejected: 0, read: 0 };
+      var groups = {};
+      var readonlyReasons = {}, readonlyTotal = 0, advisoryCount = 0;
+      suggestions.forEach(function(s){
+        if(Object.prototype.hasOwnProperty.call(byCertainty, s.certainty)) byCertainty[s.certainty]++;
+        var state;
+        if(rejected[s.id]) state = s.advisory ? "read" : "rejected";
+        else if(!s.advisory && accepted[s.id]) state = "accepted";
+        else state = "pending";
+        decisions[state]++;
+        if(state === "pending" && Object.prototype.hasOwnProperty.call(pendingCertainty, s.certainty)) pendingCertainty[s.certainty]++;
+        if(s.advisory) advisoryCount++;
+        var item = {
+          id: s.id, kind: s.kind, certainty: s.certainty,
+          paragraph: (typeof s.pIdx === "number" ? s.pIdx : 0) + 1,
+          original: s.original,
+          advisory: !!s.advisory,
+          canApply: !s.advisory && typeof s.replacement === "string",
+          state: state,
+          globalStart: (typeof s.pIdx === "number" && paraStart[s.pIdx] != null ? paraStart[s.pIdx] : 0) + (s.start || 0),
+          globalEnd: (typeof s.pIdx === "number" && paraStart[s.pIdx] != null ? paraStart[s.pIdx] : 0) + (s.end || 0),
+          doc: null
+        };
+        if(doc){
+          var m = mapping ? mapping[s.id] : null;
+          item.doc = {
+            status: m ? (m.status || null) : null,
+            reason: m ? (m.reason || null) : null,
+            reasonText: m ? (m.reasonText || null) : null,
+            blockIdx: m && typeof m.blockIdx === "number" ? m.blockIdx : null,
+            applied: !!applied[s.id],
+            refused: doc.refused && doc.refused[s.id] ? doc.refused[s.id] : null
+          };
+          if(m && m.status === "readonly"){
+            var rt = m.reasonText || m.reason || "readonly";
+            readonlyReasons[rt] = (readonlyReasons[rt] || 0) + 1;
+            readonlyTotal++;
+          }
+        }
+        var catName = diReportCategoryForKind(s.kind);
+        if(!groups[catName]) groups[catName] = { byCertainty: { "pasti": 0, "saran": 0, "potensial": 0, "gaya": 0 }, items: [] };
+        groups[catName].items.push(item);
+        if(Object.prototype.hasOwnProperty.call(groups[catName].byCertainty, s.certainty)) groups[catName].byCertainty[s.certainty]++;
+      });
+      var categories = [];
+      function pushCategory(name){
+        if(!groups[name]) return;
+        categories.push({ name: name, count: groups[name].items.length, byCertainty: groups[name].byCertainty, items: groups[name].items });
+      }
+      DI_REPORT_CATEGORIES.forEach(function(c){ pushCategory(c.name); });
+      pushCategory(DI_REPORT_FALLBACK_CATEGORY);
+      /* Rekomendasi: hanya kalimat yang dapat ditelusur ke hitungan di atas. */
+      var recommendations = [];
+      if(suggestions.length === 0){
+        recommendations.push("Tidak ada temuan pada teks ini. Pemeriksa bekerja dengan aturan dan daftar kata tertutup, jadi teks tetap perlu dibaca kembali secara manual.");
+      }
+      if(pendingCertainty.pasti > 0)
+        recommendations.push("Mulai dari " + pendingCertainty.pasti + " temuan Aturan pasti yang masih menunggu keputusan — temuan ini mengikuti aturan tulis baku dan perbaikannya bersifat mekanis.");
+      if(doc && readonlyTotal > 0){
+        var topReason = null, topCount = 0;
+        Object.keys(readonlyReasons).forEach(function(k){ if(readonlyReasons[k] > topCount){ topCount = readonlyReasons[k]; topReason = k; } });
+        recommendations.push("Sebanyak " + readonlyTotal + " saran tidak dapat diterapkan otomatis ke dokumen kerja (alasan terbanyak: " + topReason + ") — terapkan perbaikannya secara manual pada dokumen bila Anda setuju.");
+      }
+      if(doc && doc.assembly && doc.assembly.truncated)
+        recommendations.push("Dokumen terpotong pada batas blok (" + doc.assembly.keptBlocks + " dari " + doc.assembly.totalBlocks + " blok yang dianalisis) — periksa blok selebihnya secara terpisah agar seluruh dokumen tertinjau.");
+      if(advisoryCount > 0)
+        recommendations.push(advisoryCount + " saran bersifat penasihat (kalimat panjang, kalimat kompleks, pengulangan frasa, transisi antarkalimat) — saran ini tidak mengubah teks dan hanya untuk Anda pertimbangkan.");
+      var limitations = [
+        "Pemeriksa ini bekerja dengan aturan dan daftar kata tertutup — tidak semua kesalahan tertangkap, dan teks tetap perlu dibaca kembali secara manual.",
+        "Skor keterbacaan adalah indikator statistik internal Saksara — bukan penilaian ilmiah tervalidasi, bukan penilaian akademik, dan bukan ukuran mutlak kualitas tulisan."
+      ];
+      if(doc && doc.stats && doc.stats.protected > 0)
+        limitations.push("Sebanyak " + doc.stats.protected + " elemen terlindungi pada dokumen (rumus, kolom isian, gambar) tidak ikut dianalisis dan tidak pernah diubah.");
+      if(doc)
+        limitations.push("Lokasi temuan menunjuk teks hasil impor di kotak masukan, bukan berkas asli Anda.");
+      return {
+        total: suggestions.length,
+        byCertainty: DI_REPORT_CERTAINTIES.map(function(k){ return { key: k, count: byCertainty[k] }; }),
+        decisions: decisions,
+        categories: categories,
+        readability: extras.readability || null,
+        coverage: {
+          mode: doc ? "doc" : "text",
+          paragraphs: paras.length,
+          analyzedChars: acc,
+          analysisTruncated: !!(analysis && analysis.truncated),
+          docName: doc ? (doc.name || null) : null,
+          docStats: doc ? (doc.stats || null) : null,
+          docTruncated: doc && doc.assembly ? !!doc.assembly.truncated : false,
+          keptBlocks: doc && doc.assembly ? doc.assembly.keptBlocks : null,
+          totalBlocks: doc && doc.assembly ? doc.assembly.totalBlocks : null,
+          appliedToDoc: doc ? (doc.appliedIds || []).length : 0,
+          readonlyCount: readonlyTotal
+        },
+        recommendations: recommendations,
+        limitations: limitations
+      };
+    }
+    /* REPORT-CORE-END */
+
     /* Writing Intelligence — render & interaksi (DOM). */
     var WI_KIND_LABEL = { "repeated-word": "Kata berulang", "double-space": "Spasi tidak rapi", "missing-space-after-punctuation": "Spasi hilang setelah tanda baca", "sentence-capital": "Huruf awal kalimat", "kata-tidak-baku": "Kata tidak baku", "kata-depan": "Kata depan di/ke", "imbuhan": "Imbuhan di-/ke-", "tanda-baca": "Tanda baca", "huruf-kapital": "Huruf kapital", "kata-ulang": "Kata ulang", "pemisahan-kata": "Pemisahan kata", "ejaan-mekanis": "Ejaan", "kalimat-mubazir": "Kata mubazir", "kalimat-pengulangan-frasa": "Pengulangan frasa", "kalimat-kompleks": "Kalimat kompleks", "kalimat-panjang": "Kalimat panjang", "transisi-awalan": "Transisi antarkalimat" };
     var WI_CERT_LABEL = { "pasti": "Aturan pasti", "saran": "Saran", "potensial": "Masalah potensial", "gaya": "Saran gaya" };
     var wiTa = $("wi-input");
     var wiResult = null, wiAccepted = [], wiRejected = {};
+    var wiReportHook = null; /* D5: diisi blok Document Intelligence — render Laporan Analisis setiap wiRender selesai. */
     var wiIgnored = [];
     function wiShowError(msg){
       var b = $("wi-error");
@@ -7360,6 +7544,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       $("wi-undo").disabled = wiAccepted.length === 0;
       $("wi-accept-all").disabled = pendingRep === 0;
       $("wi-reset").disabled = wiAccepted.length === 0 && rejected === 0 && read === 0;
+      if(wiReportHook) wiReportHook(); /* D5: Laporan Analisis mengikuti hasil & keputusan yang baru digambar. */
     }
     function wiRenderIgnored(){
       var box = $("wi-ignored");
@@ -8370,6 +8555,193 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       if(statusEl && typeof MutationObserver === "function")
         new MutationObserver(function(){ diResetD4(); }).observe(statusEl, { childList: true });
       diRefreshD4Controls();
+
+      /* ================= Document Intelligence (D5): Laporan Analisis =================
+         Panel #wi-report menampilkan ringkasan terstruktur dari hasil
+         wiAnalyze yang SUDAH ada. Model laporan dibangun fungsi murni
+         diBuildReport (blok REPORT-CORE, lapisan presentasi) dari
+         wiResult + data polos: keputusan pengguna, keterbacaan yang
+         di-cache per objek hasil, dan keadaan dokumen D3. Laporan adalah
+         INDEKS di atas daftar kartu — kartu tidak pernah diurutkan
+         ulang, dipindah, atau digambar ulang oleh bagian ini; alasan
+         lengkap dan tombol Terima/Tolak tetap hanya ada di kartu.
+         Render dipicu satu baris panggilan di akhir wiRender lewat
+         wiReportHook. Seluruh teks pengguna/dokumen digambar lewat
+         escapeHtml/wiShowWs. Tidak ada isi dokumen yang disimpan atau
+         dikirim ke mana pun. */
+      var diReportEl = $("wi-report"), diReportBody = $("wi-report-body"), diReportNote = $("wi-report-note");
+      var diReportModel = null;      /* model laporan terakhir — sumber data navigasi lokasi */
+      var diReportReadFor = null, diReportRead = null; /* cache wiReadability per objek wiResult */
+      var DI_REPORT_STATE_TEXT = { accepted: "Diterima", pending: "Menunggu keputusan", rejected: "Ditolak", read: "Sudah dibaca" };
+      /* Keadaan kelompok kategori yang sedang terbuka dipertahankan
+         lintas render ulang (render mengikuti setiap keputusan, dan
+         membuka kelompok adalah tindakan membaca, bukan keputusan). */
+      var prevOpen = [];
+      function diReportDocStatusText(item){
+        var d = item.doc;
+        if(!d || item.advisory) return "";
+        if(d.refused) return "Penerapan ke dokumen ditolak — " + d.refused + ".";
+        if(d.applied) return "Diterapkan ke dokumen kerja";
+        if(d.status === "applicable") return "Dapat diterapkan ke dokumen kerja";
+        if(d.status === "readonly") return "Tidak diterapkan ke dokumen — " + (d.reasonText || d.reason || "") + ".";
+        return "";
+      }
+      function diRenderReport(){
+        if(!diReportEl || !diReportBody) return;
+        if(!wiResult){ diReportEl.hidden = true; diReportBody.innerHTML = ""; diReportModel = null; return; }
+        if(diReportReadFor !== wiResult){
+          diReportRead = wiReadability(wiJoin(wiResult.paragraphs, wiResult.separators));
+          diReportReadFor = wiResult;
+        }
+        var ex = { acceptedIds: wiAccepted.slice(), rejectedIds: Object.keys(wiRejected), readability: null, doc: null };
+        if(diReportRead && !diReportRead.empty){
+          ex.readability = { score: diReportRead.score, band: diReportRead.band, words: diReportRead.words,
+            sentences: diReportRead.sentences, paragraphs: diReportRead.paragraphs,
+            avgWordsPerSentence: diReportRead.avgWordsPerSentence, longShare: diReportRead.longShare,
+            denseParas: diReportRead.denseParas.length };
+        }
+        if(wiDocState){
+          diEnsureMapping();
+          ex.doc = { name: wiDocState.name, stats: diModelStats(wiDocState.model),
+            assembly: { truncated: !!wiDocState.assembly.truncated, keptBlocks: wiDocState.assembly.keptBlocks, totalBlocks: wiDocState.assembly.totalBlocks },
+            mapping: diMapping, appliedIds: diAppliedIds.slice(), refused: diRefused };
+        }
+        var R = diBuildReport(wiResult, ex);
+        diReportModel = R;
+        diReportNote.textContent = "";
+        prevOpen = [];
+        diReportBody.querySelectorAll(".wi-rep-details").forEach(function(d){ prevOpen.push(d.open); });
+        var h = "";
+        /* A — Ringkasan dokumen */
+        h += "<div class=\"wi-rep-sec\"><h4>Ringkasan dokumen</h4><div class=\"wi-read-stats\">";
+        if(R.coverage.mode === "doc") h += "<div><dt>Dokumen</dt><dd>" + escapeHtml(R.coverage.docName || "") + "</dd></div>";
+        h += "<div><dt>Total temuan</dt><dd>" + fmtNumID(R.total) + "</dd></div>";
+        h += "<div><dt>Paragraf dianalisis</dt><dd>" + fmtNumID(R.coverage.paragraphs) + "</dd></div>";
+        h += "<div><dt>Karakter dianalisis</dt><dd>" + fmtNumID(R.coverage.analyzedChars) + "</dd></div>";
+        if(R.coverage.mode === "doc" && R.coverage.docStats){
+          var st = R.coverage.docStats;
+          h += "<div><dt>Blok dokumen</dt><dd>" + fmtNumID(st.blocks) + "</dd></div>";
+          h += "<div><dt>Kata pada dokumen</dt><dd>" + fmtNumID(st.words) + "</dd></div>";
+          if(st.headings) h += "<div><dt>Judul</dt><dd>" + fmtNumID(st.headings) + "</dd></div>";
+          if(st.tables) h += "<div><dt>Tabel</dt><dd>" + fmtNumID(st.tables) + "</dd></div>";
+          if(typeof st.pages === "number" && st.pages > 0) h += "<div><dt>Halaman</dt><dd>" + fmtNumID(st.pages) + "</dd></div>";
+          h += "<div><dt>Diterapkan ke dokumen kerja</dt><dd>" + fmtNumID(R.coverage.appliedToDoc) + "</dd></div>";
+        }
+        h += "</div>";
+        h += "<p class=\"wf-note\">Berdasarkan tingkat kepastian: " + R.byCertainty.map(function(c){ return (WI_CERT_LABEL[c.key] || c.key) + " " + fmtNumID(c.count); }).join(" · ") + ".</p>";
+        var dec = [fmtNumID(R.decisions.accepted) + " diterima", fmtNumID(R.decisions.pending) + " menunggu keputusan"];
+        if(R.decisions.rejected) dec.push(fmtNumID(R.decisions.rejected) + " ditolak");
+        if(R.decisions.read) dec.push(fmtNumID(R.decisions.read) + " ditandai sudah dibaca");
+        h += "<p class=\"wf-note\">Keputusan Anda sejauh ini: " + dec.join(", ") + ".</p>";
+        if(R.coverage.docTruncated) h += "<p class=\"wf-note\">Cakupan: dokumen dipotong pada batas blok — " + fmtNumID(R.coverage.keptBlocks) + " dari " + fmtNumID(R.coverage.totalBlocks) + " blok teks pertama yang dianalisis; blok selebihnya belum dianalisis.</p>";
+        if(R.coverage.analysisTruncated) h += "<p class=\"wf-note\">Cakupan: analisis internal terpotong pada batas 50.000 karakter.</p>";
+        if(R.coverage.mode === "doc" && R.coverage.docStats && R.coverage.docStats.protected > 0)
+          h += "<p class=\"wf-note\">Sebanyak " + fmtNumID(R.coverage.docStats.protected) + " elemen terlindungi (rumus, kolom isian, gambar) tidak ikut dianalisis.</p>";
+        h += "</div>";
+        /* B — Ringkasan kualitas: skor keterbacaan yang sudah ada, apa adanya */
+        if(R.readability){
+          var rd = R.readability;
+          h += "<div class=\"wi-rep-sec\"><h4>Ringkasan kualitas — keterbacaan</h4>"
+            + "<div class=\"wi-read-score\"><div class=\"wi-read-num\">" + rd.score + "</div><div><div class=\"wi-read-band\">" + escapeHtml(rd.band) + "</div>"
+            + "<div class=\"wi-read-expl\">Indikator keterbacaan internal Saksara untuk teks yang dianalisis.</div></div></div>"
+            + "<div class=\"wi-read-stats\">"
+            + "<div><dt>Rata-rata kata per kalimat</dt><dd>" + String(rd.avgWordsPerSentence).replace(".", ",") + "</dd></div>"
+            + "<div><dt>Kalimat &gt; 40 kata</dt><dd>" + String(rd.longShare).replace(".", ",") + "%</dd></div>"
+            + "<div><dt>Paragraf padat</dt><dd>" + fmtNumID(rd.denseParas) + "</dd></div>"
+            + "<div><dt>Kalimat</dt><dd>" + fmtNumID(rd.sentences) + "</dd></div>"
+            + "</div>"
+            + "<p class=\"wf-note\">Skor ini adalah indikator statistik internal/heuristik — <strong>bukan penilaian akademik, bukan penilaian ilmiah tervalidasi, dan bukan ukuran mutlak kualitas tulisan</strong>. Rincian lengkapnya ada di panel Analisis Keterbacaan.</p></div>";
+        }
+        /* C — Indeks temuan per kategori (ringkasan navigasi di atas kartu) */
+        h += "<div class=\"wi-rep-sec\"><h4>Indeks temuan berdasarkan kategori</h4>";
+        if(R.total === 0) h += "<div class=\"wi-empty\">Tidak ditemukan saran untuk teks ini.</div>";
+        R.categories.forEach(function(cat, ci){
+          var sub = R.byCertainty.map(function(c){ return { label: WI_CERT_LABEL[c.key] || c.key, n: cat.byCertainty[c.key] || 0 }; })
+            .filter(function(x){ return x.n > 0; })
+            .map(function(x){ return x.label + " " + fmtNumID(x.n); }).join(" · ");
+          h += "<details class=\"wi-rep-details\"" + (prevOpen[ci] ? " open" : "") + "><summary>" + escapeHtml(cat.name) + " — " + fmtNumID(cat.count) + " temuan" + (sub ? " (" + sub + ")" : "") + "</summary>";
+          cat.items.forEach(function(item){
+            var docTxt = diReportDocStatusText(item);
+            h += "<div class=\"wi-rep-row\">"
+              + "<span class=\"wi-kind\">" + escapeHtml(WI_KIND_LABEL[item.kind] || item.kind) + "</span>"
+              + "<span class=\"wi-cert\">" + escapeHtml(WI_CERT_LABEL[item.certainty] || item.certainty) + "</span>"
+              + "<span class=\"wi-rep-loc\">Paragraf ke-" + fmtNumID(item.paragraph) + "</span>"
+              + "<span class=\"wi-rep-state\">" + (DI_REPORT_STATE_TEXT[item.state] || item.state) + "</span>"
+              + (item.advisory ? "<span class=\"wi-rep-loc\">Saran penasihat — tidak mengubah teks</span>" : "")
+              + (docTxt ? "<span class=\"wi-rep-loc\">" + escapeHtml(docTxt) + "</span>" : "")
+              + "<button type=\"button\" class=\"wi-rep-locate\" data-wi-locate=\"" + item.id + "\">Lihat lokasi</button>"
+              + "<span class=\"wi-rep-quote\">" + wiShowWs(item.original) + "</span>"
+              + "</div>";
+          });
+          h += "</details>";
+        });
+        h += "<p class=\"wf-note\">Indeks ini hanya ringkasan navigasi — alasan lengkap dan tombol Terima/Tolak tetap ada pada kartu saran di bawah, dalam urutan dokumen yang sama.</p></div>";
+        /* E — Rekomendasi turunan hitungan + keterbatasan */
+        h += "<div class=\"wi-rep-sec\"><h4>Rekomendasi</h4><ul class=\"wi-rep-list\">";
+        R.recommendations.forEach(function(r){ h += "<li>" + escapeHtml(r) + "</li>"; });
+        h += "</ul><h4>Keterbatasan analisis</h4><ul class=\"wi-rep-list\">";
+        R.limitations.forEach(function(r){ h += "<li>" + escapeHtml(r) + "</li>"; });
+        h += "</ul></div>";
+        diReportBody.innerHTML = h;
+        diReportEl.hidden = false;
+      }
+      /* Navigasi lokasi: jujur atau tidak sama sekali. Offset global dari
+         model laporan hanya dipakai bila isi textarea saat klik PERSIS
+         sama dengan teks yang dianalisis; bila teks sudah berubah,
+         navigasi ditolak dengan pemberitahuan — tidak ada navigasi semu,
+         dan teks pengguna tidak pernah diubah oleh bagian ini. */
+      function diLocateFinding(id){
+        if(!wiResult || !diReportModel) return;
+        var item = null;
+        diReportModel.categories.forEach(function(cat){ cat.items.forEach(function(it){ if(it.id === id) item = it; }); });
+        if(!item) return;
+        if(ta.value !== wiJoin(wiResult.paragraphs, wiResult.separators)){
+          diReportNote.textContent = "Teks telah berubah sejak analisis terakhir — lokasi temuan tidak lagi dijamin tepat. Jalankan Analisis ulang agar lokasi temuan akurat.";
+          return;
+        }
+        diReportNote.textContent = "";
+        ta.focus();
+        try { ta.setSelectionRange(item.globalStart, item.globalEnd); } catch(e) {}
+        if(typeof ta.scrollIntoView === "function") ta.scrollIntoView({ block: "center" });
+        var s = null;
+        wiResult.suggestions.forEach(function(x){ if(x.id === id) s = x; });
+        var card = s ? diCardFor(s) : null;
+        if(card){
+          card.classList.add("flash");
+          setTimeout(function(){ card.classList.remove("flash"); }, 2000);
+        }
+      }
+      if(diReportEl){
+        diReportEl.addEventListener("click", function(ev){
+          var t = ev.target;
+          var b = (t && t.closest) ? t.closest("[data-wi-locate]") : null;
+          if(b) diLocateFinding(b.getAttribute("data-wi-locate"));
+        });
+      }
+      wiReportHook = diRenderReport;
+      /* Sinkronisasi keadaan dokumen D3: wiRender berjalan SEBELUM
+         listener D3 pada klik yang sama, jadi penerapan ke dokumen
+         kerja (yang mengubah diAppliedIds/diRefused sesudah render)
+         tidak terlihat oleh render laporan pada klik itu. Dua sinyal
+         DOM menutup celahnya: setiap mutasi diAppliedIds di D3 selalu
+         diikuti diUpdateDocCount (penghitung #wi-doc-count berubah),
+         dan setiap perubahan lencana — termasuk penolakan penerapan —
+         mengubah subtree daftar kartu. Keduanya memicu render ulang
+         laporan di sini. Pintu kejujuran yang sama dengan navigasi
+         dipakai: render ulang hanya bila isi textarea masih persis
+         teks yang dianalisis — impor dokumen baru mengganti isi
+         textarea, jadi laporan lama tidak pernah dicampur dokumen
+         baru. Render laporan sendiri tidak menyentuh kedua elemen
+         yang diamati, jadi pengamat tidak berputar. */
+      function diReportSyncFromDoc(){
+        if(!wiResult || !wiDocState || !diReportModel) return;
+        if(ta.value !== wiJoin(wiResult.paragraphs, wiResult.separators)) return;
+        diRenderReport();
+      }
+      if(typeof MutationObserver === "function"){
+        if(diCountEl) new MutationObserver(diReportSyncFromDoc).observe(diCountEl, { childList: true, characterData: true });
+        if(diSugListEl) new MutationObserver(diReportSyncFromDoc).observe(diSugListEl, { childList: true, subtree: true });
+      }
     })();
 
     /* ================= Compare Writing (Phase 4) =================
