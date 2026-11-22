@@ -17,10 +17,14 @@ new Function("sandbox", core +
   " sandbox.diPdfErrorInfo = diPdfErrorInfo; sandbox.diSniffFormat = diSniffFormat;" +
   " sandbox.diSyncModel = diSyncModel; sandbox.diMapSuggestion = diMapSuggestion; sandbox.diMapAll = diMapAll;" +
   " sandbox.diApplyToModel = diApplyToModel; sandbox.diCloneModel = diCloneModel;" +
-  " sandbox.diBlockText = diBlockText; sandbox.DI_MAP_REASON_TEXT = DI_MAP_REASON_TEXT;")(sandbox);
+  " sandbox.diBlockText = diBlockText; sandbox.DI_MAP_REASON_TEXT = DI_MAP_REASON_TEXT;" +
+  " sandbox.diModelToHtml = diModelToHtml; sandbox.diModelToPlainText = diModelToPlainText;" +
+  " sandbox.diExportWarnings = diExportWarnings; sandbox.diDiffModels = diDiffModels;" +
+  " sandbox.diDiffSegments = diDiffSegments; sandbox.diLinkSafe = diLinkSafe;")(sandbox);
 const { diParseDocx, diAssembleText, diModelStats, diParseXml, diSerializeXml, DI_CAPS, DI_MAX_ANALYSIS_CHARS,
   diPdfPagesToModel, diPdfTextStats, diPdfErrorInfo, diSniffFormat,
-  diSyncModel, diMapSuggestion, diMapAll, diApplyToModel, diCloneModel, diBlockText, DI_MAP_REASON_TEXT } = sandbox;
+  diSyncModel, diMapSuggestion, diMapAll, diApplyToModel, diCloneModel, diBlockText, DI_MAP_REASON_TEXT,
+  diModelToHtml, diModelToPlainText, diExportWarnings, diDiffModels, diDiffSegments, diLinkSafe } = sandbox;
 
 /* WI-CORE diekstrak juga (read-only) agar uji D3 dapat menegaskan saran
    sungguhan dari wiAnalyze atas teks rakitan dokumen. */
@@ -612,6 +616,164 @@ function blockText(b) { return b.runs.filter(r => !r.protected).map(r => r.text)
     const syncD = { paragraphs: applyRes.paragraphs, align: applyRes.paragraphs.map((_, i) => ({ status: "matched", blockIdx: i })), textBlocks: 10 };
     const mDiv = diMapSuggestion(diverged, syncD, applyRes.suggestions[1]);
     check("blok berubah isi -> text-mismatch", mDiv.status === "readonly" && mDiv.reason === "text-mismatch", mDiv);
+  }
+
+  console.log("34) D4 — diModelToHtml: struktur, format, tautan, escaping");
+  {
+    const fmt = (await parse("formatting.docx")).model;
+    const h = diModelToHtml(fmt);
+    check("run tebal -> <strong>", h.includes("<strong>tebal</strong>"), h);
+    check("run miring -> <em>", h.includes("<em>miring</em>"));
+    check("run garis bawah -> <u>", h.includes("<u>garis bawah</u>"));
+    check("tebal+miring bersarang strong>em", h.includes("<strong><em>tebal miring</em></strong>"));
+    check("font Georgia + 12pt -> span style", h.includes("font-family:'Georgia'") && h.includes("font-size:12pt"), h);
+    check("tautan https -> <a href>", h.includes('<a href="https://saksara.vercel.app">'), h);
+    const hd = diModelToHtml((await parse("headings.docx")).model);
+    check("heading 1 -> <h1>", hd.includes("<h1>Bab Satu Pendahuluan</h1>"), hd);
+    check("heading 2 -> <h2>", hd.includes("<h2>Latar Belakang</h2>"));
+    const ls = diModelToHtml((await parse("lists.docx")).model);
+    const ulPart = ls.slice(ls.indexOf("<ul>"), ls.indexOf("</ul>"));
+    const olPart = ls.slice(ls.indexOf("<ol>"), ls.indexOf("</ol>"));
+    check("daftar bullet -> satu <ul> dengan 3 <li>", (ls.match(/<ul>/g) || []).length === 1 && (ulPart.match(/<li>/g) || []).length === 3, ls);
+    check("daftar nomor -> satu <ol> dengan 2 <li>", (ls.match(/<ol>/g) || []).length === 1 && (olPart.match(/<li>/g) || []).length === 2, ls);
+    check("urutan ul sebelum ol", ls.indexOf("<ul>") < ls.indexOf("<ol>"));
+    const tb = diModelToHtml((await parse("table.docx")).model);
+    check("gridSpan -> colspan=2", tb.includes('<td colspan="2">'), tb);
+    check("vMerge restart -> rowspan=2", tb.includes('rowspan="2"'), tb);
+    check("vMerge continue -> sel kosong berkelas", tb.includes('<td class="di-vmerge-cont"></td>'), tb);
+    const eqm = diModelToHtml((await parse("equation.docx")).model);
+    check("OMML -> span.di-prot berisi teks linear", eqm.includes('<span class="di-prot">ab</span>'), eqm);
+    /* Escaping: teks dokumen tidak boleh lolos sebagai markup */
+    const evil = { format: "docx", tables: [], blocks: [
+      { id: "b0", type: "paragraph", runs: [{ text: '<script>alert("x")</script> & "kutip" <b>palsu</b>' }] },
+      { id: "b1", type: "paragraph", runs: [{ text: "klik", link: "javascript:alert(1)" }] },
+      { id: "b2", type: "paragraph", runs: [{ text: "surel", link: "mailto:halo@example.id" }] },
+      { id: "b3", type: "paragraph", runs: [{ text: "data", link: "data:text/html;base64,PHNjcmlwdD4=" }] },
+      { id: "b4", type: "paragraph", runs: [{ text: "spasi", link: "  https://example.id/a?x=1&y=2  " }] },
+    ] };
+    const eh = diModelToHtml(evil);
+    check("teks <script> ter-escape penuh", !eh.includes("<script>") && eh.includes("&lt;script&gt;"), eh);
+    check("ampersand ter-escape", eh.includes("&amp;"));
+    check("tautan javascript: -> teks biasa (tanpa <a>)", !eh.includes("javascript:") && eh.includes("<p>klik</p>"), eh);
+    check("tautan data: -> teks biasa", !eh.includes("data:text/html"), eh);
+    check("tautan mailto: dirender", eh.includes('<a href="mailto:halo@example.id">surel</a>'), eh);
+    check("href di-trim + & ter-escape di atribut", eh.includes('<a href="https://example.id/a?x=1&amp;y=2">spasi</a>'), eh);
+    check("diLinkSafe menolak skema lain", diLinkSafe("ftp://x") === null && diLinkSafe("HTTPS://a.b") === "HTTPS://a.b" && diLinkSafe("") === null && diLinkSafe(42) === null);
+    /* Daftar bersarang: level 0,1,1,0 */
+    const nest = { format: "docx", tables: [], blocks: ["a", "b", "c", "d"].map((t, i) => ({
+      id: "b" + i, type: "list-item", listKind: "bullet", level: [0, 1, 1, 0][i], runs: [{ text: t }],
+    })) };
+    check("daftar bersarang valid", diModelToHtml(nest) === "<ul><li>a<ul><li>b</li><li>c</li></ul></li><li>d</li></ul>", diModelToHtml(nest));
+    /* Teks biasa = rakitan yang sama persis */
+    const sm = (await parse("simple.docx")).model;
+    check("diModelToPlainText == diAssembleText", diModelToPlainText(sm) === diAssembleText(sm).text);
+    check("diModelToHtml deterministik", diModelToHtml(fmt) === h);
+  }
+
+  console.log("35) D4 — diExportWarnings: hitungan per jenis + urutan deterministik");
+  {
+    const eqm = (await parse("equation.docx")).model;
+    check("equation.docx -> [protected-omml x1]", eq(diExportWarnings(eqm).map(w => [w.kind, w.count]), [["protected-omml", 1]]), diExportWarnings(eqm));
+    const apm = (await parse("doc-apply.docx")).model;
+    check("doc-apply.docx -> [protected-omml x2]", eq(diExportWarnings(apm).map(w => [w.kind, w.count]), [["protected-omml", 2]]));
+    const fmt = (await parse("formatting.docx")).model;
+    check("formatting.docx -> tanpa peringatan", eq(diExportWarnings(fmt), []));
+    const syn = { format: "docx", tables: [], blocks: [
+      { id: "b0", type: "paragraph", runs: [
+        { text: "x", protected: true, kind: "field", xml: "<w:r/>" },
+        { text: "", protected: true, kind: "object", xml: "<w:r/>" },
+        { text: "garis", underline: true, underlineStyle: "double" },
+        { text: "biasa", underline: true },
+      ] },
+    ] };
+    check("field+object+underline-style terhitung, urutan tetap",
+      eq(diExportWarnings(syn).map(w => [w.kind, w.count]),
+        [["protected-field", 1], ["protected-object", 1], ["underline-style", 1]]), diExportWarnings(syn));
+    const pdfModel = diPdfPagesToModel([{ page: 1, items: [{ str: "Halo dunia", x: 56, y: 700, width: 60, fontName: "Helvetica", fontSize: 12 }] }]);
+    check("model PDF -> pdf-source (count = halaman)", eq(diExportWarnings(pdfModel).map(w => [w.kind, w.count]), [["pdf-source", 1]]), diExportWarnings(pdfModel));
+    check("peringatan deterministik", eq(diExportWarnings(syn), diExportWarnings(syn)));
+    check("pesan peringatan tidak kosong", diExportWarnings(syn).every(w => typeof w.message === "string" && w.message.length > 10));
+  }
+
+  console.log("36) D4 — diDiffModels: unchanged/changed/added/removed + segmen");
+  {
+    const sm = (await parse("simple.docx")).model;
+    const same = diDiffModels(sm, diCloneModel(sm));
+    check("model identik -> changedCount 0", same.changedCount === 0 && same.entries.every(e => e.status === "unchanged"), same.changedCount);
+    const work = diCloneModel(sm);
+    work.blocks[0].runs[0].text = work.blocks[0].runs[0].text.replace("Senin", "Selasa");
+    const d = diDiffModels(sm, work);
+    check("satu blok berubah", d.changedCount === 1 && d.entries[0].status === "changed" && d.entries[1].status === "unchanged");
+    const segs = d.entries[0].segments;
+    const recon = (t) => segs.filter(s => s.t === "same" || s.t === t).map(s => s.text).join("");
+    check("segmen merekonstruksi teks asli", recon("del") === d.entries[0].origText, segs);
+    check("segmen merekonstruksi teks kerja", recon("ins") === d.entries[0].workText, segs);
+    check("del memuat kata lama, ins kata baru",
+      segs.some(s => s.t === "del" && s.text.includes("Senin")) && segs.some(s => s.t === "ins" && s.text.includes("Selasa")), segs);
+    /* Perubahan spasi saja terlihat lewat token separator */
+    const sp = diDiffSegments("kata  ganda", "kata ganda");
+    check("diff spasi ganda -> del '  ' ins ' '",
+      sp.some(s => s.t === "del" && s.text === "  ") && sp.some(s => s.t === "ins" && s.text === " "), sp);
+    const longer = diCloneModel(sm);
+    longer.blocks.push({ id: "bx", type: "paragraph", runs: [{ text: "Blok tambahan." }] });
+    const dAdd = diDiffModels(sm, longer);
+    check("blok ekstra di kerja -> added", dAdd.entries[dAdd.entries.length - 1].status === "added" && dAdd.changedCount === 1);
+    const dRem = diDiffModels(longer, sm);
+    check("blok hilang di kerja -> removed", dRem.entries[dRem.entries.length - 1].status === "removed" && dRem.changedCount === 1);
+    /* Tidak mengubah kedua model */
+    const snapA = JSON.stringify(sm), snapB = JSON.stringify(work);
+    diDiffModels(sm, work);
+    check("diDiffModels tidak memutasi model", JSON.stringify(sm) === snapA && JSON.stringify(work) === snapB);
+    check("diDiffModels deterministik", eq(diDiffModels(sm, work), d));
+    const hd = (await parse("headings.docx")).model;
+    const hdW = diCloneModel(hd);
+    hdW.blocks[0].runs[0].text = "Bab Satu Pembuka";
+    const dHd = diDiffModels(hd, hdW);
+    check("blok heading berubah membawa type heading", dHd.entries[0].status === "changed" && dHd.entries[0].type === "heading");
+  }
+
+  console.log("37) D4 — fixture doc-roundtrip.docx: struktur terpaku untuk round-trip peramban");
+  {
+    const r = await parse("doc-roundtrip.docx");
+    check("parse ok", r.ok === true, r);
+    const m = r.model;
+    check("urutan tipe blok", eq(m.blocks.map(b => b.type),
+      ["heading", "paragraph", "list-item", "list-item", "list-item", "list-item",
+       "table-cell", "table-cell", "table-cell", "table-cell", "table-cell",
+       "paragraph", "paragraph", "paragraph"]), m.blocks.map(b => b.type));
+    check("heading level 1", m.blocks[0].type === "heading" && m.blocks[0].level === 1);
+    check("jenis daftar bullet,bullet,number,number", eq(m.blocks.slice(2, 6).map(b => b.listKind), ["bullet", "bullet", "number", "number"]));
+    check("tabel satu, gridSpan 2 + vMerge restart/continue",
+      m.tables.length === 1 && m.tables[0].rows[0].cells[0].gridSpan === 2 &&
+      m.tables[0].rows[1].cells[0].vMerge === "restart" && m.tables[0].rows[2].cells[0].vMerge === "continue",
+      JSON.stringify(m.tables));
+    const linkRun = m.blocks[1].runs.find(x => x.link);
+    check("run tautan terbaca", !!linkRun && linkRun.link === "https://saksara.vercel.app", m.blocks[1].runs);
+    check("run tebal/miring/garis bawah terbaca",
+      m.blocks[1].runs.some(x => x.bold) && m.blocks[1].runs.some(x => x.italic) && m.blocks[1].runs.some(x => x.underline));
+    check("run Georgia 12pt terbaca", m.blocks[1].runs.some(x => x.fontName === "Georgia" && x.fontSize === 12));
+    check("teks unicode utuh", blockText(m.blocks[11]).includes("✓") && blockText(m.blocks[11]).includes("😀"), blockText(m.blocks[11]));
+    check("OMML terlindungi di blok 12", m.blocks[12].runs.some(x => x.protected && x.kind === "omml"), m.blocks[12].runs);
+    check("paragraf pelanggaran baku utuh", blockText(m.blocks[13]) === "Aktifitas ini di lakukan setiap hari Senin.", blockText(m.blocks[13]));
+    const asm = diAssembleText(m);
+    const res = wiAnalyze(asm.text);
+    const sync = diSyncModel(m, res.paragraphs);
+    const mapped = diMapAll(m, sync, res.suggestions);
+    const appl = res.suggestions.filter((s, i) => mapped[i].status === "applicable");
+    check("ada saran applicable untuk langkah round-trip", appl.length >= 2, appl.length);
+  }
+
+  console.log("38) D4 — dokumen besar mendekati batas 50.000 karakter (big.docx)");
+  {
+    const r = await parse("big.docx");
+    check("parse ok", r.ok === true, r);
+    const asm = diAssembleText(r.model);
+    check("rakitan tidak terpotong", asm.truncated === false, asm.totalChars);
+    check("panjang rakitan 48–50 ribu", asm.text.length >= 48000 && asm.text.length <= 50000, asm.text.length);
+    check("HTML dokumen besar terbangun", diModelToHtml(r.model).length > asm.text.length);
+    check("dokumen besar bersih -> tanpa peringatan", eq(diExportWarnings(r.model), []));
+    check("diff dokumen besar identik -> 0 berubah", diDiffModels(r.model, diCloneModel(r.model)).changedCount === 0);
+    check("teks biasa dokumen besar == rakitan", diModelToPlainText(r.model) === asm.text);
   }
 
   console.log("\nDI-CORE: " + pass + " lulus, " + fail + " gagal, total " + (pass + fail));
