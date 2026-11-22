@@ -2116,6 +2116,16 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         return s.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, "\"").replace(/&apos;/g, "'").replace(/&#(\d+);/g, function(m, n){ return String.fromCharCode(parseInt(n, 10)); }).replace(/&#x([0-9a-fA-F]+);/g, function(m, n){ return String.fromCharCode(parseInt(n, 16)); }).replace(/&amp;/g, "&");
       }
       /* --- DOCX: .docx adalah ZIP — parse manual, baca semua bagian yang memuat teks --- */
+      /* D7-A: paritas batas dekompresi dengan DI-CORE (D1). Nilai HARUS sama
+         dengan DI_CAPS di DI-CORE: maks 200 entri, maks 50 MB total hasil
+         dekompresi, maks 20 MB per entri. Ukuran diperiksa dari direktori
+         pusat SEBELUM inflasi, dan ditegakkan lagi secara kumulatif SELAMA
+         inflasi (direktori pusat bisa berbohong), jadi arsip bom tidak dapat
+         membekukan tab. Kesalahan keamanan membawa pesan Indonesia yang
+         jelas (message) + kode stabil (code) — rute Batch menampilkan
+         message apa adanya, rute lain menampilkan pesan generiknya. */
+      var LEGACY_ZIP_CAPS = { maxEntries: 200, maxTotalBytes: 50 * 1024 * 1024, maxEntryBytes: 20 * 1024 * 1024 };
+      function legacyZipError(code, message){ var e = new Error(message); e.code = code; return e; }
       function listZipEntries(bytes){
         var view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
         var len = bytes.length;
@@ -2125,36 +2135,94 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           if(view.getUint32(i, true) === 0x06054b50){ eocd = i; break; }
         }
         if(eocd < 0) throw new Error("zip-invalid");
+        if(eocd >= 20 && (view.getUint32(eocd - 20, true) === 0x07064b50 || view.getUint32(eocd - 20, true) === 0x06064b50))
+          throw legacyZipError("zip64", "Dokumen memakai format ZIP64 yang belum didukung. Simpan ulang dokumen sebagai .docx biasa, lalu coba lagi.");
         var total = view.getUint16(eocd + 10, true);
+        var cdSize = view.getUint32(eocd + 12, true);
         var cdOffset = view.getUint32(eocd + 16, true);
+        if(total === 0xFFFF || cdSize === 0xFFFFFFFF || cdOffset === 0xFFFFFFFF)
+          throw legacyZipError("zip64", "Dokumen memakai format ZIP64 yang belum didukung. Simpan ulang dokumen sebagai .docx biasa, lalu coba lagi.");
+        if(total > LEGACY_ZIP_CAPS.maxEntries)
+          throw legacyZipError("zip-too-many-entries", "Dokumen memuat terlalu banyak bagian internal (" + total + " entri; batas " + LEGACY_ZIP_CAPS.maxEntries + " entri).");
         var pos = cdOffset;
         var decoder = new TextDecoder("utf-8");
         var entries = [];
+        var declaredTotal = 0;
         for(var e = 0; e < total; e++){
           if(pos + 46 > len || view.getUint32(pos, true) !== 0x02014b50) break;
+          var flags = view.getUint16(pos + 8, true);
+          if(flags & 0x0001)
+            throw legacyZipError("zip-encrypted", "Dokumen terenkripsi atau dilindungi kata sandi sehingga tidak dapat dibaca.");
           var method = view.getUint16(pos + 10, true);
           var compSize = view.getUint32(pos + 20, true);
+          var size = view.getUint32(pos + 24, true);
           var nameLen = view.getUint16(pos + 28, true);
           var extraLen = view.getUint16(pos + 30, true);
           var commentLen = view.getUint16(pos + 32, true);
           var localOffset = view.getUint32(pos + 42, true);
+          if(compSize === 0xFFFFFFFF || size === 0xFFFFFFFF || localOffset === 0xFFFFFFFF)
+            throw legacyZipError("zip64", "Dokumen memakai format ZIP64 yang belum didukung. Simpan ulang dokumen sebagai .docx biasa, lalu coba lagi.");
+          if(size > LEGACY_ZIP_CAPS.maxEntryBytes)
+            throw legacyZipError("zip-entry-too-large", "Satu bagian dokumen melebihi batas 20 MB setelah dibuka.");
+          declaredTotal += size;
+          if(declaredTotal > LEGACY_ZIP_CAPS.maxTotalBytes)
+            throw legacyZipError("zip-total-too-large", "Total isi dokumen setelah dibuka melebihi batas 50 MB.");
           var name = decoder.decode(bytes.subarray(pos + 46, pos + 46 + nameLen));
           if(localOffset + 30 <= len && view.getUint32(localOffset, true) === 0x04034b50){
             var lNameLen = view.getUint16(localOffset + 26, true);
             var lExtraLen = view.getUint16(localOffset + 28, true);
             var dataStart = localOffset + 30 + lNameLen + lExtraLen;
-            entries.push({ name: name, method: method, data: bytes.subarray(dataStart, dataStart + compSize) });
+            entries.push({ name: name, method: method, size: size, data: bytes.subarray(dataStart, dataStart + compSize) });
           }
           pos += 46 + nameLen + extraLen + commentLen;
         }
         return entries;
       }
-      function zipEntryText(entry){
+      /* Dekompresi beraliran dengan penghitung byte: berhenti (membatalkan
+         aliran) begitu keluaran melewati batas per-entri atau sisa anggaran
+         total — keluaran tidak pernah dibuffer melebihi batas. */
+      function decompressBytesCapped(bytes, format, maxBytes, budget){
+        if(typeof DecompressionStream === "undefined"){
+          return Promise.reject(new Error("no-decompression"));
+        }
+        var ds = new DecompressionStream(format);
+        var stream = new Blob([bytes]).stream().pipeThrough(ds);
+        var reader = stream.getReader();
+        var chunks = [], total = 0;
+        function step(){
+          return reader.read().then(function(r){
+            if(r.done){
+              var out = new Uint8Array(total), off = 0;
+              chunks.forEach(function(c){ out.set(c, off); off += c.length; });
+              if(budget) budget.total += total;
+              return out;
+            }
+            total += r.value.length;
+            if(total > maxBytes){
+              try { reader.cancel(); } catch(e) {}
+              throw legacyZipError("zip-entry-too-large", "Satu bagian dokumen melebihi batas 20 MB setelah dibuka.");
+            }
+            if(budget && budget.total + total > budget.maxTotal){
+              try { reader.cancel(); } catch(e) {}
+              throw legacyZipError("zip-total-too-large", "Total isi dokumen setelah dibuka melebihi batas 50 MB.");
+            }
+            chunks.push(r.value);
+            return step();
+          });
+        }
+        return step();
+      }
+      function zipEntryText(entry, budget){
         if(entry.method === 0){
+          if(entry.data.length > LEGACY_ZIP_CAPS.maxEntryBytes)
+            return Promise.reject(legacyZipError("zip-entry-too-large", "Satu bagian dokumen melebihi batas 20 MB setelah dibuka."));
+          if(budget && budget.total + entry.data.length > budget.maxTotal)
+            return Promise.reject(legacyZipError("zip-total-too-large", "Total isi dokumen setelah dibuka melebihi batas 50 MB."));
+          if(budget) budget.total += entry.data.length;
           return Promise.resolve(new TextDecoder("utf-8").decode(entry.data));
         }
         if(entry.method === 8){
-          return decompressBytes(entry.data, "deflate-raw").then(function(raw){
+          return decompressBytesCapped(entry.data, "deflate-raw", LEGACY_ZIP_CAPS.maxEntryBytes, budget).then(function(raw){
             return new TextDecoder("utf-8").decode(raw);
           });
         }
@@ -2188,12 +2256,22 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
             order.push(en.name);
           }
         });
-        var jobs = order.map(function(name){
-          return zipEntryText(byName[name]).then(function(xml){
-            return docxXmlToText(xml);
-          }).catch(function(){ return ""; });
+        /* D7-A: bagian dibaca berurutan dengan satu anggaran total bersama,
+           dan kegagalan bagian mana pun kini MENOLAK seluruh impor (paritas
+           DI-CORE) — sebelumnya kegagalan bagian ditelan diam-diam, yang
+           menyembunyikan penolakan metode/batas dan dapat menghilangkan
+           teks dari analisis tanpa pemberitahuan. */
+        var budget = { total: 0, maxTotal: LEGACY_ZIP_CAPS.maxTotalBytes };
+        var chain = Promise.resolve([]);
+        order.forEach(function(name){
+          chain = chain.then(function(texts){
+            return zipEntryText(byName[name], budget).then(function(xml){
+              texts.push(docxXmlToText(xml));
+              return texts;
+            });
+          });
         });
-        return Promise.all(jobs).then(function(texts){
+        return chain.then(function(texts){
           return texts.filter(function(t){ return t && t.trim(); }).join("\n\n").trim();
         });
       }
@@ -3399,6 +3477,23 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
          .txt/.docx/.pdf — yang dilaporkan adalah teks hasil ekstraksi yang dianalisis.
          Label jujur di kaki laporan: ini analisis INDIKASI AI per kalimat, BUKAN
          laporan kecocokan plagiarisme terhadap basis data. */
+      /* D7-A: Subresource Integrity (SRI) untuk aset CDN ter-pin yang dimuat
+         lewat elemen <script>. Hash sha384 dihitung dari byte persis berkas
+         versi ter-pin (diambil dua kali dengan byte identik; untuk dua aset
+         cdnjs, hash sha512 byte yang sama cocok dengan yang diterbitkan
+         cdnjs). Aset yang dimuat sebagai modul ES (import()) atau sebagai
+         worker TIDAK dapat membawa SRI menurut spesifikasi — keduanya
+         didokumentasikan di laporan D7-A, tidak diberi proteksi palsu. */
+      var SAKSARA_SRI = {
+        "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js": "sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk",
+        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js": "sha384-/1qUCSGwTur9vjf/z9lmu/eCUYbpOTgSjmpbMQZ1/CtX2v/WcAIKqRv+U1DUCG6e",
+        "https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js": "sha384-4xaIisuLEy2lo2HkB2C4rEf7v8jbTb2kuogX6TkuEt9feTWKBSFSOzsqNNbV+sKh",
+        "https://cdn.jsdelivr.net/npm/tesseract.js@5.0.5/dist/tesseract.min.js": "sha384-sZlPHqJ8Pk1GMyFXfg9vOgDjyUZZe7wE2c0NoPg2z1vs2fmI4wOC0O1ONVyr73qa"
+      };
+      function saksaraSriApply(scriptEl, url){
+        var h = SAKSARA_SRI[url];
+        if(h){ scriptEl.integrity = h; scriptEl.crossOrigin = "anonymous"; }
+      }
       var JSPDF_URL = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
       var jspdfPromise = null;
       function loadJsPdf(){
@@ -3407,6 +3502,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         jspdfPromise = new Promise(function(resolve, reject){
           var s = document.createElement("script");
           s.src = JSPDF_URL;
+          saksaraSriApply(s, JSPDF_URL);
           s.async = true;
           s.onload = function(){
             if(window.jspdf && window.jspdf.jsPDF) resolve(window.jspdf.jsPDF);
@@ -8002,7 +8098,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       if(!ta || !fileIn) return;
       var card = $("wi-doc"), statusEl = $("wi-doc-status"), errEl = $("wi-doc-error"),
           coverEl = $("wi-doc-cover"), warnEl = $("wi-doc-warn"), actionsEl = $("wi-doc-actions");
-      var wiDocState = null; /* { name, size, model, assembly } */
+      var wiDocState = null; /* { name, size, model, assembly, pdfStats } */
       function diFmtSize(n){
         if(typeof n !== "number" || isNaN(n)) return "";
         if(n < 1024) return n + " byte";
@@ -8132,7 +8228,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
             }
             var asm = diAssembleText(res.model);
             var stats = diModelStats(res.model);
-            wiDocState = { name: f.name, size: f.size, model: res.model, assembly: asm };
+            wiDocState = { name: f.name, size: f.size, model: res.model, assembly: asm, pdfStats: res.pdfStats || null };
             diInitWork(); /* D3: siapkan salinan kerja + pemetaan untuk dokumen ini */
             ta.value = asm.text;
             wiUpdateCount();
@@ -8787,7 +8883,16 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         }
         if(wiDocState){
           diEnsureMapping();
-          ex.doc = { name: wiDocState.name, stats: diModelStats(wiDocState.model),
+          /* D7-A: statistik PDF D2 (jumlah halaman + halaman kosong) yang
+             dipertahankan di wiDocState sejak impor diserahkan ke model
+             laporan lewat saluran extras.doc.stats yang sudah ada —
+             angka yang sama persis dengan banner impor. */
+          var repStats = diModelStats(wiDocState.model);
+          if(wiDocState.pdfStats){
+            repStats.pdfEmptyPages = wiDocState.pdfStats.emptyPages;
+            repStats.pdfTotalPages = wiDocState.pdfStats.pages;
+          }
+          ex.doc = { name: wiDocState.name, stats: repStats,
             assembly: { truncated: !!wiDocState.assembly.truncated, keptBlocks: wiDocState.assembly.keptBlocks, totalBlocks: wiDocState.assembly.totalBlocks },
             mapping: diMapping, appliedIds: diAppliedIds.slice(), refused: diRefused };
         }
@@ -8810,6 +8915,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           if(st.headings) h += "<div><dt>Judul</dt><dd>" + fmtNumID(st.headings) + "</dd></div>";
           if(st.tables) h += "<div><dt>Tabel</dt><dd>" + fmtNumID(st.tables) + "</dd></div>";
           if(typeof st.pages === "number" && st.pages > 0) h += "<div><dt>Halaman</dt><dd>" + fmtNumID(st.pages) + "</dd></div>";
+          if(typeof st.pdfEmptyPages === "number" && typeof st.pdfTotalPages === "number") h += "<div><dt>Halaman PDF tanpa teks</dt><dd>" + fmtNumID(st.pdfEmptyPages) + " dari " + fmtNumID(st.pdfTotalPages) + "</dd></div>";
           h += "<div><dt>Diterapkan ke dokumen kerja</dt><dd>" + fmtNumID(R.coverage.appliedToDoc) + "</dd></div>";
         }
         h += "</div>";
@@ -9581,7 +9687,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           });
         }
         function gap(mm){ y += (mm || 3); }
-        line("Saksara — Laporan Perbandingan Dokumen (Compare Writing)", 14, true);
+        line("Saksara — Laporan Perbandingan Dokumen (Bandingkan Tulisan)", 14, true);
         line("Dibuat lokal di peramban pada " + new Date().toLocaleString("id-ID") + ". Laporan ini deskriptif: kemiripan bukan bukti kepengarangan dan perubahan karakteristik bukan bukti AI.", 9.5);
         gap(2);
         line("RINGKASAN", 11.5, true);
@@ -10008,6 +10114,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       return new Promise(function(resolve, reject){
         var s = document.createElement("script");
         s.src = url; s.async = true;
+        if(typeof saksaraSriApply === "function") saksaraSriApply(s, url);
         s.onload = function(){ resolve(); };
         s.onerror = function(){ reject(new Error("Gagal memuat " + url)); };
         document.head.appendChild(s);
@@ -10085,7 +10192,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         });
       });
     }
-    var HIST_KIND_LABEL = { detector: "Detector", forensik: "Writing Forensic", compare: "Bandingkan", batch: "Batch" };
+    var HIST_KIND_LABEL = { detector: "Periksa Tulisan", forensik: "Analisis Forensik Tulisan", compare: "Bandingkan Tulisan", batch: "Periksa Banyak Dokumen" };
     function histSummaryLine(e){
       var s = e.summary || {}, parts = [];
       if(e.kind === "detector") parts.push("Skor " + s.scorePct + "%" + (s.blended ? " (diperkuat classifier)" : "") + " · " + fmtNumID(s.words || 0) + " kata");
