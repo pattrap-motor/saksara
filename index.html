@@ -1135,15 +1135,16 @@
         <p class="sub">Rapikan tulisan Anda — kata yang terketik ganda, spasi dan tanda baca yang tidak rapi, huruf kapital, kata tidak baku, penulisan kata depan <em>di/ke</em> dan imbuhan <em>di-/ke-</em>, kata ulang, dan salah ketik mekanis — satu saran dalam satu waktu, dan <strong>Anda yang memutuskan</strong> saran mana yang diterima. Daftar kata bakunya merujuk <strong>EYD V dan KBBI</strong>. Pemeriksaan ini berbasis aturan dan daftar kata tertutup — <strong>bukan setara editor profesional</strong>: ia tidak memahami maksud kalimat secara mendalam, sehingga nama orang, tempat, merek, atau istilah asing kadang masih tertandai; untuk kata yang memang disengaja ada tombol <strong>Abaikan kata ini</strong> (hanya berlaku selama sesi ini, tidak disimpan). Saran adalah <strong>rekomendasi, bukan jaminan kebenaran</strong>: baca kembali hasil revisi sebelum memakainya. Teks diproses <strong>sepenuhnya di peramban ini</strong> — tidak dikirim ke server dan tidak disimpan, dan teks asli Anda tidak pernah ditimpa. Saran tingkat kalimat — kata mubazir, kalimat yang panjang atau kompleks, pengulangan frasa, dan awalan kalimat yang monoton — bersifat <strong>heuristik pola</strong>: pemeriksa <strong>tidak memahami makna</strong> kalimat Anda, dan kalimat panjang <strong>tidak otomatis salah</strong>. Saran kata mubazir hanya menghapus kata yang terbukti berlebih atau menukar frasa <em>melakukan …</em> menjadi kata kerja satu akarnya; istilah, nama, angka, kutipan, dan sitasi tidak pernah diubah oleh saran mana pun.</p>
         <div class="panel" id="wi-panel-input">
           <div class="wi-doc" id="wi-doc">
-            <div class="wi-doc-head">Impor dokumen Word (.docx)</div>
-            <p class="wf-note">Muat berkas .docx dari perangkat Anda — berkas dibaca <strong>sepenuhnya di peramban ini</strong>, tidak diunggah ke server dan tidak disimpan — lalu teksnya ditempatkan di kotak teks di bawah untuk dianalisis seperti biasa. Pada tahap ini hasil revisi tetap berupa teks biasa; penerapan saran dengan format dokumen yang terjaga dan ekspor kembali ke .docx menyusul pada tahap berikutnya.</p>
+            <div class="wi-doc-head">Impor dokumen Word (.docx) atau PDF (.pdf)</div>
+            <p class="wf-note">Muat berkas .docx atau .pdf dari perangkat Anda — berkas dibaca <strong>sepenuhnya di peramban ini</strong>, tidak diunggah ke server dan tidak disimpan — lalu teksnya ditempatkan di kotak teks di bawah untuk dianalisis seperti biasa. Untuk PDF, yang dibaca adalah <strong>lapisan teksnya</strong> dan formatnya hanya perkiraan dari posisi teks; PDF hasil pindaian (gambar) belum dapat dianalisis di sini karena Asisten Menulis <strong>belum mendukung OCR</strong> — gunakan halaman OCR untuk mengekstrak teks dari pindaian. Pada tahap ini hasil revisi tetap berupa teks biasa; penerapan saran dengan format dokumen yang terjaga dan ekspor kembali ke .docx menyusul pada tahap berikutnya.</p>
             <div class="wi-doc-drop">
-              <span class="upload-wrap"><span class="upload-visual" aria-hidden="true">Pilih dokumen (.docx)</span><input type="file" id="wi-doc-file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-label="Pilih dokumen Word (.docx)" /></span>
-              <span class="wi-doc-hint">atau seret &amp; letakkan berkas .docx ke kartu ini · batas 20 MB</span>
+              <span class="upload-wrap"><span class="upload-visual" aria-hidden="true">Pilih dokumen (.docx/.pdf)</span><input type="file" id="wi-doc-file" accept=".docx,.pdf,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-label="Pilih dokumen Word (.docx) atau PDF (.pdf)" /></span>
+              <span class="wi-doc-hint">atau seret &amp; letakkan berkas .docx/.pdf ke kartu ini · batas 20 MB</span>
             </div>
             <div class="file-status" id="wi-doc-status" role="status" aria-live="polite"></div>
             <div class="banner" id="wi-doc-error" role="alert"></div>
             <div class="banner" id="wi-doc-cover"></div>
+            <div class="banner" id="wi-doc-warn"></div>
             <div class="wi-doc-actions" id="wi-doc-actions" hidden>
               <button type="button" id="wi-doc-remove">Hapus dokumen</button>
             </div>
@@ -6561,6 +6562,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
     }
     function diModelStats(model){
       var stats = { blocks: 0, paragraphs: 0, headings: 0, listItems: 0, cells: 0, tables: (model.tables || []).length, words: 0, chars: 0, protected: 0 };
+      if(model && typeof model.pages === "number") stats.pages = model.pages; /* D2: hanya model PDF yang membawa jumlah halaman; model DOCX tidak berubah */
       (model.blocks || []).forEach(function(b){
         stats.blocks++;
         if(b.type === "heading") stats.headings++;
@@ -6634,6 +6636,174 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           return diFail("parse-error", "Dokumen tidak dapat dibaca.");
         }
       });
+    }
+    /* ---------- PDF: konversi item teks pdf.js menjadi DocModel (D2) ----------
+       Lapisan lem pdf.js hidup di lapisan UI; DI-CORE hanya menerima data
+       item yang sudah dinormalisasi:
+         pages = [{ page, items: [{ str, x, y, width, fontName, fontSize }] }]
+       x/y adalah posisi baseline item (transform pdf.js); y BERTAMBAH ke
+       atas sesuai konvensi PDF dan dinormalisasi di sini menjadi urutan
+       baca (halaman menaik, atas ke bawah, kiri ke kanan).
+       Keputusan desain:
+       - Semua blok bertipe "paragraph" dan membawa nomor halaman (page).
+         PDF tidak menyimpan struktur semantik, jadi TIDAK ada klaim
+         heading dari ukuran huruf — menebak judul dari geometri akan
+         mengarang struktur yang tidak ada di berkas.
+       - bold/italic hanyalah heuristik nama font (mengandung "Bold" /
+         "Italic" / "Oblique"). fontName adalah nama keluarga font menurut
+         pdf.js (dapat memuat prefiks subset seperti "ABCDEE+"), bukan
+         gaya tertanam: format hasil PDF selalu bersifat perkiraan.
+       - Pengelompokan baris murni geometris (kedekatan y, toleransi
+         sebagian ukuran font). Dokumen dua kolom terbaca menyilang per
+         baris — batas yang diketahui dan didokumentasikan.
+       - Paragraf dipisah oleh jarak vertikal > 1,5x tinggi baris
+         sebelumnya; baris di dalam paragraf disambung dengan satu spasi
+         (kecuali sesudah tanda hubung di akhir baris). */
+    function diSniffFormat(bytes){
+      if(!bytes || typeof bytes.length !== "number" || bytes.length < 4) return "unknown";
+      if(bytes[0] === 0x50 && bytes[1] === 0x4B && bytes[2] === 0x03 && bytes[3] === 0x04) return "zip";
+      var lim = Math.min(bytes.length, 1024);
+      for(var i = 0; i + 4 <= lim; i++){
+        if(bytes[i] === 0x25 && bytes[i + 1] === 0x50 && bytes[i + 2] === 0x44 && bytes[i + 3] === 0x46) return "pdf";
+      }
+      return "unknown";
+    }
+    function diPdfFontFlags(fontName){
+      var n = String(fontName || "");
+      return { bold: /bold/i.test(n), italic: /italic|oblique/i.test(n) };
+    }
+    function diPdfItemSize(it){
+      return (it && typeof it.fontSize === "number" && it.fontSize > 0) ? it.fontSize : 12;
+    }
+    function diPdfSameRun(a, b){
+      return !!a && !!b && !a.protected && !b.protected &&
+        a.bold === b.bold && a.italic === b.italic &&
+        a.fontName === b.fontName && a.fontSize === b.fontSize;
+    }
+    function diPdfLineRuns(items){
+      /* items = item-item satu baris yang sudah terurut x menaik.
+         Item berfont sama & berdekatan digabung menjadi satu run; celah
+         lebar di antara dua item menjadi satu spasi. */
+      var runs = [], prev = null;
+      items.forEach(function(it){
+        var size = diPdfItemSize(it);
+        var flags = diPdfFontFlags(it.fontName);
+        var run = { text: String(it.str) };
+        if(it.fontName) run.fontName = String(it.fontName);
+        run.fontSize = Math.round(size * 10) / 10;
+        if(flags.bold) run.bold = true;
+        if(flags.italic) run.italic = true;
+        var x = typeof it.x === "number" ? it.x : 0;
+        var w = typeof it.width === "number" ? it.width : 0;
+        if(prev){
+          var gap = x - (prev.x + prev.width);
+          var space = gap > 0.22 * size && !/\s$/.test(prev.run.text) && !/^\s/.test(run.text);
+          if(diPdfSameRun(prev.run, run)){
+            if(space) prev.run.text += " ";
+            prev.run.text += run.text;
+            prev.x = x; prev.width = w;
+            return;
+          }
+          if(space) run.text = " " + run.text;
+        }
+        runs.push(run);
+        prev = { x: x, width: w, run: run };
+      });
+      return runs;
+    }
+    function diPdfPageLines(items){
+      var deco = [];
+      (items || []).forEach(function(it, i){
+        if(!it || typeof it.str !== "string" || !it.str.length) return;
+        deco.push({ it: it, idx: i, x: typeof it.x === "number" ? it.x : 0,
+          y: typeof it.y === "number" ? it.y : 0, size: diPdfItemSize(it) });
+      });
+      deco.sort(function(a, b){ return (b.y - a.y) || (a.x - b.x) || (a.idx - b.idx); });
+      var lines = [];
+      deco.forEach(function(d){
+        var line = lines[lines.length - 1];
+        var tol = line ? Math.max(1.25, 0.45 * Math.min(d.size, line.size)) : 0;
+        if(line && Math.abs(d.y - line.y) <= tol){
+          line.items.push(d);
+          if(d.size > line.size) line.size = d.size;
+        } else {
+          lines.push({ y: d.y, size: d.size, items: [d] });
+        }
+      });
+      return lines.map(function(line){
+        var sorted = line.items.slice().sort(function(a, b){ return (a.x - b.x) || (a.idx - b.idx); });
+        return { y: line.y, height: line.size,
+          runs: diPdfLineRuns(sorted.map(function(d){ return d.it; })) };
+      });
+    }
+    function diPdfAppendRun(runs, run, spaceBefore){
+      if(!run || !run.text) return;
+      var last = runs[runs.length - 1];
+      if(last && spaceBefore && !/[\s\-]$/.test(last.text) && !/^\s/.test(run.text)){
+        if(diPdfSameRun(last, run)){ last.text += " " + run.text; return; }
+        runs.push({ text: " " });
+        last = runs[runs.length - 1];
+      }
+      if(last && diPdfSameRun(last, run)){ last.text += run.text; return; }
+      var copy = { text: run.text };
+      if(run.fontName) copy.fontName = run.fontName;
+      if(typeof run.fontSize === "number") copy.fontSize = run.fontSize;
+      if(run.bold) copy.bold = true;
+      if(run.italic) copy.italic = true;
+      runs.push(copy);
+    }
+    function diPdfPagesToModel(pages){
+      var model = { format: "pdf", blocks: [], tables: [], pages: Array.isArray(pages) ? pages.length : 0 };
+      (pages || []).forEach(function(pg, pi){
+        var pageNo = (pg && typeof pg.page === "number") ? pg.page : pi + 1;
+        var lines = diPdfPageLines(pg ? pg.items : []);
+        var curRuns = null, lastY = 0, lastHeight = 0;
+        function flush(){
+          if(curRuns && curRuns.some(function(r){ return /\S/.test(r.text); }))
+            diPushBlock(model, { type: "paragraph", page: pageNo, runs: curRuns });
+          curRuns = null;
+        }
+        lines.forEach(function(line){
+          if(!line.runs.length) return;
+          if(curRuns && (lastY - line.y) > 1.5 * lastHeight) flush();
+          if(!curRuns) curRuns = [];
+          line.runs.forEach(function(run, ri){
+            diPdfAppendRun(curRuns, run, ri === 0 && curRuns.length > 0);
+          });
+          lastY = line.y; lastHeight = line.height;
+        });
+        flush();
+      });
+      return model;
+    }
+    /* Statistik lapisan teks PDF untuk deteksi pindaian: karakter yang
+       dihitung adalah karakter bukan-spasi dari seluruh item. PDF disebut
+       mirip pindaian bila totalnya 0, atau rata-rata per halaman < 10 —
+       ambang untuk peringatan jujur "butuh OCR" di lapisan UI. */
+    function diPdfTextStats(pages){
+      var per = [], total = 0, empty = 0;
+      (pages || []).forEach(function(pg){
+        var n = 0;
+        ((pg && pg.items) || []).forEach(function(it){
+          if(it && typeof it.str === "string") n += it.str.replace(/\s+/g, "").length;
+        });
+        per.push(n); total += n; if(n === 0) empty++;
+      });
+      return { pages: per.length, totalChars: total, emptyPages: empty, charsPerPage: per,
+        scanLike: total === 0 || (per.length > 0 && total / per.length < 10) };
+    }
+    /* Pemetaan galat pdf.js menjadi kode + pesan terstruktur (Bahasa
+       Indonesia). Menerima objek mirip galat { name, message } agar dapat
+       diuji tanpa pdf.js. Pesan mentah tidak pernah ditampilkan ke
+       pengguna — lapisan UI mencatatnya ke konsol saja. */
+    function diPdfErrorInfo(err){
+      var name = (err && typeof err.name === "string") ? err.name : "";
+      var msg = (err && typeof err.message === "string") ? err.message : (typeof err === "string" ? err : "");
+      if(name === "PasswordException" || /password/i.test(name))
+        return { code: "pdf-encrypted", message: "PDF terenkripsi atau dilindungi kata sandi sehingga tidak dapat dibuka. Simpan ulang berkas tanpa perlindungan kata sandi, lalu coba lagi." };
+      if(name === "InvalidPDFException" || name === "MissingPDFException" || /invalid pdf/i.test(msg))
+        return { code: "pdf-invalid", message: "Berkas bukan PDF yang valid atau isinya rusak sehingga tidak dapat dibuka. Pastikan berkas benar-benar PDF yang utuh, lalu coba lagi." };
+      return { code: "pdf-failed", message: "PDF tidak dapat dibaca — berkas mungkin rusak atau memakai fitur yang belum didukung." };
     }
     /* DI-CORE-END */
 
@@ -6977,7 +7147,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       var fileIn = $("wi-doc-file");
       if(!ta || !fileIn) return;
       var card = $("wi-doc"), statusEl = $("wi-doc-status"), errEl = $("wi-doc-error"),
-          coverEl = $("wi-doc-cover"), actionsEl = $("wi-doc-actions");
+          coverEl = $("wi-doc-cover"), warnEl = $("wi-doc-warn"), actionsEl = $("wi-doc-actions");
       var wiDocState = null; /* { name, size, model, assembly } */
       function diFmtSize(n){
         if(typeof n !== "number" || isNaN(n)) return "";
@@ -6992,9 +7162,73 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       function diResetCard(){
         wiDocState = null;
         statusEl.innerHTML = ""; statusEl.className = "file-status";
-        diShowBanner(errEl, ""); diShowBanner(coverEl, "");
+        diShowBanner(errEl, ""); diShowBanner(coverEl, ""); diShowBanner(warnEl, "");
         actionsEl.hidden = true;
         fileIn.value = "";
+      }
+      /* ================= Document Intelligence (D2): impor PDF =================
+         Memakai pdf.js 3.11.174 yang sama dengan route OCR — URL dan pola
+         worker disalin persis dari ocrEnable; tidak ada dependensi baru.
+         Item teks pdf.js dinormalisasi menjadi data polos, lalu konversi
+         ke DocModel dilakukan fungsi murni DI-CORE (diPdfPagesToModel). */
+      var diPdfJsPromise = null;
+      function diLoadPdfJs(){
+        if(window.pdfjsLib){
+          if(!window.pdfjsLib.GlobalWorkerOptions.workerSrc)
+            window.pdfjsLib.GlobalWorkerOptions.workerSrc = OCR_PDFJS_WORKER;
+          return Promise.resolve(window.pdfjsLib);
+        }
+        if(!diPdfJsPromise){
+          diPdfJsPromise = p6LoadScript(OCR_PDFJS).then(function(){
+            window.pdfjsLib.GlobalWorkerOptions.workerSrc = OCR_PDFJS_WORKER;
+            return window.pdfjsLib;
+          });
+        }
+        return diPdfJsPromise;
+      }
+      function diImportPdf(bytes){
+        return diLoadPdfJs().then(function(pdfjsLib){
+          return pdfjsLib.getDocument({ data: bytes }).promise.then(function(doc){
+            var pagesData = [];
+            var chain = Promise.resolve();
+            function collect(n){
+              return doc.getPage(n).then(function(page){
+                return page.getTextContent().then(function(tc){
+                  var items = [];
+                  (tc.items || []).forEach(function(it){
+                    if(!it || typeof it.str !== "string" || !it.str.length) return;
+                    var t = it.transform || [1, 0, 0, 1, 0, 0];
+                    var fam = "";
+                    if(tc.styles && it.fontName && tc.styles[it.fontName] && tc.styles[it.fontName].fontFamily)
+                      fam = tc.styles[it.fontName].fontFamily;
+                    items.push({ str: it.str, x: t[4], y: t[5],
+                      width: typeof it.width === "number" ? it.width : 0,
+                      fontName: fam || it.fontName || "",
+                      fontSize: Math.abs(t[3]) || Math.abs(t[0]) || 0 });
+                  });
+                  pagesData.push({ page: n, items: items });
+                  if(typeof page.cleanup === "function") page.cleanup();
+                });
+              });
+            }
+            for(var n = 1; n <= doc.numPages; n++){
+              (function(pn){ chain = chain.then(function(){ return collect(pn); }); })(n);
+            }
+            return chain.then(function(){
+              if(typeof doc.destroy === "function") doc.destroy();
+              var tstats = diPdfTextStats(pagesData);
+              if(tstats.scanLike) return { ok: false, code: "pdf-scan", pdfStats: tstats };
+              return { ok: true, model: diPdfPagesToModel(pagesData), pdfStats: tstats };
+            });
+          });
+        }, function(loadErr){
+          if(window.console && console.warn) console.warn("Saksara: pustaka PDF gagal dimuat", loadErr);
+          return { ok: false, code: "pdf-load", message: "Pustaka pembaca PDF gagal dimuat — periksa koneksi internet, lalu coba lagi." };
+        }).catch(function(err){
+          if(window.console && console.warn) console.warn("Saksara: impor PDF gagal", err && err.name, err && err.message);
+          var info = diPdfErrorInfo(err);
+          return { ok: false, code: info.code, message: info.message };
+        });
       }
       /* Bersihkan (alur reset yang sudah ada) juga membuang model dokumen. */
       $("wi-clear").addEventListener("click", diResetCard);
@@ -7003,7 +7237,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         $("wi-clear").click(); /* pakai jalur reset teks yang sudah ada */
       });
       function diHandleFile(f){
-        diShowBanner(errEl, ""); diShowBanner(coverEl, "");
+        diShowBanner(errEl, ""); diShowBanner(coverEl, ""); diShowBanner(warnEl, "");
         actionsEl.hidden = true;
         if(!f) return;
         if(typeof f.size === "number" && f.size > MAX_FILE_BYTES){
@@ -7017,8 +7251,25 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
            penguraian berjalan sesudahnya agar halaman tidak terasa terkunci. */
         setTimeout(function(){
           f.arrayBuffer().then(function(ab){
-            return diParseDocx(new Uint8Array(ab));
+            var bytes = new Uint8Array(ab);
+            /* Pilihan jalur berdasar ISI berkas (tanda tangan %PDF-), bukan ekstensi. */
+            if(diSniffFormat(bytes) === "pdf") return diImportPdf(bytes);
+            return diParseDocx(bytes);
           }).then(function(res){
+            if(res && res.code === "pdf-scan"){
+              /* PDF mirip pindaian: tidak ada lapisan teks yang terbaca.
+                 Textarea TIDAK disentuh dan tidak ada model yang disimpan —
+                 tampilkan peringatan jujur + arahkan ke halaman OCR. */
+              var pst = res.pdfStats || { pages: 0, totalChars: 0 };
+              statusEl.className = "file-status show";
+              statusEl.innerHTML = "<span class=\"fname\">" + escapeHtml(f.name) + "</span> dimuat (" + fmtNumID(pst.pages) + " halaman), tetapi " +
+                (pst.totalChars > 0
+                  ? "hampir tidak ada teks yang dapat diekstrak darinya (hanya " + fmtNumID(pst.totalChars) + " karakter)."
+                  : "tidak ada teks yang dapat diekstrak darinya.");
+              diShowBanner(warnEl, "<strong>PDF ini tampaknya hasil pindaian (gambar), bukan dokumen teks.</strong> Asisten Menulis membaca lapisan teks PDF dan <strong>belum mendukung OCR</strong>, jadi berkas ini belum dapat dianalisis di sini. Untuk mengekstrak teks dari pindaian, gunakan <a href=\"#/ocr\">halaman OCR Saksara</a>, lalu tempel teks hasilnya ke kotak di bawah.");
+              fileIn.value = "";
+              return;
+            }
             if(!res.ok){
               statusEl.innerHTML = ""; statusEl.className = "file-status";
               diShowBanner(errEl, escapeHtml(res.message));
@@ -7031,6 +7282,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
             ta.value = asm.text;
             wiUpdateCount();
             var parts = [fmtNumID(stats.blocks) + " blok", fmtNumID(stats.words) + " kata"];
+            if(typeof stats.pages === "number" && stats.pages > 0) parts.push(fmtNumID(stats.pages) + " halaman");
             if(stats.headings) parts.push(fmtNumID(stats.headings) + " judul");
             if(stats.tables) parts.push(fmtNumID(stats.tables) + " tabel");
             if(stats.protected) parts.push(fmtNumID(stats.protected) + " elemen terlindungi (rumus/kolom isian/gambar) — tidak ikut dianalisis");
@@ -7039,6 +7291,9 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
             actionsEl.hidden = false;
             if(asm.truncated){
               diShowBanner(coverEl, "Dokumen dipotong pada batas blok: " + fmtNumID(asm.keptBlocks) + " dari " + fmtNumID(asm.totalBlocks) + " blok teks pertama yang dimuat (batas 50.000 karakter per analisis). Blok selebihnya belum dianalisis.");
+            }
+            if(res.pdfStats && res.pdfStats.emptyPages > 0){
+              diShowBanner(warnEl, fmtNumID(res.pdfStats.emptyPages) + " dari " + fmtNumID(res.pdfStats.pages) + " halaman PDF tidak menghasilkan teks (kemungkinan halaman gambar/pindaian) — halaman tersebut tidak ikut dianalisis.");
             }
             if(!asm.text.replace(/\s+/g, "")){
               diShowBanner(errEl, "Dokumen tidak memuat teks yang dapat dianalisis — mungkin isinya hanya gambar, tabel kosong, atau rumus.");
