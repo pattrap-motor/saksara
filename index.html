@@ -689,6 +689,65 @@
       .p7-steps li strong{ color:var(--navy); }
       .qc-panel{ border:1px solid var(--line); border-radius:16px; background:var(--surface); box-shadow:var(--shadow-sm); padding:20px; }
       .qc-panel textarea{ width:100%; font:inherit; border:1px solid var(--line); border-radius:12px; padding:12px 14px; background:var(--surface); color:var(--text); }
+
+      /* ---------- Phase 8.1 (Writing Intelligence): Asisten Menulis ---------- */
+      .wi-count{ font-size:13px; color:var(--muted); margin-top:6px; }
+      .wi-count.over{ color:var(--warn-ink); font-weight:700; }
+      .wi-toolbar{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:12px; }
+      .wi-busy{ font-size:13.5px; color:var(--muted); }
+      .wi-sug{ display:flex; flex-direction:column; gap:10px; margin-top:12px; }
+      .wi-card{ border:1px solid var(--line); border-radius:12px; padding:14px 16px; background:var(--surface); }
+      .wi-card.done{ opacity:.62; }
+      .wi-card-head{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:8px; }
+      .wi-kind{ font-weight:800; font-size:13.5px; }
+      .wi-cert{ font-size:11.5px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; border:1px solid var(--line); background:var(--surface2); border-radius:999px; padding:2px 10px; color:var(--muted); }
+      .wi-frag{ display:block; font-family:"IBM Plex Mono", monospace; font-size:13.5px; background:var(--red-bg); border-radius:8px; padding:7px 10px; white-space:pre-wrap; word-break:break-word; }
+      .wi-rep{ display:block; font-family:"IBM Plex Mono", monospace; font-size:13.5px; background:var(--grn-bg); border-radius:8px; padding:7px 10px; white-space:pre-wrap; word-break:break-word; margin-top:6px; }
+      .wi-arrow{ font-size:12px; color:var(--muted); margin-top:6px; }
+      .wi-expl{ font-size:13.5px; line-height:1.55; color:var(--muted); margin:8px 0 0; }
+      .wi-actions{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+      .wi-actions button{ font-size:13.5px; padding:7px 14px; }
+      .wi-state{ font-size:13px; font-weight:700; color:var(--gold-ink); }
+      .wi-controls{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:14px; }
+      .wi-revised{ min-height:160px; }
+      .wi-compare{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px; }
+      @media (max-width:760px){ .wi-compare{ grid-template-columns:1fr; } }
+      .wi-col h4{ margin:0 0 8px; font-size:15px; }
+      .wi-para{ border:1px solid var(--line); border-radius:10px; padding:10px 12px; margin:0 0 8px; font-size:14px; line-height:1.6; white-space:pre-wrap; word-break:break-word; background:var(--surface); }
+      .wi-para.changed{ background:var(--gold-soft); border-color:var(--gold-ink); }
+      .wi-empty{ border:1px dashed var(--line); border-radius:12px; padding:16px; color:var(--muted); font-size:14px; line-height:1.6; margin-top:12px; }
+      .wi-ignored{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:10px; font-size:13px; color:var(--muted); }
+      .wi-chip{ display:inline-flex; gap:4px; align-items:center; border:1px solid var(--line); background:var(--surface2); border-radius:999px; padding:2px 4px 2px 12px; font-family:"IBM Plex Mono", monospace; font-size:12.5px; }
+      .wi-chip button{ border:none; background:transparent; color:var(--gold-ink); font-size:15px; font-weight:700; line-height:1; padding:2px 6px; cursor:pointer; }
+      /* ---------- Phase 8.4: Readability Analyzer (di dalam Asisten Menulis) ---------- */
+      .wi-read-panel h4{ margin:16px 0 6px; font-size:15px; }
+      .wi-read-score{ display:flex; gap:18px; align-items:center; flex-wrap:wrap; margin:12px 0 4px; }
+      .wi-read-num{ font-size:46px; font-weight:800; line-height:1; }
+      .wi-read-band{ font-size:17px; font-weight:800; }
+      .wi-read-bar-row{ display:grid; grid-template-columns:200px 1fr 96px; gap:10px; align-items:center; font-size:13px; margin:5px 0; }
+      .wi-read-bar{ background:var(--surface2); border:1px solid var(--line); border-radius:6px; height:14px; overflow:hidden; }
+      .wi-read-fill{ background:linear-gradient(90deg,var(--navy2),var(--navy)); height:100%; border-radius:6px; }
+      .wi-read-val{ text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+      .wi-read-expl{ font-size:12.5px; color:var(--muted); line-height:1.5; margin:1px 0 9px; }
+      .wi-read-stats{ display:grid; grid-template-columns:1fr 1fr; gap:2px 22px; margin:8px 0 2px; }
+      .wi-read-stats > div{ display:flex; justify-content:space-between; gap:12px; border-bottom:1px solid var(--line); padding:5px 0; font-size:13.5px; }
+      .wi-read-stats dt{ color:var(--muted); }
+      .wi-read-stats dd{ margin:0; font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap; }
+      .wi-read-att{ margin:6px 0 0; padding-left:20px; }
+      .wi-read-att li{ margin:6px 0; font-size:14px; line-height:1.6; }
+      .wi-read-quote{ display:block; margin-top:4px; background:var(--surface2); border:1px solid var(--line); border-radius:8px; padding:7px 10px; font-size:13px; white-space:pre-wrap; word-break:break-word; }
+      .wi-read-details{ margin-top:12px; font-size:13.5px; line-height:1.6; }
+      .wi-read-details summary{ cursor:pointer; font-weight:700; }
+      .wi-read-details ul{ margin:6px 0; padding-left:20px; }
+      .wi-read-details li{ margin:4px 0; }
+      @media (max-width:760px){ .wi-read-stats{ grid-template-columns:1fr; } .wi-read-bar-row{ grid-template-columns:128px 1fr 84px; } }
+      /* ---------- Phase 8.5: Writing Style Control ---------- */
+      .wi-style-panel h4{ margin:16px 0 6px; font-size:15px; }
+      .wi-style-panel select{ font:inherit; font-size:14px; padding:8px 10px; border:1px solid var(--line); border-radius:8px; background:var(--surface); }
+      .wi-style-ind{ border-bottom:1px solid var(--line); padding:9px 0 3px; }
+      .wi-style-ind-head{ display:flex; flex-wrap:wrap; gap:4px 12px; align-items:baseline; font-size:14px; }
+      .wi-style-name{ font-weight:800; }
+      .wi-style-label{ font-weight:700; color:var(--gold-ink); }
     </style>
   </head>
   <body>
@@ -703,6 +762,7 @@
           <a href="#/home" data-route="home">Beranda</a>
           <a href="#/detector" data-route="detector">Periksa Tulisan</a>
           <a href="#/forensik" data-route="forensik">Kenali Gaya Tulisan</a>
+          <a href="#/tulis" data-route="tulis">Asisten Menulis</a>
           <a href="#/compare" data-route="compare">Bandingkan Tulisan</a>
           <a href="#batch">Periksa Banyak Dokumen</a>
           <a href="#/ocr" data-route="ocr">Baca Teks dari Gambar</a>
@@ -724,6 +784,7 @@
         <a href="#/home" data-route="home">Beranda</a>
         <a href="#/detector" data-route="detector">Periksa Tulisan</a>
         <a href="#/forensik" data-route="forensik">Kenali Gaya Tulisan</a>
+        <a href="#/tulis" data-route="tulis">Asisten Menulis</a>
         <a href="#/compare" data-route="compare">Bandingkan Tulisan</a>
         <a href="#batch">Periksa Banyak Dokumen</a>
         <a href="#/ocr" data-route="ocr">Baca Teks dari Gambar</a>
@@ -734,7 +795,7 @@
         <a href="#/posisi" data-route="posisi">Privasi &amp; Batasan</a>
       </nav>
       <a class="btn-primary side-cta" href="#analisis">Mulai Memeriksa</a>
-      <div class="side-foot">Beta Terbuka · v0.15.1-beta<br />Seluruh analisis berjalan lokal di peramban ini — teks Anda tidak dikirim ke mana pun.</div>
+      <div class="side-foot">Beta Terbuka · v0.16.0-beta<br />Seluruh analisis berjalan lokal di peramban ini — teks Anda tidak dikirim ke mana pun.</div>
     </aside>
     <div class="wrap page">
       <header class="hero" data-view="home">
@@ -777,6 +838,7 @@
           <a class="qa-card" href="#/detector"><span class="qa-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg></span><span class="qa-t">Periksa Tulisan</span><span class="qa-d">Tempel teks atau unggah berkas — lihat bagian mana yang berindikasi pola AI, kalimat demi kalimat.</span><span class="qa-go">Mulai memeriksa →</span></a>
           <a class="qa-card" href="#batch"><span class="qa-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3 8l9 5 9-5-9-5Z"/><path d="M3 13l9 5 9-5"/></svg></span><span class="qa-t">Periksa Banyak Dokumen</span><span class="qa-d">Punya banyak berkas? Antrekan sampai 50 berkas sekaligus dan unduh rekap hasilnya.</span><span class="qa-go">Antrekan berkas →</span></a>
           <a class="qa-card" href="#/forensik"><span class="qa-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l2.5-6 4 12L16 12h5"/></svg></span><span class="qa-t">Kenali Gaya Tulisan</span><span class="qa-d">Lihat ciri khas tulisan Anda — keragaman kata, ritme kalimat, konsistensi — tanpa menuduh siapa penulisnya.</span><span class="qa-go">Kenali gaya saya →</span></a>
+          <a class="qa-card" href="#/tulis"><span class="qa-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span><span class="qa-t">Asisten Menulis</span><span class="qa-d">Rapikan kata ganda, spasi, dan huruf awal kalimat — saran demi saran, Anda yang memutuskan mana yang dipakai.</span><span class="qa-go">Rapikan tulisan saya →</span></a>
           <a class="qa-card" href="#/compare"><span class="qa-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3v18M16 3v18M3 8h5M3 16h5M16 8h5M16 16h5"/></svg></span><span class="qa-t">Bandingkan Tulisan</span><span class="qa-d">Bandingkan dua versi tulisan dan lihat persis bagian yang sama, berubah, ditambah, atau dihapus.</span><span class="qa-go">Bandingkan →</span></a>
           <a class="qa-card" href="#/benchmark"><span class="qa-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg></span><span class="qa-t">Pengujian &amp; Transparansi</span><span class="qa-d">Seberapa akurat Saksara? Semua hasil pengujian kami diterbitkan apa adanya — termasuk kelemahannya.</span><span class="qa-go">Lihat hasil uji →</span></a>
           <a class="qa-card" href="#/ocr"><span class="qa-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-4.5-4.5L6 21"/></svg></span><span class="qa-t">Baca Teks dari Gambar</span><span class="qa-d">Ubah foto atau pindaian dokumen menjadi teks yang bisa disalin dan diperiksa — langsung di peramban.</span><span class="qa-go">Baca gambar →</span></a>
@@ -1051,6 +1113,86 @@
           <p class="batch-progress" id="batch-progress" role="status" aria-live="polite"></p>
           <div id="batch-summary"></div>
           <div id="batch-results"></div>
+        </div>
+      </section>
+
+      <section class="tulis" id="tulis" data-view="tulis" hidden aria-labelledby="wi-judul">
+        <div class="kicker">Writing Intelligence</div>
+        <h2 id="wi-judul">Asisten Menulis</h2>
+        <p class="sub">Rapikan tulisan Anda — kata yang terketik ganda, spasi dan tanda baca yang tidak rapi, huruf kapital, kata tidak baku, penulisan kata depan <em>di/ke</em> dan imbuhan <em>di-/ke-</em>, kata ulang, dan salah ketik mekanis — satu saran dalam satu waktu, dan <strong>Anda yang memutuskan</strong> saran mana yang diterima. Daftar kata bakunya merujuk <strong>EYD V dan KBBI</strong>. Pemeriksaan ini berbasis aturan dan daftar kata tertutup — <strong>bukan setara editor profesional</strong>: ia tidak memahami maksud kalimat secara mendalam, sehingga nama orang, tempat, merek, atau istilah asing kadang masih tertandai; untuk kata yang memang disengaja ada tombol <strong>Abaikan kata ini</strong> (hanya berlaku selama sesi ini, tidak disimpan). Saran adalah <strong>rekomendasi, bukan jaminan kebenaran</strong>: baca kembali hasil revisi sebelum memakainya. Teks diproses <strong>sepenuhnya di peramban ini</strong> — tidak dikirim ke server dan tidak disimpan, dan teks asli Anda tidak pernah ditimpa. Saran tingkat kalimat — kata mubazir, kalimat yang panjang atau kompleks, pengulangan frasa, dan awalan kalimat yang monoton — bersifat <strong>heuristik pola</strong>: pemeriksa <strong>tidak memahami makna</strong> kalimat Anda, dan kalimat panjang <strong>tidak otomatis salah</strong>. Saran kata mubazir hanya menghapus kata yang terbukti berlebih atau menukar frasa <em>melakukan …</em> menjadi kata kerja satu akarnya; istilah, nama, angka, kutipan, dan sitasi tidak pernah diubah oleh saran mana pun.</p>
+        <div class="panel" id="wi-panel-input">
+          <label for="wi-input" style="font-weight:700; display:block; margin-bottom:8px;">Teks yang ingin dirapikan</label>
+          <textarea id="wi-input" placeholder="Tempel atau ketik teks di sini…"></textarea>
+          <div class="wi-count" id="wi-count">0 / 50.000 karakter</div>
+          <div class="wi-toolbar">
+            <button type="button" class="primary" id="wi-btn">Analisis</button>
+            <button type="button" id="wi-clear">Bersihkan</button>
+            <span class="wi-busy" id="wi-busy" role="status" aria-live="polite"></span>
+          </div>
+          <div class="banner" id="wi-error" role="alert"></div>
+          <p class="det-note">Batas 50.000 karakter per analisis agar halaman tetap responsif. Struktur paragraf — baris kosong pemisah antarparagraf — dipertahankan apa adanya pada hasil revisi.</p>
+          <div class="wi-ignored" id="wi-ignored"></div>
+        </div>
+
+        <div id="wi-results" hidden>
+          <div class="wf-panel">
+            <h3>Saran perbaikan</h3>
+            <div class="file-status" id="wi-status" role="status" aria-live="polite"></div>
+            <div id="wi-sug-empty"></div>
+            <div class="wi-sug" id="wi-sug-list"></div>
+            <div class="wi-controls">
+              <button type="button" id="wi-accept-all">Terapkan semua</button>
+              <button type="button" id="wi-undo">Urungkan</button>
+              <button type="button" id="wi-reset">Atur ulang</button>
+            </div>
+            <p class="wf-note">Lencana <strong>Aturan pasti</strong> berarti perbaikan yang mengikuti aturan tulis baku EYD (spasi, tanda baca, kata baku, penulisan di/ke, kata ulang). Lencana <strong>Saran</strong> berarti rekomendasi kontekstual — baca penjelasannya dan putuskan sendiri. Khusus saran tingkat kalimat ada tiga tingkat: <strong>Aturan pasti</strong> (masalah pasti, misalnya kata berlebih yang terbukti ganda), <strong>Masalah potensial</strong> (pola yang berpotensi menyulitkan pembaca — nilai sendiri sebelum menindaklanjuti), dan <strong>Saran gaya</strong> (pilihan kehematan kata). Saran penasihat — kalimat panjang, kalimat kompleks, pengulangan frasa, dan transisi antarkalimat — tidak mengubah teks sama sekali; ia hanya dapat ditandai sudah dibaca. Saran tidak pernah diterapkan tanpa persetujuan Anda.</p>
+          </div>
+          <div class="wf-panel">
+            <h3>Hasil revisi</h3>
+            <p class="wf-note">Hasil revisi berubah mengikuti saran yang Anda terima. Teks asli di kotak atas tidak berubah — salin hasil revisi bila sudah sesuai.</p>
+            <label class="sr-only" for="wi-revised">Hasil revisi</label>
+            <textarea id="wi-revised" class="wi-revised" readonly></textarea>
+            <div class="wi-controls">
+              <button type="button" id="wi-copy">Salin hasil</button>
+              <span class="file-status" id="wi-copy-status" role="status" aria-live="polite"></span>
+            </div>
+          </div>
+          <div class="wf-panel">
+            <h3>Perbandingan sebelum / sesudah</h3>
+            <p class="wf-note">Paragraf yang berubah ditandai latar keemasan di kedua sisi. Bandingkan dengan saksama sebelum memakai hasil revisi — saran mekanis sesekali tidak cocok dengan maksud kalimat Anda.</p>
+            <div class="wi-compare">
+              <div class="wi-col"><h4>Teks asli</h4><div id="wi-cmp-orig"></div></div>
+              <div class="wi-col"><h4>Hasil revisi</h4><div id="wi-cmp-rev"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="wf-panel wi-read-panel">
+          <h3>Analisis Keterbacaan</h3>
+          <p class="wf-note">Analisis ini membaca teks yang sama di kotak masukan di atas dan hanya menampilkan <strong>indikator statistik</strong> tentang kalimat dan paragraf Anda — tidak ada saran otomatis, tidak ada teks yang diubah, dan tidak ada tingkat pendidikan pembaca yang ditebak. Skornya adalah estimasi dari indikator-indikator itu, <strong>bukan standar ilmiah dan bukan penilaian kualitas tulisan</strong>: tulisan akademik wajar berada di rentang yang lebih menuntut daripada tulisan populer. Semua dihitung <strong>di peramban ini</strong> — teks tidak dikirim ke server dan tidak disimpan.</p>
+          <div class="wi-controls">
+            <button type="button" class="primary" id="wi-read-btn">Analisis keterbacaan</button>
+          </div>
+          <div id="wi-read" hidden></div>
+        </div>
+
+        <div class="wf-panel wi-style-panel">
+          <h3>Kontrol Gaya Tulisan</h3>
+          <p class="wf-note">Pilih profil sebagai <strong>konteks pemeriksaan</strong> — bukan klasifikasi: satu tulisan dapat menunjukkan karakteristik beberapa gaya sekaligus, dan <strong>tidak ada gaya yang lebih baik dari gaya lainnya</strong>. Analisis ini bekerja dengan <strong>pencocokan pola terhadap daftar kata dan frasa kurasi</strong>, bukan pemahaman makna: hasilnya adalah temuan untuk Anda pertimbangkan sendiri. Tidak ada kata yang diganti otomatis, tidak ada teks yang diubah, dan teks tidak dikirim ke server maupun disimpan.</p>
+          <div class="wi-controls">
+            <label for="wi-style-profile">Profil acuan</label>
+            <select id="wi-style-profile">
+              <option value="formal" selected>Formal</option>
+              <option value="akademik">Akademik</option>
+              <option value="profesional">Profesional</option>
+              <option value="populer">Populer</option>
+              <option value="ringkas">Ringkas</option>
+              <option value="naratif">Naratif</option>
+            </select>
+            <button type="button" class="primary" id="wi-style-btn">Analisis gaya</button>
+          </div>
+          <p class="wf-note" id="wi-style-desc"></p>
+          <div id="wi-style" hidden></div>
         </div>
       </section>
 
@@ -1417,6 +1559,7 @@
           <a href="#/home">Beranda</a>
           <a href="#/detector">Periksa Tulisan</a>
           <a href="#/forensik">Kenali Gaya Tulisan</a>
+          <a href="#/tulis">Asisten Menulis</a>
           <a href="#/compare">Bandingkan Tulisan</a>
           <a href="#batch">Periksa Banyak Dokumen</a>
           <a href="#/ocr">Baca Teks dari Gambar</a>
@@ -1426,12 +1569,18 @@
           <a href="#/posisi">Privasi &amp; Batasan</a>
         </nav>
         <p class="copy">© 2026 Saksara — Dikembangkan oleh Ciptanala Devs</p>
-        <p class="version-line">Versi <strong>v0.15.1-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
+        <p class="version-line">Versi <strong>v0.16.0-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
       </div>
     </footer>
 
     <dialog class="changelog" id="changelog-modal" aria-labelledby="changelog-title">
       <h2 id="changelog-title">Catatan Rilis — Saksara</h2>
+      <h3>v0.16.0-beta — 22 November 2026</h3>
+      <ul>
+        <li><strong>Asisten Menulis baru (#/tulis):</strong> periksa dan perbaiki tulisan Anda di peramban — saran tata bahasa dan ejaan (102 pasangan kata baku serta aturan di-/ke-), saran kejelasan kalimat, analisis keterbacaan, dan kontrol gaya tulisan dengan 6 profil (formal, akademik, profesional, populer, ringkas, naratif). Anda yang memutuskan setiap saran; teks asli tidak pernah ditimpa.</li>
+        <li><strong>Sepenuhnya lokal dan privat:</strong> Asisten Menulis memproses teks hanya di peramban ini — tidak dikirim ke server mana pun, tidak disimpan, dan tidak memakai layanan AI eksternal.</li>
+        <li>Mesin detektor, classifier, dan seluruh skor tidak berubah: hasil Periksa Tulisan sama persis seperti versi sebelumnya.</li>
+      </ul>
       <h3>v0.15.1-beta — 21 November 2026</h3>
       <ul>
         <li><strong>Penilaian teks akademik lebih adil:</strong> pengulangan istilah teknis yang memang wajib diulang dalam tulisan ilmiah (misalnya nama sistem atau metode yang diteliti) tidak lagi dihitung sebagai pola templat. Pengulangan frasa utuh yang sama persis tetap dihitung penuh.</li>
@@ -4741,6 +4890,1468 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       wfUpdateCounters();
     }
 
+    /* ================= Writing Intelligence (Phase 8.1) =================
+       Asisten Menulis: saran perbaikan mekanis yang deterministik. Berdiri
+       sendiri: TIDAK memakai skor detector, TIDAK mengubah teks asli tanpa
+       persetujuan pengguna, dan TIDAK menyimpan teks di mana pun. */
+    /* WI-CORE-START — fungsi murni (tanpa DOM), dapat diekstrak & diuji terpisah. */
+    var WI_MAX_CHARS = 50000;
+    var WI_ABBR = { "dll":1, "dsb":1, "dst":1, "dr":1, "drs":1, "dra":1, "prof":1, "no":1, "hal":1, "thn":1, "vs":1, "rp":1, "sbb":1, "yth":1, "sc":1, "si":1, "pd":1, "kom":1, "sos":1, "hum":1, "ked":1, "kes":1, "psi":1, "ag":1, "tek":1, "ling":1, "fil":1, "phd":1, "hlm":1, "dkk":1, "pkl":1, "tgl":1, "vol":1, "tbk":1 };
+    /* ---------- Phase 8.2: Grammar & Spelling Checker ----------
+       Semua daftar di bawah adalah daftar tertutup hasil kurasi yang sengaja
+       konservatif: lebih baik melewatkan kata yang meragukan daripada
+       menandai kata yang benar. */
+    // Pasangan baku/tidak baku merujuk EYD V dan KBBI; hanya pasangan yang tidak diperdebatkan.
+    var WI_BAKU = { "praktek": "praktik", "apotik": "apotek", "jaman": "zaman", "nasehat": "nasihat", "menasehati": "menasihati", "resiko": "risiko", "sistim": "sistem", "tehnik": "teknik", "kwalitas": "kualitas", "kwalitatif": "kualitatif", "kwantitatif": "kuantitatif", "ijin": "izin", "hutang": "utang", "silahkan": "silakan", "antri": "antre", "mengantri": "mengantre", "coklat": "cokelat", "detil": "detail", "formil": "formal", "karir": "karier", "komplit": "komplet", "lembab": "lembap", "menejemen": "manajemen", "nopember": "november", "obyek": "objek", "obyekif": "objektif", "obyektif": "objektif", "analisa": "analisis", "menganalisa": "menganalisis", "atlit": "atlet", "azas": "asas", "faham": "paham", "fikir": "pikir", "berfikir": "berpikir", "frekwensi": "frekuensi", "hakekat": "hakikat", "jadual": "jadwal", "jendral": "jenderal", "kreatifitas": "kreativitas", "efektifitas": "efektivitas", "produktifitas": "produktivitas", "metoda": "metode", "musium": "museum", "nafas": "napas", "bernafas": "bernapas", "personil": "personel", "propinsi": "provinsi", "rapih": "rapi", "rejeki": "rezeki", "sekedar": "sekadar", "supir": "sopir", "telpon": "telepon", "menelpon": "menelepon", "ummat": "umat", "ustad": "ustaz", "massalah": "masalah", "menggangu": "mengganggu", "mempesona": "mempesona", "menyolok": "mencolok", "aktifitas": "aktivitas", "ekstrim": "ekstrem", "konkrit": "konkret", "negatip": "negatif", "positip": "positif", "aktip": "aktif", "pasip": "pasif", "subyek": "subjek", "subyektif": "subjektif", "hirarki": "hierarki", "cendikiawan": "cendekiawan", "diagnosa": "diagnosis", "fotocopy": "fotokopi", "kaos": "kaus", "kadaluarsa": "kedaluwarsa", "komersil": "komersial", "kwitansi": "kuitansi", "legalisir": "legalisasi", "mantera": "mantra", "prosentase": "persentase", "realita": "realitas", "rematik": "reumatik", "syaraf": "saraf", "seprei": "seprai", "sovenir": "suvenir", "tarip": "tarif", "tentram": "tenteram", "trampil": "terampil", "tradisionil": "tradisional", "difinisi": "definisi", "disain": "desain", "diskripsi": "deskripsi", "mendiskripsikan": "mendeskripsikan", "ekivalen": "ekuivalen", "frustasi": "frustrasi", "hapal": "hafal", "himbau": "imbau", "justeru": "justru", "kuatir": "khawatir", "kordinasi": "koordinasi", "kuisioner": "kuesioner", "lobang": "lubang", "prilaku": "perilaku" };
+    // Pasangan ragam cakapan: ditandai sebagai "saran", bukan kesalahan pasti.
+    var WI_BAKU_SARAN = { "pinter": "pintar", "karna": "karena", "ketawa": "tertawa" };
+    // Kata depan yang lazim tertulis serangkai padahal harus terpisah.
+    var WI_DEPAN_TETAP = { "dimana": "di mana", "kemana": "ke mana", "diantara": "di antara", "diatas": "di atas", "dibawah": "di bawah", "didalam": "di dalam", "diluar": "di luar", "didepan": "di depan", "dibelakang": "di belakang", "disamping": "di samping", "disini": "di sini", "disana": "di sana", "disitu": "di situ", "kesini": "ke sini", "kesana": "ke sana", "kesitu": "ke situ", "kebawah": "ke bawah", "keatas": "ke atas", "kedalam": "ke dalam", "kebelakang": "ke belakang", "kesamping": "ke samping" };
+    // Kata benda penunjuk tempat untuk pola "di/ke + tempat" yang tertulis serangkai.
+    var WI_TEMPAT = { "rumah":1, "sekolah":1, "kantor":1, "kampus":1, "kelas":1, "jalan":1, "pasar":1, "kota":1, "desa":1, "kampung":1, "dapur":1, "kamar":1, "ruang":1, "ruangan":1, "gedung":1, "toko":1, "warung":1, "masjid":1, "gereja":1, "universitas":1, "fakultas":1, "perpustakaan":1, "lapangan":1, "halaman":1, "taman":1, "pantai":1, "gunung":1, "sungai":1, "danau":1, "laut":1, "pulau":1, "bandara":1, "stasiun":1, "terminal":1, "pelabuhan":1, "hotel":1, "restoran":1, "bank":1, "meja":1, "kursi":1 };
+    // Kata kerja lazim untuk pola "di " + verba yang seharusnya serangkai (pasif).
+    var WI_VERBA = { "makan":1, "minum":1, "baca":1, "tulis":1, "ambil":1, "beri":1, "berikan":1, "buat":1, "lakukan":1, "gunakan":1, "pakai":1, "sebut":1, "sebutkan":1, "jelaskan":1, "tunjukkan":1, "sampaikan":1, "dapatkan":1, "peroleh":1, "lihat":1, "dengar":1, "dengarkan":1, "kerjakan":1, "pelajari":1, "ajarkan":1, "mulai":1, "selesaikan":1, "bantu":1, "dukung":1, "pilih":1, "tentukan":1, "tetapkan":1, "hasilkan":1, "ciptakan":1, "kembangkan":1, "tingkatkan":1, "turunkan":1, "naikkan":1, "simpan":1, "kirim":1, "terima":1, "tolak":1, "jual":1, "beli":1, "bayar":1, "hitung":1, "ukur":1, "amati":1, "analisis":1, "uji":1, "periksa":1, "catat":1, "buka":1, "tutup":1, "ajukan":1, "usulkan":1, "bahas":1, "diskusikan":1, "presentasikan":1, "publikasikan":1, "daftarkan":1, "umumkan":1, "laksanakan":1, "terapkan":1, "jalankan":1, "hentikan":1, "lanjutkan":1, "pahami":1, "ketahui":1, "miliki":1, "perlukan":1 };
+    // Kata ganti + "pun" yang harus terpisah, dan kata hubung serangkai yang TIDAK pernah ditandai.
+    var WI_PUN_MAP = { "apapun": "apa pun", "siapapun": "siapa pun", "manapun": "mana pun", "bagaimanapun": "bagaimana pun", "kapanpun": "kapan pun", "berapapun": "berapa pun" };
+    var WI_PUN_NEVER = { "walaupun":1, "meskipun":1, "sekalipun":1, "sungguhpun":1, "kalaupun":1 };
+    // Kata ulang baku yang lazim tertulis dua kata: kata dasar -> bentuk berhubung.
+    var WI_ULANG_MAP = { "hati": "hati-hati", "baik": "baik-baik", "pelan": "pelan-pelan", "kadang": "kadang-kadang", "masing": "masing-masing", "lain": "lain-lain", "anak": "anak-anak", "buku": "buku-buku", "orang": "orang-orang", "ibu": "ibu-ibu", "bapak": "bapak-bapak", "teman": "teman-teman", "rumah": "rumah-rumah", "pohon": "pohon-pohon", "sehari": "sehari-hari" };
+    // Bentuk gabungan yang salah dan harus dipisah.
+    var WI_PISAH_MAP = { "terimakasih": "terima kasih", "trimakasih": "terima kasih" };
+    var WI_ORDINAL = { "dua":1, "tiga":1, "empat":1, "lima":1, "enam":1, "tujuh":1, "delapan":1, "sembilan":1, "sepuluh":1, "sebelas":1 };
+    var WI_MECH_NEVER = { "allah":1 };
+    function wiQuoteSpans(p){
+      var spans = [], open = -1, openS = -1, openA = -1;
+      for(var i=0;i<p.length;i++){
+        var c = p.charAt(i);
+        if(c === "“"){ if(open < 0) open = i; }
+        else if(c === "”"){ if(open >= 0){ spans.push([open, i]); open = -1; } }
+        else if(c === "\""){ if(open < 0) open = i; else { spans.push([open, i]); open = -1; } }
+        else if(c === "‘"){ if(openS < 0) openS = i; }
+        else if(c === "’"){ if(openS >= 0){ spans.push([openS, i]); openS = -1; } }
+        else if(c === "'"){
+          // Kutip tunggal lurus hanya diakui sebagai pembatas bila berdiri di
+          // tepi kata: pembuka didahului awal/spasi/tanda buka dan diikuti
+          // huruf; penutup didahului huruf/tanda baca dan diikuti spasi/tanda
+          // baca/akhir. Apostrof di tengah kata (Jum'at) tidak pernah membuka.
+          var pv = i > 0 ? p.charAt(i-1) : "";
+          var nx = i + 1 < p.length ? p.charAt(i+1) : "";
+          if(openA < 0 && (i === 0 || /[\s(\[{“‘"—–-]/.test(pv)) && /\p{L}/u.test(nx)) openA = i;
+          else if(openA >= 0 && /[\p{L}.!?…,;:]/u.test(pv) && (nx === "" || /[\s)\]}"”’.,;:!?]/.test(nx))){ spans.push([openA, i]); openA = -1; }
+        }
+      }
+      if(open >= 0) spans.push([open, p.length - 1]);
+      if(openS >= 0) spans.push([openS, p.length - 1]);
+      // openA yang tak berpasangan dibuang (bukan diperpanjang): kutip tunggal
+      // lurus terlalu mudah tertukar dengan apostrof liar.
+      return spans;
+    }
+    function wiInSpans(spans, pos){
+      if(!spans) return false;
+      for(var i=0;i<spans.length;i++){ if(pos >= spans[i][0] && pos <= spans[i][1]) return true; }
+      return false;
+    }
+    // Konteks yang tidak boleh ditandai: URL/domain/email (satu gugus tanpa spasi bertitik internal).
+    function wiBadCtx(p, start, end){
+      var a = start; while(a > 0 && !/\s/.test(p.charAt(a-1))) a--;
+      var b = end; while(b < p.length && !/\s/.test(p.charAt(b))) b++;
+      var chunk = p.slice(a, b);
+      if(chunk.indexOf("://") >= 0 || chunk.indexOf("@") >= 0) return true;
+      chunk = chunk.replace(/[.!?,;:]+$/, "");
+      for(var i=1;i<chunk.length-1;i++){
+        if(chunk.charAt(i) === "." && /[\p{L}\p{N}]/u.test(chunk.charAt(i-1)) && /[\p{L}]/u.test(chunk.charAt(i+1))) return true;
+      }
+      return false;
+    }
+    // Gugus singkatan bertitik (s.d., a.n., u.p.): huruf tunggal berurutan yang
+    // dipisah titik — titik terakhir gugus itu bukan akhir kalimat.
+    function wiAbbrCluster(p, idx){
+      return /(?:^|\s)(?:\p{L}\.)*\p{L}$/u.test(p.slice(0, idx));
+    }
+    function wiSentenceStart(p, pos){
+      var i = pos - 1, moved = true;
+      while(moved && i >= 0){
+        moved = false;
+        while(i >= 0 && /[ \t]/.test(p.charAt(i))){ i--; moved = true; }
+        while(i >= 0 && /["'“”‘’«»(\[]/.test(p.charAt(i))){ i--; moved = true; }
+      }
+      if(i < 0) return true;
+      var c = p.charAt(i);
+      if(c === "\n") return true;
+      if(/[.!?…]/.test(c)){
+        var wb = (p.slice(0, i).match(/[\p{L}]+$/u) || [""])[0];
+        return !(wb && WI_ABBR[wb.toLowerCase()]) && !wiAbbrCluster(p, i);
+      }
+      return false;
+    }
+    function wiMatchCase(repl, cap){ return cap ? repl.charAt(0).toUpperCase() + repl.slice(1) : repl; }
+    // Penjaga bersama aturan berbasis kamus. Mengembalikan { cap } bila token aman
+    // ditandai, null bila tidak (angka, HURUF BESAR semua, kapital internal, di dalam
+    // kutip, bagian URL/domain, kapital tengah kalimat, atau frasa nama diri).
+    function wiDictFire(p, toks, i, ctx){
+      var tok = toks[i], t = tok.t;
+      if(/\d/.test(t)) return null;
+      if(t.length > 1 && t === t.toUpperCase() && t !== t.toLowerCase()) return null;
+      if(/[\p{Lu}]/u.test(t.slice(1))) return null;
+      if(ctx && wiInSpans(ctx.quotes, tok.start)) return null;
+      if(wiBadCtx(p, tok.start, tok.end)) return null;
+      if(!/[\p{Lu}]/u.test(t.charAt(0))) return { cap: false };
+      if(!wiSentenceStart(p, tok.start)) return null;
+      var nx = toks[i+1];
+      if(nx && /[\p{Lu}]/u.test(nx.t.charAt(0)) && !/[.!?…]/.test(p.slice(tok.end, nx.start))) return null;
+      return { cap: true };
+    }
+    function wiSplitParas(text){
+      var parts = String(text).split(/(\n[ \t]*\n(?:[ \t]*\n)*)/);
+      var paras = [], seps = [];
+      for(var i=0;i<parts.length;i++){ if(i%2===0) paras.push(parts[i]); else seps.push(parts[i]); }
+      return { paras: paras, seps: seps };
+    }
+    function wiTokens(p){
+      var toks = [], re = /[\p{L}\p{N}]+/gu, m;
+      while((m = re.exec(p)) !== null){ toks.push({ t: m[0], start: m.index, end: m.index + m[0].length }); }
+      return toks;
+    }
+    function wiRuleRepeated(p, pIdx, out, ctx){
+      var toks = wiTokens(p);
+      for(var i=1;i<toks.length;i++){
+        var prev = toks[i-1], cur = toks[i];
+        if(prev.t.toLowerCase() !== cur.t.toLowerCase()) continue;
+        if(/[.!?…]/.test(p.slice(prev.end, cur.start))) continue;
+        // Pasangan yang disambung tanda hubung adalah kata ulang yang sah
+        // (sungguh-sungguh, benar-benar) — ejaan bakunya memang demikian.
+        if(p.slice(prev.end, cur.start).indexOf("-") >= 0) continue;
+        // Di dalam kutip, teks direproduksi apa adanya — tidak ditandai.
+        if(ctx && (wiInSpans(ctx.quotes, prev.start) || wiInSpans(ctx.quotes, cur.start))) continue;
+        out.push({ kind: "repeated-word", pIdx: pIdx, start: prev.start, end: cur.end, original: p.slice(prev.start, cur.end), replacement: prev.t, explanation: "Kata yang sama muncul dua kali berturut-turut — kemungkinan salah ketik. Usulan menghapus pengulangan kedua.", certainty: "pasti", prio: 0 });
+      }
+    }
+    function wiRuleSpaces(p, pIdx, out){
+      var m, re = /[ \t]+(?=[.,!?;:])/g;
+      while((m = re.exec(p)) !== null){
+        var s = m.index, e = s + m[0].length, punct = p.charAt(e);
+        if(s === 0 || p.charAt(s-1) === "\n") continue;
+        if(punct === "." && p.charAt(e+1) === ".") continue;
+        if(/\d/.test(p.charAt(e+1))) continue;
+        out.push({ kind: "double-space", pIdx: pIdx, start: s, end: e+1, original: p.slice(s, e+1), replacement: punct, explanation: "Ada spasi sebelum tanda baca — tanda baca seharusnya menempel pada kata sebelumnya.", certainty: "pasti", prio: 1 });
+      }
+      var re2 = /[ \t]{2,}/g;
+      while((m = re2.exec(p)) !== null){
+        var s2 = m.index, e2 = s2 + m[0].length;
+        if(s2 === 0 || e2 >= p.length) continue;
+        if(p.charAt(s2-1) === "\n" || p.charAt(e2) === "\n") continue;
+        out.push({ kind: "double-space", pIdx: pIdx, start: s2, end: e2, original: m[0], replacement: " ", explanation: "Ada lebih dari satu spasi berturut-turut di tengah kalimat — dirapikan menjadi satu spasi.", certainty: "pasti", prio: 2 });
+      }
+    }
+    function wiRuleMissingSpace(p, pIdx, out){
+      var re = /[.!?]/g, m;
+      while((m = re.exec(p)) !== null){
+        var i = m.index, before = p.charAt(i-1), after = p.charAt(i+1);
+        if(!before || !after) continue;
+        if(!/[\p{L}]/u.test(before) || !/[\p{Lu}]/u.test(after)) continue;
+        var nb = p.charAt(i+2);
+        if(nb === "." || nb === "!" || nb === "?") continue;
+        var ls = i; while(ls > 0 && !/\s/.test(p.charAt(ls-1))) ls--;
+        var rs = i+1; while(rs < p.length && !/\s/.test(p.charAt(rs))) rs++;
+        if((p.slice(ls, rs).split(/[.!?]/).length - 1) > 1) continue;
+        var wb = (p.slice(0, i).match(/[\p{L}]+$/u) || [""])[0];
+        if(wb.length < 2 || WI_ABBR[wb.toLowerCase()]) continue;
+        out.push({ kind: "missing-space-after-punctuation", pIdx: pIdx, start: i, end: i+1, original: p.charAt(i), replacement: p.charAt(i) + " ", explanation: "Tidak ada spasi setelah tanda baca, sehingga kalimat berikutnya menempel — usulan menambahkan satu spasi.", certainty: "pasti", prio: 1 });
+      }
+    }
+    function wiRuleCapital(p, pIdx, out){
+      var lead = p.replace(/^\s+/, "");
+      if(/^([-*•·]|\d+[.)])\s/.test(lead)) return;
+      if(p.indexOf("://") >= 0) return;
+      var starts = [{ pos: 0, wb: null, digitBefore: false, punct: -1 }];
+      var re = /[.!?…]+[ \t]+/g, m;
+      while((m = re.exec(p)) !== null){
+        var wb = (p.slice(0, m.index).match(/[\p{L}]+$/u) || [""])[0];
+        starts.push({ pos: m.index + m[0].length, wb: wb, digitBefore: /\d/.test(p.charAt(m.index - 1)), punct: m.index });
+      }
+      starts.forEach(function(st){
+        if(st.wb && WI_ABBR[st.wb.toLowerCase()]) return;
+        if(st.punct >= 0 && wiAbbrCluster(p, st.punct)) return;
+        if(st.digitBefore) return;
+        var i = st.pos;
+        while(i < p.length && /[ \t]/.test(p.charAt(i))) i++;
+        while(i < p.length && /["'“”‘’«»(\[]/.test(p.charAt(i))) i++;
+        if(i >= p.length) return;
+        var ch = p.charAt(i);
+        if(!/[\p{Ll}]/u.test(ch)) return;
+        out.push({ kind: "sentence-capital", pIdx: pIdx, start: i, end: i+1, original: ch, replacement: ch.toUpperCase(), explanation: "Kalimat diawali huruf kecil — usulan mengubah huruf pertamanya menjadi huruf kapital.", certainty: "pasti", prio: 3 });
+      });
+    }
+    function wiRuleUlang(p, pIdx, out, ctx){
+      var m, reH = /([\p{L}]+)[ \t]+-[ \t]+([\p{L}]+)/gu;
+      while((m = reH.exec(p)) !== null){
+        if(m[1].toLowerCase() !== m[2].toLowerCase()) continue;
+        out.push({ kind: "kata-ulang", pIdx: pIdx, start: m.index, end: m.index + m[0].length, original: m[0], replacement: m[1] + "-" + m[2].toLowerCase(), explanation: "Kata ulang ditulis dengan tanda hubung tanpa spasi: “" + m[1].toLowerCase() + "-" + m[2].toLowerCase() + "”.", certainty: "pasti", prio: 0 });
+      }
+      var toks = wiTokens(p);
+      for(var i=0;i<toks.length;i++){
+        var tok = toks[i], mm = /^([\p{L}]+)2$/u.exec(tok.t);
+        if(!mm || mm[1].length < 3) continue;
+        if(/[\p{Lu}]/u.test(mm[1].slice(1))) continue;
+        if(mm[1].length > 1 && mm[1] === mm[1].toUpperCase()) continue;
+        if(ctx && wiInSpans(ctx.quotes, tok.start)) continue;
+        if(wiBadCtx(p, tok.start, tok.end)) continue;
+        out.push({ kind: "kata-ulang", pIdx: pIdx, start: tok.start, end: tok.end, original: tok.t, replacement: mm[1] + "-" + mm[1].toLowerCase(), explanation: "Angka 2 di akhir kata adalah cara singkat menulis kata ulang — dalam tulisan formal tuliskan bentuk lengkapnya dengan tanda hubung: “" + mm[1].toLowerCase() + "-" + mm[1].toLowerCase() + "”.", certainty: "saran", prio: 5 });
+      }
+      for(var j=1;j<toks.length;j++){
+        var prev = toks[j-1], cur = toks[j], low = cur.t.toLowerCase();
+        if(prev.t.toLowerCase() !== low || !WI_ULANG_MAP[low]) continue;
+        if(/[.!?…]/.test(p.slice(prev.end, cur.start))) continue;
+        // Sudah disambung tanda hubung = ejaan yang benar; jangan buat saran
+        // yang usulannya sama persis dengan teks aslinya.
+        if(p.slice(prev.end, cur.start).indexOf("-") >= 0) continue;
+        out.push({ kind: "kata-ulang", pIdx: pIdx, start: prev.start, end: cur.end, original: p.slice(prev.start, cur.end), replacement: wiMatchCase(WI_ULANG_MAP[low], /[\p{Lu}]/u.test(prev.t.charAt(0))), explanation: "“" + WI_ULANG_MAP[low] + "” adalah kata ulang dan ditulis dengan tanda hubung, bukan sebagai dua kata terpisah.", certainty: "pasti", prio: 0 });
+      }
+    }
+    function wiRuleBaku(p, pIdx, out, ctx){
+      var toks = wiTokens(p);
+      for(var i=0;i<toks.length;i++){
+        var low = toks[i].t.toLowerCase(), std = WI_BAKU[low], cert = "pasti";
+        if(!std){ std = WI_BAKU_SARAN[low]; cert = "saran"; }
+        if(!std) continue;
+        if(ctx && ctx.ignore && ctx.ignore[low]) continue;
+        var hit = wiDictFire(p, toks, i, ctx);
+        if(!hit) continue;
+        out.push({ kind: "kata-tidak-baku", pIdx: pIdx, start: toks[i].start, end: toks[i].end, original: toks[i].t, replacement: wiMatchCase(std, hit.cap), explanation: cert === "pasti" ? "Kata tidak baku menurut EYD V/KBBI — bentuk bakunya adalah “" + std + "”." : "Kata ini termasuk ragam cakapan — dalam tulisan formal bentuk bakunya adalah “" + std + "”.", certainty: cert, prio: 4, word: low });
+      }
+    }
+    function wiRuleDepan(p, pIdx, out, ctx){
+      var toks = wiTokens(p);
+      for(var i=0;i<toks.length;i++){
+        var tok = toks[i], low = tok.t.toLowerCase(), fixed = WI_DEPAN_TETAP[low];
+        if(fixed){
+          if(ctx && ctx.ignore && ctx.ignore[low]) continue;
+          var hitF = wiDictFire(p, toks, i, ctx);
+          if(hitF) out.push({ kind: "kata-depan", pIdx: pIdx, start: tok.start, end: tok.end, original: tok.t, replacement: wiMatchCase(fixed, hitF.cap), explanation: "Kata depan ditulis terpisah dari kata yang mengikutinya — “" + fixed + "” adalah penulisan yang baku.", certainty: "pasti", prio: 4, word: low });
+          continue;
+        }
+        if(tok.t !== low || /\d/.test(tok.t)) continue;
+        var pre = null, noun = null;
+        if(low.indexOf("di") === 0 && WI_TEMPAT[low.slice(2)]){ pre = "di"; noun = low.slice(2); }
+        else if(low.indexOf("ke") === 0 && WI_TEMPAT[low.slice(2)]){ pre = "ke"; noun = low.slice(2); }
+        if(!pre) continue;
+        if(ctx && wiInSpans(ctx.quotes, tok.start)) continue;
+        if(wiBadCtx(p, tok.start, tok.end)) continue;
+        out.push({ kind: "kata-depan", pIdx: pIdx, start: tok.start, end: tok.end, original: tok.t, replacement: pre + " " + noun, explanation: "“" + pre + "” di sini adalah kata depan penunjuk tempat, sehingga ditulis terpisah: “" + pre + " " + noun + "”.", certainty: "pasti", prio: 4 });
+      }
+    }
+    function wiRuleImbuhan(p, pIdx, out, ctx){
+      var toks = wiTokens(p);
+      for(var i=0;i<toks.length;i++){
+        var tok = toks[i], low = tok.t.toLowerCase();
+        if(WI_PUN_MAP[low] && !WI_PUN_NEVER[low]){
+          var hitP = wiDictFire(p, toks, i, ctx);
+          if(hitP) out.push({ kind: "imbuhan", pIdx: pIdx, start: tok.start, end: tok.end, original: tok.t, replacement: wiMatchCase(WI_PUN_MAP[low], hitP.cap), explanation: "Partikel “pun” pada kata ganti ditulis terpisah: “" + WI_PUN_MAP[low] + "”. (Berbeda dengan kata hubung seperti walaupun dan meskipun yang memang ditulis serangkai.)", certainty: "pasti", prio: 4 });
+          continue;
+        }
+        if((low === "di" || low === "ke") && i + 1 < toks.length){
+          var nx = toks[i+1];
+          if(!/^[ \t]+$/.test(p.slice(tok.end, nx.start))) continue;
+          if(ctx && wiInSpans(ctx.quotes, tok.start)) continue;
+          var nlow = nx.t.toLowerCase();
+          if(low === "di" && nx.t === nlow && WI_VERBA[nlow]){
+            out.push({ kind: "imbuhan", pIdx: pIdx, start: tok.start, end: nx.end, original: p.slice(tok.start, nx.end), replacement: (/[\p{Lu}]/u.test(tok.t.charAt(0)) ? "Di" : "di") + nlow, explanation: "“di-” di sini adalah awalan (imbuhan) pembentuk kata kerja pasif, sehingga ditulis serangkai dengan kata kerjanya: “di" + nlow + "”.", certainty: "pasti", prio: 4 });
+          } else if(low === "ke" && nx.t === nlow && WI_ORDINAL[nlow]){
+            var after = toks[i+2];
+            if(after && after.t.toLowerCase() === "belas") continue;
+            out.push({ kind: "imbuhan", pIdx: pIdx, start: tok.start, end: nx.end, original: p.slice(tok.start, nx.end), replacement: (/[\p{Lu}]/u.test(tok.t.charAt(0)) ? "Ke" : "ke") + nlow, explanation: "Bila maksudnya bilangan tingkat (urutan), “ke-” ditulis serangkai: “ke" + nlow + "”. Bila maksudnya “menuju " + nlow + " …”, penulisan terpisah yang benar — putuskan sesuai maksud kalimat Anda.", certainty: "saran", prio: 5 });
+          }
+        }
+      }
+    }
+    function wiRulePemisahan(p, pIdx, out, ctx){
+      var toks = wiTokens(p);
+      for(var i=0;i<toks.length;i++){
+        var tok = toks[i], low = tok.t.toLowerCase();
+        if(WI_PISAH_MAP[low]){
+          if(ctx && ctx.ignore && ctx.ignore[low]) continue;
+          var hit = wiDictFire(p, toks, i, ctx);
+          if(hit) out.push({ kind: "pemisahan-kata", pIdx: pIdx, start: tok.start, end: tok.end, original: tok.t, replacement: wiMatchCase(WI_PISAH_MAP[low], hit.cap), explanation: "“Terima kasih” ditulis terpisah sebagai dua kata.", certainty: "pasti", prio: 4, word: low });
+          continue;
+        }
+        if(low === "apa" && i + 1 < toks.length && toks[i+1].t.toLowerCase() === "bila"){
+          var nx2 = toks[i+1];
+          if(!/^[ \t]+$/.test(p.slice(tok.end, nx2.start))) continue;
+          if(ctx && ctx.ignore && ctx.ignore["apabila"]) continue;
+          if(ctx && wiInSpans(ctx.quotes, tok.start)) continue;
+          out.push({ kind: "pemisahan-kata", pIdx: pIdx, start: tok.start, end: nx2.end, original: p.slice(tok.start, nx2.end), replacement: /[\p{Lu}]/u.test(tok.t.charAt(0)) ? "Apabila" : "apabila", explanation: "Kata hubung “apabila” ditulis serangkai sebagai satu kata. Abaikan bila “apa bila” memang Anda maksudkan sebagai frasa tanya.", certainty: "saran", prio: 5, word: "apabila" });
+        }
+      }
+    }
+    function wiRulePunct2(p, pIdx, out, ctx){
+      var m;
+      var reC = /([\p{L}])(,)([\p{L}])/gu;
+      while((m = reC.exec(p)) !== null){
+        var ci = m.index + m[1].length;
+        if(wiBadCtx(p, ci, ci + 1)) continue;
+        out.push({ kind: "tanda-baca", pIdx: pIdx, start: ci, end: ci + 1, original: ",", replacement: ", ", explanation: "Tidak ada spasi setelah koma — usulan menambahkan satu spasi agar kalimat mudah dibaca.", certainty: "pasti", prio: 1 });
+      }
+      var reCC = /,{2,}/g;
+      while((m = reCC.exec(p)) !== null){
+        if(wiBadCtx(p, m.index, m.index + m[0].length)) continue;
+        out.push({ kind: "tanda-baca", pIdx: pIdx, start: m.index, end: m.index + m[0].length, original: m[0], replacement: ",", explanation: "Koma tertulis berurutan — cukup satu koma.", certainty: "pasti", prio: 1 });
+      }
+      var reBang = /([!?])[!?]+/g;
+      while((m = reBang.exec(p)) !== null){
+        if(wiBadCtx(p, m.index, m.index + m[0].length)) continue;
+        out.push({ kind: "tanda-baca", pIdx: pIdx, start: m.index, end: m.index + m[0].length, original: m[0], replacement: m[1], explanation: "Tanda baca berurutan (" + m[0] + ") — dalam tulisan formal cukup satu tanda. Abaikan bila penekanan ini memang disengaja.", certainty: "saran", prio: 5 });
+      }
+      var reDots = /(?<!\.)\.\.(?!\.)/g;
+      while((m = reDots.exec(p)) !== null){
+        if(/\d/.test(p.charAt(m.index - 1)) || /\d/.test(p.charAt(m.index + 2))) continue;
+        if(wiBadCtx(p, m.index, m.index + 2)) continue;
+        out.push({ kind: "tanda-baca", pIdx: pIdx, start: m.index, end: m.index + 2, original: "..", replacement: "…", explanation: "Dua titik berturut-turut — bila maksudnya elipsis (jeda atau kelanjutan), gunakan tanda elipsis “…”. Abaikan bila bukan.", certainty: "saran", prio: 5 });
+      }
+    }
+    function wiRuleCapitalSaya(p, pIdx, out, ctx){
+      var toks = wiTokens(p);
+      var trimmed = p.replace(/[\s"“”]+$/, "");
+      if(!/[.!?…]$/.test(trimmed) && toks.length < 8) return;
+      for(var i=0;i<toks.length;i++){
+        if(toks[i].t !== "Saya") continue;
+        if(ctx && wiInSpans(ctx.quotes, toks[i].start)) continue;
+        if(wiSentenceStart(p, toks[i].start)) continue;
+        out.push({ kind: "huruf-kapital", pIdx: pIdx, start: toks[i].start, end: toks[i].end, original: "Saya", replacement: "saya", explanation: "Menurut EYD, kata ganti “saya” ditulis dengan huruf kecil di tengah kalimat; huruf kapital hanya dipakai di awal kalimat.", certainty: "saran", prio: 5 });
+      }
+    }
+    function wiRuleEjaan(p, pIdx, out, ctx){
+      var toks = wiTokens(p);
+      for(var i=0;i<toks.length;i++){
+        var tok = toks[i], t = tok.t;
+        if(/\d/.test(t)) continue;
+        if(t.length > 1 && t === t.toUpperCase() && t !== t.toLowerCase()) continue;
+        if(/[\p{Lu}]/u.test(t.slice(1))) continue;
+        if(WI_MECH_NEVER[t.toLowerCase()]) continue;
+        if(ctx && wiInSpans(ctx.quotes, tok.start)) continue;
+        if(wiBadCtx(p, tok.start, tok.end)) continue;
+        if(!/(\p{L})\1{2,}/u.test(t)) continue;
+        var repl = t.replace(/(\p{L})\1{2,}/gu, "$1");
+        if(repl === t) continue;
+        out.push({ kind: "ejaan-mekanis", pIdx: pIdx, start: tok.start, end: tok.end, original: t, replacement: repl, explanation: "Ada huruf yang terketik tiga kali atau lebih berturut-turut — kemungkinan salah ketik atau penekanan. Usulan merapikannya menjadi satu huruf; abaikan bila memang disengaja.", certainty: "saran", prio: 5 });
+      }
+    }
+    /* ---------- Phase 8.3: Sentence Improvement ----------
+       Saran tingkat kalimat yang deterministik berbasis pola. Pemeriksa TIDAK
+       memahami makna kalimat: saran penasihat (advisory) tidak pernah mengubah
+       teks dan tidak ikut penyaringan tumpang tindih. Penggantian teks hanya
+       untuk (a) kata yang terbukti berlebih dan (b) pertukaran frasa
+       "melakukan + nomina" menjadi kata kerja satu akar yang maknanya sama. */
+    // Kata fungsi untuk menilai gram frasa (gram harus memuat >= 2 kata isi).
+    var WI_STOP = { "yang":1, "dan":1, "di":1, "ke":1, "dari":1, "untuk":1, "dengan":1, "pada":1, "adalah":1, "ini":1, "itu":1, "dalam":1, "tidak":1, "akan":1, "juga":1, "telah":1, "atau":1, "sebagai":1, "oleh":1, "karena":1, "sehingga":1, "dapat":1, "lebih":1, "sangat":1, "para":1, "ia":1, "dia":1, "mereka":1, "kita":1, "kami":1, "saya":1, "ada":1, "bukan":1, "sudah":1, "belum":1, "saat":1, "ketika":1, "jika":1, "maka":1, "namun":1, "tetapi":1, "tapi":1, "agar":1, "supaya":1, "bahwa":1, "tersebut":1, "menjadi":1, "antara":1, "atas":1, "bawah":1, "tentang":1, "terhadap":1, "secara":1, "setiap":1, "semua":1, "banyak":1, "beberapa":1, "masih":1, "hanya":1, "pun":1, "saja":1, "yakni":1, "yaitu":1, "setelah":1, "sebelum":1, "selama":1, "sampai":1, "hingga":1, "melalui":1, "tanpa":1, "seperti":1, "merupakan":1, "lain":1, "satu":1 };
+    // Penanda klausa bawahan untuk aturan kalimat kompleks.
+    var WI_MARKERS = { "yang":1, "karena":1, "sehingga":1, "agar":1, "supaya":1, "ketika":1, "apabila":1, "jika":1, "bahwa":1 };
+    // Frasa "melakukan + nomina" -> kata kerja satu akar (makna sama, lebih hemat).
+    var WI_NOMINAL = { "penelitian": "meneliti", "pengukuran": "mengukur", "pengamatan": "mengamati", "analisis": "menganalisis", "perhitungan": "menghitung", "pengujian": "menguji", "pengumpulan": "mengumpulkan", "pembahasan": "membahas", "penilaian": "menilai", "pengiriman": "mengirim", "pembayaran": "membayar", "peninjauan": "meninjau", "pemantauan": "memantau", "pendataan": "mendata", "pencatatan": "mencatat", "penghitungan": "menghitung", "kunjungan": "berkunjung", "pengontrolan": "mengontrol", "pengembangan": "mengembangkan", "peningkatan": "meningkatkan", "perbaikan": "memperbaiki", "pemeriksaan": "memeriksa", "pengajuan": "mengajukan" };
+    // Pola kata berlebih yang terbukti: urutan token -> bentuk hematnya.
+    var WI_MUBAZIR = [
+      { seq: ["disebabkan", "karena"], repl: "disebabkan oleh", cert: "pasti", expl: "“Disebabkan” sudah mengandung makna sebab, sehingga “karena” sesudahnya berlebih — bentuk hemat dan bakunya adalah “disebabkan oleh”." },
+      { seq: ["agar", "supaya"], repl: "agar", cert: "pasti", expl: "“Agar” dan “supaya” bermakna sama, sehingga tidak perlu dipakai berurutan — cukup salah satu." },
+      { seq: ["demi", "untuk"], repl: "untuk", cert: "pasti", expl: "“Demi” dan “untuk” pada posisi ini bermakna sama, sehingga salah satunya berlebih — cukup “untuk”." },
+      { seq: ["adalah", "merupakan"], repl: "merupakan", cert: "pasti", expl: "“Adalah” dan “merupakan” sama-sama kata penghubung penjelas; memakai keduanya berurutan adalah pemborosan kata yang lazim dihindari dalam tulisan akademik." },
+      { seq: ["yaitu", "adalah"], repl: "yaitu", cert: "pasti", expl: "“Yaitu” dan “adalah” sama-sama memperkenalkan penjelasan, sehingga salah satunya berlebih — cukup “yaitu”." },
+      { seq: ["naik", "ke", "atas"], repl: "naik", cert: "gaya", expl: "“Naik” sudah berarti bergerak ke atas, sehingga “ke atas” dapat dihilangkan agar lebih hemat. Abaikan bila arah memang perlu ditekankan (misalnya “naik ke atas panggung”)." },
+      { seq: ["turun", "ke", "bawah"], repl: "turun", cert: "gaya", expl: "“Turun” sudah berarti bergerak ke bawah, sehingga “ke bawah” dapat dihilangkan agar lebih hemat. Abaikan bila arah memang perlu ditekankan." },
+      { seq: ["masuk", "ke", "dalam"], repl: "masuk", cert: "gaya", expl: "“Masuk” sudah berarti bergerak ke dalam, sehingga “ke dalam” dapat dihilangkan agar lebih hemat. Abaikan bila penekanan arah memang diperlukan (misalnya “masuk ke dalam ruangan”)." }
+    ];
+    // Rentang teks di dalam tanda kurung — titik di dalamnya tidak pernah memisah kalimat.
+    function wiParenSpans(p){
+      var spans = [], depth = 0, open = -1;
+      for(var i=0;i<p.length;i++){
+        var c = p.charAt(i);
+        if(c === "("){ if(depth === 0) open = i; depth++; }
+        else if(c === ")"){ if(depth > 0){ depth--; if(depth === 0 && open >= 0){ spans.push([open, i]); open = -1; } } }
+      }
+      if(open >= 0) spans.push([open, p.length - 1]);
+      return spans;
+    }
+    // Segmentasi kalimat konservatif: memisah pada [.!?…] yang diikuti spasi +
+    // huruf kapital/angka atau akhir paragraf. Menghormati singkatan (WI_ABBR,
+    // termasuk gelar), desimal, URL/domain, elipsis, dan sitasi bertanda kurung.
+    // Titik akhir kalimat di dalam tanda kutip menutup kalimat sesudah tanda
+    // kutipnya. Bila ragu, TIDAK memisah.
+    function wiSentences(p, quotes){
+      var spans = [], n = p.length;
+      var qs = quotes || wiQuoteSpans(p);
+      function firstNonSpace(from){ var j = from; while(j < n && /\s/.test(p.charAt(j))) j++; return j; }
+      var cur = firstNonSpace(0), i = 0, depth = 0;
+      while(i < n){
+        var c = p.charAt(i);
+        if(c === "("){ depth++; i++; continue; }
+        if(c === ")"){ if(depth > 0) depth--; i++; continue; }
+        if(depth === 0 && (c === "." || c === "!" || c === "?" || c === "…")){
+          var j = i;
+          while(j < n && /[.!?…]/.test(p.charAt(j))) j++;
+          var cluster = p.slice(i, j);
+          var wb = (p.slice(0, i).match(/[\p{L}]+$/u) || [""])[0];
+          var skip = false;
+          if(cluster === "." && wb && (wb.length <= 1 || WI_ABBR[wb.toLowerCase()])) skip = true;
+          if(cluster === "." && /\d/.test(p.charAt(i - 1))) skip = true;
+          if(!skip && wiBadCtx(p, i, j)) skip = true;
+          if(!skip && wiInSpans(qs, i)){
+            var qEnd = -1;
+            for(var q=0;q<qs.length;q++){ if(i >= qs[q][0] && i <= qs[q][1]) qEnd = qs[q][1]; }
+            if(j !== qEnd) skip = true;
+          }
+          if(!skip){
+            var k = j;
+            while(k < n && /["”’»]/.test(p.charAt(k))) k++;
+            if(k >= n){ spans.push({ start: cur, end: k }); cur = n; i = n; break; }
+            if(/\s/.test(p.charAt(k))){
+              var m = firstNonSpace(k);
+              if(m >= n){ spans.push({ start: cur, end: k }); cur = n; i = n; break; }
+              var nc = p.charAt(m), split = false;
+              if(/[\p{Lu}]/u.test(nc) || /\d/.test(nc)) split = true;
+              else if(/["'“‘«]/.test(nc) && m + 1 < n && /[\p{Lu}]/u.test(p.charAt(m + 1))) split = true;
+              if(split){ spans.push({ start: cur, end: k }); cur = m; i = m; continue; }
+            }
+          }
+          i = j; continue;
+        }
+        i++;
+      }
+      if(cur < n){
+        var e = n; while(e > cur && /\s/.test(p.charAt(e - 1))) e--;
+        if(e > cur) spans.push({ start: cur, end: e });
+      }
+      return spans;
+    }
+    // Gram kata isi: gram `size` token berurutan yang memuat >= 2 kata bukan kata
+    // fungsi. Gram yang memuat dua token sama menempel (kata ulang / ketik ganda)
+    // atau token di dalam kutip dilewati.
+    function wiGramCounts(sentText, size, sentStart, quotes){
+      var toks = wiTokens(sentText), counts = {}, order = [];
+      for(var i=0;i + size <= toks.length;i++){
+        var parts = [], content = 0, bad = false;
+        for(var t=0;t<size;t++){
+          var tk = toks[i+t], low = tk.t.toLowerCase();
+          parts.push(low);
+          if(!WI_STOP[low]) content++;
+          if(t > 0 && toks[i+t-1].t.toLowerCase() === low) bad = true;
+          if(quotes && wiInSpans(quotes, sentStart + tk.start)) bad = true;
+        }
+        if(bad || content < 2) continue;
+        var key = parts.join(" ");
+        if(!counts[key]){ counts[key] = 0; order.push(key); }
+        counts[key]++;
+      }
+      return { counts: counts, order: order };
+    }
+    function wiRuleMubazir(p, pIdx, out, ctx){
+      var toks = wiTokens(p);
+      function blocked(tok){
+        if(ctx && wiInSpans(ctx.quotes, tok.start)) return true;
+        if(ctx && wiInSpans(ctx.parens, tok.start)) return true;
+        return false;
+      }
+      function gapOk(a, b){ return /^[ \t]+$/.test(p.slice(a.end, b.start)); }
+      for(var e=0;e<WI_MUBAZIR.length;e++){
+        var pat = WI_MUBAZIR[e];
+        for(var i=0;i + pat.seq.length <= toks.length;i++){
+          var okm = true;
+          for(var t=0;t<pat.seq.length;t++){
+            if(toks[i+t].t.toLowerCase() !== pat.seq[t]){ okm = false; break; }
+            if(t > 0 && !gapOk(toks[i+t-1], toks[i+t])){ okm = false; break; }
+            if(blocked(toks[i+t])){ okm = false; break; }
+          }
+          if(!okm) continue;
+          var first = toks[i], last = toks[i + pat.seq.length - 1];
+          if(wiBadCtx(p, first.start, last.end)) continue;
+          out.push({ kind: "kalimat-mubazir", pIdx: pIdx, start: first.start, end: last.end, original: p.slice(first.start, last.end), replacement: wiMatchCase(pat.repl, /[\p{Lu}]/u.test(first.t.charAt(0))), explanation: pat.expl, certainty: pat.cert, prio: 4 });
+        }
+      }
+      for(var j2=0;j2 + 1 < toks.length;j2++){
+        if(toks[j2].t.toLowerCase() !== "melakukan") continue;
+        var nx = toks[j2+1], verb = WI_NOMINAL[nx.t.toLowerCase()];
+        if(!verb) continue;
+        if(!gapOk(toks[j2], nx)) continue;
+        if(blocked(toks[j2]) || blocked(nx)) continue;
+        if(wiBadCtx(p, toks[j2].start, nx.end)) continue;
+        out.push({ kind: "kalimat-mubazir", pIdx: pIdx, start: toks[j2].start, end: nx.end, original: p.slice(toks[j2].start, nx.end), replacement: wiMatchCase(verb, /[\p{Lu}]/u.test(toks[j2].t.charAt(0))), explanation: "Frasa “melakukan " + nx.t.toLowerCase() + "” dapat diringkas menjadi kata kerja satu akarnya, “" + verb + "” — maknanya sama dan lebih hemat kata. Kata sesudah nomina tersebut tidak berubah.", certainty: "gaya", prio: 5 });
+      }
+    }
+    function wiRuleFrasa(p, pIdx, out, ctx){
+      var quotes = ctx ? ctx.quotes : null;
+      var sents = wiSentences(p, quotes);
+      var gram4 = sents.map(function(s){ return wiGramCounts(p.slice(s.start, s.end), 4, s.start, quotes); });
+      sents.forEach(function(s, si){
+        var sentText = p.slice(s.start, s.end);
+        var g3 = wiGramCounts(sentText, 3, s.start, quotes);
+        var phrase = null, cross = false;
+        for(var i=0;i<g3.order.length;i++){ if(g3.counts[g3.order[i]] >= 2){ phrase = g3.order[i]; break; } }
+        if(!phrase && si > 0){
+          var prev = gram4[si-1].counts, cur4 = gram4[si];
+          for(var j=0;j<cur4.order.length;j++){ if(prev[cur4.order[j]]){ phrase = cur4.order[j]; cross = true; break; } }
+        }
+        if(!phrase) return;
+        out.push({ kind: "kalimat-pengulangan-frasa", pIdx: pIdx, start: s.start, end: s.end, original: sentText, replacement: null, advisory: true, advPrio: 0, sentKey: pIdx + ":" + s.start, certainty: "potensial", prio: 9, explanation: cross
+          ? "Frasa “" + phrase + "” juga muncul pada kalimat sebelumnya. Pengulangan frasa yang sama pada dua kalimat berurutan dapat terasa monoton dan kadang menandakan informasi yang tertulis dua kali. Periksa apakah pengulangan ini disengaja — pemeriksa tidak menilai makna."
+          : "Frasa “" + phrase + "” muncul lebih dari sekali dalam kalimat ini. Bila tidak disengaja, pertimbangkan menghapus salah satunya atau menggantinya dengan kata lain — pemeriksa tidak menilai makna." });
+      });
+    }
+    function wiRuleKompleks(p, pIdx, out, ctx){
+      var sents = wiSentences(p, ctx ? ctx.quotes : null);
+      sents.forEach(function(s){
+        var sentText = p.slice(s.start, s.end);
+        var toks = wiTokens(sentText), markers = 0;
+        toks.forEach(function(tk){ if(WI_MARKERS[tk.t.toLowerCase()]) markers++; });
+        var commas = (sentText.match(/,/g) || []).length;
+        var isEnum = false;
+        if(commas >= 3){
+          var segs = sentText.split(",");
+          isEnum = segs.slice(0, segs.length - 1).every(function(sg){ return sg.trim().split(/\s+/).filter(Boolean).length <= 4; });
+        }
+        if(!(markers >= 3 || (commas >= 4 && !isEnum))) return;
+        out.push({ kind: "kalimat-kompleks", pIdx: pIdx, start: s.start, end: s.end, original: sentText, replacement: null, advisory: true, advPrio: 1, sentKey: pIdx + ":" + s.start, certainty: "potensial", prio: 9, explanation: "Kalimat ini memuat " + markers + " penanda klausa bawahan dan " + commas + " koma — pola seperti ini berpotensi sulit diikuti pembaca dalam sekali baca. Pemeriksa tidak menilai makna: bila kerumitan ini memang diperlukan, abaikan saran ini; bila tidak, pertimbangkan memecahnya menjadi dua kalimat." });
+      });
+    }
+    function wiRulePanjang(p, pIdx, out, ctx){
+      var sents = wiSentences(p, ctx ? ctx.quotes : null);
+      sents.forEach(function(s){
+        var sentText = p.slice(s.start, s.end);
+        var wc = wiTokens(sentText).length, expl = null;
+        if(wc > 40){
+          expl = "Kalimat ini panjang (" + wc + " kata). Kalimat panjang tidak otomatis salah — dalam tulisan akademik ia sering sah dan perlu — tetapi berisiko sulit diikuti pembaca. Periksa kembali apakah kalimat ini masih nyaman dibaca sekali jalan; bila tidak, pertimbangkan memecahnya di batas klausa. Saran ini tidak mengubah teks.";
+        } else if(wc > 30 && !/[,;]/.test(sentText)){
+          expl = "Kalimat ini cukup panjang (" + wc + " kata) dan tidak memiliki koma atau titik koma sama sekali, sehingga pembaca tidak mendapat jeda. Kalimat panjang tidak otomatis salah, tetapi periksa kembali keterbacaannya; bila perlu, tambahkan jeda atau pecah kalimat di batas klausa. Saran ini tidak mengubah teks.";
+        }
+        if(!expl) return;
+        out.push({ kind: "kalimat-panjang", pIdx: pIdx, start: s.start, end: s.end, original: sentText, replacement: null, advisory: true, advPrio: 2, sentKey: pIdx + ":" + s.start, certainty: "potensial", prio: 9, explanation: expl });
+      });
+    }
+    function wiRuleTransisi(p, pIdx, out, ctx){
+      var sents = wiSentences(p, ctx ? ctx.quotes : null);
+      if(sents.length < 3) return;
+      var openings = sents.map(function(s){
+        var txt = p.slice(s.start, s.end).replace(/^[\s"'“”‘’«»]+/, "");
+        return wiTokens(txt).map(function(t){ return t.t.toLowerCase(); });
+      });
+      function findOpen(size){
+        var counts = {}, order = [];
+        openings.forEach(function(words, idx){
+          if(words.length < size) return;
+          var first = words[0];
+          if(/^\d+$/.test(first) || first.length === 1) return;
+          var key = words.slice(0, size).join(" ");
+          if(!counts[key]){ counts[key] = []; order.push(key); }
+          counts[key].push(idx);
+        });
+        for(var i=0;i<order.length;i++){ if(counts[order[i]].length >= 3) return { key: order[i], third: counts[order[i]][2] }; }
+        return null;
+      }
+      var hit = findOpen(2) || findOpen(1);
+      if(!hit) return;
+      var s = sents[hit.third];
+      out.push({ kind: "transisi-awalan", pIdx: pIdx, start: s.start, end: s.end, original: p.slice(s.start, s.end), replacement: null, advisory: true, advPrio: 3, sentKey: pIdx + ":" + s.start, certainty: "gaya", prio: 9, explanation: "Sedikitnya tiga kalimat dalam paragraf ini diawali pola yang sama (“" + hit.key + " …”), sehingga alurnya dapat terasa monoton. Bila tidak disengaja, variasikan awalan kalimat — misalnya dengan kata transisi lain atau dengan mendahulukan unsur lain kalimat. Saran ini tidak mengubah teks." });
+    }
+    var WI_RULES = [wiRuleUlang, wiRuleRepeated, wiRuleSpaces, wiRuleMissingSpace, wiRuleCapital, wiRuleBaku, wiRuleDepan, wiRuleImbuhan, wiRulePemisahan, wiRulePunct2, wiRuleCapitalSaya, wiRuleEjaan, wiRuleMubazir, wiRuleFrasa, wiRuleKompleks, wiRulePanjang, wiRuleTransisi];
+    function wiAnalyze(text, opts){
+      var norm = String(text == null ? "" : text).replace(/\r\n?/g, "\n");
+      var truncated = false;
+      if(norm.length > WI_MAX_CHARS){ norm = norm.slice(0, WI_MAX_CHARS); truncated = true; }
+      var ignore = null;
+      if(opts && opts.ignoreWords && typeof opts.ignoreWords.forEach === "function"){
+        ignore = {};
+        opts.ignoreWords.forEach(function(w){ if(w != null) ignore[String(w).toLowerCase()] = 1; });
+      }
+      var sp = wiSplitParas(norm);
+      var cand = [];
+      sp.paras.forEach(function(p, idx){
+        if(!p || !/\S/.test(p)) return;
+        var ctx = { ignore: ignore, quotes: wiQuoteSpans(p), parens: wiParenSpans(p) };
+        for(var r=0;r<WI_RULES.length;r++) WI_RULES[r](p, idx, cand, ctx);
+      });
+      // Saran penasihat (Phase 8.3) dipisah: tidak ikut penyaringan tumpang
+      // tindih dan maksimal satu per kalimat (prioritas advPrio terkecil).
+      var adv = cand.filter(function(c){ return c.advisory; });
+      cand = cand.filter(function(c){ return !c.advisory; });
+      cand.sort(function(a, b){ return a.pIdx - b.pIdx || a.start - b.start || a.prio - b.prio || (b.end - b.start) - (a.end - a.start); });
+      var kept = [], lastEnd = {};
+      cand.forEach(function(c){
+        var le = lastEnd[c.pIdx] === undefined ? -1 : lastEnd[c.pIdx];
+        if(c.start >= le){ kept.push(c); lastEnd[c.pIdx] = c.end; }
+      });
+      var advBySent = {};
+      adv.forEach(function(a){
+        var k = a.sentKey || (a.pIdx + ":" + a.start);
+        if(!advBySent[k] || a.advPrio < advBySent[k].advPrio) advBySent[k] = a;
+      });
+      var all = kept.concat(Object.keys(advBySent).map(function(k){ return advBySent[k]; }));
+      all.sort(function(a, b){ return a.pIdx - b.pIdx || a.start - b.start || (a.advisory ? 1 : 0) - (b.advisory ? 1 : 0) || (b.end - b.start) - (a.end - a.start); });
+      var suggestions = all.map(function(c, i){
+        var s = { id: "wi-" + (i+1), kind: c.kind, pIdx: c.pIdx, start: c.start, end: c.end, original: c.original, replacement: c.replacement, explanation: c.explanation, certainty: c.certainty };
+        if(c.word) s.word = c.word;
+        if(c.advisory) s.advisory = true;
+        return s;
+      });
+      return { paragraphs: sp.paras, separators: sp.seps, suggestions: suggestions, truncated: truncated };
+    }
+    function wiApply(paragraphs, suggestions, acceptedIds){
+      var acc = {};
+      (acceptedIds || []).forEach(function(id){ acc[id] = 1; });
+      var byPara = {};
+      (suggestions || []).forEach(function(s){
+        if(acc[s.id] && !s.advisory && typeof s.replacement === "string"){ (byPara[s.pIdx] = byPara[s.pIdx] || []).push(s); }
+      });
+      return paragraphs.map(function(p, idx){
+        var list = byPara[idx];
+        if(!list || !list.length) return p;
+        list = list.slice().sort(function(a, b){ return b.start - a.start; });
+        var out = p;
+        for(var i=0;i<list.length;i++){ out = out.slice(0, list[i].start) + list[i].replacement + out.slice(list[i].end); }
+        return out;
+      });
+    }
+    /* ---------- Phase 8.4: Readability Analyzer ----------
+       wiReadability(text) murni dan deterministik: statistik kalimat dan
+       paragraf plus satu skor gabungan. Skor itu ESTIMASI dari lima
+       komponen statistik di bawah — bukan standar ilmiah, bukan formula
+       keterbacaan internasional, bukan penilaian kualitas tulisan, dan
+       tanpa label tingkat pendidikan pembaca. Kalimat atau paragraf yang
+       panjang adalah indikator untuk ditinjau, bukan kesalahan. Komponen
+       dihitung dari angka yang sama persis dengan yang ditampilkan
+       (rata-rata terbulatkan), agar pengguna dapat memeriksa ulang
+       hitungannya sendiri. */
+    // Perkiraan suku kata Bahasa Indonesia: jumlah gugus vokal — huruf
+    // vokal (a/i/u/e/o) yang berurutan dihitung sebagai satu gugus,
+    // sehingga diftong seperti "ai"/"au" terhitung satu suku kata.
+    // Ini pendekatan kasar: kata serapan, nama diri, dan kata dengan
+    // vokal berurutan lintas suku kata (mis. "saat") dapat meleset.
+    function wiSyllables(word){
+      var w = String(word == null ? "" : word).toLowerCase();
+      if(!/\p{L}/u.test(w)) return 0;
+      var m = w.match(/[aiueo]+/g);
+      return m ? m.length : 1;
+    }
+    function wiRound(x, d){
+      var f = Math.pow(10, d || 1);
+      return Math.round(x * f) / f;
+    }
+    function wiBandLabel(score){
+      if(score >= 80) return "Sangat mudah diikuti";
+      if(score >= 60) return "Mudah diikuti";
+      if(score >= 40) return "Cukup menuntut";
+      if(score >= 20) return "Menuntut";
+      return "Sangat menuntut";
+    }
+    function wiReadability(text){
+      var norm = String(text == null ? "" : text).replace(/\r\n?/g, "\n");
+      if(norm.length > WI_MAX_CHARS) norm = norm.slice(0, WI_MAX_CHARS);
+      var R = { empty: true, chars: norm.length, words: 0, sentences: 0, paragraphs: 0,
+        sentenceLengths: [], avgWordsPerSentence: 0, minSentence: 0, maxSentence: 0,
+        buckets: { pendek: 0, sedang: 0, panjang: 0 }, longShare: 0,
+        paraWords: [], paraSentences: [], avgSentencesPerParagraph: 0, avgWordsPerParagraph: 0,
+        denseParas: [], shortParas: [], paraBuckets: { le25: 0, le75: 0, le150: 0, gt150: 0 },
+        avgWordChars: 0, avgSyllables: 0, longWordShare: 0,
+        sdSentence: 0, cvSentence: 0,
+        components: { sentence: 0, variation: 0, longWords: 0, longSentences: 0, paragraph: 0 },
+        score: 0, band: wiBandLabel(0), longestSentenceText: "", longestSentenceWords: 0 };
+      var totalChars = 0, letterWords = 0, totalSyl = 0, longWords = 0;
+      wiSplitParas(norm).paras.forEach(function(p){
+        if(!wiTokens(p).length) return;
+        var sents = wiSentences(p).map(function(s){
+          var txt = p.slice(s.start, s.end);
+          return { text: txt, words: wiTokens(txt) };
+        }).filter(function(s){ return s.words.length > 0; });
+        if(!sents.length) return;
+        var pw = 0;
+        sents.forEach(function(s){
+          pw += s.words.length;
+          R.sentenceLengths.push(s.words.length);
+          if(s.words.length > R.longestSentenceWords){ R.longestSentenceWords = s.words.length; R.longestSentenceText = s.text; }
+          s.words.forEach(function(tok){
+            totalChars += tok.t.length;
+            if(/\p{L}/u.test(tok.t)){
+              letterWords++;
+              var syl = wiSyllables(tok.t);
+              totalSyl += syl;
+              if(syl >= 4) longWords++;
+            }
+          });
+        });
+        R.paraWords.push(pw);
+        R.paraSentences.push(sents.length);
+      });
+      R.paragraphs = R.paraWords.length;
+      R.sentences = R.sentenceLengths.length;
+      R.words = R.sentenceLengths.reduce(function(a, b){ return a + b; }, 0);
+      if(!R.sentences) return R;
+      R.empty = false;
+      var mean = R.words / R.sentences;
+      R.avgWordsPerSentence = wiRound(mean, 1);
+      R.minSentence = Math.min.apply(null, R.sentenceLengths);
+      R.maxSentence = Math.max.apply(null, R.sentenceLengths);
+      var longCount = 0;
+      R.sentenceLengths.forEach(function(L){
+        if(L <= 12) R.buckets.pendek++;
+        else if(L <= 25) R.buckets.sedang++;
+        else R.buckets.panjang++;
+        if(L > 40) longCount++;
+      });
+      R.longShare = wiRound(100 * longCount / R.sentences, 1);
+      var varSum = 0;
+      R.sentenceLengths.forEach(function(L){ varSum += (L - mean) * (L - mean); });
+      var sd = Math.sqrt(varSum / R.sentences);
+      R.sdSentence = wiRound(sd, 2);
+      R.cvSentence = wiRound(mean > 0 ? sd / mean : 0, 2);
+      R.avgSentencesPerParagraph = wiRound(R.sentences / R.paragraphs, 1);
+      R.avgWordsPerParagraph = wiRound(R.words / R.paragraphs, 1);
+      R.paraWords.forEach(function(pw, i){
+        if(pw <= 25) R.paraBuckets.le25++;
+        else if(pw <= 75) R.paraBuckets.le75++;
+        else if(pw <= 150) R.paraBuckets.le150++;
+        else R.paraBuckets.gt150++;
+        if(pw > 150 || R.paraSentences[i] > 8) R.denseParas.push(i);
+        if(R.paraSentences[i] === 1 && pw < 15) R.shortParas.push(i);
+      });
+      R.avgWordChars = wiRound(totalChars / R.words, 1);
+      R.avgSyllables = letterWords ? wiRound(totalSyl / letterWords, 2) : 0;
+      R.longWordShare = letterWords ? wiRound(100 * longWords / letterWords, 1) : 0;
+      function clamp100(x){ return x < 0 ? 0 : (x > 100 ? 100 : x); }
+      var avg = R.avgWordsPerSentence, cv = R.cvSentence, awp = R.avgWordsPerParagraph;
+      var cSentence = avg < 12 ? Math.max(0, (avg - 4) / 8 * 100) : (avg <= 22 ? 100 : Math.max(0, 100 - (avg - 22) / 18 * 100));
+      var cVariation = cv < 0.35 ? Math.max(0, (cv - 0.1) / 0.25 * 100) : (cv <= 0.75 ? 100 : Math.max(0, 100 - (cv - 0.75) / 0.45 * 100));
+      var cLongWords = 100 - clamp100(R.longWordShare * 2.5);
+      var cLongSentences = 100 - clamp100(R.longShare * 2);
+      var cParagraph = awp < 40 ? Math.max(0, (awp - 10) / 30 * 100) : (awp <= 120 ? 100 : Math.max(0, 100 - (awp - 120) / 130 * 100));
+      R.components = { sentence: Math.round(cSentence), variation: Math.round(cVariation), longWords: Math.round(cLongWords), longSentences: Math.round(cLongSentences), paragraph: Math.round(cParagraph) };
+      R.score = Math.round(0.30 * R.components.sentence + 0.15 * R.components.variation + 0.20 * R.components.longWords + 0.20 * R.components.longSentences + 0.15 * R.components.paragraph);
+      R.band = wiBandLabel(R.score);
+      return R;
+    }
+    /* ---------- Phase 8.5: Writing Style Control ----------
+       wiStyle(text, profile) murni dan deterministik: analisis konsistensi
+       gaya berbasis PENCocokan POLA terhadap daftar kurasi tertutup di
+       bawah — BUKAN analisis semantik: pemeriksa tidak memahami makna,
+       maksud, niat, atau kepribadian penulis. Profil adalah konteks
+       pemeriksaan, bukan klasifikasi mutlak: satu tulisan dapat
+       menunjukkan beberapa gaya sekaligus dan tidak ada gaya yang lebih
+       baik dari gaya lainnya. Kata informal BUKAN kesalahan; semua
+       temuan bersifat saran yang disebutkan, tidak pernah mengganti teks. */
+    // Penanda ragam informal/cakapan yang kuat (daftar kurasi tertutup).
+    var WI_INFORMAL = { "nggak":1, "gak":1, "ngga":1, "banget":1, "kok":1, "sih":1, "dong":1, "deh":1, "lho":1, "nih":1, "tuh":1, "kayak":1, "bikin":1, "ngomong":1, "udah":1, "aja":1, "gimana":1, "emang":1, "pengen":1, "soalnya":1, "pokoknya":1, "beneran":1, "gue":1, "gua":1, "lo":1, "lu":1 };
+    // Kelompok kata ganti (sapaan): [kunci kelompok, daftar katanya].
+    var WI_PRON_SETS_1 = [ ["saya", ["saya"]], ["aku", ["aku"]], ["gue/gua", ["gue", "gua"]] ];
+    var WI_PRON_SETS_2 = [ ["anda", ["anda"]], ["kamu", ["kamu"]], ["lo/lu", ["lo", "lu"]] ];
+    // Kelompok istilah setara: variasi dalam satu kelompok sebaiknya tidak
+    // dicampur dalam satu dokumen. Frasa multi-kata dicocokkan sebagai
+    // urutan token; variasi terpanjang dicocokkan lebih dulu agar
+    // "situs web" tidak ikut terhitung sebagai "web".
+    var WI_TERM_VARIANTS = [
+      ["email", "e-mail", "surel"],
+      ["ponsel", "handphone", "hp", "telepon pintar", "smartphone"],
+      ["situs web", "website", "web"],
+      ["unduh", "download"],
+      ["daring", "online"],
+      ["rapat", "meeting"],
+      ["tenggat waktu", "deadline"],
+      ["umpan balik", "feedback"],
+      ["fotokopi", "foto copy", "photocopy"],
+      ["pembaruan", "update"],
+      ["kata sandi", "password"],
+      ["layar", "screen"]
+    ];
+    // Satuan dan dua bentuk penulisannya. kind: "token" = token biasa;
+    // "afterNumber" = token tepat sesudah angka ("5 l"); "beforeNumber" =
+    // token tepat sebelum angka ("Rp 5.000"); "symbol" = simbol tepat
+    // sesudah angka ("10%").
+    var WI_UNIT_VARIANTS = [
+      { short: "km", long: "kilometer", kind: "token" },
+      { short: "kg", long: "kilogram", kind: "token" },
+      { short: "cm", long: "sentimeter", kind: "token" },
+      { short: "mm", long: "milimeter", kind: "token" },
+      { short: "l", long: "liter", kind: "afterNumber" },
+      { short: "%", long: "persen", kind: "symbol" },
+      { short: "rp", long: "rupiah", kind: "beforeNumber" }
+    ];
+    // Frasa birokratis yang kerap terasa berbelit bagi pembaca umum.
+    var WI_BIROKRASI = ["dalam rangka", "sehubungan dengan", "berkenaan dengan", "pada hakikatnya", "dimaksudkan untuk", "dalam hal ini"];
+    // Kata fungsi untuk statistik kosakata: WI_STOP ditambah kata hubung
+    // dan penanda wacana yang belum ada di dalamnya.
+    var WI_STYLE_STOP = {};
+    Object.keys(WI_STOP).forEach(function(k){ WI_STYLE_STOP[k] = 1; });
+    ["serta", "maupun", "ataupun", "yakni", "dll", "dsb", "dst"].forEach(function(k){ WI_STYLE_STOP[k] = 1; });
+    var WI_STYLE_PROFILES = { "formal":1, "akademik":1, "profesional":1, "populer":1, "ringkas":1, "naratif":1 };
+    var WI_STYLE_PROFILE_LABEL = { "formal": "Formal", "akademik": "Akademik", "profesional": "Profesional", "populer": "Populer", "ringkas": "Ringkas", "naratif": "Naratif" };
+    // Konteks tampil: beberapa token di sekitar rentang token [a..b] pada
+    // paragraf P, dipotong dari teks mentah agar tanda baca ikut terbaca.
+    function wiStyleExcerpt(P, a, b){
+      var s = Math.max(0, a - 4), e = Math.min(P.toks.length - 1, b + 4);
+      if(s > e || !P.toks.length) return "";
+      return (s > 0 ? "… " : "") + P.text.slice(P.toks[s].start, P.toks[e].end) + (e < P.toks.length - 1 ? " …" : "");
+    }
+    // Mencocokkan urutan token `words` pada paragraf P, di luar kutip.
+    // `consumed` (opsional) menandai indeks token yang sudah dipakai oleh
+    // variasi yang lebih panjang agar tidak dihitung dua kali. Jeda antar
+    // token hanya boleh spasi/baris baru atau satu tanda hubung (e-mail).
+    function wiStylePhraseHits(P, words, consumed){
+      var hits = [];
+      for(var i=0;i + words.length <= P.toks.length;i++){
+        var okm = true;
+        for(var t=0;t<words.length;t++){
+          if(consumed && consumed[i+t]){ okm = false; break; }
+          if(P.toks[i+t].t.toLowerCase() !== words[t]){ okm = false; break; }
+          if(wiInSpans(P.quotes, P.toks[i+t].start)){ okm = false; break; }
+          if(t > 0 && !/^[\s-]+$/.test(P.text.slice(P.toks[i+t-1].end, P.toks[i+t].start))){ okm = false; break; }
+        }
+        if(!okm) continue;
+        if(consumed) for(var t2=0;t2<words.length;t2++) consumed[i+t2] = 1;
+        hits.push({ i: i, j: i + words.length - 1 });
+      }
+      return hits;
+    }
+    function wiStyle(text, profile){
+      var prof = WI_STYLE_PROFILES[profile] ? profile : "formal";
+      var norm = String(text == null ? "" : text).replace(/\r\n?/g, "\n");
+      var truncated = false;
+      if(norm.length > WI_MAX_CHARS){ norm = norm.slice(0, WI_MAX_CHARS); truncated = true; }
+      var S = { empty: true, profile: prof, truncated: truncated, chars: norm.length, words: 0,
+        indicators: {
+          formality: { informalCount: 0, formalPronouns: 0, density: 0, informalWords: [], label: "Cenderung formal" },
+          conciseness: { avgWordsPerSentence: 0, label: "Kalimat berukuran sedang" },
+          vocabRepeat: { ttr: 0, unique: 0, total: 0, topRepeated: [] },
+          termConsistency: { variantGroups: 0, label: "Istilah konsisten" },
+          sentenceVariation: { cv: 0, label: "Panjang kalimat cukup bervariasi" },
+          density: { avgSyllables: 0, longWordShare: 0, label: "Bahasa sedang" }
+        },
+        findings: [] };
+      var sp = wiSplitParas(norm);
+      var paras = [], off = 0;
+      sp.paras.forEach(function(p, i){
+        paras.push({ text: p, offset: off, toks: wiTokens(p), quotes: wiQuoteSpans(p), parens: wiParenSpans(p) });
+        off += p.length + (i < sp.seps.length ? sp.seps[i].length : 0);
+      });
+      var allToks = [];
+      paras.forEach(function(P){ P.toks.forEach(function(t){ allToks.push(t); }); });
+      var letterToks = allToks.filter(function(t){ return /\p{L}/u.test(t.t); });
+      if(!letterToks.length) return S;
+      S.empty = false;
+      S.words = allToks.length;
+      var R = wiReadability(norm);
+      /* ----- sapaan (kata ganti), di luar kutip ----- */
+      function pronScan(sets){
+        var counts = {}, first = {};
+        sets.forEach(function(s){ counts[s[0]] = 0; });
+        paras.forEach(function(P){
+          P.toks.forEach(function(tok, ti){
+            var low = tok.t.toLowerCase();
+            for(var si=0;si<sets.length;si++){
+              if(sets[si][1].indexOf(low) < 0) continue;
+              if(wiInSpans(P.quotes, tok.start)) return;
+              counts[sets[si][0]]++;
+              if(!first[sets[si][0]]) first[sets[si][0]] = { idx: P.offset + tok.start, excerpt: wiStyleExcerpt(P, ti, ti) };
+              break;
+            }
+          });
+        });
+        return { counts: counts, first: first };
+      }
+      var pron1 = pronScan(WI_PRON_SETS_1), pron2 = pronScan(WI_PRON_SETS_2);
+      /* ----- penanda informal, di luar kutip, dengan penjaga nama ----- */
+      var informal = {}, informalOrder = [];
+      paras.forEach(function(P){
+        P.toks.forEach(function(tok, ti){
+          var low = tok.t.toLowerCase();
+          if(!WI_INFORMAL[low]) return;
+          if(wiInSpans(P.quotes, tok.start)) return;
+          if(wiBadCtx(P.text, tok.start, tok.end)) return;
+          if(/\d/.test(tok.t)) return;
+          if(tok.t.length > 1 && tok.t === tok.t.toUpperCase() && tok.t !== tok.t.toLowerCase()) return;
+          if(/[\p{Lu}]/u.test(tok.t.slice(1))) return;
+          if(/[\p{Lu}]/u.test(tok.t.charAt(0))){
+            // Kapital di tengah kalimat kemungkinan nama diri — lewati,
+            // meniru penjaga wiDictFire. Kapital di awal kalimat dihitung.
+            if(!wiSentenceStart(P.text, tok.start)) return;
+            var nx = P.toks[ti+1];
+            if(nx && /[\p{Lu}]/u.test(nx.t.charAt(0)) && !/[.!?…]/.test(P.text.slice(tok.end, nx.start))) return;
+          }
+          if(!informal[low]){ informal[low] = { word: low, count: 0, idx: P.offset + tok.start, excerpt: wiStyleExcerpt(P, ti, ti) }; informalOrder.push(low); }
+          informal[low].count++;
+        });
+      });
+      var informalCount = 0;
+      informalOrder.forEach(function(w){ informalCount += informal[w].count; });
+      /* ----- indikator ----- */
+      // Ambang formalitas (kepadatan kata informal per 100 kata):
+      // 0 = cenderung formal; <= 1,5 = sebagian besar formal;
+      // <= 4 = campuran; di atasnya = cenderung informal.
+      var formalPron = pron1.counts["saya"] + pron2.counts["anda"];
+      var density100 = S.words ? wiRound(100 * informalCount / S.words, 1) : 0;
+      S.indicators.formality = { informalCount: informalCount, formalPronouns: formalPron, density: density100,
+        informalWords: informalOrder.map(function(w){ return { word: w, count: informal[w].count }; }),
+        label: density100 === 0 ? "Cenderung formal" : density100 <= 1.5 ? "Sebagian besar formal" : density100 <= 4 ? "Campuran formal dan informal" : "Cenderung informal" };
+      // Ambang keringkasan (rata-rata kata per kalimat): < 14 ringkas;
+      // 14–24 sedang; > 24 panjang.
+      var avgW = R.avgWordsPerSentence;
+      S.indicators.conciseness = { avgWordsPerSentence: avgW, label: avgW < 14 ? "Kalimat cenderung ringkas" : avgW <= 24 ? "Kalimat berukuran sedang" : "Kalimat cenderung panjang" };
+      // Ambang variasi kalimat (koefisien variasi panjang kalimat):
+      // < 0,25 seragam; 0,25–0,6 cukup bervariasi; > 0,6 sangat bervariasi.
+      var cv = R.cvSentence;
+      S.indicators.sentenceVariation = { cv: cv, label: cv < 0.25 ? "Panjang kalimat seragam" : cv <= 0.6 ? "Panjang kalimat cukup bervariasi" : "Panjang kalimat sangat bervariasi" };
+      // Ambang kepadatan bahasa (proporsi kata panjang >= 4 suku kata):
+      // < 10% ringan; 10–25% sedang; > 25% padat.
+      var lws = R.longWordShare;
+      S.indicators.density = { avgSyllables: R.avgSyllables, longWordShare: lws, label: lws < 10 ? "Bahasa ringan" : lws <= 25 ? "Bahasa sedang" : "Bahasa padat" };
+      /* ----- kosakata: rasio type-token & kata isi paling sering ----- */
+      var vCounts = {}, vTotal = 0;
+      paras.forEach(function(P){
+        P.toks.forEach(function(tok){
+          if(!/\p{L}/u.test(tok.t)) return;
+          var low = tok.t.toLowerCase();
+          vCounts[low] = (vCounts[low] || 0) + 1;
+          vTotal++;
+        });
+      });
+      var vUnique = Object.keys(vCounts).length;
+      var topRepeated = Object.keys(vCounts)
+        .filter(function(w){ return vCounts[w] >= 3 && w.length >= 2 && !WI_STYLE_STOP[w]; })
+        .map(function(w){ return { word: w, count: vCounts[w] }; })
+        .sort(function(a, b){ return b.count - a.count || (a.word < b.word ? -1 : a.word > b.word ? 1 : 0); })
+        .slice(0, 5);
+      S.indicators.vocabRepeat = { ttr: vTotal ? wiRound(vUnique / vTotal, 3) : 0, unique: vUnique, total: vTotal, topRepeated: topRepeated };
+      /* ----- variasi istilah setara ----- */
+      var termFound = [];
+      WI_TERM_VARIANTS.forEach(function(group){
+        var counts = {}, firstIdx = Infinity, firstExcerpt = "";
+        group.forEach(function(v){ counts[v] = 0; });
+        var variants = group.map(function(v){ return { v: v, words: v.split(" ") }; })
+          .sort(function(a, b){ return b.words.length - a.words.length; });
+        paras.forEach(function(P){
+          var consumed = {};
+          variants.forEach(function(vr){
+            wiStylePhraseHits(P, vr.words, consumed).forEach(function(h){
+              counts[vr.v]++;
+              var gi = P.offset + P.toks[h.i].start;
+              if(gi < firstIdx){ firstIdx = gi; firstExcerpt = wiStyleExcerpt(P, h.i, h.j); }
+            });
+          });
+        });
+        var used = group.filter(function(v){ return counts[v] > 0; });
+        if(used.length >= 2) termFound.push({ counts: counts, used: used, idx: firstIdx, excerpt: firstExcerpt });
+      });
+      S.indicators.termConsistency = { variantGroups: termFound.length, label: termFound.length === 0 ? "Istilah konsisten" : "Ada istilah yang bervariasi" };
+      /* ----- variasi satuan ----- */
+      var unitFound = [];
+      WI_UNIT_VARIANTS.forEach(function(u){
+        var short = 0, long = 0, firstIdx = Infinity;
+        paras.forEach(function(P){
+          P.toks.forEach(function(tok, ti){
+            var low = tok.t.toLowerCase();
+            if(wiInSpans(P.quotes, tok.start)) return;
+            if(low === u.long) long++;
+            var hitShort = false;
+            if(u.kind === "token" && low === u.short) hitShort = true;
+            else if(u.kind === "afterNumber" && low === u.short){
+              var pv = P.toks[ti-1];
+              if(pv && /^\d+$/.test(pv.t) && /^[ \t]+$/.test(P.text.slice(pv.end, tok.start))) hitShort = true;
+            } else if(u.kind === "beforeNumber" && low === u.short){
+              var nx2 = P.toks[ti+1];
+              if(nx2 && /^\d+$/.test(nx2.t) && /^[ \t]+$/.test(P.text.slice(tok.end, nx2.start))) hitShort = true;
+            }
+            if(hitShort){ short++; if(P.offset + tok.start < firstIdx) firstIdx = P.offset + tok.start; }
+          });
+          if(u.kind === "symbol"){
+            var re = /\d[ \t]*%/g, m;
+            while((m = re.exec(P.text)) !== null){
+              if(wiInSpans(P.quotes, m.index)) continue;
+              short++;
+              if(P.offset + m.index < firstIdx) firstIdx = P.offset + m.index;
+            }
+          }
+        });
+        if(short > 0 && long > 0) unitFound.push({ shortForm: u.short, longForm: u.long, short: short, long: long, idx: firstIdx });
+      });
+      /* ----- desimal campuran (koma vs titik) -----
+         Pemisah ribuan (1.000) bukan desimal titik: pola /\d\.\d(?!\d)/
+         sudah menolaknya, dan pemeriksaan eksplisit di bawah menegaskannya.
+         Batas yang diketahui: string mirip versi ("versi 2.5") dapat tampak
+         sebagai desimal titik. */
+      var decComma = /\d+,\d+/.exec(norm), decDot = null;
+      var reD = /\d\.\d(?!\d)/g, mD;
+      while((mD = reD.exec(norm)) !== null){
+        if(/\d\.\d{3}\b/.test(norm.slice(mD.index, mD.index + 5))) continue;
+        decDot = mD; break;
+      }
+      /* ----- pengulangan frasa (3-gram dalam kalimat, >= 3 kali) ----- */
+      var gramTotals = {}, gramFirst = {};
+      paras.forEach(function(P){
+        wiSentences(P.text, P.quotes).forEach(function(s){
+          var g = wiGramCounts(P.text.slice(s.start, s.end), 3, s.start, P.quotes);
+          g.order.forEach(function(key){
+            gramTotals[key] = (gramTotals[key] || 0) + g.counts[key];
+            if(gramFirst[key] === undefined) gramFirst[key] = P.offset + s.start;
+          });
+        });
+      });
+      var bestPhrase = null;
+      Object.keys(gramTotals).forEach(function(key){
+        if(gramTotals[key] < 3) return;
+        if(!bestPhrase || gramTotals[key] > bestPhrase.count || (gramTotals[key] === bestPhrase.count && gramFirst[key] < gramFirst[bestPhrase.key]))
+          bestPhrase = { key: key, count: gramTotals[key] };
+      });
+      /* ----- frasa birokratis & pola kata berlebih (untuk profil) ----- */
+      function wiStyleScanPhrases(wordLists, skipParens){
+        return wordLists.map(function(words){
+          var cnt = 0, fIdx = Infinity, fEx = "";
+          paras.forEach(function(P){
+            wiStylePhraseHits(P, words, null).forEach(function(h){
+              if(skipParens){
+                var blocked = false;
+                for(var t=h.i;t<=h.j;t++) if(wiInSpans(P.parens, P.toks[t].start)) blocked = true;
+                if(blocked) return;
+              }
+              cnt++;
+              var gi = P.offset + P.toks[h.i].start;
+              if(gi < fIdx){ fIdx = gi; fEx = wiStyleExcerpt(P, h.i, h.j); }
+            });
+          });
+          return { count: cnt, idx: fIdx, excerpt: fEx };
+        });
+      }
+      var biroHits = wiStyleScanPhrases(WI_BIROKRASI.map(function(ph){ return ph.split(" "); }), false);
+      var mubHits = wiStyleScanPhrases(WI_MUBAZIR.map(function(pat){ return pat.seq; }), true);
+      /* ----- kalimat sangat panjang (untuk profil Ringkas) ----- */
+      var longSents = [];
+      paras.forEach(function(P){
+        wiSentences(P.text, P.quotes).forEach(function(s){
+          var txt = P.text.slice(s.start, s.end);
+          var wc = wiTokens(txt).length;
+          if(wc > 30) longSents.push({ idx: P.offset + s.start, words: wc, excerpt: txt.length > 90 ? txt.slice(0, 90) + "…" : txt });
+        });
+      });
+      /* ----- temuan lingkup dokumen (berlaku untuk semua profil) ----- */
+      var findings = [];
+      function pronSummary(sets, scan){
+        return sets.filter(function(s){ return scan.counts[s[0]] > 0; })
+          .map(function(s){ return "“" + s[0] + "” " + scan.counts[s[0]] + " kali"; }).join(", ");
+      }
+      function pronFirstIdx(sets, scan){
+        var m = Infinity;
+        sets.forEach(function(s){ if(scan.counts[s[0]] > 0 && scan.first[s[0]] && scan.first[s[0]].idx < m) m = scan.first[s[0]].idx; });
+        return m;
+      }
+      if(WI_PRON_SETS_1.filter(function(s){ return pron1.counts[s[0]] > 0; }).length >= 2)
+        findings.push({ scope: "dokumen", kind: "sapaan-orang-pertama", certainty: "potensial",
+          excerpt: pronSummary(WI_PRON_SETS_1, pron1),
+          reason: "Dokumen memakai lebih dari satu kelompok kata ganti orang pertama di luar kutipan: " + pronSummary(WI_PRON_SETS_1, pron1) + ". Pergantian sapaan dapat disengaja — misalnya dalam narasi atau dialog — tetapi pada tulisan formal umumnya dipilih satu bentuk yang konsisten. Pemeriksa hanya mencocokkan kata, tidak menilai maksud penulis.",
+          profile: null, idx: pronFirstIdx(WI_PRON_SETS_1, pron1) });
+      if(WI_PRON_SETS_2.filter(function(s){ return pron2.counts[s[0]] > 0; }).length >= 2)
+        findings.push({ scope: "dokumen", kind: "sapaan-orang-kedua", certainty: "potensial",
+          excerpt: pronSummary(WI_PRON_SETS_2, pron2),
+          reason: "Dokumen memakai lebih dari satu kelompok kata ganti orang kedua di luar kutipan: " + pronSummary(WI_PRON_SETS_2, pron2) + ". Pergantian sapaan dapat disengaja, tetapi konsistensi sapaan membantu pembaca memahami posisi penulis terhadapnya. Pemeriksa hanya mencocokkan kata, tidak menilai maksud penulis.",
+          profile: null, idx: pronFirstIdx(WI_PRON_SETS_2, pron2) });
+      termFound.forEach(function(tf){
+        var list = tf.used.map(function(v){ return "“" + v + "” " + tf.counts[v] + " kali"; }).join(", ");
+        findings.push({ scope: "dokumen", kind: "variasi-istilah", certainty: "potensial",
+          excerpt: tf.excerpt,
+          reason: "Istilah yang setara dipakai dalam beberapa variasi: " + list + ". Memilih satu variasi untuk seluruh dokumen memudahkan pembaca; variasi dapat saja disengaja bila konteksnya memang berbeda.",
+          profile: null, idx: tf.idx });
+      });
+      unitFound.forEach(function(uf){
+        findings.push({ scope: "dokumen", kind: "variasi-satuan", certainty: "potensial",
+          excerpt: "“" + uf.shortForm + "” " + uf.short + " kali · “" + uf.longForm + "” " + uf.long + " kali",
+          reason: "Satuan yang sama ditulis dalam dua bentuk: singkatan “" + uf.shortForm + "” dan bentuk panjang “" + uf.longForm + "”. Konsistensi penulisan satuan memudahkan pembaca membandingkan angka di seluruh dokumen.",
+          profile: null, idx: uf.idx });
+      });
+      if(decComma && decDot)
+        findings.push({ scope: "dokumen", kind: "desimal-campuran", certainty: "potensial",
+          excerpt: decComma[0] + " · " + decDot[0],
+          reason: "Dokumen memakai dua gaya penulisan desimal: koma (mis. “" + decComma[0] + "”) dan titik (mis. “" + decDot[0] + "”). Dalam Bahasa Indonesia, desimal baku memakai koma. Perlu diingat angka mirip versi perangkat lunak dapat tampak seperti desimal titik — periksa konteksnya sebelum menyimpulkan.",
+          profile: null, idx: Math.min(decComma.index, decDot.index) });
+      if(bestPhrase)
+        findings.push({ scope: "dokumen", kind: "pengulangan-frasa", certainty: "gaya",
+          excerpt: bestPhrase.key,
+          reason: "Frasa “" + bestPhrase.key + "” muncul " + bestPhrase.count + " kali dalam dokumen. Pengulangan frasa yang sama dapat disengaja untuk penekanan atau karena frasa itu istilah baku; bila tidak disengaja, pertimbangkan variasi kata. Pemeriksa hanya menghitung pengulangan, tidak menilai makna.",
+          profile: null, idx: gramFirst[bestPhrase.key] });
+      /* ----- temuan lingkup profil (hanya profil yang dipilih) ----- */
+      var pLabel = WI_STYLE_PROFILE_LABEL[prof];
+      if(prof === "formal" || prof === "profesional" || prof === "akademik"){
+        informalOrder.slice(0, 10).forEach(function(w){
+          var e = informal[w];
+          findings.push({ scope: "profil", kind: "kata-informal", certainty: "gaya",
+            excerpt: e.excerpt,
+            reason: "Kata “" + w + "” termasuk penanda ragam informal pada daftar kurasi Saksara (muncul " + e.count + " kali di luar kutipan), sedangkan profil acuan yang dipilih adalah " + pLabel + ". Ini saran gaya, bukan kesalahan — kata informal dapat disengaja, misalnya untuk dialog atau penekanan.",
+            profile: prof, idx: e.idx });
+        });
+      }
+      if(prof === "akademik"){
+        [ ["aku", pron1, "aku"], ["kamu", pron2, "kamu"], ["gue/gua", pron1, "gue/gua"], ["lo/lu", pron2, "lo/lu"] ].forEach(function(cfg){
+          var scan = cfg[1], key = cfg[2];
+          if(scan.counts[key] > 0)
+            findings.push({ scope: "profil", kind: "sapaan-akademik", certainty: "gaya",
+              excerpt: scan.first[key].excerpt,
+              reason: "Kata ganti “" + cfg[0] + "” dipakai " + scan.counts[key] + " kali di luar kutipan. Tulisan akademik umumnya memakai “saya”/“anda” atau bentuk pasif. Ini panduan gaya, bukan kesalahan.",
+              profile: prof, idx: scan.first[key].idx });
+        });
+      }
+      if(prof === "populer"){
+        WI_BIROKRASI.forEach(function(ph, i){
+          var h = biroHits[i];
+          if(h.count > 0)
+            findings.push({ scope: "profil", kind: "frasa-birokratis", certainty: "gaya",
+              excerpt: h.excerpt,
+              reason: "Frasa “" + ph + "” termasuk frasa birokratis yang kerap terasa berbelit bagi pembaca umum (muncul " + h.count + " kali). Pada profil Populer, pertimbangkan menulis maksudnya secara langsung bila sesuai dengan kalimatnya. Ini saran gaya, bukan kesalahan.",
+              profile: prof, idx: h.idx });
+        });
+      }
+      if(prof === "ringkas"){
+        WI_MUBAZIR.forEach(function(pat, i){
+          var h = mubHits[i];
+          if(h.count > 0)
+            findings.push({ scope: "profil", kind: "kata-mubazir", certainty: "gaya",
+              excerpt: h.excerpt,
+              reason: "Pola “" + pat.seq.join(" ") + "” termasuk kata berlebih yang terbukti; bentuk hematnya adalah “" + pat.repl + "” — disebutkan sebagai alternatif saja, teks tidak diubah otomatis.",
+              profile: prof, idx: h.idx });
+        });
+        longSents.slice(0, 3).forEach(function(ls){
+          findings.push({ scope: "profil", kind: "kalimat-panjang-ringkas", certainty: "gaya",
+            excerpt: ls.excerpt,
+            reason: "Kalimat ini berisi " + ls.words + " kata, di atas ambang 30 kata pada profil Ringkas. Kalimat panjang tidak otomatis buruk — periksa saja apakah isinya masih hemat dan jelas dalam sekali baca.",
+            profile: prof, idx: ls.idx });
+        });
+      }
+      // Urutan deterministik: dokumen dulu, lalu profil; di dalam lingkup
+      // yang sama urut menurut jenis temuan, lalu posisi kemunculan pertama.
+      findings.sort(function(a, b){
+        var sa = a.scope === "dokumen" ? 0 : 1, sb = b.scope === "dokumen" ? 0 : 1;
+        return sa - sb || (a.kind < b.kind ? -1 : a.kind > b.kind ? 1 : 0) || a.idx - b.idx;
+      });
+      S.findings = findings;
+      return S;
+    }
+    /* WI-CORE-END */
+
+    /* Writing Intelligence — render & interaksi (DOM). */
+    var WI_KIND_LABEL = { "repeated-word": "Kata berulang", "double-space": "Spasi tidak rapi", "missing-space-after-punctuation": "Spasi hilang setelah tanda baca", "sentence-capital": "Huruf awal kalimat", "kata-tidak-baku": "Kata tidak baku", "kata-depan": "Kata depan di/ke", "imbuhan": "Imbuhan di-/ke-", "tanda-baca": "Tanda baca", "huruf-kapital": "Huruf kapital", "kata-ulang": "Kata ulang", "pemisahan-kata": "Pemisahan kata", "ejaan-mekanis": "Ejaan", "kalimat-mubazir": "Kata mubazir", "kalimat-pengulangan-frasa": "Pengulangan frasa", "kalimat-kompleks": "Kalimat kompleks", "kalimat-panjang": "Kalimat panjang", "transisi-awalan": "Transisi antarkalimat" };
+    var WI_CERT_LABEL = { "pasti": "Aturan pasti", "saran": "Saran", "potensial": "Masalah potensial", "gaya": "Saran gaya" };
+    var wiTa = $("wi-input");
+    var wiResult = null, wiAccepted = [], wiRejected = {};
+    var wiIgnored = [];
+    function wiShowError(msg){
+      var b = $("wi-error");
+      if(msg){ b.textContent = msg; b.classList.add("show"); }
+      else { b.textContent = ""; b.classList.remove("show"); }
+    }
+    function wiUpdateCount(){
+      if(!wiTa) return;
+      var n = wiTa.value.length, c = $("wi-count");
+      c.textContent = fmtNumID(n) + " / 50.000 karakter";
+      c.classList.toggle("over", n > WI_MAX_CHARS);
+    }
+    function wiJoin(paras, seps){
+      var out = "";
+      for(var i=0;i<paras.length;i++){ out += paras[i]; if(i < seps.length) out += seps[i]; }
+      return out;
+    }
+    function wiParaHtml(t){
+      if(!t) return "<em>(paragraf kosong)</em>";
+      return escapeHtml(t).replace(/\n/g, "<br>");
+    }
+    // Khusus tampilan kartu saran: spasi dan baris baru dibuat terlihat
+    // (␣ / ↵) agar saran tentang whitespace tidak tampak kosong.
+    function wiShowWs(t){
+      return escapeHtml(t).replace(/ /g, "␣").replace(/\n/g, "↵");
+    }
+    function wiRender(){
+      if(!wiResult) return;
+      var html = "", pending = 0, done = 0, rejected = 0, read = 0, pendingRep = 0;
+      wiResult.suggestions.forEach(function(s){
+        if(wiRejected[s.id]){ if(s.advisory) read++; else rejected++; return; }
+        var isAcc = !s.advisory && wiAccepted.indexOf(s.id) >= 0;
+        if(isAcc) done++; else { pending++; if(!s.advisory) pendingRep++; }
+        html += "<div class=\"wi-card" + (isAcc ? " done" : "") + "\">"
+          + "<div class=\"wi-card-head\"><span class=\"wi-kind\">" + (WI_KIND_LABEL[s.kind] || s.kind) + "</span>"
+          + "<span class=\"wi-cert\">" + (WI_CERT_LABEL[s.certainty] || "Saran") + "</span>"
+          + (isAcc ? "<span class=\"wi-state\">Diterima</span>" : "") + "</div>"
+          + "<span class=\"wi-frag\">" + wiShowWs(s.original) + "</span>"
+          + (s.advisory ? "" : "<div class=\"wi-arrow\">menjadi ↓</div>"
+          + "<span class=\"wi-rep\">" + wiShowWs(s.replacement) + "</span>")
+          + "<p class=\"wi-expl\">" + escapeHtml(s.explanation) + "</p>"
+          + (isAcc ? "" : s.advisory
+            ? "<div class=\"wi-actions\"><button type=\"button\" data-wi-reject=\"" + s.id + "\">Tandai sudah dibaca</button></div>"
+            : "<div class=\"wi-actions\"><button type=\"button\" class=\"primary\" data-wi-accept=\"" + s.id + "\">Terima</button><button type=\"button\" data-wi-reject=\"" + s.id + "\">Tolak</button>" + (s.word ? "<button type=\"button\" data-wi-ignore=\"" + s.id + "\">Abaikan kata ini</button>" : "") + "</div>")
+          + "</div>";
+      });
+      $("wi-sug-list").innerHTML = html;
+      $("wi-sug-empty").innerHTML = wiResult.suggestions.length === 0
+        ? "<div class=\"wi-empty\">Tidak ditemukan saran untuk teks ini. Pemeriksa ini bekerja dengan aturan dan daftar kata tertutup, jadi tidak semua kesalahan tertangkap — teks tetap perlu dibaca kembali secara manual.</div>" : "";
+      $("wi-status").textContent = wiResult.suggestions.length === 0 ? "" :
+        "Ditemukan " + wiResult.suggestions.length + " saran — " + done + " diterima, " + pending + " menunggu keputusan Anda" + (rejected ? ", " + rejected + " ditolak" : "") + (read ? ", " + read + " ditandai sudah dibaca" : "") + ".";
+      var rev = wiApply(wiResult.paragraphs, wiResult.suggestions, wiAccepted);
+      $("wi-revised").value = wiJoin(rev, wiResult.separators);
+      var co = "", cr = "";
+      wiResult.paragraphs.forEach(function(p, i){
+        var changed = rev[i] !== p;
+        co += "<p class=\"wi-para" + (changed ? " changed" : "") + "\">" + wiParaHtml(p) + "</p>";
+        cr += "<p class=\"wi-para" + (changed ? " changed" : "") + "\">" + wiParaHtml(rev[i]) + "</p>";
+      });
+      $("wi-cmp-orig").innerHTML = co;
+      $("wi-cmp-rev").innerHTML = cr;
+      $("wi-undo").disabled = wiAccepted.length === 0;
+      $("wi-accept-all").disabled = pendingRep === 0;
+      $("wi-reset").disabled = wiAccepted.length === 0 && rejected === 0 && read === 0;
+    }
+    function wiRenderIgnored(){
+      var box = $("wi-ignored");
+      if(!box) return;
+      if(!wiIgnored.length){ box.innerHTML = ""; return; }
+      var html = "<span>Kata yang diabaikan sesi ini:</span>";
+      wiIgnored.forEach(function(w){
+        html += "<span class=\"wi-chip\">" + escapeHtml(w) + "<button type=\"button\" data-wi-unignore=\"" + escapeHtml(w) + "\" aria-label=\"Berhenti mengabaikan kata " + escapeHtml(w) + "\">×</button></span>";
+      });
+      box.innerHTML = html;
+    }
+    function wiRerun(){
+      wiRenderIgnored();
+      if(!wiResult) return;
+      wiResult = wiAnalyze(wiTa.value, { ignoreWords: wiIgnored });
+      wiAccepted = []; wiRejected = {};
+      wiRender();
+    }
+    function wiRun(){
+      var text = wiTa.value;
+      wiShowError("");
+      if(!text.trim()){ wiShowError("Tempel atau ketik teks terlebih dahulu, lalu tekan Analisis."); wiTa.focus(); return; }
+      if(text.length > WI_MAX_CHARS){ wiShowError("Teks melebihi batas 50.000 karakter (" + fmtNumID(text.length) + " karakter). Persingkat teks atau bagi menjadi beberapa bagian, lalu coba lagi."); return; }
+      var btn = $("wi-btn");
+      btn.disabled = true;
+      $("wi-busy").textContent = "Menganalisis…";
+      setTimeout(function(){
+        wiResult = wiAnalyze(text, { ignoreWords: wiIgnored });
+        wiAccepted = []; wiRejected = {};
+        $("wi-results").hidden = false;
+        btn.disabled = false;
+        $("wi-busy").textContent = "";
+        wiRender();
+      }, 30);
+    }
+    if(wiTa){
+      wiTa.addEventListener("input", wiUpdateCount);
+      $("wi-btn").addEventListener("click", wiRun);
+      $("wi-clear").addEventListener("click", function(){
+        wiTa.value = "";
+        wiResult = null; wiAccepted = []; wiRejected = {};
+        wiIgnored = []; wiRenderIgnored();
+        wiUpdateCount();
+        wiShowError("");
+        $("wi-results").hidden = true;
+        $("wi-read").hidden = true;
+        $("wi-style").hidden = true;
+        wiStyleText = null;
+        wiTa.focus();
+      });
+      $("wi-sug-list").addEventListener("click", function(ev){
+        var t = ev.target;
+        var b = (t && t.closest) ? t.closest("[data-wi-accept],[data-wi-reject],[data-wi-ignore]") : null;
+        if(!b) return;
+        var a = b.getAttribute("data-wi-accept"), r = b.getAttribute("data-wi-reject"), ig = b.getAttribute("data-wi-ignore");
+        if(a){ if(wiAccepted.indexOf(a) < 0 && !wiRejected[a]) wiAccepted.push(a); wiRender(); }
+        else if(r){ wiRejected[r] = 1; wiRender(); }
+        else if(ig && wiResult){
+          var s = null;
+          wiResult.suggestions.forEach(function(x){ if(x.id === ig) s = x; });
+          if(s && s.word && wiIgnored.indexOf(s.word) < 0){ wiIgnored.push(s.word); wiRerun(); }
+        }
+      });
+      $("wi-ignored").addEventListener("click", function(ev){
+        var t = ev.target;
+        var b = (t && t.closest) ? t.closest("[data-wi-unignore]") : null;
+        if(!b) return;
+        var w = b.getAttribute("data-wi-unignore");
+        wiIgnored = wiIgnored.filter(function(x){ return x !== w; });
+        wiRerun();
+      });
+      $("wi-accept-all").addEventListener("click", function(){
+        if(!wiResult) return;
+        wiResult.suggestions.forEach(function(s){ if(s.advisory) return; if(!wiRejected[s.id] && wiAccepted.indexOf(s.id) < 0) wiAccepted.push(s.id); });
+        wiRender();
+      });
+      $("wi-undo").addEventListener("click", function(){ wiAccepted.pop(); wiRender(); });
+      $("wi-reset").addEventListener("click", function(){ wiAccepted = []; wiRejected = {}; wiRender(); });
+      $("wi-copy").addEventListener("click", function(){
+        var ta = $("wi-revised"), st = $("wi-copy-status");
+        function done(){ st.textContent = "Hasil revisi disalin."; }
+        if(navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(ta.value).then(done, function(){ ta.select(); document.execCommand("copy"); done(); });
+        } else { ta.select(); document.execCommand("copy"); done(); }
+      });
+      /* Phase 8.4 — Analisis Keterbacaan: hanya menampilkan statistik dari
+         wiReadability; tidak pernah mengubah teks dan tidak menyimpan apa pun. */
+      function wiReadBar(label, pct, valTxt){
+        return "<div class=\"wi-read-bar-row\"><span>" + label + "</span><div class=\"wi-read-bar\"><div class=\"wi-read-fill\" style=\"width:" + pct + "%\"></div></div><span class=\"wi-read-val\">" + valTxt + "</span></div>";
+      }
+      function wiReadHtml(R){
+        var c = R.components;
+        var html = "<div class=\"wi-read-score\"><div class=\"wi-read-num\">" + R.score + "</div><div>"
+          + "<div class=\"wi-read-band\">" + R.band + "</div>"
+          + "<div class=\"wf-note\">Skor keterbacaan Saksara (0–100) — semakin tinggi, semakin ringan indikator statistiknya.</div></div></div>"
+          + "<p class=\"wf-note\">Skor Saksara adalah estimasi dari indikator statistik di bawah ini — bukan standar ilmiah, bukan penilaian kualitas tulisan. Tulisan akademik wajar berada di rentang yang lebih menuntut.</p>";
+        html += "<h4>Komponen skor</h4>";
+        var rows = [
+          ["Panjang kalimat rata-rata", c.sentence, "Rata-rata " + wfFmt(R.avgWordsPerSentence, 1) + " kata per kalimat. Nilai penuh pada rentang 12–22 kata; kalimat yang jauh lebih pendek atau jauh lebih panjang menurunkannya."],
+          ["Keragaman panjang kalimat", c.variation, "Koefisien variasi panjang kalimat " + wfFmt(R.cvSentence, 2) + ". Nilai penuh pada rentang 0,35–0,75 — campuran kalimat pendek dan panjang membuat alur tidak monoton."],
+          ["Kata panjang", c.longWords, "Sebesar " + wfFmt(R.longWordShare, 1) + "% kata tergolong panjang (perkiraan ≥ 4 suku kata). Makin besar proporsinya, makin rendah nilai komponen ini."],
+          ["Kalimat sangat panjang", c.longSentences, "Sebesar " + wfFmt(R.longShare, 1) + "% kalimat berisi lebih dari 40 kata. Kalimat panjang tidak otomatis salah — komponen ini hanya menghitung proporsinya."],
+          ["Panjang paragraf rata-rata", c.paragraph, "Rata-rata " + wfFmt(R.avgWordsPerParagraph, 1) + " kata per paragraf. Nilai penuh pada rentang 40–120 kata."]
+        ];
+        rows.forEach(function(r){
+          html += wiReadBar(r[0], r[1], r[1] + " / 100") + "<p class=\"wi-read-expl\">" + r[2] + "</p>";
+        });
+        html += "<details class=\"wi-read-details\"><summary>Cara skor dihitung</summary>"
+          + "<p>Skor adalah gabungan tertimbang lima komponen di atas (masing-masing 0–100): panjang kalimat rata-rata <strong>30%</strong>, keragaman panjang kalimat <strong>15%</strong>, kata panjang <strong>20%</strong>, kalimat sangat panjang <strong>20%</strong>, dan panjang paragraf rata-rata <strong>15%</strong>. Setiap komponen bernilai penuh pada rentang nyamannya dan menurun secara linear di luar rentang itu. Label hasilnya bersifat deskriptif — misalnya “Mudah diikuti” atau “Menuntut” — dan <strong>bukan</strong> label tingkat pendidikan pembaca.</p>"
+          + "<ul>"
+          + "<li><strong>Suku kata adalah perkiraan.</strong> Jumlah suku kata dihitung dari gugus huruf vokal, bukan dari kamus — kata serapan, nama diri, dan kata seperti “saat” dapat meleset.</li>"
+          + "<li><strong>Pemisahan kalimat bersifat konservatif.</strong> Singkatan umum (dll., dkk., s.d., gelar), angka desimal, URL, dan sitasi dalam tanda kurung diusahakan tidak memotong kalimat, tetapi singkatan atau format yang tidak lazim tetap dapat memengaruhi hitungan.</li>"
+          + "<li><strong>Hasil wajar berbeda antarjenis tulisan.</strong> Tulisan akademik dan hukum cenderung lebih menuntut daripada berita atau cerita — perbedaan itu normal, bukan masalah.</li>"
+          + "<li><strong>Skor tidak mengukur isi.</strong> Kebenaran, tata bahasa, dan kualitas gagasan tidak dinilai oleh analisis ini.</li>"
+          + "</ul></details>";
+        html += "<h4>Distribusi panjang kalimat</h4>";
+        function pctOf(n){ return R.sentences ? Math.round(1000 * n / R.sentences) / 10 : 0; }
+        html += wiReadBar("Pendek (≤ 12 kata)", pctOf(R.buckets.pendek), fmtNumID(R.buckets.pendek) + " (" + wfFmt(pctOf(R.buckets.pendek), 1) + "%)");
+        html += wiReadBar("Sedang (13–25 kata)", pctOf(R.buckets.sedang), fmtNumID(R.buckets.sedang) + " (" + wfFmt(pctOf(R.buckets.sedang), 1) + "%)");
+        html += wiReadBar("Panjang (> 25 kata)", pctOf(R.buckets.panjang), fmtNumID(R.buckets.panjang) + " (" + wfFmt(pctOf(R.buckets.panjang), 1) + "%)");
+        html += "<h4>Distribusi panjang paragraf</h4>";
+        function pctP(n){ return R.paragraphs ? Math.round(1000 * n / R.paragraphs) / 10 : 0; }
+        html += wiReadBar("≤ 25 kata", pctP(R.paraBuckets.le25), fmtNumID(R.paraBuckets.le25) + " paragraf");
+        html += wiReadBar("26–75 kata", pctP(R.paraBuckets.le75), fmtNumID(R.paraBuckets.le75) + " paragraf");
+        html += wiReadBar("76–150 kata", pctP(R.paraBuckets.le150), fmtNumID(R.paraBuckets.le150) + " paragraf");
+        html += wiReadBar("> 150 kata", pctP(R.paraBuckets.gt150), fmtNumID(R.paraBuckets.gt150) + " paragraf");
+        html += "<h4>Statistik dokumen</h4><dl class=\"wi-read-stats\">"
+          + "<div><dt>Total kata</dt><dd>" + fmtNumID(R.words) + "</dd></div>"
+          + "<div><dt>Jumlah kalimat</dt><dd>" + fmtNumID(R.sentences) + "</dd></div>"
+          + "<div><dt>Jumlah paragraf</dt><dd>" + fmtNumID(R.paragraphs) + "</dd></div>"
+          + "<div><dt>Rata-rata kata per kalimat</dt><dd>" + wfFmt(R.avgWordsPerSentence, 1) + "</dd></div>"
+          + "<div><dt>Kalimat terpendek</dt><dd>" + R.minSentence + " kata</dd></div>"
+          + "<div><dt>Kalimat terpanjang</dt><dd>" + R.maxSentence + " kata</dd></div>"
+          + "<div><dt>Rata-rata kalimat per paragraf</dt><dd>" + wfFmt(R.avgSentencesPerParagraph, 1) + "</dd></div>"
+          + "<div><dt>Rata-rata kata per paragraf</dt><dd>" + wfFmt(R.avgWordsPerParagraph, 1) + "</dd></div>"
+          + "<div><dt>Rata-rata suku kata per kata (perkiraan)</dt><dd>" + wfFmt(R.avgSyllables, 2) + "</dd></div>"
+          + "</dl>";
+        html += "<h4>Bagian yang perlu diperhatikan</h4>";
+        var att = [];
+        R.denseParas.slice(0, 10).forEach(function(i){
+          att.push("Paragraf ke-" + (i + 1) + " tergolong padat (" + fmtNumID(R.paraWords[i]) + " kata, " + R.paraSentences[i] + " kalimat) — pembaca mungkin terbantu jika paragraf ini dibagi menjadi dua atau lebih. Ini indikator statistik, bukan kesalahan.");
+        });
+        if(R.denseParas.length > 10) att.push("…dan " + (R.denseParas.length - 10) + " paragraf padat lainnya.");
+        R.shortParas.slice(0, 10).forEach(function(i){
+          att.push("Paragraf ke-" + (i + 1) + " sangat pendek (1 kalimat, " + R.paraWords[i] + " kata) — paragraf pendek bisa disengaja untuk penekanan; periksa saja apakah ia lebih baik digabung dengan paragraf di sekitarnya.");
+        });
+        if(R.shortParas.length > 10) att.push("…dan " + (R.shortParas.length - 10) + " paragraf sangat pendek lainnya.");
+        if(R.longestSentenceWords > 40){
+          var ex = R.longestSentenceText;
+          if(ex.length > 160) ex = ex.slice(0, 160) + "…";
+          att.push("Kalimat terpanjang berisi " + R.longestSentenceWords + " kata — pertimbangkan memeriksa apakah kalimat ini tetap jelas dalam sekali baca; kalimat panjang bisa saja sah dan perlu, terutama dalam tulisan akademik.<span class=\"wi-read-quote\">" + escapeHtml(ex) + "</span>");
+        }
+        html += att.length ? "<ul class=\"wi-read-att\"><li>" + att.join("</li><li>") + "</li></ul>"
+          : "<p class=\"wf-note\">Tidak ada bagian yang menonjol perlu ditinjau dari indikator ini.</p>";
+        return html;
+      }
+      $("wi-read-btn").addEventListener("click", function(){
+        var text = wiTa.value;
+        wiShowError("");
+        if(text.length > WI_MAX_CHARS){ wiShowError("Teks melebihi batas 50.000 karakter (" + fmtNumID(text.length) + " karakter). Persingkat teks atau bagi menjadi beberapa bagian, lalu coba lagi."); return; }
+        var R = wiReadability(text);
+        var box = $("wi-read");
+        box.hidden = false;
+        box.innerHTML = R.empty
+          ? "<div class=\"wi-empty\">Teks masih terlalu pendek untuk dianalisis keterbacaannya. Tulis atau tempel beberapa kalimat lengkap terlebih dahulu, lalu tekan Analisis keterbacaan lagi.</div>"
+          : wiReadHtml(R);
+      });
+      /* Phase 8.5 — Kontrol Gaya Tulisan: menampilkan indikator dan temuan
+         pola dari wiStyle; bersifat saran dan tidak pernah mengubah teks. */
+      var WI_STYLE_DESC = {
+        formal: "Acuan: bahasa baku dan sapaan resmi (saya/anda). Kata informal ditampilkan sebagai saran gaya, bukan kesalahan.",
+        akademik: "Acuan: tulisan ilmiah — bahasa baku, sapaan saya/anda atau bentuk pasif, dan istilah yang konsisten.",
+        profesional: "Acuan: komunikasi kerja yang jelas dan sopan — bahasa baku dengan nada profesional; kata informal ditampilkan sebagai saran gaya.",
+        populer: "Acuan: tulisan untuk pembaca umum — bahasa lugas; frasa birokratis yang berbelit ditampilkan sebagai saran.",
+        ringkas: "Acuan: hemat kata — pola kata berlebih yang terbukti dan kalimat sangat panjang ditampilkan sebagai saran.",
+        naratif: "Acuan: cerita dan tuturan — pemeriksaan menekankan konsistensi sapaan dan istilah; profil ini tidak menambah temuan leksikal."
+      };
+      var WI_STYLE_KIND_LABEL = { "sapaan-orang-pertama": "Sapaan orang pertama", "sapaan-orang-kedua": "Sapaan orang kedua", "variasi-istilah": "Variasi istilah", "variasi-satuan": "Variasi satuan", "desimal-campuran": "Penulisan desimal", "pengulangan-frasa": "Pengulangan frasa", "kata-informal": "Kata informal", "sapaan-akademik": "Sapaan pada tulisan akademik", "frasa-birokratis": "Frasa birokratis", "kata-mubazir": "Kata berlebih", "kalimat-panjang-ringkas": "Kalimat panjang" };
+      var wiStyleText = null;
+      function wiStyleDescUpdate(){
+        var sel = $("wi-style-profile");
+        if(sel) $("wi-style-desc").textContent = WI_STYLE_DESC[sel.value] || "";
+      }
+      function wiStyleFindingHtml(f){
+        return "<div class=\"wi-card\">"
+          + "<div class=\"wi-card-head\"><span class=\"wi-kind\">" + (WI_STYLE_KIND_LABEL[f.kind] || f.kind) + "</span>"
+          + "<span class=\"wi-cert\">" + (WI_CERT_LABEL[f.certainty] || "Saran gaya") + "</span>"
+          + (f.scope === "profil" ? "<span class=\"wi-state\">Profil acuan: " + escapeHtml(WI_STYLE_PROFILE_LABEL[f.profile] || f.profile) + "</span>" : "")
+          + "</div>"
+          + "<span class=\"wi-frag\">" + escapeHtml(f.excerpt) + "</span>"
+          + "<p class=\"wi-expl\">" + escapeHtml(f.reason) + "</p></div>";
+      }
+      function wiStyleHtml(S){
+        var ind = S.indicators, html = "";
+        function row(name, val, label, expl){
+          return "<div class=\"wi-style-ind\"><div class=\"wi-style-ind-head\"><span class=\"wi-style-name\">" + name + "</span><span>" + val + "</span><span class=\"wi-style-label\">" + label + "</span></div><p class=\"wi-read-expl\">" + expl + "</p></div>";
+        }
+        html += "<h4>Karakteristik gaya</h4>";
+        var f = ind.formality;
+        html += row("Kecenderungan formalitas", fmtNumID(f.informalCount) + " kata informal (" + wfFmt(f.density, 1) + " per 100 kata)", f.label,
+          "Dihitung dari penanda informal pada daftar kurasi (mis. nggak, banget, udah) di luar kutipan. Kata informal bukan kesalahan — angka ini hanya menggambarkan kecenderungan ragam bahasa.");
+        html += row("Keringkasan kalimat", "Rata-rata " + wfFmt(ind.conciseness.avgWordsPerSentence, 1) + " kata per kalimat", ind.conciseness.label,
+          "Rata-rata panjang kalimat yang sama dengan Analisis Keterbacaan. Kalimat panjang sah pada banyak jenis tulisan; ini sekadar deskripsi ukuran.");
+        var vr = ind.vocabRepeat;
+        var vrLabel = vr.topRepeated.length
+          ? "Paling sering: " + vr.topRepeated.map(function(t){ return "“" + t.word + "” (" + t.count + " kali)"; }).join(", ")
+          : "Tidak ada kata isi yang muncul 3 kali atau lebih";
+        html += row("Pengulangan kosakata", "Rasio kata unik " + wfFmt(vr.ttr, 3) + " (" + fmtNumID(vr.unique) + " dari " + fmtNumID(vr.total) + " kata)", vrLabel,
+          "Rasio type-token: makin rendah nilainya, makin banyak kata yang berulang. Pengulangan istilah baku dapat disengaja dan memang perlu — ini bukan penilaian.");
+        html += row("Konsistensi istilah", fmtNumID(ind.termConsistency.variantGroups) + " kelompok istilah bervariasi", ind.termConsistency.label,
+          "Kelompok istilah setara pada daftar kurasi (mis. email/surel, ponsel/handphone) yang dipakai dalam lebih dari satu variasi di dokumen ini.");
+        html += row("Variasi kalimat", "Koefisien variasi " + wfFmt(ind.sentenceVariation.cv, 2), ind.sentenceVariation.label,
+          "Sebaran panjang kalimat: nilai kecil berarti panjang kalimat seragam; nilai besar berarti campuran kalimat pendek dan panjang.");
+        html += row("Kepadatan bahasa", "Rata-rata " + wfFmt(ind.density.avgSyllables, 2) + " suku kata per kata · " + wfFmt(ind.density.longWordShare, 1) + "% kata panjang", ind.density.label,
+          "Berdasarkan perkiraan suku kata dari gugus vokal dan proporsi kata panjang (≥ 4 suku kata). Kosakata teknis memang cenderung lebih padat.");
+        var doc = S.findings.filter(function(x){ return x.scope === "dokumen"; });
+        var profF = S.findings.filter(function(x){ return x.scope === "profil"; });
+        html += "<h4>Konsistensi dokumen</h4>";
+        html += doc.length ? "<div class=\"wi-sug\">" + doc.map(wiStyleFindingHtml).join("") + "</div>"
+          : "<p class=\"wf-note\">Tidak ada temuan konsistensi dari indikator ini.</p>";
+        html += "<h4>Kesesuaian dengan profil " + escapeHtml(WI_STYLE_PROFILE_LABEL[S.profile] || S.profile) + "</h4>";
+        html += profF.length ? "<div class=\"wi-sug\">" + profF.map(wiStyleFindingHtml).join("") + "</div>"
+          : "<p class=\"wf-note\">Tidak ada temuan untuk profil ini dari indikator yang diperiksa.</p>";
+        html += "<p class=\"wf-note\">Semua temuan di panel ini adalah hasil pencocokan pola terhadap daftar kurasi — bukan penilaian makna, maksud, atau kualitas tulisan. Keputusan akhir selalu di tangan penulis.</p>";
+        return html;
+      }
+      function wiStyleRender(S){
+        var box = $("wi-style");
+        box.hidden = false;
+        box.innerHTML = S.empty
+          ? "<div class=\"wi-empty\">Teks belum memuat kata yang dapat dianalisis gayanya. Tulis atau tempel beberapa kalimat terlebih dahulu, lalu tekan Analisis gaya lagi.</div>"
+          : wiStyleHtml(S);
+      }
+      $("wi-style-btn").addEventListener("click", function(){
+        var text = wiTa.value;
+        wiShowError("");
+        if(!text.trim()){
+          wiStyleText = null;
+          var box = $("wi-style");
+          box.hidden = false;
+          box.innerHTML = "<div class=\"wi-empty\">Tempel atau ketik teks terlebih dahulu, pilih profil acuan, lalu tekan Analisis gaya.</div>";
+          return;
+        }
+        if(text.length > WI_MAX_CHARS){ wiShowError("Teks melebihi batas 50.000 karakter (" + fmtNumID(text.length) + " karakter). Persingkat teks atau bagi menjadi beberapa bagian, lalu coba lagi."); return; }
+        wiStyleText = text;
+        wiStyleRender(wiStyle(text, $("wi-style-profile").value));
+      });
+      $("wi-style-profile").addEventListener("change", function(){
+        wiStyleDescUpdate();
+        // Profil adalah konteks pemeriksaan: mengganti profil menjalankan
+        // ulang analisis yang sama pada teks terakhir yang dianalisis.
+        if(wiStyleText !== null) wiStyleRender(wiStyle(wiStyleText, $("wi-style-profile").value));
+      });
+      wiStyleDescUpdate();
+      wiUpdateCount();
+      wiRenderIgnored();
+    }
+
     /* ================= Compare Writing (Phase 4) =================
        Mesin perbandingan dokumen. Berdiri sendiri: TIDAK menjalankan Detector
        dan tidak memakai skor deteksi apa pun. */
@@ -6275,8 +7886,8 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
     // Router tampilan per halaman (satu berkas): #/home, #/detector, #/cara-kerja, #/metode, #/posisi.
     // Tautan lama (#analisis, #clf-panel, #benchmark, …) tetap didukung lewat peta LEGACY.
     (function(){
-      var TITLES = { home: "Saksara — Pahami Tulisan Anda", detector: "Periksa Tulisan — Saksara", forensik: "Kenali Gaya Tulisan — Saksara", compare: "Bandingkan Tulisan — Saksara", benchmark: "Pengujian & Transparansi — Saksara", ocr: "Baca Teks dari Gambar — Saksara", history: "Riwayat Saya — Saksara", "cara-kerja": "Cara Menggunakan Saksara", metode: "Metode & Pengukuran — Saksara", posisi: "Privasi & Batasan — Saksara" };
-      var ROUTES = { "": "home", "/": "home", "/home": "home", "/detector": "detector", "/forensik": "forensik", "/compare": "compare", "/benchmark": "benchmark", "/ocr": "ocr", "/history": "history", "/cara-kerja": "cara-kerja", "/metode": "metode", "/posisi": "posisi" };
+      var TITLES = { home: "Saksara — Pahami Tulisan Anda", detector: "Periksa Tulisan — Saksara", forensik: "Kenali Gaya Tulisan — Saksara", tulis: "Asisten Menulis — Saksara", compare: "Bandingkan Tulisan — Saksara", benchmark: "Pengujian & Transparansi — Saksara", ocr: "Baca Teks dari Gambar — Saksara", history: "Riwayat Saya — Saksara", "cara-kerja": "Cara Menggunakan Saksara", metode: "Metode & Pengukuran — Saksara", posisi: "Privasi & Batasan — Saksara" };
+      var ROUTES = { "": "home", "/": "home", "/home": "home", "/detector": "detector", "/forensik": "forensik", "/tulis": "tulis", "/compare": "compare", "/benchmark": "benchmark", "/ocr": "ocr", "/history": "history", "/cara-kerja": "cara-kerja", "/metode": "metode", "/posisi": "posisi" };
       var LEGACY = { "analisis": ["detector", "analisis"], "panel-analisis": ["detector", "panel-analisis"], "clf-panel": ["detector", "clf-panel"], "report": ["detector", "report"], "batch": ["detector", "batch"], "cara-kerja": ["cara-kerja", null], "benchmark": ["metode", "benchmark-note"], "posisi": ["posisi", null], "atas": ["home", null] };
       function show(view, anchor){
         var blocks = document.querySelectorAll("[data-view]");
