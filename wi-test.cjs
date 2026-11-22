@@ -7,8 +7,8 @@ const core = coreRaw.slice(coreRaw.indexOf("*/") + 2);
 
 const sandbox = {};
 new Function("sandbox", core +
-  "\nsandbox.wiAnalyze = wiAnalyze; sandbox.wiApply = wiApply; sandbox.WI_MAX_CHARS = WI_MAX_CHARS;")(sandbox);
-const wiAnalyze = sandbox.wiAnalyze, wiApply = sandbox.wiApply;
+  "\nsandbox.wiAnalyze = wiAnalyze; sandbox.wiApply = wiApply; sandbox.WI_MAX_CHARS = WI_MAX_CHARS; sandbox.wiSentences = wiSentences;")(sandbox);
+const wiAnalyze = sandbox.wiAnalyze, wiApply = sandbox.wiApply, wiSentences = sandbox.wiSentences;
 
 let pass = 0, fail = 0;
 function check(name, cond, extra) {
@@ -211,6 +211,115 @@ const mix = wiAnalyze("Hari ini cerah ☀️ dan ia pergi ke apotik dekat kafé.
 check("unicode: baku tepat offset setelah emoji", invariantsHold(mix) === true && mix.suggestions.some(s => s.kind === "kata-tidak-baku" && s.original === "apotik"), invariantsHold(mix));
 check("unicode: apply eksak dengan diakritik", joinRes(mix, wiApply(mix.paragraphs, mix.suggestions, mix.suggestions.map(s => s.id))) === "Hari ini cerah ☀️ dan ia pergi ke apotek dekat kafé.");
 check("invarian teks ramai 8.2", invariantsHold(wiAnalyze("dirumah,ia di baca buku2 tentang praktek.. bagusss sekali")) === true, invariantsHold(wiAnalyze("dirumah,ia di baca buku2 tentang praktek.. bagusss sekali")));
+
+/* ================= Phase 8.3 — Sentence Improvement ================= */
+const KINDS83 = ["kalimat-mubazir", "kalimat-pengulangan-frasa", "kalimat-kompleks", "kalimat-panjang", "transisi-awalan"];
+function k83(r) { return r.suggestions.filter(s => KINDS83.includes(s.kind)); }
+function advisories(r) { return r.suggestions.filter(s => s.advisory); }
+function invariants83(r) {
+  for (const s of r.suggestions) {
+    if (r.paragraphs[s.pIdx].slice(s.start, s.end) !== s.original) return "original mismatch: " + s.id;
+  }
+  const by = {};
+  for (const s of r.suggestions) {
+    if (s.advisory) continue;
+    (by[s.pIdx] = by[s.pIdx] || []).push(s);
+  }
+  for (const k in by) {
+    const a = by[k].slice().sort((x, y) => x.start - y.start);
+    for (let i = 1; i < a.length; i++) if (a[i].start < a[i - 1].end) return "overlap (non-advisory) in paragraph " + k;
+  }
+  return true;
+}
+
+console.log("21) Phase 8.3 — segmentasi kalimat (wiSentences)");
+check("seg: singkatan gelar + desimal -> 1 kalimat", wiSentences("Dr. Hadi, M.Sc. meneliti hal. 5 pada pukul 3.5 di aula.").length === 1, wiSentences("Dr. Hadi, M.Sc. meneliti hal. 5 pada pukul 3.5 di aula.").length);
+check("seg: sitasi kurung tidak memisah, titik sesudahnya memisah", wiSentences("Hasilnya signifikan (Rahman, 2020). Penelitian lanjut diperlukan.").length === 2);
+check("seg: titik di dalam kurung tidak memisah", wiSentences("Data awal (lihat Bab 3. Rincian menyusul) dipakai apa adanya.").length === 1);
+check("seg: URL/domain tidak memisah", wiSentences("Kunjungi saksara.vercel.app untuk info. Lalu coba lagi.").length === 2);
+check("seg: titik akhir di dalam kutip menutup kalimat", wiSentences("Ia berkata, \"Saya pergi.\" Kemudian ia pulang.").length === 2);
+check("seg: tiga kalimat sederhana", wiSentences("Satu kalimat. Dua kalimat! Tiga kalimat?").length === 3);
+
+console.log("22) Phase 8.3 — kata mubazir (pasti)");
+const mb1 = wiAnalyze("Hal itu disebabkan karena hujan deras.");
+check("mubazir: 'disebabkan karena' -> 'disebabkan oleh' (pasti)", mb1.suggestions.some(s => s.kind === "kalimat-mubazir" && s.original === "disebabkan karena" && s.replacement === "disebabkan oleh" && s.certainty === "pasti"), kinds(mb1));
+check("mubazir: apply disebabkan", joinRes(mb1, wiApply(mb1.paragraphs, mb1.suggestions, mb1.suggestions.map(s => s.id))) === "Hal itu disebabkan oleh hujan deras.");
+check("mubazir: 'agar supaya' -> 'agar'", wiAnalyze("Ia belajar agar supaya lulus ujian.").suggestions.some(s => s.kind === "kalimat-mubazir" && s.replacement === "agar" && s.certainty === "pasti"));
+const mb3 = wiAnalyze("Demi untuk kebaikan bersama, kami setuju.");
+check("mubazir: 'Demi untuk' -> 'Untuk' (kapital dipertahankan)", mb3.suggestions.some(s => s.kind === "kalimat-mubazir" && s.replacement === "Untuk" && s.certainty === "pasti"), kinds(mb3));
+check("mubazir: 'adalah merupakan' -> 'merupakan'", wiAnalyze("Metode ini adalah merupakan cara baru.").suggestions.some(s => s.kind === "kalimat-mubazir" && s.original === "adalah merupakan" && s.replacement === "merupakan"));
+check("mubazir: 'yaitu adalah' -> 'yaitu'", wiAnalyze("Fokusnya yaitu adalah peningkatan mutu.").suggestions.some(s => s.kind === "kalimat-mubazir" && s.replacement === "yaitu" && s.certainty === "pasti"));
+
+console.log("23) Phase 8.3 — nominalisasi & pleonasme arah (gaya)");
+const nm1 = wiAnalyze("Peneliti melakukan penelitian di laboratorium.");
+check("nominalisasi: 'melakukan penelitian' -> 'meneliti' (gaya)", nm1.suggestions.some(s => s.kind === "kalimat-mubazir" && s.original === "melakukan penelitian" && s.replacement === "meneliti" && s.certainty === "gaya"), kinds(nm1));
+check("nominalisasi: apply", joinRes(nm1, wiApply(nm1.paragraphs, nm1.suggestions, nm1.suggestions.map(s => s.id))) === "Peneliti meneliti di laboratorium.");
+check("nominalisasi: awal kalimat 'Melakukan pengamatan' -> 'Mengamati'", wiAnalyze("Melakukan pengamatan adalah tugas utamanya.").suggestions.some(s => s.kind === "kalimat-mubazir" && s.replacement === "Mengamati"));
+check("nominalisasi: objek sesudahnya utuh ('melakukan pengumpulan data' -> 'mengumpulkan data')", (() => { const r = wiAnalyze("Tim melakukan pengumpulan data lapangan."); const a = wiApply(r.paragraphs, r.suggestions, r.suggestions.map(s => s.id)); return joinRes(r, a) === "Tim mengumpulkan data lapangan."; })());
+check("pleonasme: 'naik ke atas' -> 'naik' (gaya)", wiAnalyze("Ia naik ke atas panggung dengan hati-hati.").suggestions.some(s => s.kind === "kalimat-mubazir" && s.original === "naik ke atas" && s.replacement === "naik" && s.certainty === "gaya"));
+check("pleonasme: 'turun ke bawah' -> 'turun' (gaya)", wiAnalyze("Air turun ke bawah dengan deras.").suggestions.some(s => s.kind === "kalimat-mubazir" && s.replacement === "turun" && s.certainty === "gaya"));
+
+console.log("24) Phase 8.3 — penjaga mubazir: kutip & sitasi");
+check("mubazir: di dalam kutip tidak memicu", !kinds(wiAnalyze("Ia menulis \"disebabkan karena\" dalam contoh kalimatnya.")).includes("kalimat-mubazir"));
+check("mubazir: di dalam kurung sitasi tidak memicu", !kinds(wiAnalyze("Hasil (disebabkan karena keterbatasan, 2020) dicatat apa adanya.")).includes("kalimat-mubazir"));
+check("mubazir: 'melakukan penelitian' di dalam kutip tidak memicu", !kinds(wiAnalyze("Ia berkata, \"Kami melakukan penelitian ini dengan serius.\"")).includes("kalimat-mubazir"));
+
+console.log("25) Phase 8.3 — kalimat panjang (penasihat)");
+const LONG = "Penelitian ini bertujuan untuk mengetahui pengaruh penggunaan media pembelajaran interaktif berbasis teknologi informasi terhadap peningkatan hasil belajar siswa pada mata pelajaran matematika di sekolah menengah atas negeri yang berada di wilayah perkotaan dengan mempertimbangkan berbagai faktor pendukung dan penghambat yang muncul selama proses pembelajaran berlangsung setiap semester.";
+const lp = wiAnalyze(LONG);
+check("panjang: kalimat akademik >40 kata -> tepat 1 penasihat kalimat-panjang", advisories(lp).length === 1 && advisories(lp)[0].kind === "kalimat-panjang", kinds(lp));
+check("panjang: penasihat bersifat advisory, replacement null, certainty potensial", advisories(lp).length === 1 && advisories(lp)[0].advisory === true && advisories(lp)[0].replacement === null && advisories(lp)[0].certainty === "potensial");
+check("panjang: kalimat panjang yang sah tidak dilabeli kompleks", !kinds(lp).includes("kalimat-kompleks"), kinds(lp));
+const RUNON = "Siswa yang terpilih mengikuti kegiatan pelatihan kepemimpinan dasar selama tiga hari berturut turut di gedung serbaguna sekolah bersama para guru pembimbing dan narasumber dari berbagai instansi terkait untuk meningkatkan keterampilan organisasi serta kedisiplinan mereka.";
+check("panjang: >30 kata tanpa koma -> penasihat run-on", wiAnalyze(RUNON).suggestions.some(s => s.kind === "kalimat-panjang" && s.advisory === true));
+check("panjang: kalimat normal 15 kata -> tidak ada penasihat", advisories(wiAnalyze("Penelitian ini dilakukan di sekolah dasar negeri selama dua minggu penuh pada bulan lalu.")).length === 0);
+
+console.log("26) Phase 8.3 — kalimat kompleks (penasihat) & penjaga enumerasi");
+const KX = "Hasil penelitian menunjukkan bahwa metode yang digunakan ketika siswa belajar secara berkelompok dapat meningkatkan pemahaman karena mereka saling membantu.";
+check("kompleks: >=3 penanda klausa -> penasihat potensial", wiAnalyze(KX).suggestions.some(s => s.kind === "kalimat-kompleks" && s.advisory === true && s.certainty === "potensial"), kinds(wiAnalyze(KX)));
+check("kompleks: enumerasi koma pendek -> TIDAK ada penasihat kompleks", !kinds(wiAnalyze("Siswa membawa buku, pena, penggaris, penghapus, dan tas ke sekolah.")).includes("kalimat-kompleks"));
+check("kompleks: kalimat sederhana -> tidak ada penasihat", advisories(wiAnalyze("Guru menjelaskan pelajaran dengan suara yang jelas.")).length === 0);
+
+console.log("27) Phase 8.3 — pengulangan frasa (penasihat)");
+const FR1 = wiAnalyze("Hasil penelitian ini menunjukkan bahwa hasil penelitian ini memberikan gambaran awal.");
+check("frasa: gram isi berulang dalam 1 kalimat -> penasihat", FR1.suggestions.some(s => s.kind === "kalimat-pengulangan-frasa" && s.advisory === true && s.certainty === "potensial"), kinds(FR1));
+check("frasa: penjelasan menyebut frasa yang berulang", FR1.suggestions.some(s => s.kind === "kalimat-pengulangan-frasa" && s.explanation.includes("hasil penelitian ini")));
+const FR2 = wiAnalyze("Data dikumpulkan melalui observasi lapangan selama dua minggu penuh. Observasi lapangan selama dua minggu penuh itu kemudian dianalisis.");
+check("frasa: gram-4 sama pada kalimat berurutan -> penasihat di kalimat kedua", FR2.suggestions.some(s => s.kind === "kalimat-pengulangan-frasa" && s.start >= FR2.paragraphs[0].indexOf("Observasi")), kinds(FR2));
+check("frasa: kata ulang (anak anak) tidak memicu penasihat frasa", !kinds(wiAnalyze("Anak anak bermain dan anak anak tertawa riang.")).includes("kalimat-pengulangan-frasa"));
+
+console.log("28) Phase 8.3 — transisi awalan (penasihat gaya)");
+const TR1 = wiAnalyze("Kemudian, siswa masuk kelas. Kemudian, guru membuka pelajaran. Kemudian, semua siswa mencatat.");
+check("transisi: 3 awalan sama -> tepat 1 penasihat gaya", advisories(TR1).length === 1 && advisories(TR1)[0].kind === "transisi-awalan" && advisories(TR1)[0].certainty === "gaya", kinds(TR1));
+check("transisi: penasihat menempel pada kemunculan ketiga", advisories(TR1).length === 1 && TR1.paragraphs[0].slice(advisories(TR1)[0].start, advisories(TR1)[0].end).indexOf("semua siswa") >= 0);
+check("transisi: awalan bervariasi -> tidak ada penasihat", advisories(wiAnalyze("Pertama, siswa masuk kelas. Selanjutnya guru membuka pelajaran. Terakhir, semua siswa mencatat.")).length === 0);
+
+console.log("29) Phase 8.3 — prioritas satu penasihat per kalimat");
+const MULTI = "Hasil penelitian ini menunjukkan bahwa hasil penelitian ini penting karena data yang dikumpulkan dari lapangan yang luas memberikan gambaran yang jelas tentang kondisi yang sebenarnya terjadi pada masyarakat yang tinggal di wilayah yang diteliti selama periode yang sangat panjang dan melelahkan sekali.";
+const mr = wiAnalyze(MULTI);
+check("prioritas: kalimat multi-masalah -> tepat 1 penasihat", advisories(mr).length === 1, kinds(mr));
+check("prioritas: pengulangan frasa menang atas panjang/kompleks", advisories(mr).length === 1 && advisories(mr)[0].kind === "kalimat-pengulangan-frasa", kinds(mr));
+
+console.log("30) Phase 8.3 — interaksi dengan 8.1/8.2 & keamanan wiApply");
+const IX = wiAnalyze("Praktek itu disebabkan karena kelalaian petugas.");
+check("interaksi: baku (8.2) + mubazir (8.3) sama-sama muncul", kinds(IX).includes("kata-tidak-baku") && kinds(IX).includes("kalimat-mubazir"), kinds(IX));
+check("interaksi: apply keduanya", joinRes(IX, wiApply(IX.paragraphs, IX.suggestions, IX.suggestions.map(s => s.id))) === "Praktik itu disebabkan oleh kelalaian petugas.", joinRes(IX, wiApply(IX.paragraphs, IX.suggestions, IX.suggestions.map(s => s.id))));
+const LONGBAKU = "Penelitian ini bertujuan untuk mengetahui pengaruh penggunaan media pembelajaran interaktif berbasis teknologi informasi terhadap peningkatan hasil belajar siswa pada mata pelajaran matematika di sekolah menengah atas negeri yang berada di wilayah perkotaan dengan apotik sebagai lokasi pembanding tambahan selama proses pembelajaran berlangsung setiap semester.";
+const lb = wiAnalyze(LONGBAKU);
+check("interaksi: penasihat tidak menghalangi saran kata di kalimat yang sama", advisories(lb).length === 1 && lb.suggestions.some(s => s.kind === "kata-tidak-baku"), kinds(lb));
+check("interaksi: wiApply mengabaikan id penasihat (teks utuh)", joinRes(lb, wiApply(lb.paragraphs, lb.suggestions, advisories(lb).map(s => s.id))) === LONGBAKU);
+check("interaksi: apply saran kata di kalimat berpenasihat", (() => { const b = lb.suggestions.find(s => s.kind === "kata-tidak-baku"); const out = joinRes(lb, wiApply(lb.paragraphs, lb.suggestions, [b.id])); return out.includes("apotek") && !out.includes("apotik"); })());
+check("invarian 8.3 pada teks campuran", invariants83(wiAnalyze("Praktek itu disebabkan karena anak anak bermain di apotik.. bagusss")) === true, invariants83(wiAnalyze("Praktek itu disebabkan karena anak anak bermain di apotik.. bagusss")));
+
+console.log("31) Phase 8.3 — Unicode & pelestarian sitasi/angka/kutip");
+const UNI83 = "Hari ini cerah ☀️ dan ia belajar agar supaya lulus ujian di kafé.";
+const u83 = wiAnalyze(UNI83);
+check("unicode 8.3: mubazir tepat offset sesudah emoji", invariants83(u83) === true && u83.suggestions.some(s => s.kind === "kalimat-mubazir"), invariants83(u83));
+check("unicode 8.3: apply eksak", joinRes(u83, wiApply(u83.paragraphs, u83.suggestions, u83.suggestions.map(s => s.id))) === "Hari ini cerah ☀️ dan ia belajar agar lulus ujian di kafé.");
+const PRES = wiAnalyze("Sebanyak 35 sampel itu disebabkan karena praktek lama yang buruk.");
+check("pelestarian: angka & sitasi utuh sesudah apply", joinRes(PRES, wiApply(PRES.paragraphs, PRES.suggestions, PRES.suggestions.map(s => s.id))) === "Sebanyak 35 sampel itu disebabkan oleh praktik lama yang buruk.", joinRes(PRES, wiApply(PRES.paragraphs, PRES.suggestions, PRES.suggestions.map(s => s.id))));
+const PRES2 = wiAnalyze("Hasil (Rahman, 2020) melibatkan 35 siswa. Ia berkata, \"Kami melakukan penelitian dengan sangat serius.\"");
+check("pelestarian: teks bersitasi + kutip tanpa saran pengubah", PRES2.suggestions.filter(s => !s.advisory).length === 0 && joinRes(PRES2, wiApply(PRES2.paragraphs, PRES2.suggestions, PRES2.suggestions.map(s => s.id))) === "Hasil (Rahman, 2020) melibatkan 35 siswa. Ia berkata, \"Kami melakukan penelitian dengan sangat serius.\"", kinds(PRES2));
 
 console.log("\nWI TESTS:", pass, "passed,", fail, "failed");
 process.exit(fail ? 1 : 0);
