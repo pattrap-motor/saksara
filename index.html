@@ -839,7 +839,7 @@
         <a href="#/posisi" data-route="posisi">Privasi &amp; Batasan</a>
       </nav>
       <a class="btn-primary side-cta" href="#analisis">Mulai Memeriksa</a>
-      <div class="side-foot">Beta Terbuka · v0.16.0-beta<br />Seluruh analisis berjalan lokal di peramban ini — teks Anda tidak dikirim ke mana pun.</div>
+      <div class="side-foot">Beta Terbuka · v0.17.0-beta<br />Seluruh analisis berjalan lokal di peramban ini — teks Anda tidak dikirim ke mana pun.</div>
     </aside>
     <div class="wrap page">
       <header class="hero" data-view="home">
@@ -1644,12 +1644,23 @@
           <a href="#/posisi">Privasi &amp; Batasan</a>
         </nav>
         <p class="copy">© 2026 Saksara — Dikembangkan oleh Ciptanala Devs</p>
-        <p class="version-line">Versi <strong>v0.16.0-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
+        <p class="version-line">Versi <strong>v0.17.0-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
       </div>
     </footer>
 
     <dialog class="changelog" id="changelog-modal" aria-labelledby="changelog-title">
       <h2 id="changelog-title">Catatan Rilis — Saksara</h2>
+      <h3>v0.17.0-beta — 22 November 2026</h3>
+      <ul>
+        <li><strong>Impor dokumen Word &amp; PDF di Asisten Menulis:</strong> kini Anda dapat memuat berkas .docx dan .pdf langsung ke Asisten Menulis. Dokumen Word dibaca terstruktur — judul, daftar, tabel, serta teks tebal/miring dan tautan dipertahankan; dokumen PDF dibaca per halaman. Berkas dibaca sepenuhnya di peramban ini; analisis tidak berjalan otomatis, Anda yang menekan tombol periksa.</li>
+        <li><strong>Revisi yang aman untuk dokumen:</strong> saran perbaikan yang Anda terima dapat diterapkan kembali ke dokumen kerja — setiap penerapan divalidasi ulang pada saat diklik, dan yang tidak dapat diterapkan dengan aman akan ditolak dengan penjelasan, bukan dipaksakan. Hasil revisi dapat diunduh kembali sebagai berkas Word (.docx), disalin dengan formatnya, dan dibandingkan berdampingan dengan dokumen asal sebelum Anda memutuskan.</li>
+        <li><strong>Laporan Analisis terstruktur:</strong> setiap hasil pemeriksaan Asisten Menulis kini disertai laporan — ringkasan dokumen, ringkasan kualitas tulisan, indeks temuan yang dikelompokkan per kategori (ejaan, tata bahasa, tanda baca &amp; spasi, redundansi, kalimat), rekomendasi, dan tombol "Lihat lokasi" yang menunjukkan persis letak setiap temuan pada teks Anda.</li>
+        <li><strong>Unduh laporan analisis sebagai PDF:</strong> laporan yang sama dapat diunduh sebagai berkas PDF yang rapi dengan huruf tertanam, sehingga kutipan dan tanda baca tampil persis seperti aslinya. Bila ada karakter yang tidak dapat ditampilkan dengan aman, pengunduhan dihentikan dengan pesan yang menyebut karakternya — tidak ada isi yang diam-diam diubah atau dihapus.</li>
+        <li><strong>Peringatan kesesuaian dokumen:</strong> bila dokumen Anda memuat hal yang tidak dapat dipertahankan utuh saat diekspor (misalnya rumus, tabel di dalam tabel, atau catatan kaki), Anda diperingatkan lebih dulu sebelum mengunduh — tidak ada kejutan sesudah berkas jadi.</li>
+        <li><strong>Keamanan diperkuat:</strong> batas dekompresi ZIP untuk impor DOCX kini ditegakkan di kedua pembaca DOCX — pembaca Document Intelligence dan extractor lama pada rute detektor/batch/forensik/bandingkan (paritas D7-A) — dengan angka yang sama: maksimum 200 entri, 50 MB total hasil dekompresi, 20 MB per entri, ditegakkan dari direktori pusat sebelum inflasi dan selama inflasi berlangsung; berkas terenkripsi/ZIP64/metode tak dikenal ditolak dengan pesan Indonesia. Ini melindungi dari berkas DOCX berbahaya yang mengembang sangat besar (zip bomb). Jalur PDF bukan ZIP dan tidak dicakup batas ini — jalur PDF diatur penjaga ukuran berkas 20 MB dan batas analisis 50.000 karakter. Sebagian besar pustaka pihak ketiga juga dimuat dengan pemeriksaan integritas (SRI), dan situs kini berjalan dengan kebijakan keamanan konten (CSP) dalam mode pantau.</li>
+        <li><strong>Mesin pembaca PDF diperbarui:</strong> pembaca PDF diperbarui ke PDF.js 4.10.38 (build legacy). Hasil pembacaan pada 11 berkas uji kami terverifikasi identik dengan versi sebelumnya — teks yang diekstrak, jumlah halaman, statistik halaman, dan pesan kesalahan sama. Berkas di luar set uji (misalnya PDF hasil konversi dari ponsel dengan font CID tanpa ToUnicode — keterbatasan lama B-01 — dan PDF bergambar JPX/JBIG2) belum terverifikasi dan perilakunya dapat berbeda; keterbatasan B-01 tidak berubah oleh pembaruan ini. Pembaca baru memakai build legacy agar tetap berjalan di peramban yang lebih lama, tetapi dukungan Safari iOS dan peramban lama belum diuji pada perangkat nyata.</li>
+        <li>Mesin detektor, classifier, rumus, bobot, ambang, dan seluruh skor <strong>tidak berubah</strong>: hasil Periksa Tulisan Anda sama persis seperti versi sebelumnya.</li>
+      </ul>
       <h3>v0.16.0-beta — 22 November 2026</h3>
       <ul>
         <li><strong>Asisten Menulis baru (#/tulis):</strong> periksa dan perbaiki tulisan Anda di peramban — saran tata bahasa dan ejaan (102 pasangan kata baku serta aturan di-/ke-), saran kejelasan kalimat, analisis keterbacaan, dan kontrol gaya tulisan dengan 6 profil (formal, akademik, profesional, populer, ringkas, naratif). Anda yang memutuskan setiap saran; teks asli tidak pernah ditimpa.</li>
