@@ -44,8 +44,14 @@ const repCore = repRaw.slice(repRaw.indexOf("*/") + 2);
 const repSandbox = {};
 new Function("sandbox", repCore +
   "\nsandbox.diBuildReport = diBuildReport; sandbox.diReportCategoryForKind = diReportCategoryForKind;" +
-  " sandbox.DI_REPORT_CATEGORIES = DI_REPORT_CATEGORIES; sandbox.DI_REPORT_FALLBACK_CATEGORY = DI_REPORT_FALLBACK_CATEGORY;")(repSandbox);
-const { diBuildReport, diReportCategoryForKind, DI_REPORT_CATEGORIES, DI_REPORT_FALLBACK_CATEGORY } = repSandbox;
+  " sandbox.DI_REPORT_CATEGORIES = DI_REPORT_CATEGORIES; sandbox.DI_REPORT_FALLBACK_CATEGORY = DI_REPORT_FALLBACK_CATEGORY;" +
+  " sandbox.diReportPdfLines = diReportPdfLines; sandbox.diReportPdfTexts = diReportPdfTexts;" +
+  " sandbox.diReportPdfFileName = diReportPdfFileName; sandbox.diReportFmtNum = diReportFmtNum;" +
+  " sandbox.diPdfPreflight = diPdfPreflight; sandbox.diPdfHelveticaSafe = diPdfHelveticaSafe;" +
+  " sandbox.diPdfHelveticaSafeChar = diPdfHelveticaSafeChar; sandbox.diPdfHelveticaDeleted = diPdfHelveticaDeleted;")(repSandbox);
+const { diBuildReport, diReportCategoryForKind, DI_REPORT_CATEGORIES, DI_REPORT_FALLBACK_CATEGORY,
+  diReportPdfLines, diReportPdfTexts, diReportPdfFileName, diReportFmtNum,
+  diPdfPreflight, diPdfHelveticaSafe, diPdfHelveticaSafeChar, diPdfHelveticaDeleted } = repSandbox;
 
 const inflateRaw = (data) => zlib.inflateRawSync(Buffer.from(data.buffer, data.byteOffset, data.byteLength));
 const OPTS = { inflateRaw };
@@ -993,6 +999,78 @@ function blockText(b) { return b.runs.filter(r => !r.protected).map(r => r.text)
     check("integrasi wiAnalyze: rentang global menunjuk original persis", RR.categories.reduce((a, c) => a.concat(c.items), []).every(it => joined.slice(it.globalStart, it.globalEnd) === it.original));
     const readEx = { score: 62, band: "Uji", words: 7, sentences: 1, paragraphs: 1, avgWordsPerSentence: 7, longShare: 0, denseParas: 0 };
     check("readability diteruskan apa adanya (bukan skor baru)", eq(diBuildReport(real, { readability: readEx }).readability, readEx));
+  }
+
+  console.log("46) D6 REPORT-CORE — jahitan PDF: kelengkapan blok, kutipan mentah, pra-cek font/Helvetica, nama berkas, kemurnian");
+  {
+    const LABELS = {
+      kindLabels: { "ejaan-mekanis": "Ejaan", "double-space": "Spasi tidak rapi", "kata-depan": "Kata depan di/ke", "kalimat-panjang": "Kalimat panjang" },
+      certLabels: { "pasti": "Aturan pasti", "saran": "Saran", "potensial": "Masalah potensial", "gaya": "Saran gaya" },
+      stateLabels: { accepted: "Diterima", pending: "Menunggu keputusan", rejected: "Ditolak", read: "Sudah dibaca" },
+      dateStr: "22/11/2026, 18.30.00"
+    };
+    const analysis = {
+      paragraphs: ["Harga €50 untuk café A→B ✓ sudah diperiksa.", "Paragraf kedua."],
+      separators: ["\n\n"],
+      truncated: false,
+      suggestions: [
+        { id: "wi-1", kind: "ejaan-mekanis", certainty: "pasti", pIdx: 0, start: 0, end: 5, original: "Harga", replacement: "Harga", explanation: "Penjelasan lengkap temuan pertama — tidak dipotong." },
+        { id: "wi-2", kind: "double-space", certainty: "pasti", pIdx: 1, start: 0, end: 9, original: "penggunaan kata  ganda", replacement: "penggunaan kata ganda", explanation: "Spasi ganda di tengah kalimat." },
+        { id: "wi-3", kind: "kalimat-panjang", certainty: "gaya", pIdx: 1, start: 0, end: 16, original: "Paragraf kedua.", replacement: null, explanation: "Kalimat panjang.", advisory: true }
+      ]
+    };
+    const details = {}, snapA = JSON.stringify(analysis);
+    analysis.suggestions.forEach(s => { details[s.id] = { explanation: s.explanation, replacement: typeof s.replacement === "string" ? s.replacement : null }; });
+    const model = diBuildReport(analysis, { readability: { score: 62, band: "Cukup", words: 9, sentences: 2, paragraphs: 2, avgWordsPerSentence: 4.5, longShare: 0, denseParas: 0 } });
+    const snapM = JSON.stringify(model);
+    const ex = Object.assign({}, LABELS, { details, docStatus: { "wi-1": "Dapat diterapkan ke dokumen kerja" } });
+    const snapE = JSON.stringify(ex);
+    const blocks = diReportPdfLines(model, ex);
+    const findings = blocks.filter(b => b.t === "finding");
+    check("blok temuan == total model, tepat satu kali per id", findings.length === model.total && eq(findings.map(f => f.id).sort(), ["wi-1", "wi-2", "wi-3"]), findings.map(f => f.id));
+    check("urutan bagian: judul -> Ringkasan -> Kualitas -> Detail -> Rekomendasi -> Keterbatasan",
+      blocks[0].t === "title" && blocks[0].text === "LAPORAN ANALISIS TULISAN" &&
+      eq(blocks.filter(b => b.t === "h").map(b => b.text), ["Ringkasan Analisis", "Ringkasan Kualitas — Keterbacaan", "Detail Temuan", "Rekomendasi", "Keterbatasan Analisis"]),
+      blocks.filter(b => b.t === "h").map(b => b.text));
+    const f2 = findings.find(f => f.id === "wi-2");
+    const quote2 = f2.fields.find(f => f[0] === "Kutipan")[1];
+    check("kutipan MENTAH persis (spasi ganda utuh, tanpa penanda wiShowWs)", quote2 === "penggunaan kata  ganda" && quote2.indexOf("␣") < 0, JSON.stringify(quote2));
+    const f1 = findings.find(f => f.id === "wi-1");
+    check("penjelasan lengkap ikut (tidak dipotong)", f1.fields.some(f => f[0] === "Penjelasan" && f[1] === "Penjelasan lengkap temuan pertama — tidak dipotong."));
+    check("saran perbaikan ikut bila ada pengganti", f1.fields.some(f => f[0] === "Saran perbaikan" && f[1] === "Harga"));
+    check("status dokumen dari extras diteruskan", f1.fields.some(f => f[0] === "Dokumen" && f[1] === "Dapat diterapkan ke dokumen kerja"));
+    const f3 = findings.find(f => f.id === "wi-3");
+    check("penasihat: tanpa Saran perbaikan, dengan Catatan penasihat", !f3.fields.some(f => f[0] === "Saran perbaikan") && f3.fields.some(f => f[0] === "Catatan"));
+    check("kepala temuan: label jenis + kepastian + Paragraf ke-N", f1.head === "Ejaan · Aturan pasti · Paragraf ke-1", f1.head);
+    const kv = blocks.find(b => b.t === "kv");
+    check("tabel ringkasan: Total temuan + rincian kepastian dari model", kv.rows[0][0] === "Total temuan" && kv.rows[0][1] === "3" && kv.rows.some(r => r[0] === "Aturan pasti" && r[1] === "2"), kv.rows);
+    check("catatan indikator internal keterbacaan hadir", blocks.some(b => b.t === "p" && /indikator statistik internal\/heuristik/.test(b.text) && /bukan penilaian akademik/.test(b.text)));
+    check("model tidak berubah oleh jahitan (kemurnian)", JSON.stringify(model) === snapM && JSON.stringify(analysis) === snapA);
+    check("extras tidak berubah oleh jahitan", JSON.stringify(ex) === snapE);
+    check("deterministik: dua pembangunan blok deep-equal", eq(diReportPdfLines(model, ex), blocks));
+    const blocks0 = diReportPdfLines(diBuildReport({ paragraphs: [], separators: [], suggestions: [], truncated: false }, {}), LABELS);
+    check("model kosong: tetap ada susunan sah + kalimat tidak ada temuan", blocks0.some(b => b.t === "p" && b.text === "Tidak ada temuan pada teks ini.") && blocks0.filter(b => b.t === "finding").length === 0);
+    const texts = diReportPdfTexts(blocks);
+    check("teks rata memuat kutipan mentah + penjelasan (dasar pra-cek)", texts.indexOf("penggunaan kata  ganda") >= 0 && texts.some(t => t.indexOf("Penjelasan lengkap") === 0));
+    /* Pra-cek terhadap cakupan font SEBENARNYA yang terbangun. */
+    const covJson = JSON.parse(fs.readFileSync(path.join(__dirname, "fonts", "noto-sans-coverage.json"), "utf8"));
+    const cov = covJson.coverage;
+    check("berkas cakupan font terbangun terbaca (irisan kedua bobot)", Array.isArray(cov) && cov.length > 10 && covJson.coverageCount >= 400, covJson.coverageCount);
+    const wajib = "café naïve ° £ € A→B ✓ — ± 5 × 3 ≤ ≥ ≠ ␣ ↵ “kutip” ‘tunggal’ … •";
+    check("seluruh karakter wajib lolos pra-cek font terbangun", diPdfPreflight([wajib], cov).ok === true, diPdfPreflight([wajib], cov).unsupported);
+    const emoji = diPdfPreflight(["senang 😀 sekali"], cov);
+    check("emoji dilaporkan tidak didukung dengan codepoint-nya", emoji.ok === false && emoji.unsupported.length === 1 && emoji.unsupported[0].cp === "U+1F600" && emoji.unsupported[0].ch === "😀", emoji.unsupported);
+    check("pra-cek atas teks jahitan nyata (kutipan €/→/✓) lolos", diPdfPreflight(texts, cov).ok === true, diPdfPreflight(texts, cov).unsupported);
+    /* Helvetica: putusan aman ketat + gerbang terhapus mengikuti pdfSafe. */
+    check("Helvetica aman ketat: 'café' aman", diPdfHelveticaSafe("café") === true);
+    check("Helvetica aman ketat: 'A→B' tidak aman", diPdfHelveticaSafe("A→B") === false);
+    check("Helvetica aman ketat: 'Harga €50' tidak aman", diPdfHelveticaSafe("Harga €50") === false);
+    check("Helvetica aman ketat: '±' tidak aman (dipetakan pdfSafe)", diPdfHelveticaSafe("±5") === false && diPdfHelveticaSafeChar(0xB1) === false);
+    check("karakter terhapus pdfSafe: → dan € terdeteksi", eq(diPdfHelveticaDeleted(["A→B", "Harga €50"]).map(u => u.cp), ["U+2192", "U+20AC"]), diPdfHelveticaDeleted(["A→B", "Harga €50"]));
+    check("karakter terhapus pdfSafe: café + em dash TIDAK terhapus (dash dipetakan, bukan dibuang)", diPdfHelveticaDeleted(["café — kota"]).length === 0, diPdfHelveticaDeleted(["café — kota"]));
+    check("nama berkas dari tanggal tetap", diReportPdfFileName(new Date(2026, 10, 22, 9, 5, 3)) === "saksara-laporan-analisis-2026-11-22.pdf", diReportPdfFileName(new Date(2026, 10, 22)));
+    check("nama berkas: bulan/hari satu digit di-nol-kan", diReportPdfFileName(new Date(2027, 0, 3)) === "saksara-laporan-analisis-2027-01-03.pdf");
+    check("format angka meniru fmtNumID (ribuan titik)", diReportFmtNum(1234567) === "1.234.567" && diReportFmtNum(42) === "42");
   }
 
   console.log("\nDI-CORE: " + pass + " lulus, " + fail + " gagal, total " + (pass + fail));

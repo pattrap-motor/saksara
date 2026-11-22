@@ -1203,6 +1203,10 @@
         <div id="wi-results" hidden>
           <div class="wf-panel" id="wi-report" hidden>
             <h3>Laporan Analisis</h3>
+            <div class="wi-controls">
+              <button type="button" id="wi-report-pdf">Ekspor PDF</button>
+              <span class="file-status" id="wi-report-pdf-status" role="status" aria-live="polite"></span>
+            </div>
             <div id="wi-report-body"></div>
             <p class="wi-rep-note" id="wi-report-note" role="status" aria-live="polite"></p>
           </div>
@@ -7472,6 +7476,187 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         limitations: limitations
       };
     }
+    /* ---------- D6: jahitan murni ekspor PDF Laporan Analisis ----------
+       Fungsi-fungsi murni (tanpa DOM, deterministik, tidak mengubah
+       masukan) yang mengubah MODEL laporan D5 menjadi susunan blok teks
+       PDF, plus pra-cek karakter. PDF adalah representasi model yang
+       sama dengan panel — tidak ada hitungan ulang di sini: angka
+       diformat (pengelompokan ribuan titik, meniru fmtNumID lapisan UI
+       agar angka PDF == angka panel), label diserahkan lapisan UI
+       lewat extras (kindLabels/certLabels/stateLabels — peta label
+       yang sama dengan yang dipakai panel), penjelasan + saran
+       perbaikan digabungkan dari saran sumber lewat id (details),
+       dan teks status dokumen dihitung lapisan UI dengan fungsi yang
+       sama dengan panel (docStatus). Kutipan selalu item.original
+       MENTAH — tidak pernah hasil gambar wiShowWs. */
+    function diReportFmtNum(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
+    function diReportPdfFileName(date){
+      function p2(x){ return (x < 10 ? "0" : "") + x; }
+      return "saksara-laporan-analisis-" + date.getFullYear() + "-" + p2(date.getMonth() + 1) + "-" + p2(date.getDate()) + ".pdf";
+    }
+    function diReportPdfLines(model, extras){
+      extras = extras || {};
+      var kindLabels = extras.kindLabels || {}, certLabels = extras.certLabels || {}, stateLabels = extras.stateLabels || {};
+      var details = extras.details || {}, docStatus = extras.docStatus || {};
+      var cov = model.coverage || {};
+      var blocks = [];
+      blocks.push({ t: "title", text: "LAPORAN ANALISIS TULISAN" });
+      blocks.push({ t: "meta", text: "Asisten Menulis Cerdas · Saksara" });
+      blocks.push({ t: "meta", text: "Dibuat lokal di peramban · " + (extras.dateStr || "") + " · saksara.vercel.app" });
+      /* Ringkasan analisis — angka yang sama dengan bagian A panel. */
+      blocks.push({ t: "h", text: "Ringkasan Analisis" });
+      var rows = [];
+      rows.push(["Total temuan", diReportFmtNum(model.total)]);
+      (model.byCertainty || []).forEach(function(c){ rows.push([certLabels[c.key] || c.key, diReportFmtNum(c.count)]); });
+      var dec = model.decisions || { accepted: 0, pending: 0, rejected: 0, read: 0 };
+      var decParts = [diReportFmtNum(dec.accepted) + " diterima", diReportFmtNum(dec.pending) + " menunggu keputusan"];
+      if(dec.rejected) decParts.push(diReportFmtNum(dec.rejected) + " ditolak");
+      if(dec.read) decParts.push(diReportFmtNum(dec.read) + " ditandai sudah dibaca");
+      rows.push(["Keputusan Anda", decParts.join(", ")]);
+      rows.push(["Paragraf dianalisis", diReportFmtNum(cov.paragraphs || 0)]);
+      rows.push(["Karakter dianalisis", diReportFmtNum(cov.analyzedChars || 0)]);
+      if(cov.mode === "doc"){
+        rows.push(["Dokumen", cov.docName || ""]);
+        if(cov.docStats){
+          var st = cov.docStats;
+          rows.push(["Blok dokumen", diReportFmtNum(st.blocks)]);
+          rows.push(["Kata pada dokumen", diReportFmtNum(st.words)]);
+          if(st.headings) rows.push(["Judul pada dokumen", diReportFmtNum(st.headings)]);
+          if(st.tables) rows.push(["Tabel pada dokumen", diReportFmtNum(st.tables)]);
+          if(typeof st.pages === "number" && st.pages > 0) rows.push(["Halaman dokumen", diReportFmtNum(st.pages)]);
+        }
+        rows.push(["Diterapkan ke dokumen kerja", diReportFmtNum(cov.appliedToDoc || 0)]);
+      }
+      blocks.push({ t: "kv", rows: rows });
+      if(cov.docTruncated) blocks.push({ t: "p", text: "Cakupan: dokumen dipotong pada batas blok — " + diReportFmtNum(cov.keptBlocks) + " dari " + diReportFmtNum(cov.totalBlocks) + " blok teks pertama yang dianalisis; blok selebihnya belum dianalisis." });
+      if(cov.analysisTruncated) blocks.push({ t: "p", text: "Cakupan: analisis internal terpotong pada batas 50.000 karakter." });
+      if(cov.mode === "doc" && cov.docStats && cov.docStats.protected > 0)
+        blocks.push({ t: "p", text: "Sebanyak " + diReportFmtNum(cov.docStats.protected) + " elemen terlindungi (rumus, kolom isian, gambar) tidak ikut dianalisis." });
+      /* Ringkasan kualitas — skor keterbacaan D5 apa adanya + catatan wajib. */
+      if(model.readability){
+        var rd = model.readability;
+        blocks.push({ t: "h", text: "Ringkasan Kualitas — Keterbacaan" });
+        blocks.push({ t: "kv", rows: [
+          ["Skor keterbacaan", String(rd.score) + " — " + rd.band],
+          ["Rata-rata kata per kalimat", String(rd.avgWordsPerSentence).replace(".", ",")],
+          ["Kalimat > 40 kata", String(rd.longShare).replace(".", ",") + "%"],
+          ["Paragraf padat", diReportFmtNum(rd.denseParas)],
+          ["Kalimat", diReportFmtNum(rd.sentences)],
+          ["Kata", diReportFmtNum(rd.words)]
+        ] });
+        blocks.push({ t: "p", text: "Skor ini adalah indikator statistik internal/heuristik — bukan penilaian akademik, bukan penilaian ilmiah tervalidasi, dan bukan ukuran mutlak kualitas tulisan." });
+      }
+      /* Detail temuan — setiap item model tepat satu kali, urutan model. */
+      blocks.push({ t: "h", text: "Detail Temuan" });
+      if(!model.total) blocks.push({ t: "p", text: "Tidak ada temuan pada teks ini." });
+      (model.categories || []).forEach(function(cat){
+        blocks.push({ t: "h2", text: cat.name + " — " + diReportFmtNum(cat.count) + " temuan" });
+        cat.items.forEach(function(item){
+          var fields = [];
+          fields.push(["Kutipan", String(item.original == null ? "" : item.original)]);
+          var det = details[item.id] || {};
+          if(det.explanation) fields.push(["Penjelasan", String(det.explanation)]);
+          if(!item.advisory && typeof det.replacement === "string") fields.push(["Saran perbaikan", det.replacement]);
+          fields.push(["Keputusan", stateLabels[item.state] || item.state]);
+          if(docStatus[item.id]) fields.push(["Dokumen", String(docStatus[item.id])]);
+          if(item.advisory) fields.push(["Catatan", "Saran penasihat — tidak mengubah teks"]);
+          blocks.push({ t: "finding", id: item.id,
+            head: (kindLabels[item.kind] || item.kind) + " · " + (certLabels[item.certainty] || item.certainty) + " · Paragraf ke-" + diReportFmtNum(item.paragraph),
+            fields: fields });
+        });
+      });
+      /* Rekomendasi + keterbatasan — string model apa adanya. */
+      blocks.push({ t: "h", text: "Rekomendasi" });
+      (model.recommendations || []).forEach(function(r){ blocks.push({ t: "li", text: String(r) }); });
+      blocks.push({ t: "h", text: "Keterbatasan Analisis" });
+      (model.limitations || []).forEach(function(r){ blocks.push({ t: "li", text: String(r) }); });
+      blocks.push({ t: "p", text: "Laporan ini adalah bantuan analisis tulisan — bukan keputusan akademik yang mutlak." });
+      return blocks;
+    }
+    /* Seluruh string yang akan dicetak PDF, diratakan dari blok —
+       dasar pra-cek karakter (tidak ada teks yang lolos dari pra-cek). */
+    function diReportPdfTexts(blocks){
+      var out = [];
+      (blocks || []).forEach(function(b){
+        if(b.t === "kv"){ b.rows.forEach(function(r){ out.push(String(r[0])); out.push(String(r[1])); }); }
+        else if(b.t === "finding"){ out.push(b.head); b.fields.forEach(function(f){ out.push(String(f[0])); out.push(String(f[1])); }); }
+        else if(b.text != null) out.push(String(b.text));
+      });
+      return out;
+    }
+    /* Pra-cek font ter-embed: coverage adalah daftar rentang codepoint
+       [lo, hi] terurut yang DIEKSTRAK dari cmap berkas font subset yang
+       benar-benar terbangun (fonts/noto-sans-coverage.json), bukan dari
+       niat charset. Karakter whitespace tata-letak (\n \r \t) dilewati —
+       ia dirender sebagai spasi/pindah baris, bukan glif isi. */
+    function diPdfCpInRanges(ranges, cp){
+      var lo = 0, hi = (ranges || []).length - 1;
+      while(lo <= hi){
+        var mid = (lo + hi) >> 1;
+        if(cp < ranges[mid][0]) hi = mid - 1;
+        else if(cp > ranges[mid][1]) lo = mid + 1;
+        else return true;
+      }
+      return false;
+    }
+    function diPdfEachChar(texts, fn){
+      (texts || []).forEach(function(t){
+        var s = String(t == null ? "" : t);
+        for(var i = 0; i < s.length; i++){
+          var cp = s.codePointAt(i);
+          var ch = String.fromCodePoint(cp);
+          if(cp > 0xFFFF) i++;
+          if(cp === 0x0A || cp === 0x0D || cp === 0x09) continue;
+          fn(ch, cp);
+        }
+      });
+    }
+    function diPdfPreflight(texts, coverage){
+      var seen = {}, unsupported = [];
+      diPdfEachChar(texts, function(ch, cp){
+        if(diPdfCpInRanges(coverage, cp)) return;
+        var key = "U+" + cp.toString(16).toUpperCase();
+        if(seen[key]) return;
+        seen[key] = 1;
+        unsupported.push({ ch: ch, cp: "U+" + (cp < 0x10000 ? ("000" + cp.toString(16).toUpperCase()).slice(-4) : cp.toString(16).toUpperCase()) });
+      });
+      return { ok: unsupported.length === 0, unsupported: unsupported };
+    }
+    /* Helvetica (font inti jsPDF): karakter "aman ketat" bila pdfSafe
+       membiarkannya persis sama — himpunan eksplisit yang setara dengan
+       perilaku pdfSafe: \x20–\x7E dan \xA0–\xFF KECUALI yang dipetakan
+       pdfSafe (« » ± ×). Karakter "terhapus" adalah yang dibuang
+       pdfSafe diam-diam (di luar kedua rentang dan tidak dipetakan):
+       inilah yang menghentikan ekspor fallback, karena penghapusan
+       menempelkan kata dan mengubah makna (A→B menjadi AB, €50 menjadi
+       50). Karakter yang DIPETAKAN pdfSafe (— menjadi -, "…" menjadi
+       ...) tidak hilang dan tidak menempelkan kata; pada jalur fallback
+       ia dirender lewat pdfSafe dengan pemberitahuan font cadangan
+       yang eksplisit — perilaku yang sama dengan keempat laporan PDF
+       Saksara yang sudah ada. */
+    var DI_PDF_HELVETICA_MAPPED = { 0x201C: 1, 0x201D: 1, 0x201E: 1, 0x00AB: 1, 0x00BB: 1, 0x2018: 1, 0x2019: 1, 0x201A: 1, 0x2014: 1, 0x2013: 1, 0x2026: 1, 0x00B1: 1, 0x00D7: 1, 0x2265: 1, 0x2264: 1, 0x2022: 1 };
+    function diPdfHelveticaSafeChar(cp){
+      if(cp >= 0x20 && cp <= 0x7E) return true;
+      if(cp >= 0xA0 && cp <= 0xFF) return !(cp === 0xAB || cp === 0xBB || cp === 0xB1 || cp === 0xD7);
+      return false;
+    }
+    function diPdfHelveticaSafe(text){
+      var ok = true;
+      diPdfEachChar([text], function(ch, cp){ if(!diPdfHelveticaSafeChar(cp)) ok = false; });
+      return ok;
+    }
+    function diPdfHelveticaDeleted(texts){
+      var seen = {}, out = [];
+      diPdfEachChar(texts, function(ch, cp){
+        var inRange = (cp >= 0x20 && cp <= 0x7E) || (cp >= 0xA0 && cp <= 0xFF);
+        if(inRange || DI_PDF_HELVETICA_MAPPED[cp]) return;
+        var key = "U+" + cp.toString(16).toUpperCase();
+        if(seen[key]) return;
+        seen[key] = 1;
+        out.push({ ch: ch, cp: "U+" + (cp < 0x10000 ? ("000" + cp.toString(16).toUpperCase()).slice(-4) : cp.toString(16).toUpperCase()) });
+      });
+      return out;
+    }
     /* REPORT-CORE-END */
 
     /* Writing Intelligence — render & interaksi (DOM). */
@@ -8742,6 +8927,266 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         if(diCountEl) new MutationObserver(diReportSyncFromDoc).observe(diCountEl, { childList: true, characterData: true });
         if(diSugListEl) new MutationObserver(diReportSyncFromDoc).observe(diSugListEl, { childList: true, subtree: true });
       }
+
+      /* ================= Document Intelligence (D6): Ekspor PDF Laporan Analisis =================
+         Tombol "Ekspor PDF" pada panel #wi-report mencetak MODEL laporan
+         yang sama persis dengan yang dirender panel (diReportModel) —
+         tidak ada hitungan ulang: susunan blok dibangun fungsi murni
+         diReportPdfLines (REPORT-CORE) dari model + label panel +
+         penjelasan/saran yang digabungkan lewat id saran + teks status
+         dokumen dari diReportDocStatusText yang sama dengan panel.
+         Kutipan selalu original MENTAH (tidak pernah wiShowWs).
+         Font: subset Noto Sans (fonts/, OFL 1.1) dimuat MALAS hanya
+         saat ekspor dari origin yang sama — tidak ada isi dokumen yang
+         dikirim ke mana pun; satu-satunya lalu lintas adalah GET aset
+         statis (jsPDF dari CDN yang sudah ada + berkas font lokal).
+         Pra-cek karakter SEBELUM PDF dibuat:
+         - font termuat -> setiap karakter wajib ada di cakupan cmap
+           subset yang terbangun (fonts/noto-sans-coverage.json); yang
+           tidak didukung menghentikan ekspor dengan pesan yang menyebut
+           karakternya — tidak ada PDF yang kehilangan isi diam-diam.
+         - font GAGAL dimuat -> fallback Helvetica hanya bila tidak ada
+           karakter yang akan DIHAPUS pdfSafe (penghapusan menempelkan
+           kata/mengubah makna); ekspor fallback menyatakan pemakaian
+           font cadangan di status dan di dalam PDF. Bila ada karakter
+           terhapus, ekspor dihentikan dengan pesan jelas.
+         Dokumen dibangun di atas p6PdfKit (dokumen + geometri yang
+         sama); primitif baris lokal D6 diperlukan karena line() kit
+         mengunci helvetica + pdfSafe (akan merusak teks font Unicode)
+         dan kit tidak punya tabel/keep-with-next — kedua pembangun
+         PDF lain tidak diubah sama sekali. */
+      var diPdfBtn = $("wi-report-pdf"), diPdfStatusEl = $("wi-report-pdf-status");
+      var DI_PDF_FONT_FAMILY = "SaksaraLaporan";
+      var DI_PDF_FONT_URLS = { normal: "fonts/saksara-laporan-regular.ttf", bold: "fonts/saksara-laporan-bold.ttf" };
+      var DI_PDF_FONT_VFS = { normal: "saksara-laporan-regular.ttf", bold: "saksara-laporan-bold.ttf" };
+      var DI_PDF_COVERAGE_URL = "fonts/noto-sans-coverage.json";
+      var DI_PDF_FALLBACK_NOTICE = "Catatan: font utama laporan (Noto Sans) gagal dimuat, jadi laporan ini dicetak dengan font cadangan (Helvetica). Beberapa karakter tipografis disederhanakan mengikuti font cadangan.";
+      var DI_PDF_LH = 5.6, DI_PDF_TOP = 18, DI_PDF_BOTTOM = 278, DI_PDF_M = 16, DI_PDF_W = 210;
+      var diPdfFontPromise = null;
+      function diPdfSetStatus(msg){ if(diPdfStatusEl) diPdfStatusEl.textContent = msg || ""; }
+      function diPdfB64(buf){
+        var bytes = new Uint8Array(buf), bin = "", CH = 0x8000;
+        for(var i = 0; i < bytes.length; i += CH) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + CH));
+        return btoa(bin);
+      }
+      function diPdfFetchFont(url){
+        return fetch(url).then(function(r){
+          if(!r.ok) throw new Error("berkas font " + url + " gagal dimuat (HTTP " + r.status + ")");
+          return r.arrayBuffer();
+        });
+      }
+      function diLoadReportFonts(){
+        if(diPdfFontPromise) return diPdfFontPromise;
+        diPdfFontPromise = Promise.all([
+          diPdfFetchFont(DI_PDF_FONT_URLS.normal),
+          diPdfFetchFont(DI_PDF_FONT_URLS.bold),
+          fetch(DI_PDF_COVERAGE_URL).then(function(r){
+            if(!r.ok) throw new Error("data cakupan font gagal dimuat (HTTP " + r.status + ")");
+            return r.json();
+          })
+        ]).then(function(res){
+          return { normal: diPdfB64(res[0]), bold: diPdfB64(res[1]), coverage: (res[2] && res[2].coverage) || [] };
+        });
+        /* Kegagalan tidak dimemoisasi: ekspor berikutnya boleh mencoba lagi. */
+        diPdfFontPromise.catch(function(){ diPdfFontPromise = null; });
+        return diPdfFontPromise;
+      }
+      function diPdfUnsupportedText(list){
+        var shown = list.slice(0, 8).map(function(u){ return "'" + u.ch + "' (" + u.cp + ")"; }).join(", ");
+        if(list.length > 8) shown += ", dan " + (list.length - 8) + " karakter lainnya";
+        return shown;
+      }
+      /* ----- primitif tata letak lokal D6 (di atas dokumen p6PdfKit) ----- */
+      function diPdfPrep(R, size, bold){ R.doc.setFont(R.font, bold ? "bold" : "normal"); R.doc.setFontSize(size); R.doc.setTextColor(0); }
+      function diPdfTxt(R, txt){ return R.safe ? pdfSafe(txt) : String(txt); }
+      function diPdfWrap(R, txt, size, bold, width){ diPdfPrep(R, size, bold); return R.doc.splitTextToSize(diPdfTxt(R, txt), width); }
+      function diPdfPageBreak(R){ R.doc.addPage(); R.kit.setY(DI_PDF_TOP); }
+      function diPdfDrawParts(R, parts, x){
+        parts.forEach(function(p){
+          if(R.kit.getY() > DI_PDF_BOTTOM) diPdfPageBreak(R);
+          R.doc.text(p, x, R.kit.getY());
+          R.kit.setY(R.kit.getY() + DI_PDF_LH);
+        });
+      }
+      function diPdfPara(R, txt, size, bold){ diPdfDrawParts(R, diPdfWrap(R, txt, size || 10.5, !!bold, DI_PDF_W - 2 * DI_PDF_M), DI_PDF_M); }
+      function diPdfGap(R, h){ R.kit.setY(R.kit.getY() + (h || 3)); }
+      function diPdfHeading(R, txt, size, gapBefore){
+        var parts = diPdfWrap(R, txt, size, true, DI_PDF_W - 2 * DI_PDF_M);
+        var need = parts.length * DI_PDF_LH + DI_PDF_LH + (gapBefore || 0);
+        if(R.kit.getY() > DI_PDF_TOP + 0.1 && R.kit.getY() + need > DI_PDF_BOTTOM) diPdfPageBreak(R);
+        else if(gapBefore) diPdfGap(R, gapBefore);
+        diPdfPrep(R, size, true);
+        diPdfDrawParts(R, parts, DI_PDF_M);
+        diPdfGap(R, 1.2);
+      }
+      function diPdfKv(R, rows){
+        rows.forEach(function(row){
+          var lp = diPdfWrap(R, row[0], 10.5, true, 54);
+          var vp = diPdfWrap(R, row[1], 10.5, false, DI_PDF_W - DI_PDF_M - 72);
+          var lines = Math.max(lp.length, vp.length);
+          /* Baris yang muat satu halaman diusahakan utuh; baris yang
+             lebih panjang dari satu halaman mengalir per baris —
+             tidak ada baris nilai yang dibuang dalam keadaan apa pun. */
+          if(R.kit.getY() + lines * DI_PDF_LH > DI_PDF_BOTTOM && lines * DI_PDF_LH <= DI_PDF_BOTTOM - DI_PDF_TOP) diPdfPageBreak(R);
+          for(var i = 0; i < lines; i++){
+            if(R.kit.getY() > DI_PDF_BOTTOM) diPdfPageBreak(R);
+            var y = R.kit.getY();
+            if(i < lp.length){ diPdfPrep(R, 10.5, true); R.doc.text(lp[i], DI_PDF_M, y); }
+            if(i < vp.length){ diPdfPrep(R, 10.5, false); R.doc.text(vp[i], 72, y); }
+            R.kit.setY(y + DI_PDF_LH);
+          }
+        });
+      }
+      function diPdfFinding(R, block){
+        /* Bungkus dulu seluruh blok agar tingginya diketahui: blok yang
+           muat satu halaman diusahakan tidak terbelah; blok yang lebih
+           panjang dari satu halaman mengalir apa adanya. */
+        var headParts = diPdfWrap(R, block.head, 10.5, true, DI_PDF_W - 2 * DI_PDF_M);
+        var fields = block.fields.map(function(f){
+          diPdfPrep(R, 10.5, true);
+          var lw = R.doc.getTextWidth(diPdfTxt(R, f[0]) + "  ");
+          if(lw > 60) lw = 60;
+          return { label: f[0], lw: lw, parts: diPdfWrap(R, f[1], 10.5, false, DI_PDF_W - 2 * DI_PDF_M - lw) };
+        });
+        var totalLines = headParts.length;
+        fields.forEach(function(f){ totalLines += Math.max(1, f.parts.length); });
+        var height = totalLines * DI_PDF_LH + 2.5;
+        if(R.kit.getY() + height > DI_PDF_BOTTOM && height <= DI_PDF_BOTTOM - DI_PDF_TOP) diPdfPageBreak(R);
+        diPdfPrep(R, 10.5, true);
+        diPdfDrawParts(R, headParts, DI_PDF_M);
+        fields.forEach(function(f){
+          if(R.kit.getY() > DI_PDF_BOTTOM) diPdfPageBreak(R);
+          var y0 = R.kit.getY();
+          diPdfPrep(R, 10.5, true);
+          R.doc.text(diPdfTxt(R, f.label), DI_PDF_M, y0);
+          diPdfPrep(R, 10.5, false);
+          f.parts.forEach(function(p, i){
+            var yy = y0 + i * DI_PDF_LH;
+            if(yy > DI_PDF_BOTTOM){ diPdfPageBreak(R); yy = R.kit.getY(); y0 = yy - i * DI_PDF_LH; }
+            R.doc.text(p, DI_PDF_M + f.lw, yy);
+          });
+          R.kit.setY(y0 + Math.max(1, f.parts.length) * DI_PDF_LH);
+        });
+        diPdfGap(R, 2.5);
+      }
+      function diPdfBullet(R, txt){
+        var parts = diPdfWrap(R, txt, 10.5, false, DI_PDF_W - 2 * DI_PDF_M - 4);
+        parts.forEach(function(p, i){
+          if(R.kit.getY() > DI_PDF_BOTTOM) diPdfPageBreak(R);
+          if(i === 0){ diPdfPrep(R, 10.5, false); R.doc.text(diPdfTxt(R, "•"), DI_PDF_M, R.kit.getY()); }
+          R.doc.text(p, DI_PDF_M + 4, R.kit.getY());
+          R.kit.setY(R.kit.getY() + DI_PDF_LH);
+        });
+      }
+      function diPdfRender(R, blocks, opts){
+        /* Kepala laporan (pola wordmark kit, dengan font aktif D6). */
+        diPdfPrep(R, 16, true);
+        R.doc.setTextColor(29, 95, 209);
+        R.doc.text("Saksara", DI_PDF_M, R.kit.getY());
+        R.doc.setTextColor(0);
+        R.kit.setY(R.kit.getY() + 8);
+        var coverDone = false;
+        blocks.forEach(function(b){
+          if(b.t === "title"){ diPdfPara(R, b.text, 13.5, true); }
+          else if(b.t === "meta"){ diPdfPara(R, b.text, 9.5, false); }
+          else if(b.t === "h"){
+            if(!coverDone){
+              coverDone = true;
+              diPdfGap(R, 1);
+              R.doc.setDrawColor(160);
+              R.doc.line(DI_PDF_M, R.kit.getY(), DI_PDF_W - DI_PDF_M, R.kit.getY());
+              diPdfGap(R, 5);
+              if(opts.fallback){ diPdfPara(R, DI_PDF_FALLBACK_NOTICE, 10, false); diPdfGap(R, 2); }
+            }
+            diPdfHeading(R, b.text, 12, 4);
+          }
+          else if(b.t === "h2"){ diPdfHeading(R, b.text, 11, 3); }
+          else if(b.t === "kv"){ diPdfKv(R, b.rows); diPdfGap(R, 2); }
+          else if(b.t === "p"){ diPdfPara(R, b.text, 10.5, false); diPdfGap(R, 1); }
+          else if(b.t === "li"){ diPdfBullet(R, b.text); }
+          else if(b.t === "finding"){ diPdfFinding(R, b); }
+        });
+      }
+      function diPdfStamp(R, dateStr){
+        var n = R.doc.getNumberOfPages();
+        var left = "Saksara · Laporan Analisis Tulisan · dibuat lokal di peramban ini · " + dateStr;
+        for(var i = 1; i <= n; i++){
+          R.doc.setPage(i);
+          R.doc.setFont(R.font, "normal");
+          R.doc.setFontSize(8);
+          R.doc.setTextColor(120);
+          R.doc.text(diPdfTxt(R, left), DI_PDF_M, 290);
+          R.doc.text(diPdfTxt(R, "Halaman " + i + " dari " + n), DI_PDF_W - DI_PDF_M, 290, { align: "right" });
+        }
+        R.doc.setTextColor(0);
+      }
+      async function diExportReportPdf(){
+        if(!diReportModel || !wiResult){
+          diPdfSetStatus("Belum ada laporan — jalankan analisis terlebih dahulu, lalu ekspor PDF-nya.");
+          return;
+        }
+        var details = {}, docStatus = {};
+        wiResult.suggestions.forEach(function(s){
+          details[s.id] = { explanation: s.explanation || "", replacement: typeof s.replacement === "string" ? s.replacement : null };
+        });
+        diReportModel.categories.forEach(function(cat){
+          cat.items.forEach(function(it){
+            var t = diReportDocStatusText(it);
+            if(t) docStatus[it.id] = t;
+          });
+        });
+        var dateStr = new Date().toLocaleString("id-ID");
+        var blocks = diReportPdfLines(diReportModel, {
+          kindLabels: WI_KIND_LABEL, certLabels: WI_CERT_LABEL, stateLabels: DI_REPORT_STATE_TEXT,
+          details: details, docStatus: docStatus, dateStr: dateStr
+        });
+        var fileName = diReportPdfFileName(new Date());
+        var texts = diReportPdfTexts(blocks).concat([
+          "Saksara", "Saksara · Laporan Analisis Tulisan · dibuat lokal di peramban ini · " + dateStr,
+          "Halaman 1 dari 1", DI_PDF_FALLBACK_NOTICE
+        ]);
+        diPdfBtn.disabled = true;
+        diPdfSetStatus("Menyiapkan PDF…");
+        try {
+          var jsPDF = await loadJsPdf();
+          var fonts = null;
+          try { fonts = await diLoadReportFonts(); } catch(eFont) { fonts = null; }
+          var useFont = !!fonts;
+          if(useFont){
+            var pf = diPdfPreflight(texts, fonts.coverage);
+            if(!pf.ok){
+              diPdfSetStatus("Ekspor dihentikan: karakter berikut tidak didukung font laporan, sehingga isi laporan tidak dapat dipertahankan persis: " + diPdfUnsupportedText(pf.unsupported) + ". PDF tidak dibuat agar tidak ada isi yang hilang diam-diam.");
+              return;
+            }
+          } else {
+            var deleted = diPdfHelveticaDeleted(texts);
+            if(deleted.length){
+              diPdfSetStatus("Ekspor dihentikan: font laporan (Noto Sans) gagal dimuat, dan karakter berikut akan hilang bila dicetak dengan font cadangan: " + diPdfUnsupportedText(deleted) + ". PDF tidak dibuat — periksa koneksi internet lalu coba lagi.");
+              return;
+            }
+          }
+          var kit = p6PdfKit(jsPDF, "Laporan Analisis Tulisan — Saksara");
+          var doc = kit.doc;
+          if(useFont){
+            doc.addFileToVFS(DI_PDF_FONT_VFS.normal, fonts.normal);
+            doc.addFont(DI_PDF_FONT_VFS.normal, DI_PDF_FONT_FAMILY, "normal");
+            doc.addFileToVFS(DI_PDF_FONT_VFS.bold, fonts.bold);
+            doc.addFont(DI_PDF_FONT_VFS.bold, DI_PDF_FONT_FAMILY, "bold");
+          }
+          var R = { doc: doc, kit: kit, font: useFont ? DI_PDF_FONT_FAMILY : "helvetica", safe: !useFont };
+          diPdfRender(R, blocks, { fallback: !useFont });
+          diPdfStamp(R, dateStr);
+          doc.save(fileName);
+          diPdfSetStatus(useFont
+            ? "PDF dibuat: " + fileName + " — dicetak dengan font Noto Sans subset (karakter Unicode dipertahankan)."
+            : "PDF dibuat dengan font cadangan (Helvetica) karena font utama gagal dimuat: " + fileName + " — beberapa karakter tipografis disederhanakan.");
+        } catch(e){
+          diPdfSetStatus("Ekspor PDF gagal: " + (e && e.message ? e.message : e));
+        } finally {
+          diPdfBtn.disabled = false;
+        }
+      }
+      if(diPdfBtn) diPdfBtn.addEventListener("click", function(){ diExportReportPdf(); });
     })();
 
     /* ================= Compare Writing (Phase 4) =================
