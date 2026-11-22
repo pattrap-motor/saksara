@@ -689,6 +689,33 @@
       .p7-steps li strong{ color:var(--navy); }
       .qc-panel{ border:1px solid var(--line); border-radius:16px; background:var(--surface); box-shadow:var(--shadow-sm); padding:20px; }
       .qc-panel textarea{ width:100%; font:inherit; border:1px solid var(--line); border-radius:12px; padding:12px 14px; background:var(--surface); color:var(--text); }
+
+      /* ---------- Phase 8.1 (Writing Intelligence): Asisten Menulis ---------- */
+      .wi-count{ font-size:13px; color:var(--muted); margin-top:6px; }
+      .wi-count.over{ color:var(--warn-ink); font-weight:700; }
+      .wi-toolbar{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:12px; }
+      .wi-busy{ font-size:13.5px; color:var(--muted); }
+      .wi-sug{ display:flex; flex-direction:column; gap:10px; margin-top:12px; }
+      .wi-card{ border:1px solid var(--line); border-radius:12px; padding:14px 16px; background:var(--surface); }
+      .wi-card.done{ opacity:.62; }
+      .wi-card-head{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:8px; }
+      .wi-kind{ font-weight:800; font-size:13.5px; }
+      .wi-cert{ font-size:11.5px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; border:1px solid var(--line); background:var(--surface2); border-radius:999px; padding:2px 10px; color:var(--muted); }
+      .wi-frag{ display:block; font-family:"IBM Plex Mono", monospace; font-size:13.5px; background:var(--red-bg); border-radius:8px; padding:7px 10px; white-space:pre-wrap; word-break:break-word; }
+      .wi-rep{ display:block; font-family:"IBM Plex Mono", monospace; font-size:13.5px; background:var(--grn-bg); border-radius:8px; padding:7px 10px; white-space:pre-wrap; word-break:break-word; margin-top:6px; }
+      .wi-arrow{ font-size:12px; color:var(--muted); margin-top:6px; }
+      .wi-expl{ font-size:13.5px; line-height:1.55; color:var(--muted); margin:8px 0 0; }
+      .wi-actions{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+      .wi-actions button{ font-size:13.5px; padding:7px 14px; }
+      .wi-state{ font-size:13px; font-weight:700; color:var(--gold-ink); }
+      .wi-controls{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:14px; }
+      .wi-revised{ min-height:160px; }
+      .wi-compare{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px; }
+      @media (max-width:760px){ .wi-compare{ grid-template-columns:1fr; } }
+      .wi-col h4{ margin:0 0 8px; font-size:15px; }
+      .wi-para{ border:1px solid var(--line); border-radius:10px; padding:10px 12px; margin:0 0 8px; font-size:14px; line-height:1.6; white-space:pre-wrap; word-break:break-word; background:var(--surface); }
+      .wi-para.changed{ background:var(--gold-soft); border-color:var(--gold-ink); }
+      .wi-empty{ border:1px dashed var(--line); border-radius:12px; padding:16px; color:var(--muted); font-size:14px; line-height:1.6; margin-top:12px; }
     </style>
   </head>
   <body>
@@ -703,6 +730,7 @@
           <a href="#/home" data-route="home">Beranda</a>
           <a href="#/detector" data-route="detector">Periksa Tulisan</a>
           <a href="#/forensik" data-route="forensik">Kenali Gaya Tulisan</a>
+          <a href="#/tulis" data-route="tulis">Asisten Menulis</a>
           <a href="#/compare" data-route="compare">Bandingkan Tulisan</a>
           <a href="#batch">Periksa Banyak Dokumen</a>
           <a href="#/ocr" data-route="ocr">Baca Teks dari Gambar</a>
@@ -724,6 +752,7 @@
         <a href="#/home" data-route="home">Beranda</a>
         <a href="#/detector" data-route="detector">Periksa Tulisan</a>
         <a href="#/forensik" data-route="forensik">Kenali Gaya Tulisan</a>
+        <a href="#/tulis" data-route="tulis">Asisten Menulis</a>
         <a href="#/compare" data-route="compare">Bandingkan Tulisan</a>
         <a href="#batch">Periksa Banyak Dokumen</a>
         <a href="#/ocr" data-route="ocr">Baca Teks dari Gambar</a>
@@ -777,6 +806,7 @@
           <a class="qa-card" href="#/detector"><span class="qa-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg></span><span class="qa-t">Periksa Tulisan</span><span class="qa-d">Tempel teks atau unggah berkas — lihat bagian mana yang berindikasi pola AI, kalimat demi kalimat.</span><span class="qa-go">Mulai memeriksa →</span></a>
           <a class="qa-card" href="#batch"><span class="qa-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3 8l9 5 9-5-9-5Z"/><path d="M3 13l9 5 9-5"/></svg></span><span class="qa-t">Periksa Banyak Dokumen</span><span class="qa-d">Punya banyak berkas? Antrekan sampai 50 berkas sekaligus dan unduh rekap hasilnya.</span><span class="qa-go">Antrekan berkas →</span></a>
           <a class="qa-card" href="#/forensik"><span class="qa-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l2.5-6 4 12L16 12h5"/></svg></span><span class="qa-t">Kenali Gaya Tulisan</span><span class="qa-d">Lihat ciri khas tulisan Anda — keragaman kata, ritme kalimat, konsistensi — tanpa menuduh siapa penulisnya.</span><span class="qa-go">Kenali gaya saya →</span></a>
+          <a class="qa-card" href="#/tulis"><span class="qa-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span><span class="qa-t">Asisten Menulis</span><span class="qa-d">Rapikan kata ganda, spasi, dan huruf awal kalimat — saran demi saran, Anda yang memutuskan mana yang dipakai.</span><span class="qa-go">Rapikan tulisan saya →</span></a>
           <a class="qa-card" href="#/compare"><span class="qa-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3v18M16 3v18M3 8h5M3 16h5M16 8h5M16 16h5"/></svg></span><span class="qa-t">Bandingkan Tulisan</span><span class="qa-d">Bandingkan dua versi tulisan dan lihat persis bagian yang sama, berubah, ditambah, atau dihapus.</span><span class="qa-go">Bandingkan →</span></a>
           <a class="qa-card" href="#/benchmark"><span class="qa-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg></span><span class="qa-t">Pengujian &amp; Transparansi</span><span class="qa-d">Seberapa akurat Saksara? Semua hasil pengujian kami diterbitkan apa adanya — termasuk kelemahannya.</span><span class="qa-go">Lihat hasil uji →</span></a>
           <a class="qa-card" href="#/ocr"><span class="qa-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-4.5-4.5L6 21"/></svg></span><span class="qa-t">Baca Teks dari Gambar</span><span class="qa-d">Ubah foto atau pindaian dokumen menjadi teks yang bisa disalin dan diperiksa — langsung di peramban.</span><span class="qa-go">Baca gambar →</span></a>
@@ -1051,6 +1081,57 @@
           <p class="batch-progress" id="batch-progress" role="status" aria-live="polite"></p>
           <div id="batch-summary"></div>
           <div id="batch-results"></div>
+        </div>
+      </section>
+
+      <section class="tulis" id="tulis" data-view="tulis" hidden aria-labelledby="wi-judul">
+        <div class="kicker">Writing Intelligence</div>
+        <h2 id="wi-judul">Asisten Menulis</h2>
+        <p class="sub">Rapikan tulisan Anda — kata yang terketik ganda, spasi yang tidak rapi, spasi yang hilang setelah tanda baca, dan huruf awal kalimat — satu saran dalam satu waktu, dan <strong>Anda yang memutuskan</strong> saran mana yang diterima. Saran adalah <strong>rekomendasi, bukan jaminan kebenaran</strong>: baca kembali hasil revisi sebelum memakainya. Teks diproses <strong>sepenuhnya di peramban ini</strong> — tidak dikirim ke server dan tidak disimpan, dan teks asli Anda tidak pernah ditimpa.</p>
+        <div class="panel" id="wi-panel-input">
+          <label for="wi-input" style="font-weight:700; display:block; margin-bottom:8px;">Teks yang ingin dirapikan</label>
+          <textarea id="wi-input" placeholder="Tempel atau ketik teks di sini…"></textarea>
+          <div class="wi-count" id="wi-count">0 / 50.000 karakter</div>
+          <div class="wi-toolbar">
+            <button type="button" class="primary" id="wi-btn">Analisis</button>
+            <button type="button" id="wi-clear">Bersihkan</button>
+            <span class="wi-busy" id="wi-busy" role="status" aria-live="polite"></span>
+          </div>
+          <div class="banner" id="wi-error" role="alert"></div>
+          <p class="det-note">Batas 50.000 karakter per analisis agar halaman tetap responsif. Struktur paragraf — baris kosong pemisah antarparagraf — dipertahankan apa adanya pada hasil revisi.</p>
+        </div>
+
+        <div id="wi-results" hidden>
+          <div class="wf-panel">
+            <h3>Saran perbaikan</h3>
+            <div class="file-status" id="wi-status" role="status" aria-live="polite"></div>
+            <div id="wi-sug-empty"></div>
+            <div class="wi-sug" id="wi-sug-list"></div>
+            <div class="wi-controls">
+              <button type="button" id="wi-accept-all">Terapkan semua</button>
+              <button type="button" id="wi-undo">Urungkan</button>
+              <button type="button" id="wi-reset">Atur ulang</button>
+            </div>
+            <p class="wf-note">Lencana <strong>Aturan pasti</strong> berarti perbaikan mekanis yang mengikuti aturan tulis baku (spasi, pengulangan kata, huruf kapital awal kalimat). Saran tidak pernah diterapkan tanpa persetujuan Anda.</p>
+          </div>
+          <div class="wf-panel">
+            <h3>Hasil revisi</h3>
+            <p class="wf-note">Hasil revisi berubah mengikuti saran yang Anda terima. Teks asli di kotak atas tidak berubah — salin hasil revisi bila sudah sesuai.</p>
+            <label class="sr-only" for="wi-revised">Hasil revisi</label>
+            <textarea id="wi-revised" class="wi-revised" readonly></textarea>
+            <div class="wi-controls">
+              <button type="button" id="wi-copy">Salin hasil</button>
+              <span class="file-status" id="wi-copy-status" role="status" aria-live="polite"></span>
+            </div>
+          </div>
+          <div class="wf-panel">
+            <h3>Perbandingan sebelum / sesudah</h3>
+            <p class="wf-note">Paragraf yang berubah ditandai latar keemasan di kedua sisi. Bandingkan dengan saksama sebelum memakai hasil revisi — saran mekanis sesekali tidak cocok dengan maksud kalimat Anda.</p>
+            <div class="wi-compare">
+              <div class="wi-col"><h4>Teks asli</h4><div id="wi-cmp-orig"></div></div>
+              <div class="wi-col"><h4>Hasil revisi</h4><div id="wi-cmp-rev"></div></div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -1417,6 +1498,7 @@
           <a href="#/home">Beranda</a>
           <a href="#/detector">Periksa Tulisan</a>
           <a href="#/forensik">Kenali Gaya Tulisan</a>
+          <a href="#/tulis">Asisten Menulis</a>
           <a href="#/compare">Bandingkan Tulisan</a>
           <a href="#batch">Periksa Banyak Dokumen</a>
           <a href="#/ocr">Baca Teks dari Gambar</a>
@@ -4741,6 +4823,243 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       wfUpdateCounters();
     }
 
+    /* ================= Writing Intelligence (Phase 8.1) =================
+       Asisten Menulis: saran perbaikan mekanis yang deterministik. Berdiri
+       sendiri: TIDAK memakai skor detector, TIDAK mengubah teks asli tanpa
+       persetujuan pengguna, dan TIDAK menyimpan teks di mana pun. */
+    /* WI-CORE-START — fungsi murni (tanpa DOM), dapat diekstrak & diuji terpisah. */
+    var WI_MAX_CHARS = 50000;
+    var WI_ABBR = { "dll":1, "dsb":1, "dst":1, "dr":1, "drs":1, "dra":1, "prof":1, "no":1, "hal":1, "thn":1, "vs":1, "rp":1, "sbb":1, "yth":1 };
+    function wiSplitParas(text){
+      var parts = String(text).split(/(\n[ \t]*\n(?:[ \t]*\n)*)/);
+      var paras = [], seps = [];
+      for(var i=0;i<parts.length;i++){ if(i%2===0) paras.push(parts[i]); else seps.push(parts[i]); }
+      return { paras: paras, seps: seps };
+    }
+    function wiTokens(p){
+      var toks = [], re = /[\p{L}\p{N}]+/gu, m;
+      while((m = re.exec(p)) !== null){ toks.push({ t: m[0], start: m.index, end: m.index + m[0].length }); }
+      return toks;
+    }
+    function wiRuleRepeated(p, pIdx, out){
+      var toks = wiTokens(p);
+      for(var i=1;i<toks.length;i++){
+        var prev = toks[i-1], cur = toks[i];
+        if(prev.t.toLowerCase() !== cur.t.toLowerCase()) continue;
+        if(/[.!?…]/.test(p.slice(prev.end, cur.start))) continue;
+        out.push({ kind: "repeated-word", pIdx: pIdx, start: prev.start, end: cur.end, original: p.slice(prev.start, cur.end), replacement: prev.t, explanation: "Kata yang sama muncul dua kali berturut-turut — kemungkinan salah ketik. Usulan menghapus pengulangan kedua.", certainty: "pasti", prio: 0 });
+      }
+    }
+    function wiRuleSpaces(p, pIdx, out){
+      var m, re = /[ \t]+(?=[.,!?;:])/g;
+      while((m = re.exec(p)) !== null){
+        var s = m.index, e = s + m[0].length, punct = p.charAt(e);
+        if(s === 0 || p.charAt(s-1) === "\n") continue;
+        if(punct === "." && p.charAt(e+1) === ".") continue;
+        if(/\d/.test(p.charAt(e+1))) continue;
+        out.push({ kind: "double-space", pIdx: pIdx, start: s, end: e+1, original: p.slice(s, e+1), replacement: punct, explanation: "Ada spasi sebelum tanda baca — tanda baca seharusnya menempel pada kata sebelumnya.", certainty: "pasti", prio: 1 });
+      }
+      var re2 = /[ \t]{2,}/g;
+      while((m = re2.exec(p)) !== null){
+        var s2 = m.index, e2 = s2 + m[0].length;
+        if(s2 === 0 || e2 >= p.length) continue;
+        if(p.charAt(s2-1) === "\n" || p.charAt(e2) === "\n") continue;
+        out.push({ kind: "double-space", pIdx: pIdx, start: s2, end: e2, original: m[0], replacement: " ", explanation: "Ada lebih dari satu spasi berturut-turut di tengah kalimat — dirapikan menjadi satu spasi.", certainty: "pasti", prio: 2 });
+      }
+    }
+    function wiRuleMissingSpace(p, pIdx, out){
+      var re = /[.!?]/g, m;
+      while((m = re.exec(p)) !== null){
+        var i = m.index, before = p.charAt(i-1), after = p.charAt(i+1);
+        if(!before || !after) continue;
+        if(!/[\p{L}]/u.test(before) || !/[\p{Lu}]/u.test(after)) continue;
+        var nb = p.charAt(i+2);
+        if(nb === "." || nb === "!" || nb === "?") continue;
+        var ls = i; while(ls > 0 && !/\s/.test(p.charAt(ls-1))) ls--;
+        var rs = i+1; while(rs < p.length && !/\s/.test(p.charAt(rs))) rs++;
+        if((p.slice(ls, rs).split(/[.!?]/).length - 1) > 1) continue;
+        var wb = (p.slice(0, i).match(/[\p{L}]+$/u) || [""])[0];
+        if(wb.length < 2 || WI_ABBR[wb.toLowerCase()]) continue;
+        out.push({ kind: "missing-space-after-punctuation", pIdx: pIdx, start: i, end: i+1, original: p.charAt(i), replacement: p.charAt(i) + " ", explanation: "Tidak ada spasi setelah tanda baca, sehingga kalimat berikutnya menempel — usulan menambahkan satu spasi.", certainty: "pasti", prio: 1 });
+      }
+    }
+    function wiRuleCapital(p, pIdx, out){
+      var lead = p.replace(/^\s+/, "");
+      if(/^([-*•·]|\d+[.)])\s/.test(lead)) return;
+      if(p.indexOf("://") >= 0) return;
+      var starts = [{ pos: 0, wb: null, digitBefore: false }];
+      var re = /[.!?…]+[ \t]+/g, m;
+      while((m = re.exec(p)) !== null){
+        var wb = (p.slice(0, m.index).match(/[\p{L}]+$/u) || [""])[0];
+        starts.push({ pos: m.index + m[0].length, wb: wb, digitBefore: /\d/.test(p.charAt(m.index - 1)) });
+      }
+      starts.forEach(function(st){
+        if(st.wb && WI_ABBR[st.wb.toLowerCase()]) return;
+        if(st.digitBefore) return;
+        var i = st.pos;
+        while(i < p.length && /[ \t]/.test(p.charAt(i))) i++;
+        while(i < p.length && /["'“”‘’«»(\[]/.test(p.charAt(i))) i++;
+        if(i >= p.length) return;
+        var ch = p.charAt(i);
+        if(!/[\p{Ll}]/u.test(ch)) return;
+        out.push({ kind: "sentence-capital", pIdx: pIdx, start: i, end: i+1, original: ch, replacement: ch.toUpperCase(), explanation: "Kalimat diawali huruf kecil — usulan mengubah huruf pertamanya menjadi huruf kapital.", certainty: "pasti", prio: 3 });
+      });
+    }
+    var WI_RULES = [wiRuleRepeated, wiRuleSpaces, wiRuleMissingSpace, wiRuleCapital];
+    function wiAnalyze(text){
+      var norm = String(text == null ? "" : text).replace(/\r\n?/g, "\n");
+      var truncated = false;
+      if(norm.length > WI_MAX_CHARS){ norm = norm.slice(0, WI_MAX_CHARS); truncated = true; }
+      var sp = wiSplitParas(norm);
+      var cand = [];
+      sp.paras.forEach(function(p, idx){
+        if(!p || !/\S/.test(p)) return;
+        for(var r=0;r<WI_RULES.length;r++) WI_RULES[r](p, idx, cand);
+      });
+      cand.sort(function(a, b){ return a.pIdx - b.pIdx || a.start - b.start || a.prio - b.prio || (b.end - b.start) - (a.end - a.start); });
+      var kept = [], lastEnd = {};
+      cand.forEach(function(c){
+        var le = lastEnd[c.pIdx] === undefined ? -1 : lastEnd[c.pIdx];
+        if(c.start >= le){ kept.push(c); lastEnd[c.pIdx] = c.end; }
+      });
+      var suggestions = kept.map(function(c, i){
+        return { id: "wi-" + (i+1), kind: c.kind, pIdx: c.pIdx, start: c.start, end: c.end, original: c.original, replacement: c.replacement, explanation: c.explanation, certainty: c.certainty };
+      });
+      return { paragraphs: sp.paras, separators: sp.seps, suggestions: suggestions, truncated: truncated };
+    }
+    function wiApply(paragraphs, suggestions, acceptedIds){
+      var acc = {};
+      (acceptedIds || []).forEach(function(id){ acc[id] = 1; });
+      var byPara = {};
+      (suggestions || []).forEach(function(s){
+        if(acc[s.id]){ (byPara[s.pIdx] = byPara[s.pIdx] || []).push(s); }
+      });
+      return paragraphs.map(function(p, idx){
+        var list = byPara[idx];
+        if(!list || !list.length) return p;
+        list = list.slice().sort(function(a, b){ return b.start - a.start; });
+        var out = p;
+        for(var i=0;i<list.length;i++){ out = out.slice(0, list[i].start) + list[i].replacement + out.slice(list[i].end); }
+        return out;
+      });
+    }
+    /* WI-CORE-END */
+
+    /* Writing Intelligence — render & interaksi (DOM). */
+    var WI_KIND_LABEL = { "repeated-word": "Kata berulang", "double-space": "Spasi tidak rapi", "missing-space-after-punctuation": "Spasi hilang setelah tanda baca", "sentence-capital": "Huruf awal kalimat" };
+    var wiTa = $("wi-input");
+    var wiResult = null, wiAccepted = [], wiRejected = {};
+    function wiShowError(msg){
+      var b = $("wi-error");
+      if(msg){ b.textContent = msg; b.classList.add("show"); }
+      else { b.textContent = ""; b.classList.remove("show"); }
+    }
+    function wiUpdateCount(){
+      if(!wiTa) return;
+      var n = wiTa.value.length, c = $("wi-count");
+      c.textContent = fmtNumID(n) + " / 50.000 karakter";
+      c.classList.toggle("over", n > WI_MAX_CHARS);
+    }
+    function wiJoin(paras, seps){
+      var out = "";
+      for(var i=0;i<paras.length;i++){ out += paras[i]; if(i < seps.length) out += seps[i]; }
+      return out;
+    }
+    function wiParaHtml(t){
+      if(!t) return "<em>(paragraf kosong)</em>";
+      return escapeHtml(t).replace(/\n/g, "<br>");
+    }
+    function wiRender(){
+      if(!wiResult) return;
+      var html = "", pending = 0, done = 0, rejected = 0;
+      wiResult.suggestions.forEach(function(s){
+        if(wiRejected[s.id]){ rejected++; return; }
+        var isAcc = wiAccepted.indexOf(s.id) >= 0;
+        if(isAcc) done++; else pending++;
+        html += "<div class=\"wi-card" + (isAcc ? " done" : "") + "\">"
+          + "<div class=\"wi-card-head\"><span class=\"wi-kind\">" + (WI_KIND_LABEL[s.kind] || s.kind) + "</span>"
+          + "<span class=\"wi-cert\">" + (s.certainty === "pasti" ? "Aturan pasti" : "Saran") + "</span>"
+          + (isAcc ? "<span class=\"wi-state\">Diterima</span>" : "") + "</div>"
+          + "<span class=\"wi-frag\">" + escapeHtml(s.original) + "</span>"
+          + "<div class=\"wi-arrow\">menjadi ↓</div>"
+          + "<span class=\"wi-rep\">" + escapeHtml(s.replacement) + "</span>"
+          + "<p class=\"wi-expl\">" + escapeHtml(s.explanation) + "</p>"
+          + (isAcc ? "" : "<div class=\"wi-actions\"><button type=\"button\" class=\"primary\" data-wi-accept=\"" + s.id + "\">Terima</button><button type=\"button\" data-wi-reject=\"" + s.id + "\">Tolak</button></div>")
+          + "</div>";
+      });
+      $("wi-sug-list").innerHTML = html;
+      $("wi-sug-empty").innerHTML = wiResult.suggestions.length === 0
+        ? "<div class=\"wi-empty\">Tidak ditemukan saran untuk teks ini. Pemeriksa mekanis ini hanya menangkap pola sederhana — ejaan dan tanda baca tetap perlu dibaca kembali secara manual.</div>" : "";
+      $("wi-status").textContent = wiResult.suggestions.length === 0 ? "" :
+        "Ditemukan " + wiResult.suggestions.length + " saran — " + done + " diterima, " + pending + " menunggu keputusan Anda" + (rejected ? ", " + rejected + " ditolak" : "") + ".";
+      var rev = wiApply(wiResult.paragraphs, wiResult.suggestions, wiAccepted);
+      $("wi-revised").value = wiJoin(rev, wiResult.separators);
+      var co = "", cr = "";
+      wiResult.paragraphs.forEach(function(p, i){
+        var changed = rev[i] !== p;
+        co += "<p class=\"wi-para" + (changed ? " changed" : "") + "\">" + wiParaHtml(p) + "</p>";
+        cr += "<p class=\"wi-para" + (changed ? " changed" : "") + "\">" + wiParaHtml(rev[i]) + "</p>";
+      });
+      $("wi-cmp-orig").innerHTML = co;
+      $("wi-cmp-rev").innerHTML = cr;
+      $("wi-undo").disabled = wiAccepted.length === 0;
+      $("wi-accept-all").disabled = pending === 0;
+      $("wi-reset").disabled = wiAccepted.length === 0 && rejected === 0;
+    }
+    function wiRun(){
+      var text = wiTa.value;
+      wiShowError("");
+      if(!text.trim()){ wiShowError("Tempel atau ketik teks terlebih dahulu, lalu tekan Analisis."); wiTa.focus(); return; }
+      if(text.length > WI_MAX_CHARS){ wiShowError("Teks melebihi batas 50.000 karakter (" + fmtNumID(text.length) + " karakter). Persingkat teks atau bagi menjadi beberapa bagian, lalu coba lagi."); return; }
+      var btn = $("wi-btn");
+      btn.disabled = true;
+      $("wi-busy").textContent = "Menganalisis…";
+      setTimeout(function(){
+        wiResult = wiAnalyze(text);
+        wiAccepted = []; wiRejected = {};
+        $("wi-results").hidden = false;
+        btn.disabled = false;
+        $("wi-busy").textContent = "";
+        wiRender();
+      }, 30);
+    }
+    if(wiTa){
+      wiTa.addEventListener("input", wiUpdateCount);
+      $("wi-btn").addEventListener("click", wiRun);
+      $("wi-clear").addEventListener("click", function(){
+        wiTa.value = "";
+        wiResult = null; wiAccepted = []; wiRejected = {};
+        wiUpdateCount();
+        wiShowError("");
+        $("wi-results").hidden = true;
+        wiTa.focus();
+      });
+      $("wi-sug-list").addEventListener("click", function(ev){
+        var t = ev.target;
+        var b = (t && t.closest) ? t.closest("[data-wi-accept],[data-wi-reject]") : null;
+        if(!b) return;
+        var a = b.getAttribute("data-wi-accept"), r = b.getAttribute("data-wi-reject");
+        if(a){ if(wiAccepted.indexOf(a) < 0 && !wiRejected[a]) wiAccepted.push(a); }
+        else if(r){ wiRejected[r] = 1; }
+        wiRender();
+      });
+      $("wi-accept-all").addEventListener("click", function(){
+        if(!wiResult) return;
+        wiResult.suggestions.forEach(function(s){ if(!wiRejected[s.id] && wiAccepted.indexOf(s.id) < 0) wiAccepted.push(s.id); });
+        wiRender();
+      });
+      $("wi-undo").addEventListener("click", function(){ wiAccepted.pop(); wiRender(); });
+      $("wi-reset").addEventListener("click", function(){ wiAccepted = []; wiRejected = {}; wiRender(); });
+      $("wi-copy").addEventListener("click", function(){
+        var ta = $("wi-revised"), st = $("wi-copy-status");
+        function done(){ st.textContent = "Hasil revisi disalin."; }
+        if(navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(ta.value).then(done, function(){ ta.select(); document.execCommand("copy"); done(); });
+        } else { ta.select(); document.execCommand("copy"); done(); }
+      });
+      wiUpdateCount();
+    }
+
     /* ================= Compare Writing (Phase 4) =================
        Mesin perbandingan dokumen. Berdiri sendiri: TIDAK menjalankan Detector
        dan tidak memakai skor deteksi apa pun. */
@@ -6275,8 +6594,8 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
     // Router tampilan per halaman (satu berkas): #/home, #/detector, #/cara-kerja, #/metode, #/posisi.
     // Tautan lama (#analisis, #clf-panel, #benchmark, …) tetap didukung lewat peta LEGACY.
     (function(){
-      var TITLES = { home: "Saksara — Pahami Tulisan Anda", detector: "Periksa Tulisan — Saksara", forensik: "Kenali Gaya Tulisan — Saksara", compare: "Bandingkan Tulisan — Saksara", benchmark: "Pengujian & Transparansi — Saksara", ocr: "Baca Teks dari Gambar — Saksara", history: "Riwayat Saya — Saksara", "cara-kerja": "Cara Menggunakan Saksara", metode: "Metode & Pengukuran — Saksara", posisi: "Privasi & Batasan — Saksara" };
-      var ROUTES = { "": "home", "/": "home", "/home": "home", "/detector": "detector", "/forensik": "forensik", "/compare": "compare", "/benchmark": "benchmark", "/ocr": "ocr", "/history": "history", "/cara-kerja": "cara-kerja", "/metode": "metode", "/posisi": "posisi" };
+      var TITLES = { home: "Saksara — Pahami Tulisan Anda", detector: "Periksa Tulisan — Saksara", forensik: "Kenali Gaya Tulisan — Saksara", tulis: "Asisten Menulis — Saksara", compare: "Bandingkan Tulisan — Saksara", benchmark: "Pengujian & Transparansi — Saksara", ocr: "Baca Teks dari Gambar — Saksara", history: "Riwayat Saya — Saksara", "cara-kerja": "Cara Menggunakan Saksara", metode: "Metode & Pengukuran — Saksara", posisi: "Privasi & Batasan — Saksara" };
+      var ROUTES = { "": "home", "/": "home", "/home": "home", "/detector": "detector", "/forensik": "forensik", "/tulis": "tulis", "/compare": "compare", "/benchmark": "benchmark", "/ocr": "ocr", "/history": "history", "/cara-kerja": "cara-kerja", "/metode": "metode", "/posisi": "posisi" };
       var LEGACY = { "analisis": ["detector", "analisis"], "panel-analisis": ["detector", "panel-analisis"], "clf-panel": ["detector", "clf-panel"], "report": ["detector", "report"], "batch": ["detector", "batch"], "cara-kerja": ["cara-kerja", null], "benchmark": ["metode", "benchmark-note"], "posisi": ["posisi", null], "atas": ["home", null] };
       function show(view, anchor){
         var blocks = document.querySelectorAll("[data-view]");
