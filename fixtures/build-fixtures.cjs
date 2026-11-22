@@ -66,7 +66,7 @@ function contentTypes(extra) {
     '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
     '<Default Extension="xml" ContentType="application/xml"/>' +
     '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>';
-  if (extra && extra.styles) s += '<Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>';
+  if (extra && (extra.styles || extra.stylesCustom)) s += '<Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>';
   if (extra && extra.numbering) s += '<Override PartName="/word/numbering.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml"/>';
   return s + "</Types>";
 }
@@ -93,6 +93,22 @@ const NUMBERING_XML = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' 
 const DOC_RELS_LINK = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
   '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
   '<Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="https://saksara.vercel.app" TargetMode="External"/></Relationships>';
+/* D4.1: gaya kustom untuk F5 — "Bab Khusus" (styleId BabKhusus, outlineLvl 0)
+   di samping Heading2 bawaan sebagai kontrol di dokumen yang sama. */
+const STYLES_CUSTOM = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+  "<w:styles " + W_NS + ">" +
+  '<w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style>' +
+  '<w:style w:type="paragraph" w:styleId="Heading2"><w:name w:val="heading 2"/><w:pPr><w:outlineLvl w:val="1"/></w:pPr></w:style>' +
+  '<w:style w:type="paragraph" w:styleId="BabKhusus"><w:name w:val="Bab Khusus"/><w:pPr><w:outlineLvl w:val="0"/></w:pPr></w:style>' +
+  "</w:styles>";
+/* D4.1: tiga tautan untuk F4 — https (aman), ftp (skema tidak didukung),
+   dan target relatif tanpa skema (tidak boleh memicu peringatan). */
+const DOC_RELS_MULTI = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+  '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+  '<Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="https://saksara.vercel.app" TargetMode="External"/>' +
+  '<Relationship Id="rId6" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="ftp://berkas.contoh.id/berkas.zip" TargetMode="External"/>' +
+  '<Relationship Id="rId7" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="dokumen-relatif.docx" TargetMode="External"/>' +
+  "</Relationships>";
 
 function docx(body, opts) {
   opts = opts || {};
@@ -102,8 +118,10 @@ function docx(body, opts) {
     { name: "word/document.xml", data: documentXml(body), deflate: opts.deflate },
   ];
   if (opts.styles) entries.push({ name: "word/styles.xml", data: STYLES_XML, deflate: opts.deflate });
+  if (opts.stylesCustom) entries.push({ name: "word/styles.xml", data: STYLES_CUSTOM, deflate: opts.deflate });
   if (opts.numbering) entries.push({ name: "word/numbering.xml", data: NUMBERING_XML, deflate: opts.deflate });
   if (opts.rels) entries.push({ name: "word/_rels/document.xml.rels", data: DOC_RELS_LINK, deflate: opts.deflate });
+  if (opts.relsMulti) entries.push({ name: "word/_rels/document.xml.rels", data: DOC_RELS_MULTI, deflate: opts.deflate });
   return zipWrite(entries);
 }
 const P = (inner) => "<w:p>" + inner + "</w:p>";
@@ -321,6 +339,122 @@ FIXTURES["doc-roundtrip.docx"] = docx(
 
 /* Korup: simple.docx terpotong */
 FIXTURES["corrupt.docx"] = FIXTURES["simple.docx"].subarray(0, Math.floor(FIXTURES["simple.docx"].length * 0.55));
+
+/* D4.1 F3: tabel bersarang — satu tabel di dalam sel tabel luar (nested.docx).
+   Importir meratakannya menjadi tabel tersendiri; flags.nestedTables = 1. */
+FIXTURES["nested.docx"] = docx(
+  P(R("Paragraf sebelum tabel luar.")) +
+  "<w:tbl><w:tr>" +
+    "<w:tc>" + P(R("Sel luar kiri.")) + "</w:tc>" +
+    "<w:tc>" + P(R("Sel luar berisi tabel berikut:")) +
+      "<w:tbl><w:tr>" +
+        "<w:tc>" + P(R("Sel dalam satu.")) + "</w:tc>" +
+        "<w:tc>" + P(R("Sel dalam dua.")) + "</w:tc>" +
+      "</w:tr></w:tbl>" +
+    "</w:tc>" +
+  "</w:tr></w:tbl>" +
+  P(R("Paragraf sesudah tabel luar."))
+);
+
+/* D4.1 F4: tautan aman + skema tidak didukung + relatif (links-unsafe.docx) */
+FIXTURES["links-unsafe.docx"] = docx(
+  P(R("Tautan aman ke ") + '<w:hyperlink r:id="rId5"><w:r><w:t>situs Saksara</w:t></w:r></w:hyperlink>' + R(" tersedia.")) +
+  P(R("Tautan berkas lewat ") + '<w:hyperlink r:id="rId6"><w:r><w:t>server FTP lama</w:t></w:r></w:hyperlink>' + R(" tercatat.")) +
+  P(R("Tautan relatif ke ") + '<w:hyperlink r:id="rId7"><w:r><w:t>dokumen lain</w:t></w:r></w:hyperlink>' + R(" menyertai.")),
+  { relsMulti: true }
+);
+
+/* D4.1 F5: heading gaya kustom + heading bawaan sebagai kontrol internal
+   (heading-custom.docx) — hanya blok kustom yang boleh memicu peringatan. */
+FIXTURES["heading-custom.docx"] = docx(
+  '<w:p><w:pPr><w:pStyle w:val="BabKhusus"/></w:pPr>' + R("Bab Khusus Pembahasan") + "</w:p>" +
+  P(R("Isi bab dengan gaya judul buatan sendiri.")) +
+  '<w:p><w:pPr><w:pStyle w:val="Heading2"/></w:pPr>' + R("Subbab Bawaan Biasa") + "</w:p>" +
+  P(R("Isi subbab dengan gaya bawaan Word.")),
+  { stylesCustom: true }
+);
+
+/* D4.1 F6: indentasi — left bukan-nol, firstLine bukan-nol, left eksplisit 0
+   (tidak boleh terhitung), dan paragraf tanpa indentasi (indent.docx). */
+FIXTURES["indent.docx"] = docx(
+  '<w:p><w:pPr><w:ind w:left="720"/></w:pPr>' + R("Paragraf menjorok kiri setengah inci.") + "</w:p>" +
+  '<w:p><w:pPr><w:ind w:firstLine="360"/></w:pPr>' + R("Paragraf dengan baris pertama menjorok.") + "</w:p>" +
+  '<w:p><w:pPr><w:ind w:left="0"/></w:pPr>' + R("Paragraf dengan indentasi nol eksplisit.") + "</w:p>" +
+  P(R("Paragraf tanpa indentasi sama sekali."))
+);
+
+/* D4.1 F7: bagian pendamping — header, footer, catatan kaki sungguhan,
+   komentar (parts.docx). Dibangun manual lewat zipWrite karena docx()
+   tidak memodelkan bagian-bagian ini. */
+const CT_PARTS = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+  '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
+  '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
+  '<Default Extension="xml" ContentType="application/xml"/>' +
+  '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>' +
+  '<Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/>' +
+  '<Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/>' +
+  '<Override PartName="/word/footnotes.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footnotes+xml"/>' +
+  '<Override PartName="/word/comments.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.comments+xml"/>' +
+  "</Types>";
+const DOC_RELS_PARTS = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+  '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+  '<Relationship Id="rIdH1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header" Target="header1.xml"/>' +
+  '<Relationship Id="rIdF1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/>' +
+  '<Relationship Id="rIdFn" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footnotes" Target="footnotes.xml"/>' +
+  '<Relationship Id="rIdCm" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments" Target="comments.xml"/>' +
+  "</Relationships>";
+const HEADER_XML = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+  "<w:hdr " + W_NS + ">" + P(R("Kepala halaman dokumen.")) + "</w:hdr>";
+const FOOTER_XML = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+  "<w:ftr " + W_NS + ">" + P(R("Kaki halaman dokumen.")) + "</w:ftr>";
+const FOOTNOTES_XML = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+  "<w:footnotes " + W_NS + ">" +
+  '<w:footnote w:type="separator" w:id="0"><w:p><w:r><w:separator/></w:r></w:p></w:footnote>' +
+  '<w:footnote w:type="continuationSeparator" w:id="1"><w:p><w:r><w:continuationSeparator/></w:r></w:p></w:footnote>' +
+  '<w:footnote w:id="2"><w:p>' + R("Catatan kaki sungguhan dari penulis.") + "</w:p></w:footnote>" +
+  "</w:footnotes>";
+const COMMENTS_XML = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+  "<w:comments " + W_NS + ">" +
+  '<w:comment w:id="0" w:author="Penguji" w:date="2026-11-22T00:00:00Z"><w:p>' + R("Komentar penguji pada bagian ini.") + "</w:p></w:comment>" +
+  "</w:comments>";
+FIXTURES["parts.docx"] = zipWrite([
+  { name: "[Content_Types].xml", data: CT_PARTS },
+  { name: "_rels/.rels", data: ROOT_RELS },
+  { name: "word/document.xml", data: documentXml(
+      P(R("Isi utama dokumen yang dirujuk catatan.")) +
+      '<w:p>' + R("Ada catatan kaki") + '<w:r><w:footnoteReference w:id="2"/></w:r>' + R(" pada kalimat ini.") + "</w:p>" +
+      '<w:p><w:commentRangeStart w:id="0"/>' + R("Bagian yang dikomentari penguji.") + '<w:commentRangeEnd w:id="0"/><w:r><w:commentReference w:id="0"/></w:r></w:p>' +
+      '<w:sectPr><w:headerReference w:type="default" r:id="rIdH1"/><w:footerReference w:type="default" r:id="rIdF1"/></w:sectPr>'
+    ) },
+  { name: "word/_rels/document.xml.rels", data: DOC_RELS_PARTS },
+  { name: "word/header1.xml", data: HEADER_XML },
+  { name: "word/footer1.xml", data: FOOTER_XML },
+  { name: "word/footnotes.xml", data: FOOTNOTES_XML },
+  { name: "word/comments.xml", data: COMMENTS_XML },
+]);
+
+/* D4.1 F7 kontrol negatif: footnotes.xml hanya berisi entri struktural
+   (separator dsb.) tanpa catatan kaki sungguhan dan tanpa rujukan di isi —
+   flags.footnotes TIDAK boleh terpasang (footnotes-sep.docx). */
+const CT_FN_SEP = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+  '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
+  '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
+  '<Default Extension="xml" ContentType="application/xml"/>' +
+  '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>' +
+  '<Override PartName="/word/footnotes.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footnotes+xml"/>' +
+  "</Types>";
+const FOOTNOTES_SEP_XML = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+  "<w:footnotes " + W_NS + ">" +
+  '<w:footnote w:type="separator" w:id="0"><w:p><w:r><w:separator/></w:r></w:p></w:footnote>' +
+  '<w:footnote w:type="continuationSeparator" w:id="1"><w:p><w:r><w:continuationSeparator/></w:r></w:p></w:footnote>' +
+  '<w:footnote w:type="continuationNotice" w:id="2"><w:p><w:r><w:t xml:space="preserve">(lanjutan)</w:t></w:r></w:p></w:footnote>' +
+  "</w:footnotes>";
+FIXTURES["footnotes-sep.docx"] = zipWrite([
+  { name: "[Content_Types].xml", data: CT_FN_SEP },
+  { name: "_rels/.rels", data: ROOT_RELS },
+  { name: "word/document.xml", data: documentXml(P(R("Dokumen dengan bagian catatan kaki struktural saja."))) },
+  { name: "word/footnotes.xml", data: FOOTNOTES_SEP_XML },
+]);
 
 /* ---------- Tulis semua ---------- */
 const outDir = __dirname;
