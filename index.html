@@ -674,6 +674,30 @@
       body:not(.mode-deep) #wf-results .wf-cards{ display:none; }
       body:not(.mode-deep) #wf-results .wf-panel:not(.wf-keep){ display:none; }
       body:not(.mode-deep) .bn-deep{ display:none; }
+
+      /* ---------- Rombak UI/UX: mode detektor, lipatan hasil, istilah ramah ---------- */
+      body:not(.mode-deep) .stats{ display:none; }
+      .deep-hint{ margin:14px 0 0; font-size:13.5px; color:var(--muted); }
+      body.mode-deep .deep-hint{ display:none; }
+      .dm-btn{ font:inherit; font-weight:700; font-size:13px; border:1px solid var(--line); background:var(--surface); color:var(--muted); border-radius:999px; padding:5px 14px; cursor:pointer; }
+      .dm-btn[aria-pressed="true"]{ background:linear-gradient(90deg, var(--btn-top), var(--navy)); color:#fff; border-color:transparent; }
+      body.det-batch #analisis, body.det-batch #report{ display:none !important; }
+      body:not(.det-batch) #batch{ display:none; }
+      .clf-fold > summary, .contrib-fold > summary, .examples > summary, .all-feats > summary, .wi-extra > summary{ cursor:pointer; }
+      .clf-fold > summary{ font-weight:700; font-size:15.5px; padding:2px 0 6px; }
+      .clf-fold .clf-fold-hint{ display:block; font-weight:500; font-size:13px; color:var(--muted); margin-top:2px; }
+      .score-card .pdf-actions{ margin-top:14px; }
+      .score-card .save-panel{ margin-top:14px; }
+      .examples > summary.lbl{ margin-bottom:0; }
+      .examples[open ] > summary.lbl{ margin-bottom:11px; }
+      .all-feats{ border:1px solid var(--line); border-radius:var(--r-lg); padding:18px 20px; background:var(--surface); box-shadow:var(--shadow-sm); }
+      .all-feats > summary{ font-weight:700; font-size:15.5px; }
+      .all-feats .qa-grid{ margin-top:14px; }
+      .all-feats .dash-row{ margin-top:16px; }
+      .opt-explain{ margin:2px 0 10px; font-size:13.5px; color:var(--muted); }
+      .opt-explain > summary{ cursor:pointer; font-weight:600; }
+      .batch-adv{ display:inline-block; }
+      .batch-adv > summary{ cursor:pointer; font-size:13.5px; font-weight:600; color:var(--muted); padding:6px 2px; }
       .human-card{ border:1px solid var(--line); border-left:5px solid var(--navy); background:var(--surface); border-radius:14px; padding:16px 18px; margin:0 0 16px; }
       .human-card h3{ margin:0 0 6px; font-size:var(--fs-panel-title); }
       .human-card p{ margin:0 0 6px; line-height:1.55; }
@@ -882,13 +906,13 @@
           <a href="#/forensik" data-route="forensik">Kenali Gaya Tulisan</a>
           <a href="#/compare" data-route="compare">Bandingkan Tulisan</a>
           <a href="#batch">Periksa Banyak Dokumen</a>
-          <a href="#/benchmark" data-route="benchmark">Pengujian &amp; Transparansi</a>
           <span class="nav-group">Menulis</span>
           <a href="#/tulis" data-route="tulis">Asisten Menulis</a>
           <span class="nav-group">Alat</span>
           <a href="#/ocr" data-route="ocr">Baca Teks dari Gambar</a>
           <a href="#/history" data-route="history">Riwayat Saya</a>
           <span class="nav-group">Pelajari</span>
+          <a href="#/benchmark" data-route="benchmark">Pengujian &amp; Transparansi</a>
           <a href="#/cara-kerja" data-route="cara-kerja">Cara Menggunakan Saksara</a>
           <a href="#/metode" data-route="metode">Metode &amp; Pengukuran</a>
           <a href="#/posisi" data-route="posisi">Privasi &amp; Batasan</a>
@@ -908,19 +932,19 @@
         <a href="#/forensik" data-route="forensik">Kenali Gaya Tulisan</a>
         <a href="#/compare" data-route="compare">Bandingkan Tulisan</a>
         <a href="#batch">Periksa Banyak Dokumen</a>
-        <a href="#/benchmark" data-route="benchmark">Pengujian &amp; Transparansi</a>
         <span class="nav-group">Menulis</span>
         <a href="#/tulis" data-route="tulis">Asisten Menulis</a>
         <span class="nav-group">Alat</span>
         <a href="#/ocr" data-route="ocr">Baca Teks dari Gambar</a>
         <a href="#/history" data-route="history">Riwayat Saya</a>
         <span class="nav-group">Pelajari</span>
+        <a href="#/benchmark" data-route="benchmark">Pengujian &amp; Transparansi</a>
         <a href="#/cara-kerja" data-route="cara-kerja">Cara Menggunakan Saksara</a>
         <a href="#/metode" data-route="metode">Metode &amp; Pengukuran</a>
         <a href="#/posisi" data-route="posisi">Privasi &amp; Batasan</a>
       </nav>
       <a class="btn-primary side-cta" href="#analisis">Mulai Memeriksa</a>
-      <div class="side-foot">Beta Terbuka · v0.20.0-beta<br />Seluruh analisis berjalan lokal di peramban ini — teks Anda tidak dikirim ke mana pun.</div>
+      <div class="side-foot">Beta Terbuka · v0.21.0-beta<br />Seluruh analisis berjalan lokal di peramban ini — teks Anda tidak dikirim ke mana pun.</div>
     </aside>
     <div class="wrap page">
       <header class="hero" data-view="home">
@@ -950,6 +974,7 @@
           <textarea id="p7-quick-text" rows="5" aria-label="Teks yang ingin diperiksa" placeholder="Tempel teks tugas, esai, atau artikel Anda di sini… (disarankan ±300 kata atau lebih agar hasilnya dapat dipegang)"></textarea>
           <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; align-items:center;">
             <button type="button" class="btn-primary" id="p7-quick-go">Periksa Tulisan</button>
+            <button type="button" class="btn-ghost" id="p7-quick-example">Coba Contoh Teks</button>
             <span class="upload-wrap"><span class="upload-visual" aria-hidden="true">atau unggah .txt / .docx / .pdf</span><input type="file" id="p7-quick-file" accept=".txt,.docx,.pdf,.doc,text/plain,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-label="Unggah berkas untuk diperiksa" /></span>
           </div>
           <p class="file-note">Tulisan Anda diproses di peramban ini dan tidak dikirim ke server mana pun. Menekan Periksa Tulisan membawa Anda ke halaman pemeriksaan lengkap beserta hasilnya.</p>
@@ -961,15 +986,21 @@
         <h2 class="dash-h" id="dash-cepat-judul">Mau memeriksa apa hari ini?</h2>
         <div class="qa-grid">
           <a class="qa-card" href="#/detector"><span class="qa-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg></span><span class="qa-t">Periksa Tulisan</span><span class="qa-d">Tempel teks atau unggah berkas — lihat bagian mana yang berindikasi pola AI, kalimat demi kalimat.</span><span class="qa-go">Mulai memeriksa →</span></a>
-          <a class="qa-card" href="#batch"><span class="qa-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3 8l9 5 9-5-9-5Z"/><path d="M3 13l9 5 9-5"/></svg></span><span class="qa-t">Periksa Banyak Dokumen</span><span class="qa-d">Punya banyak berkas? Antrekan sampai 50 berkas sekaligus dan unduh rekap hasilnya.</span><span class="qa-go">Antrekan berkas →</span></a>
-          <a class="qa-card" href="#/forensik"><span class="qa-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l2.5-6 4 12L16 12h5"/></svg></span><span class="qa-t">Kenali Gaya Tulisan</span><span class="qa-d">Lihat ciri khas tulisan Anda — keragaman kata, ritme kalimat, konsistensi — tanpa menuduh siapa penulisnya.</span><span class="qa-go">Kenali gaya saya →</span></a>
+          <a class="qa-card" href="#batch"><span class="qa-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3 8l9 5 9-5-9-5Z"/><path d="M3 13l9 5 9-5"/></svg></span><span class="qa-t">Banyak Berkas</span><span class="qa-d">Punya banyak berkas? Antrekan sampai 50 berkas sekaligus dan unduh rekap hasilnya.</span><span class="qa-go">Antrekan berkas →</span></a>
           <a class="qa-card" href="#/tulis"><span class="qa-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span><span class="qa-t">Asisten Menulis</span><span class="qa-d">Rapikan kata ganda, spasi, dan huruf awal kalimat — saran demi saran, Anda yang memutuskan mana yang dipakai.</span><span class="qa-go">Rapikan tulisan saya →</span></a>
+          <a class="qa-card" href="#/ocr"><span class="qa-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-4.5-4.5L6 21"/></svg></span><span class="qa-t">Baca Teks dari Gambar</span><span class="qa-d">Ubah foto atau pindaian dokumen menjadi teks yang bisa disalin dan diperiksa — langsung di peramban.</span><span class="qa-go">Baca gambar →</span></a>
+        </div>
+      </section>
+      <section class="dash-quick" data-view="home" aria-label="Semua fitur">
+        <details class="all-feats" id="all-feats">
+          <summary>Lihat semua fitur</summary>
+          <div class="qa-grid">
+          <a class="qa-card" href="#/forensik"><span class="qa-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l2.5-6 4 12L16 12h5"/></svg></span><span class="qa-t">Kenali Gaya Tulisan</span><span class="qa-d">Lihat ciri khas tulisan Anda — keragaman kata, ritme kalimat, konsistensi — tanpa menuduh siapa penulisnya.</span><span class="qa-go">Kenali gaya saya →</span></a>
           <a class="qa-card" href="#/compare"><span class="qa-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3v18M16 3v18M3 8h5M3 16h5M16 8h5M16 16h5"/></svg></span><span class="qa-t">Bandingkan Tulisan</span><span class="qa-d">Bandingkan dua versi tulisan dan lihat persis bagian yang sama, berubah, ditambah, atau dihapus.</span><span class="qa-go">Bandingkan →</span></a>
           <a class="qa-card" href="#/benchmark"><span class="qa-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg></span><span class="qa-t">Pengujian &amp; Transparansi</span><span class="qa-d">Seberapa akurat Saksara? Semua hasil pengujian kami diterbitkan apa adanya — termasuk kelemahannya.</span><span class="qa-go">Lihat hasil uji →</span></a>
-          <a class="qa-card" href="#/ocr"><span class="qa-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-4.5-4.5L6 21"/></svg></span><span class="qa-t">Baca Teks dari Gambar</span><span class="qa-d">Ubah foto atau pindaian dokumen menjadi teks yang bisa disalin dan diperiksa — langsung di peramban.</span><span class="qa-go">Baca gambar →</span></a>
           <a class="qa-card" href="#/history"><span class="qa-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 2.6-6.3L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3.5 2"/></svg></span><span class="qa-t">Riwayat Saya</span><span class="qa-d">Simpan hasil pemeriksaan di perangkat ini agar bisa dibuka lagi — <strong id="dash-hist-state">nonaktif</strong> sampai Anda mengaktifkannya sendiri.</span><span class="qa-go">Atur riwayat →</span></a>
-          <a class="qa-card" href="#clf-panel"><span class="qa-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg></span><span class="qa-t">Penguat Otomatis (Opsional)</span><span class="qa-d">Lapis pemeriksa kedua yang berjalan lokal (±280 MB) — hanya memperkuat indikasi, tidak pernah menuduh sendirian.</span><span class="qa-go">Aktifkan penguat →</span></a>
-        </div>
+          <a class="qa-card" href="#clf-panel"><span class="qa-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg></span><span class="qa-t">Penguat Skor (Opsional)</span><span class="qa-d">Lapis pemeriksa kedua yang berjalan lokal (±280 MB) — hanya memperkuat indikasi, tidak pernah menuduh sendirian.</span><span class="qa-go">Aktifkan penguat →</span></a>
+          </div>
         <div class="dash-row">
           <div class="dash-panel" aria-labelledby="dash-akt-judul">
             <h3 id="dash-akt-judul">Aktivitas sesi ini</h3>
@@ -978,14 +1009,15 @@
           <div class="dash-panel" aria-labelledby="dash-status-judul">
             <h3 id="dash-status-judul">Status di perangkat ini</h3>
             <ul class="dash-status-list">
-              <li>Mesin heuristik: <strong>Siap</strong> — berjalan lokal, tanpa unduhan.</li>
-              <li>Classifier: <strong id="dash-clf-state">Belum diaktifkan</strong></li>
-              <li>Model di cache peramban: <strong id="dash-clf-cache">Diperiksa…</strong></li>
+              <li>Pemeriksa pola: <strong>Siap</strong> — berjalan lokal, tanpa unduhan.</li>
+              <li>Penguat skor: <strong id="dash-clf-state">Belum diaktifkan</strong></li>
+              <li>Model tersimpan di peramban: <strong id="dash-clf-cache">Diperiksa…</strong></li>
               <li>Penyimpanan lokal: <strong id="dash-storage-state">Tidak ada teks yang disimpan</strong> — riwayat hanya aktif bila Anda menyetujuinya di halaman Riwayat.</li>
             </ul>
-            <a class="btn-ghost" href="#clf-panel">Buka Panel Classifier</a>
+            <a class="btn-ghost" href="#clf-panel">Buka Panel Penguat Skor</a>
           </div>
         </div>
+        </details>
       </section>
 
       <section class="dash-feats" data-view="home" aria-labelledby="dash-fitur-judul">
@@ -993,7 +1025,7 @@
         <h2 class="dash-h" id="dash-fitur-judul">Apa yang bisa dilakukan Saksara</h2>
         <div class="feat-grid">
           <div class="feat-card"><h3>Tujuh tanda yang diperiksa</h3><p>Ritme kalimat, keragaman kata, frasa khas AI, gaya &amp; struktur, sisa format, kerapian paragraf, dan pengulangan — masing-masing dijelaskan dengan bahasa sederhana pada setiap pemeriksaan.</p><a href="#/metode">Lihat penjelasannya</a></div>
-          <div class="feat-card"><h3>Penguat otomatis lokal</h3><p>Model pemeriksa kedua (±280 MB) berjalan di peramban Anda sebagai penguat bersyarat — tidak ada server yang menilai teks Anda.</p><a href="#clf-panel">Aktifkan saat memeriksa</a></div>
+          <div class="feat-card"><h3>Penguat skor lokal</h3><p>Model pemeriksa kedua (±280 MB) berjalan di peramban Anda sebagai penguat bersyarat — tidak ada server yang menilai teks Anda.</p><a href="#clf-panel">Aktifkan saat memeriksa</a></div>
           <div class="feat-card"><h3>Laporan per kalimat</h3><p>Kalimat terindikasi ditandai warna, lengkap dengan bukti dan saran perbaikan — plus laporan PDF bergaya Turnitin dan tombol Salin Ringkasan.</p><a href="#/detector">Coba sekarang</a></div>
           <div class="feat-card"><h3>Periksa banyak berkas</h3><p>Periksa puluhan berkas tugas dalam satu antrean dan unduh tabel rekapnya.</p><a href="#batch">Buka antrean berkas</a></div>
           <div class="feat-card"><h3>Privasi utuh</h3><p>Tanpa akun, tanpa unggahan teks. Satu-satunya unduhan adalah berkas model — itu pun hanya bila Anda mengaktifkannya; penyimpanan lokal hanya untuk fitur Riwayat yang opt-in dan nonaktif secara bawaan.</p><a href="#/posisi">Baca posisi privasi</a></div>
@@ -1002,7 +1034,7 @@
         <h3 class="dash-h" style="font-size:19px; margin-top:26px;">Angka dari pengujian kami</h3>
         <p class="wf-note">Ringkasan kecil dari pengujian internal — cerita lengkapnya, termasuk kelemahannya, ada di halaman Pengujian &amp; Transparansi.</p>
         <div class="stats-strip" aria-label="Angka kunci dari benchmark internal">
-          <div class="strip-stat"><div class="n">7</div><div class="t">sinyal heuristik — cara kerjanya dijelaskan terbuka di halaman ini</div></div>
+          <div class="strip-stat"><div class="n">7</div><div class="t">tanda pemeriksa pola — cara kerjanya dijelaskan terbuka di halaman ini</div></div>
           <div class="strip-stat"><div class="n">0/9</div><div class="t">sampel tulisan manusia yang terindikasi pada benchmark internal Bahasa Indonesia</div></div>
           <div class="strip-stat"><div class="n">18</div><div class="t">teks Bahasa Indonesia pada benchmark internal awal (n kecil, diakui terbuka)</div></div>
           <div class="strip-stat"><div class="n">0</div><div class="t">teks yang dikirim ke server — seluruh analisis berjalan di peramban Anda</div></div>
@@ -1012,14 +1044,14 @@
       <section class="method" id="cara-kerja" data-view="cara-kerja" hidden aria-labelledby="metode-judul">
         <div class="kicker">Metode</div>
         <h2 id="metode-judul">Cara menggunakan Saksara</h2>
-        <p class="sub">Tidak ada alat yang bisa tahu pasti apakah sebuah teks ditulis manusia atau dihasilkan AI. Yang bisa diukur adalah pola-pola dalam tulisan. Saksara memeriksa teks lewat dua lapis: lapis pertama adalah <strong>pemeriksaan pola statistik</strong> (Ensemble Heuristik v3) — tujuh tanda berikut dihitung lalu digabungkan menjadi satu skor, dengan setiap kalimat dinilai satu per satu; lapis kedua adalah <strong>pemeriksaan model AI</strong> yang hanya boleh menguatkan temuan lapis pertama. Skor akhir berupa persentase: semakin tinggi, semakin mirip pola tulisan itu dengan teks hasil AI. Tujuh tanda pada lapis pertama:</p>
+        <p class="sub">Tidak ada alat yang bisa tahu pasti apakah sebuah teks ditulis manusia atau dihasilkan AI. Yang bisa diukur adalah pola-pola dalam tulisan. Saksara memeriksa teks lewat dua lapis: lapis pertama adalah <strong>pemeriksaan pola statistik</strong> (pemeriksa pola — tujuh tanda berikut dihitung lalu digabungkan menjadi satu skor, dengan setiap kalimat dinilai satu per satu; lapis kedua adalah <strong>pemeriksaan model AI</strong> yang hanya boleh menguatkan temuan lapis pertama. Skor akhir berupa persentase: semakin tinggi, semakin mirip pola tulisan itu dengan teks hasil AI. Tujuh tanda pada lapis pertama:</p>
         <div class="steps">
-          <div class="step"><span class="num">SINYAL 1</span><h3>Burstiness</h3><p>Variasi panjang kalimat. Tulisan manusia biasanya mencampur kalimat pendek dan panjang; teks AI cenderung berukuran seragam dari satu kalimat ke kalimat berikutnya. Saksara mengukur seberapa beragam panjang kalimat dalam teks Anda.</p></div>
+          <div class="step"><span class="num">SINYAL 1</span><h3>Ritme kalimat (burstiness)</h3><p>Variasi panjang kalimat. Tulisan manusia biasanya mencampur kalimat pendek dan panjang; teks AI cenderung berukuran seragam dari satu kalimat ke kalimat berikutnya. Saksara mengukur seberapa beragam panjang kalimat dalam teks Anda.</p></div>
           <div class="step"><span class="num">SINYAL 2</span><h3>Keragaman kosakata</h3><p>Seberapa beragam kata yang dipakai di seluruh teks. Tulisan yang kata-katanya itu-itu saja — sedikit kata unik dan sedikit kata yang hanya muncul sekali — mendapat skor lebih tinggi.</p></div>
           <div class="step"><span class="num">SINYAL 3</span><h3>Frasa khas AI</h3><p>Kamus ungkapan yang sangat sering muncul pada teks hasil AI, dalam Bahasa Indonesia maupun Inggris — frasa penghubung dan pembuka yang generik seperti “berikut adalah”, “merupakan salah satu”, dan “menjaga integritas”. Dihitung per kalimat dan di seluruh dokumen.</p></div>
-          <div class="step"><span class="num">SINYAL 4</span><h3>Stilometri</h3><p>Sidik jari gaya tulisan: awalan kalimat yang berulang, panjang paragraf yang terlalu seragam, dan rata-rata panjang kalimat yang berada di rentang khas teks AI.</p></div>
-          <div class="step"><span class="num">SINYAL 5</span><h3>Sisa Markdown</h3><p>Sisa format mentah yang biasanya ikut tersalin dari keluaran AI: tebal <code>**…**</code>, judul <code>##</code>, garis <code>---</code>, kutip <code>&gt;</code>, dan daftar yang terlalu rapi. Tulisan yang diketik langsung hampir tidak pernah memuat sintaks seperti ini.</p></div>
-          <div class="step"><span class="num">SINYAL 6</span><h3>Simetri Paragraf</h3><p>Paragraf-paragraf yang panjang dan jumlah kalimatnya mirip satu sama lain, apalagi diawali pembuka generik (“Selain itu,”, “Selanjutnya,”, “Kesimpulannya,”) — struktur khas teks hasil AI.</p></div>
+          <div class="step"><span class="num">SINYAL 4</span><h3>Gaya &amp; struktur tulisan (stilometri)</h3><p>Sidik jari gaya tulisan: awalan kalimat yang berulang, panjang paragraf yang terlalu seragam, dan rata-rata panjang kalimat yang berada di rentang khas teks AI.</p></div>
+          <div class="step"><span class="num">SINYAL 5</span><h3>Sisa format (markdown)</h3><p>Sisa format mentah yang biasanya ikut tersalin dari keluaran AI: tebal <code>**…**</code>, judul <code>##</code>, garis <code>---</code>, kutip <code>&gt;</code>, dan daftar yang terlalu rapi. Tulisan yang diketik langsung hampir tidak pernah memuat sintaks seperti ini.</p></div>
+          <div class="step"><span class="num">SINYAL 6</span><h3>Kerapian paragraf</h3><p>Paragraf-paragraf yang panjang dan jumlah kalimatnya mirip satu sama lain, apalagi diawali pembuka generik (“Selain itu,”, “Selanjutnya,”, “Kesimpulannya,”) — struktur khas teks hasil AI.</p></div>
           <div class="step"><span class="num">SINYAL 7</span><h3>Pengulangan Frasa</h3><p>Rangkaian 4 kata yang sama muncul berulang kali di seluruh dokumen. Teks generik sering memakai ulang rangkaian kata yang sama berkali-kali; tulisan manusia yang konkret jarang melakukannya.</p></div>
         </div>
         <p class="formula">Kedua lapis itu tidak dicampur sembarangan. Lapis pertama selalu menjadi penemu indikasi awal: bila ia tidak menemukan indikasi yang cukup, skor akhir berhenti di situ — lapis kedua <strong>tidak pernah menuduh sendirian</strong>. Hanya bila lapis pertama sudah menemukan indikasi awal, skor dari model boleh ikut menguatkan skor akhir. Penanda warna pada setiap kalimat selalu berasal dari lapis pertama. Bila model belum siap, laporan tampil dari lapis pertama terlebih dahulu, lalu diperbarui otomatis begitu model siap — dan pada setiap tahap, teks Anda tidak pernah dikirim ke server mana pun.</p>
@@ -1029,12 +1061,23 @@
         <div class="kicker">Analisis</div>
         <h2 id="analisis-judul">Periksa tulisan Anda</h2>
         <div class="mode-toggle" role="group" aria-label="Tingkat tampilan"><span>Tampilan:</span><button type="button" class="mt-btn" data-mode="simple" aria-pressed="true">Sederhana</button><button type="button" class="mt-btn" data-mode="deep" aria-pressed="false">Mendalam</button><span class="mt-note">Mode Mendalam menampilkan seluruh angka &amp; rincian teknis.</span></div>
+        <div class="mode-toggle det-mode" role="group" aria-label="Mode pemeriksaan"><span>Mode:</span><button type="button" class="dm-btn" data-dmode="single" aria-pressed="true">Satu Tulisan</button><button type="button" class="dm-btn" data-dmode="batch" aria-pressed="false">Banyak Berkas</button><span class="mt-note">Periksa satu tulisan, atau banyak berkas sekaligus.</span></div>
         <ol class="p7-steps" aria-label="Langkah pemeriksaan"><li><strong>1.</strong> Masukkan tulisan</li><li><strong>2.</strong> Tekan Periksa Tulisan</li><li><strong>3.</strong> Pahami hasilnya</li></ol>
         <p class="sub">Tempel teks di bawah ini, unggah berkas .txt, .docx, atau .pdf (klik tombol Unggah, atau seret &amp; letakkan berkas ke panel ini), atau coba salah satu contoh uji.</p>
         <div class="panel" id="panel-analisis">
           <label for="input-teks" style="font-weight:700; display:block; margin-bottom:8px;">Teks yang diperiksa</label>
           <textarea id="input-teks" placeholder="Tempel teks di sini… (disarankan minimal 300 kata agar hasil lebih dapat dipegang)"></textarea>
-          <label class="opt-exclude" for="opt-exclude"><input type="checkbox" id="opt-exclude" /> <span>Abaikan bagian baku — daftar pustaka, kata pengantar, kutipan panjang, dan baris tabel/angka tidak ikut dinilai</span></label>
+          <details class="examples" id="examples-fold">
+            <summary class="lbl">Coba Contoh Teks — klik untuk mengisi &amp; menganalisis langsung</summary>
+            <div class="row">
+              <button type="button" id="ex1">Contoh: Tulisan Manusia<span class="exp">Cerita pengalaman pribadi — diharapkan: indikasi rendah</span></button>
+              <button type="button" id="ex2">Contoh: Murni AI<span class="exp">Esai generik teknologi — diharapkan: indikasi tinggi</span></button>
+              <button type="button" id="ex3">Contoh: AI Diparafrase<span class="exp">Topik sama, ditulis ulang — diharapkan: pita tengah</span></button>
+              <button type="button" id="ex4">Contoh: AI Modern<span class="exp">AI modern, ritme bervariasi + sisa markdown — diharapkan: indikasi tinggi</span></button>
+            </div>
+          </details>
+          <label class="opt-exclude" for="opt-exclude"><input type="checkbox" id="opt-exclude" /> <span>Abaikan bagian baku (daftar pustaka, kutipan, tabel)</span></label>
+          <details class="opt-explain"><summary>Apa saja yang diabaikan?</summary><p>Bagian baku yang tidak ikut dinilai: daftar pustaka, kata pengantar, kutipan panjang, dan baris tabel/angka.</p></details>
           <div class="toolbar">
             <span class="counters"><b id="cnt-kata">0</b> kata · <b id="cnt-kalimat">0</b> kalimat</span>
             <span class="upload-wrap" id="btn-upload"><span class="upload-visual" aria-hidden="true">Unggah .txt / .docx / .pdf</span><input type="file" id="file-input" accept=".txt,.docx,.pdf,.doc,text/plain,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-label="Unggah berkas .txt, .docx, atau .pdf" /></span>
@@ -1043,34 +1086,28 @@
           </div>
           <p class="det-note">Skor yang dihasilkan adalah <strong>indikasi statistik</strong> dari pola teks — <strong>bukan bukti mutlak kepengarangan</strong>. Gunakan sebagai bahan pemeriksaan dan klarifikasi, bukan vonis.</p>
           <div class="clf-panel" id="clf-panel">
+            <details class="clf-fold" id="clf-fold">
+            <summary>Penguat skor (opsional) — model pemeriksa kedua<span class="clf-fold-hint">Pemeriksa kedua yang berjalan lokal di peramban; klik untuk penjelasan dan tombol pengaktifan.</span></summary>
             <div class="clf-head">
-              <div class="clf-title">Mesin Classifier — model terlatih, berjalan lokal di peramban</div>
+              <div class="clf-title">Penguat skor (model pemeriksa kedua) — berjalan lokal di peramban</div>
               <div class="clf-actions">
-                <button type="button" id="btn-clf-cancel" style="display:none;">Batalkan Penilaian Classifier</button>
-                <button type="button" id="btn-clf-del" style="display:none;">Hapus cache model</button>
-                <button type="button" id="btn-clf">Aktifkan Penguat AI (±280 MB)</button>
+                <button type="button" id="btn-clf-cancel" style="display:none;">Batalkan Penilaian Penguat Skor</button>
+                <button type="button" id="btn-clf-del" style="display:none;">Hapus model tersimpan</button>
+                <button type="button" id="btn-clf">Aktifkan penguat skor (±280 MB, sekali unduh)</button>
               </div>
             </div>
             <p class="clf-desc">Lapis kedua setelah pemeriksaan pola: sebuah <strong>model bahasa multibahasa</strong> yang sudah dilatih untuk membedakan teks manusia dan teks AI, berjalan <strong>sepenuhnya di peramban ini</strong> — tidak ada server yang menilai teks Anda. Berkas modelnya cukup besar (±280 MB) dan <strong>hanya diunduh bila Anda mengaktifkannya</strong> lewat tombol di panel ini.</p>
-            <details class="clf-more"><summary>Baca detail teknis &amp; batasan</summary><p>Halaman ini <strong>tidak mengunduh apa pun secara otomatis</strong> saat dibuka, agar kuota data dan ruang penyimpanan Anda tetap hemat. Sekali diunduh, model <strong>tersimpan di peramban</strong> untuk kunjungan berikutnya (pengaktifan berikutnya tanpa unduhan), dan bisa dihapus kapan saja lewat tombol “Hapus cache model”. Satu-satunya lalu lintas jaringan hanyalah unduhan berkas model itu; teks yang dianalisis <strong>tidak pernah dikirim ke mana pun</strong>. Selagi model dimuat, halaman tetap berfungsi penuh dengan lapis pertama. Peran model ini adalah <strong>penguat</strong>: ia hanya boleh menaikkan skor bila lapis pertama sudah menemukan indikasi awal — bila tidak, skornya tidak dipakai sama sekali, karena model ini <strong>tidak pernah menuduh sendirian</strong>. Pada dokumen yang sangat panjang, model menilai paling banyak 100 segmen teks yang disebar merata dari seluruh dokumen (30 segmen pada perangkat seluler/hemat). Penanda warna per kalimat tetap berasal dari lapis pertama. <strong>Keterbatasannya, apa adanya:</strong> pada pengujian kami, model ini sangat yakin pada teks AI formal — tetapi sebagian tulisan manusia yang sangat formal dan bergaya ensiklopedis juga dinilainya mirip AI, dan teks AI yang ditulis ulang (parafrase) dengan rapi bisa lolos darinya. Karena bias itulah ia ditempatkan hanya sebagai penguat di belakang lapis pertama.</p></details>
-            <p class="clf-mobile-note">Di HP, classifier berjalan memakai prosesor perangkat dan bisa terasa lambat — penilaian di perangkat seluler dibatasi 30 segmen yang disebar merata dari seluruh dokumen agar tetap ringan, dan Anda dapat membatalkannya kapan saja (skor heuristik tetap tampil). Untuk dokumen sangat panjang, desktop terasa jauh lebih cepat.</p>
+            <details class="clf-more"><summary>Baca detail teknis &amp; batasan</summary><p>Halaman ini <strong>tidak mengunduh apa pun secara otomatis</strong> saat dibuka, agar kuota data dan ruang penyimpanan Anda tetap hemat. Sekali diunduh, model <strong>tersimpan di peramban</strong> untuk kunjungan berikutnya (pengaktifan berikutnya tanpa unduhan), dan bisa dihapus kapan saja lewat tombol “Hapus model tersimpan”. Satu-satunya lalu lintas jaringan hanyalah unduhan berkas model itu; teks yang dianalisis <strong>tidak pernah dikirim ke mana pun</strong>. Selagi model dimuat, halaman tetap berfungsi penuh dengan lapis pertama. Peran model ini adalah <strong>penguat</strong>: ia hanya boleh menaikkan skor bila lapis pertama sudah menemukan indikasi awal — bila tidak, skornya tidak dipakai sama sekali, karena model ini <strong>tidak pernah menuduh sendirian</strong>. Pada dokumen yang sangat panjang, model menilai paling banyak 100 bagian teks yang disebar merata dari seluruh dokumen (30 bagian pada perangkat seluler/hemat). Penanda warna per kalimat tetap berasal dari lapis pertama. <strong>Keterbatasannya, apa adanya:</strong> pada pengujian kami, model ini sangat yakin pada teks AI formal — tetapi sebagian tulisan manusia yang sangat formal dan bergaya ensiklopedis juga dinilainya mirip AI, dan teks AI yang ditulis ulang (parafrase) dengan rapi bisa lolos darinya. Karena bias itulah ia ditempatkan hanya sebagai penguat di belakang lapis pertama.</p></details>
+            <p class="clf-mobile-note">Di HP, penguat skor berjalan memakai prosesor perangkat dan bisa terasa lambat — penilaian di perangkat seluler dibatasi 30 bagian yang disebar merata dari seluruh dokumen agar tetap ringan, dan Anda dapat membatalkannya kapan saja (skor pemeriksa pola tetap tampil). Untuk dokumen sangat panjang, desktop terasa jauh lebih cepat.</p>
             <div class="clf-progress" id="clf-progress" style="display:none;"><div class="clf-progress-fill" id="clf-progress-fill"></div></div>
-            <p class="clf-status" id="clf-status" role="status" aria-live="polite">Status classifier: Penguat AI belum diaktifkan — skor saat ini 100% Ensemble Heuristik v3.</p>
+            </details>
+            <p class="clf-status" id="clf-status" role="status" aria-live="polite">Status penguat skor: belum diaktifkan — skor saat ini 100% pemeriksa pola (7 tanda).</p>
           </div>
           <p class="file-note"><strong>Batas &amp; cakupan:</strong> Maks. 20 MB / 100.000 kata &middot; Disarankan min. &plusmn;300 kata agar hasil dapat dipegang.</p>
-          <details class="clf-more"><summary>Baca batas &amp; cakupan lengkap</summary><p>Ukuran berkas yang diunggah dibatasi maksimum 20 MB, dan analisis mencakup hingga 100.000 kata pertama dari teks — bila dokumen lebih panjang dari itu, yang dianalisis adalah 100.000 kata pertamanya dan laporan menampilkan catatan pemotongan tersebut secara terbuka (berapa kata total dokumen dan berapa yang dianalisis). Di dalam batas itu, seluruh teks yang terbaca dari berkas akan dianalisis. Di halaman ini, dari DOCX dibaca isi utama, tabel, kotak teks, catatan kaki/akhir, komentar, serta header dan footer — teks pendamping digabung sesudah isi utama; dari PDF dibaca lapisan teks dari semua halaman. Cakupan Asisten Menulis berbeda: di sana header, footer, catatan kaki/akhir, dan komentar tidak ikut dimuat, dan Anda diberi tahu saat dokumen dimuat bila bagian itu terdeteksi. Agar hasil dapat dipegang, teks disarankan minimal ±300 kata. PDF hasil pindai (gambar) tidak punya lapisan teks sehingga belum bisa dibaca — tempel teksnya langsung. Format .doc lama juga belum didukung; simpan ulang berkasnya sebagai .docx. Pemeriksaan lapis pertama memakai <strong>Ensemble Heuristik v3</strong> dengan 7 sinyal — termasuk sisa markdown, simetri paragraf, dan pengulangan frasa — yang disetel untuk pola tulisan Bahasa Indonesia, termasuk tulisan formal dan birokratis yang generik. <strong>Classifier lokal:</strong> model bahasa multibahasa hanya diunduh bila Anda mengaktifkan Penguat AI di panel classifier (±280 MB, sekali saja, lalu tersimpan di cache peramban dan bisa dihapus dari panel yang sama) dan menilai teks sepenuhnya di perangkat ini — pada mode apa pun, tidak ada teks yang meninggalkan peramban ini. Pada pengujian kami model ini sangat kuat pada teks AI formal Bahasa Indonesia, tetapi juga menandai sebagian tulisan manusia yang sangat formal sebagai mirip AI — karena itu ia hanya dipakai sebagai penguat di atas lapis pertama (tidak pernah menaikkan skor bila lapis pertama tidak menemukan indikasi awal), dan teks AI yang diparafrase tetap bisa lolos dari keduanya. Apa pun hasilnya, skor tetap indikasi statistik, bukan bukti.</p></details>
+          <details class="clf-more"><summary>Baca batas &amp; cakupan lengkap</summary><p>Ukuran berkas yang diunggah dibatasi maksimum 20 MB, dan analisis mencakup hingga 100.000 kata pertama dari teks — bila dokumen lebih panjang dari itu, yang dianalisis adalah 100.000 kata pertamanya dan laporan menampilkan catatan pemotongan tersebut secara terbuka (berapa kata total dokumen dan berapa yang dianalisis). Di dalam batas itu, seluruh teks yang terbaca dari berkas akan dianalisis. Di halaman ini, dari DOCX dibaca isi utama, tabel, kotak teks, catatan kaki/akhir, komentar, serta header dan footer — teks pendamping digabung sesudah isi utama; dari PDF dibaca lapisan teks dari semua halaman. Cakupan Asisten Menulis berbeda: di sana header, footer, catatan kaki/akhir, dan komentar tidak ikut dimuat, dan Anda diberi tahu saat dokumen dimuat bila bagian itu terdeteksi. Agar hasil dapat dipegang, teks disarankan minimal ±300 kata. PDF hasil pindai (gambar) tidak punya lapisan teks sehingga belum bisa dibaca — tempel teksnya langsung. Format .doc lama juga belum didukung; simpan ulang berkasnya sebagai .docx. Pemeriksaan lapis pertama memakai <strong>pemeriksa pola (Ensemble Heuristik v3)</strong> dengan 7 sinyal — termasuk sisa markdown, simetri paragraf, dan pengulangan frasa — yang disetel untuk pola tulisan Bahasa Indonesia, termasuk tulisan formal dan birokratis yang generik. <strong>Penguat skor lokal:</strong> model bahasa multibahasa hanya diunduh bila Anda mengaktifkan penguat skor di panel di atas (±280 MB, sekali saja, lalu tersimpan di peramban dan bisa dihapus dari panel yang sama) dan menilai teks sepenuhnya di perangkat ini — pada mode apa pun, tidak ada teks yang meninggalkan peramban ini. Pada pengujian kami model ini sangat kuat pada teks AI formal Bahasa Indonesia, tetapi juga menandai sebagian tulisan manusia yang sangat formal sebagai mirip AI — karena itu ia hanya dipakai sebagai penguat di atas lapis pertama (tidak pernah menaikkan skor bila lapis pertama tidak menemukan indikasi awal), dan teks AI yang diparafrase tetap bisa lolos dari keduanya. Apa pun hasilnya, skor tetap indikasi statistik, bukan bukti.</p></details>
           <div class="file-status" id="file-status" role="status" aria-live="polite"></div>
           <div class="banner" id="banner-pendek" role="alert"></div>
           <div class="banner" id="banner-sibuk" role="status" aria-live="polite"></div>
-          <div class="examples">
-            <div class="lbl">Contoh uji — klik untuk mengisi &amp; menganalisis langsung</div>
-            <div class="row">
-              <button type="button" id="ex1">Contoh: Tulisan Manusia<span class="exp">Cerita pengalaman pribadi — diharapkan: indikasi rendah</span></button>
-              <button type="button" id="ex2">Contoh: Murni AI<span class="exp">Esai generik teknologi — diharapkan: indikasi tinggi</span></button>
-              <button type="button" id="ex3">Contoh: AI Diparafrase<span class="exp">Topik sama, ditulis ulang — diharapkan: pita tengah</span></button>
-              <button type="button" id="ex4">Contoh: AI Modern<span class="exp">AI modern, ritme bervariasi + sisa markdown — diharapkan: indikasi tinggi</span></button>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -1084,7 +1121,7 @@
         <div class="human-card" id="human-card" hidden><h3 id="human-title"></h3><p id="human-explain"></p><p class="human-tip" id="human-tip"></p><p class="human-note">Ingat: skor ini <strong>indikasi statistik, bukan bukti</strong> siapa penulisnya. Persentase ringkasnya ada pada kartu skor; rincian teknis lengkapnya tampil di Mode Mendalam.</p></div>
         <div class="report-grid">
           <div class="score-card">
-            <div class="cap">Skor indikasi AI keseluruhan</div>
+            <div class="cap">Skor kemiripan pola AI (indikasi keseluruhan)</div>
             <div class="score-num"><span id="score-num">0</span><small>%</small></div>
             <span class="verdict" id="verdict">—</span>
             <div class="meter"><div class="pin" id="meter-pin" style="left:0%"></div></div>
@@ -1096,11 +1133,15 @@
               <div class="ss-cap">Ringkasan per kalimat</div>
               <p class="ss-line" id="sent-summary-line"></p>
             </div>
+            <span class="pdf-actions">
+              <button type="button" id="btn-salin">Salin Ringkasan</button>
+              <button type="button" id="btn-pdf">Unduh Laporan PDF</button>
+            </span>
           </div>
           <div class="signals">
-            <h3>Rincian per sinyal</h3>
+            <h3>Rincian per tanda</h3>
             <div class="sig">
-              <div class="sig-head"><span class="sig-name">Burstiness (ritme kalimat)</span><span class="sig-pct" id="pct-burst">0%</span></div>
+              <div class="sig-head"><span class="sig-name">Ritme kalimat (burstiness)</span><span class="sig-pct" id="pct-burst">0%</span></div>
               <div class="sig-bar"><div class="sig-fill" id="fill-burst"></div></div>
               <p class="sig-desc" id="desc-burst"></p>
             </div>
@@ -1115,17 +1156,17 @@
               <p class="sig-desc" id="desc-phrase"></p>
             </div>
             <div class="sig">
-              <div class="sig-head"><span class="sig-name">Stilometri (gaya &amp; struktur)</span><span class="sig-pct" id="pct-stylo">0%</span></div>
+              <div class="sig-head"><span class="sig-name">Gaya &amp; struktur tulisan (stilometri)</span><span class="sig-pct" id="pct-stylo">0%</span></div>
               <div class="sig-bar"><div class="sig-fill" id="fill-stylo"></div></div>
               <p class="sig-desc" id="desc-stylo"></p>
             </div>
             <div class="sig">
-              <div class="sig-head"><span class="sig-name">Sisa Markdown</span><span class="sig-pct" id="pct-md">0%</span></div>
+              <div class="sig-head"><span class="sig-name">Sisa format (markdown)</span><span class="sig-pct" id="pct-md">0%</span></div>
               <div class="sig-bar"><div class="sig-fill" id="fill-md"></div></div>
               <p class="sig-desc" id="desc-md"></p>
             </div>
             <div class="sig">
-              <div class="sig-head"><span class="sig-name">Simetri Paragraf</span><span class="sig-pct" id="pct-sym">0%</span></div>
+              <div class="sig-head"><span class="sig-name">Kerapian paragraf</span><span class="sig-pct" id="pct-sym">0%</span></div>
               <div class="sig-bar"><div class="sig-fill" id="fill-sym"></div></div>
               <p class="sig-desc" id="desc-sym"></p>
             </div>
@@ -1135,22 +1176,24 @@
               <p class="sig-desc" id="desc-rep"></p>
             </div>
             <div class="sig" id="sig-clf" style="display:none;">
-              <div class="sig-head"><span class="sig-name">Classifier (model terlatih — penguat bersyarat)</span><span class="sig-pct" id="pct-clf">—</span></div>
+              <div class="sig-head"><span class="sig-name">Penguat skor (model pemeriksa kedua — penguat bersyarat)</span><span class="sig-pct" id="pct-clf">—</span></div>
               <div class="sig-bar"><div class="sig-fill" id="fill-clf"></div></div>
               <p class="sig-desc" id="desc-clf"></p>
             </div>
           </div>
         </div>
 
+        <p class="deep-hint">Rincian per tanda dan statistik lengkap tampil di <strong>mode Mendalam</strong> — gunakan pengalih Tampilan di bagian atas halaman ini.</p>
+
         <div class="stats">
           <div class="stat"><div class="v" id="st-kata">0</div><div class="k">Jumlah kata</div></div>
           <div class="stat"><div class="v" id="st-kalimat">0</div><div class="k">Jumlah kalimat</div></div>
           <div class="stat"><div class="v" id="st-rata">0</div><div class="k">Rata-rata kata / kalimat</div></div>
-          <div class="stat"><div class="v" id="st-ttr">0</div><div class="k">Type-token ratio (TTR)</div></div>
+          <div class="stat"><div class="v" id="st-ttr">0</div><div class="k">Perbandingan kata unik (TTR)</div></div>
         </div>
 
-        <details class="hl-panel" id="hl-panel">
-          <summary class="hl-summary"><h3>Teks dengan penanda per kalimat</h3><span class="hl-toggle" aria-hidden="true"></span></summary>
+        <details class="hl-panel" id="hl-panel" open>
+          <summary class="hl-summary"><h3>Teks dengan tanda warna per kalimat</h3><span class="hl-toggle" aria-hidden="true"></span></summary>
           <div class="legend">
             <span><span class="sw r"></span>Merah — skor kalimat ≥ 65% (sangat mirip pola AI)</span>
             <span><span class="sw y"></span>Kuning — 35–65% (indikasi AI sedang)</span>
@@ -1177,14 +1220,13 @@
         <div class="pdf-panel">
           <div class="pdf-head">
             <h3>Laporan PDF</h3>
-            <span class="pdf-actions">
-              <button type="button" id="btn-salin">Salin Ringkasan</button>
-              <button type="button" id="btn-pdf">Unduh Laporan PDF</button>
-            </span>
           </div>
-          <p class="pdf-note">Unduh hasil pemeriksaan ini sebagai berkas PDF bergaya laporan Turnitin: panel skor berwarna, bagian khusus hasil classifier (Lapis 2), rincian ketujuh sinyal dengan warna berbeda per sinyal, keterangan warna, teks lengkap dengan kalimat terindikasi diberi latar warna (frasa khas AI tampil ungu tebal, pola berulang cokelat bergaris bawah), serta skor dan alasan untuk setiap kalimat. PDF dibuat langsung di peramban Anda; pustaka jsPDF dimuat dari CDN hanya saat tombol ini ditekan. Isinya adalah analisis <strong>indikasi AI per kalimat</strong>, bukan laporan kecocokan plagiarisme terhadap basis data. <span id="pdf-status" role="status" aria-live="polite"></span></p>
+          <p class="pdf-note">Unduh hasil pemeriksaan ini sebagai berkas PDF bergaya laporan: panel skor berwarna, rincian ketujuh tanda dengan warna berbeda per tanda, keterangan warna, teks lengkap dengan kalimat terindikasi diberi latar warna, serta skor dan alasan untuk setiap kalimat. Isinya adalah analisis <strong>indikasi AI per kalimat</strong>, bukan laporan kecocokan plagiarisme terhadap basis data. <span id="pdf-status" role="status" aria-live="polite"></span></p>
+          <details class="clf-more"><summary>Detail teknis laporan</summary><p>PDF dibuat langsung di peramban Anda; pustaka jsPDF dimuat dari CDN hanya saat tombol Unduh Laporan PDF ditekan. Laporan memuat pula bagian khusus hasil penguat skor (model pemeriksa kedua, Lapis 2) bila penguat itu aktif, dan menandai frasa khas AI dengan ungu tebal serta pola berulang dengan cokelat bergaris bawah pada teks berpenanda. Gaya panelnya terinspirasi laporan Turnitin, tetapi isinya berbeda: ini analisis indikasi AI per kalimat, bukan laporan kecocokan plagiarisme terhadap basis data.</p></details>
         </div>
 
+        <details class="hl-panel contrib-fold" id="contrib-fold">
+          <summary class="hl-summary"><h3>Bantu Saksara membaik — kalibrasi, donasi teks, &amp; masukan (opsional)</h3><span class="hl-toggle" aria-hidden="true"></span></summary>
         <div class="telemetry" id="telemetry">
           <p>Hasil ini terasa meleset? Bantu kalibrasi Saksara — kirim angka-angka statistik hasil ini (tanpa teks Anda) beserta penilaian Anda:</p>
           <div class="telemetry-btns">
@@ -1214,13 +1256,15 @@
           <a class="feedback-btn" href="https://forms.gle/GmtjuWKRAqMp1Jby7" target="_blank" rel="noopener">Laporkan Ketidakakuratan / Beri Masukan</a>
           <p class="feedback-note">Formulir sukarela yang terbuka di tab baru. Formulir itu <strong>tidak otomatis mengirim teks Anda</strong> — ceritakan pengalaman Anda saja, dan jangan menempel teks lengkap yang Anda analisis.</p>
         </div>
+        </details>
       </section>
 
       <section class="batch" id="batch" data-view="detector" hidden aria-labelledby="batch-judul">
-        <div class="kicker">Berkas Banyak</div>
+        <div class="kicker">Banyak Berkas</div>
         <h2 id="batch-judul">Periksa banyak dokumen</h2>
+        <div class="mode-toggle det-mode" role="group" aria-label="Mode pemeriksaan"><span>Mode:</span><button type="button" class="dm-btn" data-dmode="single" aria-pressed="false">Satu Tulisan</button><button type="button" class="dm-btn" data-dmode="batch" aria-pressed="true">Banyak Berkas</button><span class="mt-note">Periksa satu tulisan, atau banyak berkas sekaligus.</span></div>
           <ol class="p7-steps" aria-label="Langkah pemeriksaan banyak dokumen"><li><strong>1.</strong> Pilih dokumen</li><li><strong>2.</strong> Tekan Periksa Semua Berkas</li><li><strong>3.</strong> Lihat hasil</li><li><strong>4.</strong> Unduh laporan</li></ol>
-        <p class="sub">Pilih beberapa berkas .txt, .docx, atau .pdf untuk dinilai sekaligus dan diringkas dalam satu tabel. Setiap berkas dinilai dengan Ensemble Heuristik v3; bila Penguat AI (classifier) sudah aktif, penguat bersyarat yang sama ikut diterapkan — bila belum aktif, skornya murni heuristik. Hasil batch tampil di sini saja: ia tidak mengubah laporan utama di atas dan tidak disimpan ke arsip hasil.</p>
+        <p class="sub">Pilih beberapa berkas .txt, .docx, atau .pdf untuk dinilai sekaligus dan diringkas dalam satu tabel. Setiap berkas dinilai dengan pemeriksa pola (7 tanda); bila penguat skor (model pemeriksa kedua) sudah aktif, penguat bersyarat yang sama ikut diterapkan — bila belum aktif, skornya murni pemeriksa pola. Hasil batch tampil di sini saja: ia tidak mengubah laporan utama di atas dan tidak disimpan ke arsip hasil.</p>
         <div class="panel">
           <label for="batch-input" style="font-weight:700; display:block; margin-bottom:8px;">Berkas yang diperiksa</label>
           <input type="file" id="batch-input" multiple accept=".txt,.docx,.pdf,text/plain,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-label="Pilih banyak berkas .txt, .docx, atau .pdf" />
@@ -1231,8 +1275,8 @@
             <button type="button" class="primary" id="btn-batch">Periksa Semua Berkas</button>
             <button type="button" id="btn-batch-cancel" style="display:none;">Batalkan</button>
             <button type="button" id="btn-batch-retry" style="display:none;">Coba Lagi yang Gagal</button>
-            <button type="button" id="btn-batch-csv" style="display:none;">Unduh CSV</button>
-            <button type="button" id="btn-batch-json" style="display:none;">Unduh JSON</button>
+            <button type="button" id="btn-batch-csv" style="display:none;">Unduh tabel hasil (CSV)</button>
+            <details class="batch-adv"><summary>Pilihan lanjutan</summary><button type="button" id="btn-batch-json" style="display:none;">Unduh JSON</button></details>
             <button type="button" id="btn-batch-pdf" style="display:none;">Unduh PDF Ringkasan</button>
           </div>
           <p class="batch-progress" id="batch-progress" role="status" aria-live="polite"></p>
@@ -1244,11 +1288,13 @@
       <section class="tulis" id="tulis" data-view="tulis" hidden aria-labelledby="wi-judul">
         <div class="kicker">Asisten Menulis Cerdas</div>
         <h2 id="wi-judul">Asisten Menulis</h2>
-        <p class="sub">Rapikan tulisan Anda — kata yang terketik ganda, spasi dan tanda baca yang tidak rapi, huruf kapital, kata tidak baku, penulisan kata depan <em>di/ke</em> dan imbuhan <em>di-/ke-</em>, kata ulang, dan salah ketik mekanis — satu saran dalam satu waktu, dan <strong>Anda yang memutuskan</strong> saran mana yang diterima. Daftar kata bakunya merujuk <strong>EYD V dan KBBI</strong>. Pemeriksaan ini berbasis aturan dan daftar kata tertutup — <strong>bukan setara editor profesional</strong>: ia tidak memahami maksud kalimat secara mendalam, sehingga nama orang, tempat, merek, atau istilah asing kadang masih tertandai; untuk kata yang memang disengaja ada tombol <strong>Abaikan kata ini</strong> (hanya berlaku selama sesi ini, tidak disimpan). Saran adalah <strong>rekomendasi, bukan jaminan kebenaran</strong>: baca kembali hasil revisi sebelum memakainya. Teks diproses <strong>sepenuhnya di peramban ini</strong> — tidak dikirim ke server dan tidak disimpan, dan teks asli Anda tidak pernah ditimpa. Saran tingkat kalimat — kata mubazir, kalimat yang panjang atau kompleks, pengulangan frasa, dan awalan kalimat yang monoton — bersifat <strong>heuristik pola</strong>: pemeriksa <strong>tidak memahami makna</strong> kalimat Anda, dan kalimat panjang <strong>tidak otomatis salah</strong>. Saran kata mubazir hanya menghapus kata yang terbukti berlebih atau menukar frasa <em>melakukan …</em> menjadi kata kerja satu akarnya; istilah, nama, angka, kutipan, dan sitasi tidak pernah diubah oleh saran mana pun.</p>
+        <p class="sub">Rapikan tulisan Anda — kata yang terketik ganda, spasi dan tanda baca yang tidak rapi, huruf kapital, kata tidak baku, penulisan kata depan <em>di/ke</em> dan imbuhan <em>di-/ke-</em>, kata ulang, dan salah ketik mekanis — satu saran dalam satu waktu, dan <strong>Anda yang memutuskan</strong> saran mana yang diterima. Teks diproses <strong>sepenuhnya di peramban ini</strong> — tidak dikirim ke server dan tidak disimpan, dan teks asli Anda tidak pernah ditimpa.</p>
+        <details class="clf-more"><summary>Baca sebelum memakai</summary><p>Rapikan tulisan Anda — kata yang terketik ganda, spasi dan tanda baca yang tidak rapi, huruf kapital, kata tidak baku, penulisan kata depan <em>di/ke</em> dan imbuhan <em>di-/ke-</em>, kata ulang, dan salah ketik mekanis — satu saran dalam satu waktu, dan <strong>Anda yang memutuskan</strong> saran mana yang diterima. Daftar kata bakunya merujuk <strong>EYD V dan KBBI</strong>. Pemeriksaan ini berbasis aturan dan daftar kata tertutup — <strong>bukan setara editor profesional</strong>: ia tidak memahami maksud kalimat secara mendalam, sehingga nama orang, tempat, merek, atau istilah asing kadang masih tertandai; untuk kata yang memang disengaja ada tombol <strong>Abaikan kata ini</strong> (hanya berlaku selama sesi ini, tidak disimpan). Saran adalah <strong>rekomendasi, bukan jaminan kebenaran</strong>: baca kembali hasil revisi sebelum memakainya. Teks diproses <strong>sepenuhnya di peramban ini</strong> — tidak dikirim ke server dan tidak disimpan, dan teks asli Anda tidak pernah ditimpa. Saran tingkat kalimat — kata mubazir, kalimat yang panjang atau kompleks, pengulangan frasa, dan awalan kalimat yang monoton — bersifat <strong>heuristik pola</strong>: pemeriksa <strong>tidak memahami makna</strong> kalimat Anda, dan kalimat panjang <strong>tidak otomatis salah</strong>. Saran kata mubazir hanya menghapus kata yang terbukti berlebih atau menukar frasa <em>melakukan …</em> menjadi kata kerja satu akarnya; istilah, nama, angka, kutipan, dan sitasi tidak pernah diubah oleh saran mana pun.</p></details>
         <div class="panel" id="wi-panel-input">
           <div class="wi-doc" id="wi-doc">
             <div class="wi-doc-head">Impor dokumen Word (.docx) atau PDF (.pdf)</div>
-            <p class="wf-note">Muat berkas .docx atau .pdf dari perangkat Anda — berkas dibaca <strong>sepenuhnya di peramban ini</strong>, tidak diunggah ke server dan tidak disimpan — lalu teksnya ditempatkan di kotak teks di bawah untuk dianalisis seperti biasa. Untuk PDF, yang dibaca adalah <strong>lapisan teksnya</strong> dan formatnya hanya perkiraan dari posisi teks; PDF hasil pindaian (gambar) belum dapat dianalisis di sini karena Asisten Menulis <strong>belum mendukung OCR</strong> — gunakan halaman OCR untuk mengekstrak teks dari pindaian. Saran yang posisinya aman di dalam dokumen kini juga diterapkan ke salinan kerja dokumen dengan format dokumen yang terjaga (dokumen asli Anda tidak berubah). Dokumen kerja juga dapat disalin dengan format, dibandingkan dengan dokumen asli, dan diunduh kembali sebagai berkas .docx. Dari dokumen Word, yang dimuat adalah isi utama, tabel, dan kotak teks; header, footer, catatan kaki/akhir, dan komentar tidak ikut dimuat — bila bagian itu ada, Anda diberi tahu sesudah dokumen selesai dimuat.</p>
+            <p class="wf-note">Muat berkas .docx atau .pdf dari perangkat Anda — berkas dibaca <strong>sepenuhnya di peramban ini</strong>, tidak diunggah ke server dan tidak disimpan — lalu teksnya ditempatkan di kotak teks di bawah untuk dianalisis seperti biasa. Dari dokumen Word, yang dimuat adalah isi utama, tabel, dan kotak teks; header, footer, catatan kaki/akhir, dan komentar tidak ikut dimuat — bila bagian itu ada, Anda diberi tahu sesudah dokumen selesai dimuat.</p>
+            <details class="clf-more"><summary>Detail impor dokumen</summary><p>Untuk PDF, yang dibaca adalah <strong>lapisan teksnya</strong> dan formatnya hanya perkiraan dari posisi teks; PDF hasil pindaian (gambar) belum dapat dianalisis di sini karena Asisten Menulis <strong>belum mendukung OCR</strong> — gunakan halaman OCR untuk mengekstrak teks dari pindaian. Saran yang posisinya aman di dalam dokumen kini juga diterapkan ke salinan kerja dokumen dengan format dokumen yang terjaga (dokumen asli Anda tidak berubah). Dokumen kerja juga dapat disalin dengan format, dibandingkan dengan dokumen asli, dan diunduh kembali sebagai berkas .docx.</p></details>
             <div class="wi-doc-drop">
               <span class="upload-wrap"><span class="upload-visual" aria-hidden="true">Pilih dokumen (.docx/.pdf)</span><input type="file" id="wi-doc-file" accept=".docx,.pdf,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-label="Pilih dokumen Word (.docx) atau PDF (.pdf)" /></span>
               <span class="wi-doc-hint">atau seret &amp; letakkan berkas .docx/.pdf ke kartu ini · batas 20 MB</span>
@@ -1327,6 +1373,8 @@
           </div>
         </div>
 
+        <details class="hl-panel wi-extra" id="wi-extra">
+          <summary class="hl-summary"><h3>Alat tambahan — analisis keterbacaan &amp; gaya tulisan</h3><span class="hl-toggle" aria-hidden="true"></span></summary>
         <div class="wf-panel wi-read-panel">
           <h3>Analisis Keterbacaan</h3>
           <p class="wf-note">Analisis ini membaca teks yang sama di kotak masukan di atas dan hanya menampilkan <strong>indikator statistik</strong> tentang kalimat dan paragraf Anda — tidak ada saran otomatis, tidak ada teks yang diubah, dan tidak ada tingkat pendidikan pembaca yang ditebak. Skornya adalah estimasi dari indikator-indikator itu, <strong>bukan standar ilmiah dan bukan penilaian kualitas tulisan</strong>: tulisan akademik wajar berada di rentang yang lebih menuntut daripada tulisan populer. Semua dihitung <strong>di peramban ini</strong> — teks tidak dikirim ke server dan tidak disimpan.</p>
@@ -1354,10 +1402,11 @@
           <p class="wf-note" id="wi-style-desc"></p>
           <div id="wi-style" hidden></div>
         </div>
+        </details>
       </section>
 
       <section class="forensik" id="forensik" data-view="forensik" hidden aria-labelledby="wf-judul">
-        <div class="kicker">Analisis Forensik Tulisan</div>
+        <div class="kicker">Kenali Gaya Tulisan</div>
         <h2 id="wf-judul">Kenali gaya tulisan Anda</h2>
         <div class="mode-toggle" role="group" aria-label="Tingkat tampilan"><span>Tampilan:</span><button type="button" class="mt-btn" data-mode="simple" aria-pressed="true">Sederhana</button><button type="button" class="mt-btn" data-mode="deep" aria-pressed="false">Mendalam</button><span class="mt-note">Mode Mendalam menampilkan seluruh angka &amp; rincian teknis.</span></div>
         <p class="sub">Ukur karakteristik gaya sebuah teks — keragaman kosakata, ritme kalimat, kompleksitas struktur, konsistensi paragraf, kata transisi, dan pengulangan — dihitung sepenuhnya di peramban ini. Modul ini <strong>bukan detektor AI</strong>: hasilnya adalah statistik deskriptif untuk penyuntingan dan pembelajaran menulis, <strong>bukan bukti siapa penulisnya</strong>, dan tidak memengaruhi skor Detector.</p>
@@ -1572,7 +1621,7 @@
 
       <section class="ocr" id="ocr" data-view="ocr" hidden aria-labelledby="ocr-judul">
         <p class="wf-kicker">OCR Dokumen</p>
-        <h2 id="ocr-judul">Ekstrak teks dari gambar &amp; PDF pindai</h2>
+        <h2 id="ocr-judul">Baca teks dari gambar &amp; PDF pindai</h2>
         <p class="wf-lede">OCR (pengenalan karakter optik) membaca halaman sebagai <strong>gambar</strong> dan menebak teksnya — jalan pintas untuk PDF hasil pindai atau berkas yang lapisan teksnya tidak terbaca. Ia <strong>tidak memperbaiki ekstraktor teks</strong> Saksara: ekstraksi teks biasa tetap jalur utama di semua halaman, dan temuan B-01 (PDF dengan font CID tanpa peta ToUnicode) tetap terbuka — OCR hanya dapat menolong bila halaman *tampil* benar di layar. Hasil OCR selalu dapat keliru; periksa dan sunting sebelum dipakai. Cocok untuk: tugas yang difoto, dokumen hasil pindai, dan PDF yang teksnya tidak terbaca.</p>
         <div class="wf-panel" id="ocr-consent">
           <h3>Aktifkan OCR (unduhan satu kali, perlu persetujuan Anda)</h3>
@@ -1616,12 +1665,12 @@
           <div class="wf-toolbar">
             <button type="button" class="btn-ghost" id="ocr-copy">Salin hasil</button>
             <button type="button" class="btn-ghost" id="ocr-dl">Unduh .txt</button>
-            <button type="button" class="btn-primary" id="ocr-to-detector">Analisis di Detector</button>
+            <button type="button" class="btn-primary" id="ocr-to-detector">Analisis Teks Ini</button>
           </div>
         </div>
         <div class="wf-panel">
           <h3>Privasi &amp; permintaan jaringan</h3>
-          <p class="wf-note">Halaman ini jujur soal jaringan: mengaktifkan OCR mengunduh aset pada tabel di atas dari CDN-nya masing-masing, dan situs ini sendiri dimuat dari hosting Vercel. Di luar unduhan aset yang Anda picu sendiri (OCR, jsPDF untuk laporan, model classifier ±280 MB bila Anda mengaktifkannya), tidak ada permintaan lain — dan <strong>isi dokumen Anda tidak pernah termasuk</strong> dalam permintaan mana pun. OCR bukan bukti keaslian dokumen; teks hasil OCR adalah tebakan mesin atas gambar.</p>
+          <p class="wf-note">Halaman ini jujur soal jaringan: mengaktifkan OCR mengunduh aset pada tabel di atas dari CDN-nya masing-masing, dan situs ini sendiri dimuat dari hosting Vercel. Di luar unduhan aset yang Anda picu sendiri (OCR, jsPDF untuk laporan, model penguat skor ±280 MB bila Anda mengaktifkannya), tidak ada permintaan lain — dan <strong>isi dokumen Anda tidak pernah termasuk</strong> dalam permintaan mana pun. OCR bukan bukti keaslian dokumen; teks hasil OCR adalah tebakan mesin atas gambar.</p>
         </div>
       </section>
 
@@ -1645,7 +1694,7 @@
           </div>
           <p class="wf-note" id="hist-usage"></p>
           <div class="wf-toolbar">
-            <button type="button" class="btn-ghost" id="hist-clear-cache">Hapus cache model classifier (±280 MB)</button>
+            <button type="button" class="btn-ghost" id="hist-clear-cache">Hapus model penguat skor tersimpan (±280 MB)</button>
             <span class="wf-note" id="hist-cache-status" aria-live="polite"></span>
           </div>
         </div>
@@ -1722,24 +1771,32 @@
           <a href="#/forensik">Kenali Gaya Tulisan</a>
           <a href="#/compare">Bandingkan Tulisan</a>
           <a href="#batch">Periksa Banyak Dokumen</a>
-          <a href="#/benchmark">Pengujian &amp; Transparansi</a>
           <span class="nav-group">Menulis</span>
           <a href="#/tulis">Asisten Menulis</a>
           <span class="nav-group">Alat</span>
           <a href="#/ocr">Baca Teks dari Gambar</a>
           <a href="#/history">Riwayat Saya</a>
           <span class="nav-group">Pelajari</span>
+          <a href="#/benchmark">Pengujian &amp; Transparansi</a>
           <a href="#/cara-kerja">Cara Menggunakan Saksara</a>
           <a href="#/metode">Metode &amp; Pengukuran</a>
           <a href="#/posisi">Privasi &amp; Batasan</a>
         </nav>
         <p class="copy">© 2026 Saksara — Dikembangkan oleh Ciptanala Devs</p>
-        <p class="version-line">Versi <strong>v0.20.0-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
+        <p class="version-line">Versi <strong>v0.21.0-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
       </div>
     </footer>
 
     <dialog class="changelog" id="changelog-modal" aria-labelledby="changelog-title">
       <h2 id="changelog-title">Catatan Rilis — Saksara</h2>
+      <h3>v0.21.0-beta — 23 November 2026</h3>
+      <ul>
+        <li>Tampilan dirombak agar lebih sederhana dan ramah: Beranda kini menonjolkan satu kartu periksa cepat dengan tombol Coba Contoh Teks; fitur lainnya rapi dalam lipatan "Lihat semua fitur".</li>
+        <li>Halaman Periksa Tulisan kini punya sakelar tegas "Satu Tulisan | Banyak Berkas", dan panel penguat skor tampil terlipat sebagai pilihan tambahan — layar pertama jauh lebih lega.</li>
+        <li>Hasil pemeriksaan lebih gampang dibaca: tombol Salin Ringkasan dan Unduh PDF kini berada di kartu skor, penanda kalimat langsung terbuka, rincian angka mengikuti mode Sederhana/Mendalam, dan panel bantuan berkumpul dalam satu lipatan "Bantu Saksara membaik".</li>
+        <li>Istilah teknis di seluruh halaman diganti label yang lebih mudah dipahami, masing-masing dengan penjelasan satu baris.</li>
+        <li>Hasil analisis dan detektor tidak berubah.</li>
+      </ul>
       <h3>v0.20.0-beta — 23 November 2026</h3>
       <ul>
         <li>Editor kini dilengkapi Cari &amp; Ganti di semua halaman: cari kata, lompat antarhasil, ganti satu atau ganti semua. Saat mengganti, format tampilan teks diatur ulang mengikuti teks baru — isi teksnya sendiri tidak berubah selain kata yang diganti.</li>
@@ -2814,7 +2871,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         if(!b) return;
         b.style.display = show ? "" : "none";
         b.disabled = false;
-        b.textContent = "Batalkan Penilaian Classifier";
+        b.textContent = "Batalkan Penilaian Penguat Skor";
       }
       var clfState = "off"; /* off | loading | ready | error */
       var clfOrt = null;       /* modul onnxruntime-web */
@@ -2856,11 +2913,11 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       function updateClfPanelIdle(){
         if(clfState !== "off") return;
         if(clfCacheExists){
-          setClfButton("Aktifkan Penguat AI", false);
-          setClfStatus("Status classifier: Penguat AI belum diaktifkan — model sudah tersimpan di peramban ini, jadi pengaktifan tidak perlu mengunduh apa pun. Skor saat ini 100% Ensemble Heuristik v3.");
+          setClfButton("Aktifkan penguat skor", false);
+          setClfStatus("Status penguat skor: Penguat skor belum diaktifkan — model sudah tersimpan di peramban ini, jadi pengaktifan tidak perlu mengunduh apa pun. Skor saat ini 100% pemeriksa pola (7 tanda).");
         } else {
-          setClfButton("Aktifkan Penguat AI (±280 MB)", false);
-          setClfStatus("Status classifier: Penguat AI belum diaktifkan — skor saat ini 100% Ensemble Heuristik v3. Model hanya diunduh bila Anda menekan tombol aktifkan.");
+          setClfButton("Aktifkan penguat skor (±280 MB)", false);
+          setClfStatus("Status penguat skor: Penguat skor belum diaktifkan — skor saat ini 100% pemeriksa pola (7 tanda). Model hanya diunduh bila Anda menekan tombol aktifkan.");
         }
         refreshClfDeleteBtn();
       }
@@ -2954,7 +3011,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         clfState = "loading";
         clfServedFromNetwork = false;
         setClfButton("Memuat model…", true);
-        setClfStatus("Status classifier: memuat model classifier ke peramban ini (±280 MB, sekali saja — sesudahnya tersimpan di cache peramban)…");
+        setClfStatus("Status penguat skor: memuat model penguat skor ke peramban ini (±280 MB, sekali saja — sesudahnya tersimpan di peramban)…");
         try{
           // 1) Runtime inferensi: onnxruntime-web mentah — bukan pipeline
           //    transformers.js, karena pustaka itu tidak bisa memuat model
@@ -2991,10 +3048,10 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
               var mb = (totalLoaded / 1048576).toFixed(1).replace(".", ",");
               if(clfServedFromNetwork){
                 setClfButton("Mengunduh model… " + pc + "%", true);
-                setClfStatus("Status classifier: Mengunduh model… " + pc + "% (" + mb + " dari ±280 MB). Unduhan ini hanya terjadi sekali; model lalu tersimpan di cache peramban dan teks Anda tetap di peramban ini.");
+                setClfStatus("Status penguat skor: Mengunduh model… " + pc + "% (" + mb + " dari ±280 MB). Unduhan ini hanya terjadi sekali; model lalu tersimpan di peramban dan teks Anda tetap di peramban ini.");
               } else {
                 setClfButton("Memuat model… " + pc + "%", true);
-                setClfStatus("Status classifier: Memuat model dari cache peramban… " + pc + "% (" + mb + " dari ±280 MB) — tanpa unduhan jaringan.");
+                setClfStatus("Status penguat skor: Memuat model tersimpan di peramban… " + pc + "% (" + mb + " dari ±280 MB) — tanpa unduhan jaringan.");
               }
             }
           }
@@ -3022,7 +3079,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           //    WebGPU dicoba lebih dulu (hanya bila peramban memilikinya);
           //    kegagalan apa pun jatuh kembali ke WASM dengan opsi sesi yang
           //    sama persis — skor tidak berubah, hanya penyedia eksekusinya.
-          setClfStatus("Status classifier: unduhan selesai — membuat sesi model di peramban…");
+          setClfStatus("Status penguat skor: unduhan selesai — membuat sesi model di peramban…");
           var externalData = CLF_SHARDS.map(function(nm){ return { path: nm, data: buffers[nm] }; });
           clfSession = null;
           clfProvider = null;
@@ -3037,13 +3094,13 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
             clfProvider = "WASM";
           }
           // 5) Tokenizer saja dari @xenova/transformers (tanpa pipeline).
-          setClfStatus("Status classifier: sesi siap — memuat tokenizer…");
+          setClfStatus("Status penguat skor: sesi siap — memuat tokenizer…");
           var tf = await import(/* webpackIgnore: true */ CLF_LIB_URL);
           clfTokenizer = await tf.AutoTokenizer.from_pretrained(CLF_MODEL_ID);
           clfState = "ready";
           setClfProgress(null);
           setClfButton("Classifier lokal aktif", true);
-          setClfStatus("Status classifier: aktif — classifier Saksara berjalan lokal di peramban ini (" + (clfProvider === "WebGPU" ? "akselerasi WebGPU" : "WASM") + "). Saat Anda menekan “Analisis teks”, classifier berperan sebagai penguat: ia hanya menaikkan skor bila heuristik v3 sudah menemukan indikasi awal. Teks tidak dikirim ke mana pun.");
+          setClfStatus("Status penguat skor: aktif — penguat skor Saksara berjalan lokal di peramban ini (" + (clfProvider === "WebGPU" ? "akselerasi WebGPU" : "WASM") + "). Saat Anda menekan “Periksa Tulisan”, penguat ini hanya menaikkan skor bila pemeriksa pola sudah menemukan indikasi awal. Teks tidak dikirim ke mana pun.");
           // Bila laporan heuristik sudah tampil, gabungkan skor classifier ke laporan
           // yang sama — tanpa meminta pengguna mengetik atau menganalisis ulang.
           if(lastResult && lastText){ applyClassifierToReport(lastText, lastResult, analysisRunSeq); }
@@ -3054,7 +3111,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           clfProvider = null;
           setClfProgress(null);
           setClfButton("Coba muat lagi classifier", false);
-          setClfStatus("Status classifier: model gagal dimuat" + (err && err.message ? " (" + err.message + ")" : "") + ". Halaman tetap memakai Ensemble Heuristik v3 saja. Periksa koneksi internet lalu coba lagi.");
+          setClfStatus("Status penguat skor: model gagal dimuat" + (err && err.message ? " (" + err.message + ")" : "") + ". Halaman tetap memakai pemeriksa pola (7 tanda) saja. Periksa koneksi internet lalu coba lagi.");
           checkClfCache(); /* sebagian berkas mungkin sudah tercache — tombol hapus cache mengikuti keadaan sebenarnya */
         }
       }
@@ -3078,8 +3135,8 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         clfCacheExists = false;
         setClfProgress(null);
         refreshClfDeleteBtn();
-        setClfButton("Aktifkan Penguat AI (±280 MB)", false);
-        setClfStatus("Status classifier: cache model dihapus dari peramban ini. Penguat AI belum diaktifkan — skor saat ini 100% Ensemble Heuristik v3.");
+        setClfButton("Aktifkan penguat skor (±280 MB)", false);
+        setClfStatus("Status penguat skor: model tersimpan dihapus dari peramban ini. Penguat skor belum diaktifkan — skor saat ini 100% pemeriksa pola (7 tanda).");
       }
       $("btn-clf-del").addEventListener("click", function(){ deleteClfCache(); });
       // OPT-IN: halaman TIDAK mengunduh model secara otomatis. Saat dibuka,
@@ -3193,7 +3250,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
               var externalDataW = CLF_SHARDS.map(function(nm){ return { path: nm, data: clfBuffers[nm] }; });
               clfSession = await clfOrt.InferenceSession.create(clfBuffers[CLF_GRAPH], { executionProviders: ["wasm"], externalData: externalDataW });
               clfProvider = "WASM";
-              setClfStatus("Status classifier: aktif — classifier Saksara berjalan lokal di peramban ini (WASM). Saat Anda menekan “Analisis teks”, classifier berperan sebagai penguat: ia hanya menaikkan skor bila heuristik v3 sudah menemukan indikasi awal. Teks tidak dikirim ke mana pun.");
+              setClfStatus("Status penguat skor: aktif — penguat skor Saksara berjalan lokal di peramban ini (WASM). Saat Anda menekan “Periksa Tulisan”, penguat ini hanya menaikkan skor bila pemeriksa pola sudah menemukan indikasi awal. Teks tidak dikirim ke mana pun.");
               return await clfScorePass(text, onProgress);
             }catch(e2){ return null; }
           }
@@ -3205,7 +3262,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         sig.style.display = "";
         $("pct-clf").textContent = "…";
         $("fill-clf").style.width = "0%";
-        $("desc-clf").textContent = "Classifier lokal sedang menilai teks ini di peramban ini (teks dibagi per paragraf menjadi potongan-potongan ±1.200 karakter)…";
+        $("desc-clf").textContent = "Penguat skor lokal sedang menilai teks ini di peramban ini (teks dibagi per paragraf menjadi potongan-potongan ±1.200 karakter)…";
         clfCancelRequested = false;
         showClfCancel(true);
         var r = await runClassifierScore(text, function(done, total){
@@ -3221,7 +3278,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           lastClfCapUsed = 0;
           $("pct-clf").textContent = "—";
           $("fill-clf").style.width = "0%";
-          $("desc-clf").textContent = "Classifier lokal tidak menghasilkan skor untuk teks ini — skor yang tampil tetap 100% Ensemble Heuristik v3.";
+          $("desc-clf").textContent = "Penguat skor lokal tidak menghasilkan skor untuk teks ini — skor yang tampil tetap 100% pemeriksa pola (7 tanda).";
           $("engine-line").textContent = "Mesin skor: Ensemble Heuristik v3 (classifier tidak menghasilkan skor)";
           showClfCancel(false);
           return;
@@ -3234,7 +3291,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           lastClfCapUsed = 0;
           $("pct-clf").textContent = "—";
           $("fill-clf").style.width = "0%";
-          $("desc-clf").textContent = "Penilaian classifier dibatalkan — skor yang tampil 100% Ensemble Heuristik v3.";
+          $("desc-clf").textContent = "Penilaian penguat skor dibatalkan — skor yang tampil 100% pemeriksa pola (7 tanda).";
           $("engine-line").textContent = "Mesin skor: Ensemble Heuristik v3 (penilaian classifier dibatalkan)";
           showClfCancel(false);
           return;
@@ -3258,12 +3315,12 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         if(res.final >= CLF_GATE){
           lastClfApplied = true;
           var boosted = res.final + (1 - res.final) * r.score * 0.5;
-          $("desc-clf").textContent = "Classifier berjalan lokal di peramban ini — menilai rata-rata " + r.windows + " jendela teks: probabilitas kelas AI " + pct(r.score) + "%. Heuristik v3 sudah menemukan indikasi awal (" + pct(res.final) + "% ≥ 35%), jadi classifier MEMPERKUAT skor akhir menjadi " + pct(boosted) + "%.";
+          $("desc-clf").textContent = "Penguat skor berjalan lokal di peramban ini — menilai rata-rata " + r.windows + " jendela teks: probabilitas kelas AI " + pct(r.score) + "%. Heuristik v3 sudah menemukan indikasi awal (" + pct(res.final) + "% ≥ 35%), jadi classifier MEMPERKUAT skor akhir menjadi " + pct(boosted) + "%.";
           applyScore(boosted, true);
           $("engine-line").textContent = "Mesin skor: Heuristik v3 + Penguat Classifier (heuristik murni: " + pct(res.final) + "%, classifier: " + pct(r.score) + "%)" + clfTruncNote;
         } else {
           lastClfApplied = false;
-          $("desc-clf").textContent = "Classifier berjalan lokal di peramban ini — menilai rata-rata " + r.windows + " jendela teks: probabilitas kelas AI " + pct(r.score) + "%. Skor ini TIDAK menaikkan skor akhir: heuristik v3 hanya menemukan indikasi " + pct(res.final) + "% (di bawah ambang 35%), dan classifier di sini hanya boleh memperkuat indikasi yang sudah ditemukan heuristik — tidak pernah menuduh sendirian. (Terukur pada pengujian kami: model ini juga memberi skor tinggi pada sebagian tulisan manusia yang sangat formal — gerbang inilah yang menahannya.) Skor akhir tetap 100% heuristik v3.";
+          $("desc-clf").textContent = "Penguat skor berjalan lokal di peramban ini — menilai rata-rata " + r.windows + " jendela teks: probabilitas kelas AI " + pct(r.score) + "%. Skor ini TIDAK menaikkan skor akhir: heuristik v3 hanya menemukan indikasi " + pct(res.final) + "% (di bawah ambang 35%), dan classifier di sini hanya boleh memperkuat indikasi yang sudah ditemukan heuristik — tidak pernah menuduh sendirian. (Terukur pada pengujian kami: model ini juga memberi skor tinggi pada sebagian tulisan manusia yang sangat formal — gerbang inilah yang menahannya.) Skor akhir tetap 100% heuristik v3.";
           applyScore(res.final, false);
           $("engine-line").textContent = "Mesin skor: Ensemble Heuristik v3 (classifier dinilai " + pct(r.score) + "%, ditahan — heuristik di bawah ambang 35%)" + clfTruncNote;
           // SINYAL WASPADA — kedua lapis sangat tidak sepakat (heuristik di
@@ -3288,12 +3345,12 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         histSaveDetector(finalPct, !!blended);
         $("meter-pin").style.left = finalPct + "%";
         var verdict = $("verdict"), note = $("score-note");
-        var suffix = blended ? " Skor akhir ini adalah skor Ensemble Heuristik v3 yang diperkuat classifier terlatih (penguat bersyarat: classifier hanya menaikkan skor bila heuristik sudah menemukan indikasi awal ≥35%)." : "";
+        var suffix = blended ? " Skor akhir ini adalah skor pemeriksa pola (7 tanda) yang diperkuat penguat skor terlatih (penguat bersyarat: penguat hanya menaikkan skor bila pemeriksa pola sudah menemukan indikasi awal ≥35%)." : "";
         if(score < 0.35){
           verdict.textContent = "Indikasi AI rendah";
           note.textContent = "Indikasi pola AI rendah: ritme kalimat bervariasi dan frasa formulaik sedikit. Tetap baca isinya — skor rendah bukan jaminan keaslian." + suffix;
         } else if(score <= 0.65){
-          verdict.textContent = "Campuran — perlu pemeriksaan lebih lanjut";
+          verdict.textContent = "Sebagian mirip pola AI — perlu diperiksa lebih lanjut";
           note.textContent = "Sebagian pola menyerupai teks AI, sebagian lain tidak menunjukkan pola tersebut. Ini zona abu-abu: bisa jadi teks AI yang diparafrase, atau tulisan manusia yang sangat rapi. Periksa lebih lanjut sebelum menyimpulkan." + suffix;
         } else {
           verdict.textContent = "Indikasi AI tinggi";
@@ -3314,7 +3371,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         $("btn-analisis").textContent = busy ? "Menganalisis…" : "Analisis teks";
         var bb = $("banner-sibuk");
         if(busy){
-          bb.innerHTML = "<strong>Menganalisis…</strong> Ensemble Heuristik v3 sedang menilai teks — mohon tunggu sebentar.";
+          bb.innerHTML = "<strong>Menganalisis…</strong> Pemeriksa pola sedang menilai teks — mohon tunggu sebentar.";
           bb.classList.add("show");
         } else {
           bb.classList.remove("show");
@@ -3413,7 +3470,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         renderCompareLine();
         resetTelemetry();
         resetDonasi();
-        var hlPanel = $("hl-panel"); if(hlPanel) hlPanel.open = false;
+        var hlPanel = $("hl-panel"); if(hlPanel) hlPanel.open = true;
         // Mode bawaan: skor 100% heuristik v3 — identik dengan sebelum classifier ada.
         applyScore(res.final, false);
         $("engine-line").textContent = "Mesin skor: Ensemble Heuristik v3" + (clfState === "ready" ? " — classifier sedang dihitung…" : (clfState === "loading" ? " (sementara — classifier sedang dimuat; penguatan menyusul otomatis begitu siap)" : " (100% heuristik)"));
@@ -12279,7 +12336,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
     var dashRuns = 0, dashLast = null, dashBatch = null, dashCountedRun = -1;
     function dashBandLabel(p){
       if(p < 35) return "Indikasi AI rendah";
-      if(p <= 65) return "Campuran — perlu pemeriksaan lebih lanjut";
+      if(p <= 65) return "Sebagian mirip pola AI — perlu diperiksa lebih lanjut";
       return "Indikasi AI tinggi";
     }
     function dashClock(){
@@ -12838,9 +12895,9 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       var cc = $("hist-clear-cache");
       if(cc) cc.addEventListener("click", function(){
         var st = $("hist-cache-status");
-        if(!window.caches){ if(st) st.textContent = "Cache API tidak tersedia di peramban ini."; return; }
+        if(!window.caches){ if(st) st.textContent = "Penyimpanan model peramban tidak tersedia di peramban ini."; return; }
         caches.delete("saksara-clf-v1").then(function(had){
-          if(st) st.textContent = had ? "Cache model classifier dihapus. Model akan diunduh ulang bila Anda mengaktifkannya lagi." : "Tidak ada cache model classifier yang tersimpan.";
+          if(st) st.textContent = had ? "Model penguat skor tersimpan dihapus. Model akan diunduh ulang bila Anda mengaktifkannya lagi." : "Tidak ada model penguat skor yang tersimpan.";
           if(typeof dashClfRefresh === "function") dashClfRefresh();
         }).catch(function(){ if(st) st.textContent = "Penghapusan cache gagal."; });
       });
@@ -15228,6 +15285,47 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       });
     })();
 
+  </script>
+  <script>
+  /* ---------- Rombak UI/UX: lem presentasi (mode detektor, panel simpan, contoh beranda) ---------- */
+  (function(){
+    function setDetMode(m, scroll){
+      var batch = (m === "batch");
+      document.body.classList.toggle("det-batch", batch);
+      var btns = document.querySelectorAll(".dm-btn");
+      for(var i = 0; i < btns.length; i++){
+        btns[i].setAttribute("aria-pressed", (btns[i].getAttribute("data-dmode") === m) ? "true" : "false");
+      }
+      if(scroll){
+        var t = document.getElementById(batch ? "batch" : "analisis");
+        if(t) t.scrollIntoView();
+      }
+    }
+    document.addEventListener("click", function(e){
+      var b = (e.target && e.target.closest) ? e.target.closest(".dm-btn") : null;
+      if(!b) return;
+      setDetMode(b.getAttribute("data-dmode"), true);
+    });
+    function detModeFromHash(){
+      var h = window.location.hash || "";
+      if(h === "#batch"){ setDetMode("batch", false); }
+      else if(h === "#/detector" || h === "#analisis" || h === "#report" || h === "#clf-panel" || h === "#panel-analisis"){ setDetMode("single", false); }
+    }
+    window.addEventListener("hashchange", detModeFromHash);
+    detModeFromHash();
+    /* Panel "Simpan Hasil Analisis" (disuntikkan skrip arsip) dipindah ke kartu skor
+       agar tiga tindakan utama berkumpul di blok ringkasan hasil. */
+    var sc = document.querySelector(".score-card");
+    var sp = document.querySelector(".save-panel");
+    if(sc && sp) sc.appendChild(sp);
+    /* "Coba Contoh Teks" di beranda: pakai alur contoh detektor yang sudah ada persis. */
+    var ex = document.getElementById("p7-quick-example");
+    if(ex) ex.addEventListener("click", function(){
+      function go(){ var b = document.getElementById("ex1"); if(b) b.click(); }
+      if((window.location.hash || "") === "#/detector"){ go(); }
+      else { window.location.hash = "#/detector"; setTimeout(go, 350); }
+    });
+  })();
   </script>
   </body>
 </html>
