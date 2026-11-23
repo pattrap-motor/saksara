@@ -840,6 +840,31 @@
         .wi-ed-surface{ min-height:200px; font-size:16px; }
         .wi-ed-bar select{ max-width:140px; }
       }
+      /* ---------- Paket Toolbar: refleksi keadaan, panel utilitas, tinggi terbatas ---------- */
+      .wi-ed-bar button.is-on{ background:var(--navy); color:var(--navy-ink); border-color:var(--navy); }
+      .wi-ed-util{ background:var(--surface2); border:1px solid var(--line); border-bottom:none; padding:8px; }
+      .wi-ed-util[hidden], .wi-ed-util-row[hidden], .wi-ed-hint[hidden]{ display:none; }
+      .wi-ed-util-row{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+      .wi-ed-util-f{ display:inline-flex; align-items:center; gap:5px; font-size:13px; font-weight:600; }
+      .wi-ed-util-f input{ font:inherit; font-size:13.5px; min-height:31px; padding:3px 7px; border:1px solid var(--line);
+        border-radius:8px; background:var(--surface); color:var(--ink); }
+      .wi-ed-util-row button{ min-height:31px; padding:3px 9px; font-size:13.5px; border-radius:8px; background:var(--surface); }
+      .wi-ed-util-c{ display:inline-flex; align-items:center; gap:5px; font-size:13px; }
+      .wi-ed-util-count{ font-size:13px; color:var(--muted); }
+      .wi-ed-util-note{ flex-basis:100%; margin:4px 0 0; font-size:12.5px; color:var(--muted); line-height:1.5; }
+      .wi-ed-hint{ margin:0; font-size:12.5px; color:var(--muted); }
+      /* G5: permukaan editor tidak lagi memanjang mengikuti isi — tingginya
+         meniru textarea pasangannya (border-box; padding dan huruf memang
+         sudah sama): global 250px, #input-teks 280px, #wf-input 220px,
+         <=640px semua 200px. Isi menggulir di dalam kotak; bilah alat
+         berada di luar permukaan sehingga tidak ikut tergulir. */
+      .wi-ed-surface{ height:250px; overflow-y:auto; resize:vertical; }
+      #ed-surface-input-teks{ height:280px; min-height:280px; }
+      #ed-surface-wf-input{ height:220px; min-height:220px; }
+      @media (max-width:640px){
+        .wi-ed-surface{ height:200px; }
+        #ed-surface-input-teks, #ed-surface-wf-input{ height:200px; min-height:200px; }
+      }
     </style>
   </head>
   <body>
@@ -895,7 +920,7 @@
         <a href="#/posisi" data-route="posisi">Privasi &amp; Batasan</a>
       </nav>
       <a class="btn-primary side-cta" href="#analisis">Mulai Memeriksa</a>
-      <div class="side-foot">Beta Terbuka · v0.19.1-beta<br />Seluruh analisis berjalan lokal di peramban ini — teks Anda tidak dikirim ke mana pun.</div>
+      <div class="side-foot">Beta Terbuka · v0.20.0-beta<br />Seluruh analisis berjalan lokal di peramban ini — teks Anda tidak dikirim ke mana pun.</div>
     </aside>
     <div class="wrap page">
       <header class="hero" data-view="home">
@@ -1709,12 +1734,21 @@
           <a href="#/posisi">Privasi &amp; Batasan</a>
         </nav>
         <p class="copy">© 2026 Saksara — Dikembangkan oleh Ciptanala Devs</p>
-        <p class="version-line">Versi <strong>v0.19.1-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
+        <p class="version-line">Versi <strong>v0.20.0-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
       </div>
     </footer>
 
     <dialog class="changelog" id="changelog-modal" aria-labelledby="changelog-title">
       <h2 id="changelog-title">Catatan Rilis — Saksara</h2>
+      <h3>v0.20.0-beta — 23 November 2026</h3>
+      <ul>
+        <li>Editor kini dilengkapi Cari &amp; Ganti di semua halaman: cari kata, lompat antarhasil, ganti satu atau ganti semua. Saat mengganti, format tampilan teks diatur ulang mengikuti teks baru — isi teksnya sendiri tidak berubah selain kata yang diganti.</li>
+        <li>Tombol Sisipkan Tautan pada bilah alat editor untuk teks terpilih (alamat http, https, atau email). Tautan hanya tampil selama menyunting; yang dianalisis tetap teksnya.</li>
+        <li>Tombol format pada bilah alat kini menyala mengikuti teks yang sedang dipilih, misalnya tombol Tebal menyala saat kursor berada di kata tebal.</li>
+        <li>Ukuran huruf kini dapat diatur sebelum mulai mengetik di semua editor; pada posisi paling tepi paragraf, editor menampilkan petunjuk singkat bila ukuran belum dapat diterapkan di titik itu.</li>
+        <li>Kotak editor tidak lagi memanjang mengikuti isi: tingginya tetap dan teks panjang bergulir di dalam kotak, sama seperti kotak teks polos.</li>
+        <li>Hasil analisis dan detektor tidak berubah.</li>
+      </ul>
       <h3>v0.19.1-beta — 23 November 2026</h3>
       <ul>
         <li>PDF yang teksnya rusak total — misalnya berkas hasil konversi yang font-nya tidak menyertakan peta huruf, sehingga teksnya terbaca sebagai kode mentah — kini ditolak sejak impor di Asisten Menulis, dengan penjelasan dan tawaran membuka halaman OCR. Sebelumnya berkas seperti itu diam-diam diterima dan dianalisis apa adanya.</li>
@@ -9703,6 +9737,58 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       if(m[2] === "pt") n = n * 96 / 72;
       return n;
     }
+    /* TB-ADD-START — Paket Toolbar (G1 Cari & Ganti, G2 Tautan): fungsi
+       murni tambahan. Blok ini SENGAJA terpisah dan terdelimitasi:
+       menghapus rentang TB-ADD-START..TB-ADD-END mengembalikan ekstrak
+       ED-CORE ke keadaan basis byte-identik (dibuktikan uji T-TB-10).
+       Tidak satu baris pun fungsi lama diubah oleh paket ini. */
+    /* Daftar offset [awal, akhir) semua kecocokan jarum di dalam teks,
+       tidak tumpang tindih, dari kiri ke kanan. Jarum kosong atau lebih
+       panjang dari teks -> daftar kosong. caseSensitive=false (bawaan
+       Cari & Ganti) membandingkan dalam huruf kecil. */
+    function wiEdFindOffsets(text, needle, caseSensitive){
+      var out = [];
+      var t = String(text == null ? "" : text);
+      var n = String(needle == null ? "" : needle);
+      if(!n || n.length > t.length) return out;
+      var hay = caseSensitive ? t : t.toLowerCase();
+      var pin = caseSensitive ? n : n.toLowerCase();
+      var pos = 0;
+      for(;;){
+        var i = hay.indexOf(pin, pos);
+        if(i < 0) break;
+        out.push([i, i + n.length]);
+        pos = i + n.length;
+      }
+      return out;
+    }
+    /* Ganti semua kecocokan (semantik wiEdFindOffsets) dengan repl
+       sebagai huruf biasa: pengulangan indexOf manual, sehingga "$&",
+       "$'" dan sejenisnya pada teks pengganti TIDAK ditafsirkan
+       sebagai pola khusus. Mengembalikan { text, count }; nol
+       kecocokan mengembalikan string asal yang identik. */
+    function wiEdReplaceAll(text, needle, repl, caseSensitive){
+      var t = String(text == null ? "" : text);
+      var n = String(needle == null ? "" : needle);
+      var r = String(repl == null ? "" : repl);
+      var offs = wiEdFindOffsets(t, n, caseSensitive);
+      if(!offs.length) return { text: t, count: 0 };
+      var parts = [], last = 0;
+      offs.forEach(function(o){
+        parts.push(t.slice(last, o[0]), r);
+        last = o[1];
+      });
+      parts.push(t.slice(last));
+      return { text: parts.join(""), count: offs.length };
+    }
+    /* Pemeriksa skema tautan untuk penyisipan editor: pola yang sama
+       persis dengan pembersih tempelan — hanya http:, https:, dan
+       mailto: yang lolos. Masukan dipangkas lebih dulu (kolom alamat
+       memang dipangkas sebelum alamat disisipkan). */
+    function wiEdLinkSchemeOk(url){
+      return /^(https?:|mailto:)/i.test(String(url == null ? "" : url).trim());
+    }
+    /* TB-ADD-END */
     /* ED-CORE-END */
 
     /* Writing Intelligence — render & interaksi (DOM). */
@@ -13396,20 +13482,20 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           <option value="24">24 pt</option>
         </select>
         <span class="wi-ed-sep"></span>
-        <button type="button" data-cmd="bold" title="Tebal"><b>B</b></button>
-        <button type="button" data-cmd="italic" title="Miring"><i>I</i></button>
-        <button type="button" data-cmd="underline" title="Garis bawah"><u>U</u></button>
-        <button type="button" data-cmd="strikeThrough" title="Coret"><s>S</s></button>
-        <button type="button" data-cmd="subscript" title="Subskrip (tulis kecil di bawah)">x<sub>2</sub></button>
-        <button type="button" data-cmd="superscript" title="Superskrip (tulis kecil di atas)">x<sup>2</sup></button>
+        <button type="button" data-cmd="bold" title="Tebal" aria-pressed="false"><b>B</b></button>
+        <button type="button" data-cmd="italic" title="Miring" aria-pressed="false"><i>I</i></button>
+        <button type="button" data-cmd="underline" title="Garis bawah" aria-pressed="false"><u>U</u></button>
+        <button type="button" data-cmd="strikeThrough" title="Coret" aria-pressed="false"><s>S</s></button>
+        <button type="button" data-cmd="subscript" title="Subskrip (tulis kecil di bawah)" aria-pressed="false">x<sub>2</sub></button>
+        <button type="button" data-cmd="superscript" title="Superskrip (tulis kecil di atas)" aria-pressed="false">x<sup>2</sup></button>
         <label class="wi-ed-color" title="Warna teks">A<input type="color" data-wied="fore" value="#14304f" aria-label="Warna teks"></label>
         <label class="wi-ed-color" title="Warna sorotan teks"><span class="wi-ed-hilite-mark">A</span><input type="color" data-wied="hilite" value="#fbeec3" aria-label="Warna sorotan teks"></label>
         <button type="button" data-cmd="removeFormat" title="Hapus format pada teks/blok terpilih">Hapus format</button>
         <span class="wi-ed-sep"></span>
-        <button type="button" data-cmd="justifyLeft" title="Rata kiri">Kiri</button>
-        <button type="button" data-cmd="justifyCenter" title="Rata tengah">Tengah</button>
-        <button type="button" data-cmd="justifyRight" title="Rata kanan">Kanan</button>
-        <button type="button" data-cmd="justifyFull" title="Rata kiri-kanan">Rata</button>
+        <button type="button" data-cmd="justifyLeft" title="Rata kiri" aria-pressed="false">Kiri</button>
+        <button type="button" data-cmd="justifyCenter" title="Rata tengah" aria-pressed="false">Tengah</button>
+        <button type="button" data-cmd="justifyRight" title="Rata kanan" aria-pressed="false">Kanan</button>
+        <button type="button" data-cmd="justifyFull" title="Rata kiri-kanan" aria-pressed="false">Rata</button>
         <span class="wi-ed-sep"></span>
         <select data-wied="leading" aria-label="Spasi baris" title="Spasi baris">
           <option value="" selected>Spasi baris</option>
@@ -13432,10 +13518,36 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         </select>
         <button type="button" data-cmd="indentOut" title="Kurangi indentasi">Geser kiri</button>
         <button type="button" data-cmd="indentIn" title="Tambah indentasi">Geser kanan</button>
-        <button type="button" data-cmd="hanging" title="Indentasi gantung (baris pertama menjorok keluar)">Indentasi gantung</button>
+        <button type="button" data-cmd="hanging" title="Indentasi gantung (baris pertama menjorok keluar)" aria-pressed="false">Indentasi gantung</button>
         <span class="wi-ed-sep"></span>
-        <button type="button" data-cmd="insertUnorderedList" title="Daftar berpoin">Poin</button>
-        <button type="button" data-cmd="insertOrderedList" title="Daftar bernomor">Nomor</button>
+        <button type="button" data-cmd="insertUnorderedList" title="Daftar berpoin" aria-pressed="false">Poin</button>
+        <button type="button" data-cmd="insertOrderedList" title="Daftar bernomor" aria-pressed="false">Nomor</button>
+        <span class="wi-ed-sep"></span>
+        <button type="button" data-wied-open="find" title="Cari dan ganti teks">Cari</button>
+        <button type="button" data-wied-open="link" title="Sisipkan tautan">Tautan</button>
+      </div>
+      <div class="wi-ed-util" data-wied-util hidden>
+        <div class="wi-ed-util-row" data-wied-panel="find" hidden>
+          <label class="wi-ed-util-f">Cari <input type="text" data-wied-find autocomplete="off" placeholder="Kata yang dicari"></label>
+          <label class="wi-ed-util-f">Ganti dengan <input type="text" data-wied-repl autocomplete="off" placeholder="Teks pengganti"></label>
+          <button type="button" data-wied-act="prev">Sebelumnya</button>
+          <button type="button" data-wied-act="next">Berikutnya</button>
+          <button type="button" data-wied-act="one">Ganti</button>
+          <button type="button" data-wied-act="all">Ganti Semua</button>
+          <label class="wi-ed-util-c"><input type="checkbox" data-wied-case> Samakan huruf besar/kecil</label>
+          <span class="wi-ed-util-count" data-wied-count role="status"></span>
+          <button type="button" data-wied-act="close" aria-label="Tutup panel">×</button>
+          <p class="wi-ed-util-note">Mengganti teks menggambar ulang isi editor tanpa format visual (tebal, warna, spasi). Teksnya sendiri tidak berubah selain pada bagian yang diganti.</p>
+        </div>
+        <div class="wi-ed-util-row" data-wied-panel="link" hidden>
+          <label class="wi-ed-util-f">Alamat tautan <input type="text" data-wied-url autocomplete="off" placeholder="https://contoh.com"></label>
+          <label class="wi-ed-util-f">Teks tautan <input type="text" data-wied-ltext autocomplete="off" placeholder="Teks yang ditampilkan"></label>
+          <button type="button" data-wied-act="insert">Sisipkan</button>
+          <button type="button" data-wied-act="close" aria-label="Tutup panel">×</button>
+          <span class="wi-ed-util-count" data-wied-lmsg role="alert"></span>
+          <p class="wi-ed-util-note">Tautan hanya tampil selama menyunting di editor. Teks yang dianalisis dan diekspor adalah teksnya saja, tanpa alamat tautan.</p>
+        </div>
+        <p class="wi-ed-hint" data-wied-hint hidden>Pilih dulu teksnya untuk mengubah ukuran huruf di kotak ini.</p>
       </div>
       <div class="wi-ed-surface" id="wi-ed-surface" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Teks yang ingin dirapikan" data-placeholder="Tempel atau ketik teks di sini…"></div>`;
       var wrap = null, ed = null, bar = null;
@@ -13710,7 +13822,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       ed.addEventListener("input", function(){ syncFromEditor(); });
       document.addEventListener("selectionchange", function(){
         var sel = window.getSelection();
-        if(sel && sel.rangeCount && ed.contains(sel.getRangeAt(0).commonAncestorContainer)) saveRange();
+        if(sel && sel.rangeCount && ed.contains(sel.getRangeAt(0).commonAncestorContainer)){ saveRange(); queueReflect(); }
       });
       /* Bilah alat: mousedown tombol tidak boleh mencuri seleksi editor;
          seleksi selalu disnapshot agar perintah berlaku pada teks yang
@@ -13759,6 +13871,311 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         else if(k === "fore"){ cmdCss("foreColor", v); }
         else if(k === "hilite"){ cmdCss("hiliteColor", v); }
       });
+      /* ---------- Paket Toolbar: Cari & Ganti (G1), Tautan (G2), Refleksi (G3) ----------
+         Cari & Ganti bekerja di tingkat tulang punggung (keputusan D-2):
+         pencarian/penggantian berjalan pada string #wi-input sendiri,
+         ditulis kembali lewat setter bawaan (kait nilai menggambar ulang
+         editor) dan peristiwa "input" dipancarkan persis seperti ketikan
+         biasa — gerbang kejujuran warisan (penghitung, penolakan "Lihat
+         lokasi" saat teks berubah, validasi ulang saran saat klik)
+         menerima sinyal yang sama seperti suntingan manual. Navigasi
+         hanya menyeleksi: offset tulang punggung dipetakan ke titik DOM
+         oleh pola slot yang sama dengan jembatan D5 (edStreamSlots) dan
+         digulir di dalam kotak editor saja, bukan halaman. */
+      var util = wrap.querySelector("[data-wied-util]");
+      var findPanel = wrap.querySelector('[data-wied-panel="find"]');
+      var linkPanel = wrap.querySelector('[data-wied-panel="link"]');
+      var findIn = wrap.querySelector("[data-wied-find]");
+      var replIn = wrap.querySelector("[data-wied-repl]");
+      var caseBox = wrap.querySelector("[data-wied-case]");
+      var countEl = wrap.querySelector("[data-wied-count]");
+      var urlIn = wrap.querySelector("[data-wied-url]");
+      var ltextIn = wrap.querySelector("[data-wied-ltext]");
+      var lmsgEl = wrap.querySelector("[data-wied-lmsg]");
+      var hintEl = wrap.querySelector("[data-wied-hint]");
+      var panelOpen = "";
+      var hintOn = false;
+      var findState = { offsets: [], idx: -1 };
+      function syncUtilVis(){
+        if(!util) return;
+        util.hidden = !(mode === "editor" && (panelOpen !== "" || hintOn));
+        if(findPanel) findPanel.hidden = panelOpen !== "find";
+        if(linkPanel) linkPanel.hidden = panelOpen !== "link";
+        if(hintEl) hintEl.hidden = !hintOn;
+      }
+      function showHint(){ hintOn = true; syncUtilVis(); }
+      function hideHint(){ if(hintOn){ hintOn = false; syncUtilVis(); } }
+      function needleNow(){ return ((findIn && findIn.value) || "").replace(/[\r\n]/g, ""); }
+      function replNow(){ return ((replIn && replIn.value) || "").replace(/[\r\n]/g, ""); }
+      function findRefresh(){
+        var n = needleNow();
+        findState.offsets = n ? wiEdFindOffsets(nativeGet.call(ta), n, !!(caseBox && caseBox.checked)) : [];
+        if(findState.idx >= findState.offsets.length) findState.idx = findState.offsets.length - 1;
+        var total = findState.offsets.length;
+        if(countEl){
+          countEl.textContent = !n ? "" :
+            (total === 0 ? "Tidak ditemukan" :
+              (findState.idx >= 0 ? (findState.idx + 1) + " dari " + total : total + " ditemukan"));
+        }
+        if(util){
+          Array.prototype.forEach.call(util.querySelectorAll("[data-wied-act]"), function(b){
+            var a = b.getAttribute("data-wied-act");
+            if(a === "next" || a === "prev" || a === "one" || a === "all") b.disabled = (!n || total === 0);
+          });
+        }
+      }
+      function writeBackbone(next){
+        ta.value = next;
+        ta.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+      function edScrollToRange(range){
+        try {
+          var r = range.getBoundingClientRect();
+          var er = ed.getBoundingClientRect();
+          if(!r.height && !r.width) return;
+          ed.scrollTop += (r.top - er.top) - (ed.clientHeight / 2) + (r.height / 2);
+        } catch(e) {}
+      }
+      function selectBackboneRange(start, end){
+        var slots = edStreamSlots();
+        var a = slots[start], b = slots[end];
+        if(!a || !b) return false;
+        var range = document.createRange();
+        try { range.setStart(a.node, a.off); range.setEnd(b.node, b.off); } catch(e) { return false; }
+        var sel = window.getSelection();
+        sel.removeAllRanges(); sel.addRange(range);
+        edScrollToRange(range);
+        saveRange();
+        return true;
+      }
+      function findGo(dir){
+        findRefresh();
+        var total = findState.offsets.length;
+        if(!total) return;
+        var i = findState.idx;
+        i = i < 0 ? (dir > 0 ? 0 : total - 1) : (i + dir + total) % total;
+        findState.idx = i;
+        var o = findState.offsets[i];
+        if(mode === "editor") selectBackboneRange(o[0], o[1]);
+        findRefresh();
+      }
+      function findReplaceOne(){
+        findRefresh();
+        var offs = findState.offsets;
+        if(!offs.length) return;
+        var i = findState.idx >= 0 ? findState.idx : 0;
+        var o = offs[i];
+        var text = nativeGet.call(ta);
+        writeBackbone(text.slice(0, o[0]) + replNow() + text.slice(o[1]));
+        findState.idx = i;
+        findRefresh();
+        var no = findState.offsets;
+        if(no.length){
+          var j = Math.min(i, no.length - 1);
+          findState.idx = j;
+          if(mode === "editor") selectBackboneRange(no[j][0], no[j][1]);
+          findRefresh();
+        } else savedRange = null;
+      }
+      function findReplaceAll(){
+        var n = needleNow();
+        if(!n) return;
+        var res = wiEdReplaceAll(nativeGet.call(ta), n, replNow(), !!(caseBox && caseBox.checked));
+        if(res.count) writeBackbone(res.text);
+        findState.idx = -1;
+        findRefresh();
+        if(countEl) countEl.textContent = res.count ? ("Diganti di " + res.count + " tempat.") : "Tidak ditemukan";
+      }
+      var findTimer = null;
+      if(findIn) findIn.addEventListener("input", function(){
+        if(findTimer) clearTimeout(findTimer);
+        findTimer = setTimeout(function(){ findState.idx = -1; findRefresh(); }, 200);
+      });
+      if(findIn) findIn.addEventListener("keydown", function(e){
+        if(e.key === "Enter"){ e.preventDefault(); findGo(1); }
+      });
+      if(caseBox) caseBox.addEventListener("change", function(){ findState.idx = -1; findRefresh(); });
+      function prepLinkPanel(){
+        if(lmsgEl) lmsgEl.textContent = "";
+        var txt = "";
+        try { if(savedRange && !savedRange.collapsed) txt = savedRange.toString(); } catch(e) {}
+        if(ltextIn) ltextIn.value = txt;
+      }
+      function linkInsert(){
+        var url = ((urlIn && urlIn.value) || "").trim();
+        if(!wiEdLinkSchemeOk(url)){
+          if(lmsgEl) lmsgEl.textContent = "Alamat harus diawali https://, http://, atau mailto:";
+          return;
+        }
+        if(lmsgEl) lmsgEl.textContent = "";
+        restoreRange();
+        var sel = window.getSelection();
+        if(!sel || !sel.rangeCount) return;
+        var range = sel.getRangeAt(0);
+        if(!ed.contains(range.commonAncestorContainer)) return;
+        var a = document.createElement("a");
+        a.setAttribute("href", url);
+        a.setAttribute("rel", "noopener");
+        var label = ((ltextIn && ltextIn.value) || "").trim();
+        try {
+          if(range.collapsed){
+            a.appendChild(document.createTextNode(label || url));
+            range.insertNode(a);
+          } else if(label && range.toString() !== label){
+            range.deleteContents();
+            a.appendChild(document.createTextNode(label));
+            range.insertNode(a);
+          } else {
+            a.appendChild(range.extractContents());
+            range.insertNode(a);
+          }
+          var r2 = document.createRange();
+          r2.setStartAfter(a); r2.collapse(true);
+          sel.removeAllRanges(); sel.addRange(r2);
+        } catch(e) { return; }
+        panelOpen = ""; syncUtilVis();
+        syncFromEditor(); saveRange();
+      }
+      function openPanel(which){
+        if(which === "link") prepLinkPanel();
+        panelOpen = (panelOpen === which) ? "" : which;
+        syncUtilVis();
+        if(panelOpen === "find"){ findRefresh(); if(findIn) try { findIn.focus(); } catch(e) {} }
+        if(panelOpen === "link" && urlIn) try { urlIn.focus(); } catch(e) {}
+      }
+      bar.addEventListener("click", function(e){
+        var t = e.target;
+        var b = (t && t.closest) ? t.closest("button[data-wied-open]") : null;
+        if(b) openPanel(b.getAttribute("data-wied-open"));
+      });
+      if(util) util.addEventListener("click", function(e){
+        var t = e.target;
+        var b = (t && t.closest) ? t.closest("button[data-wied-act]") : null;
+        if(!b || b.disabled) return;
+        var a = b.getAttribute("data-wied-act");
+        if(a === "close"){ panelOpen = ""; syncUtilVis(); }
+        else if(a === "next") findGo(1);
+        else if(a === "prev") findGo(-1);
+        else if(a === "one") findReplaceOne();
+        else if(a === "all") findReplaceAll();
+        else if(a === "insert") linkInsert();
+      });
+      if(util) util.addEventListener("keydown", function(e){
+        if(e.key === "Escape"){ panelOpen = ""; syncUtilVis(); }
+      });
+      /* ---------- G3: refleksi keadaan tombol ----------
+         Baca-murni: hanya membaca seleksi + DOM editor, hanya menulis
+         ke bilah alat (kelas is-on, aria-pressed, nilai pilihan).
+         Tidak menyentuh anak editor, seleksi, maupun tulang punggung,
+         sehingga pemetaan offset D5 tidak terpengaruh sama sekali.
+         Dijadwalkan lewat requestAnimationFrame dari pendengar
+         selectionchange yang sudah ada dan sesudah perintah bilah
+         alat. Kegagalan refleksi tidak boleh mengganggu penyuntingan:
+         seluruhnya dibungkus try/catch. */
+      var reflectQueued = false;
+      function queueReflect(){
+        if(reflectQueued) return;
+        reflectQueued = true;
+        if(window.requestAnimationFrame) window.requestAnimationFrame(function(){ edReflect(); });
+        else edReflect();
+      }
+      function edReflect(){
+        reflectQueued = false;
+        try {
+          var sel = window.getSelection();
+          if(!sel || !sel.rangeCount) return;
+          var range = sel.getRangeAt(0);
+          if(!ed.contains(range.startContainer)) return;
+          var anchor = range.startContainer;
+          var el = anchor.nodeType === 1 ? anchor : anchor.parentNode;
+          var on = { bold: false, italic: false, underline: false, strikeThrough: false, subscript: false, superscript: false };
+          var n = el;
+          while(n && n !== ed){
+            var tg = n.tagName;
+            if(tg === "B" || tg === "STRONG") on.bold = true;
+            else if(tg === "I" || tg === "EM") on.italic = true;
+            else if(tg === "U") on.underline = true;
+            else if(tg === "S" || tg === "STRIKE") on.strikeThrough = true;
+            else if(tg === "SUB") on.subscript = true;
+            else if(tg === "SUP") on.superscript = true;
+            n = n.parentNode;
+          }
+          if(el){
+            var cs = window.getComputedStyle(el);
+            if(cs.fontWeight === "bold" || parseInt(cs.fontWeight, 10) >= 600) on.bold = true;
+            if(cs.fontStyle === "italic" || cs.fontStyle === "oblique") on.italic = true;
+            var td = cs.textDecorationLine || cs.textDecoration || "";
+            if(td.indexOf("underline") >= 0) on.underline = true;
+            if(td.indexOf("line-through") >= 0) on.strikeThrough = true;
+            if(cs.verticalAlign === "sub") on.subscript = true;
+            if(cs.verticalAlign === "super") on.superscript = true;
+            /* D-5: warna teks direfleksikan hanya bila terbaca sebagai
+               satu nilai rgb() tunggal; warna sorotan tidak pernah. */
+            var m = /^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/.exec(cs.color || "");
+            if(m){
+              var hex = "#" + [m[1], m[2], m[3]].map(function(x){ var h = Number(x).toString(16); return h.length < 2 ? "0" + h : h; }).join("");
+              var fore = bar.querySelector('[data-wied="fore"]');
+              if(fore) fore.value = hex;
+            }
+            var fontSel = bar.querySelector('[data-wied="font"]');
+            if(fontSel){
+              var fam = (cs.fontFamily || "").split(",")[0].trim().replace(/^["']|["']$/g, "").toLowerCase();
+              var hit = "";
+              Array.prototype.forEach.call(fontSel.options, function(o){
+                if(!o.value) return;
+                if(o.value.split(",")[0].trim().replace(/^["']|["']$/g, "").toLowerCase() === fam) hit = o.value;
+              });
+              fontSel.value = hit;
+            }
+            var sizeSel = bar.querySelector('[data-wied="size"]');
+            if(sizeSel){
+              var pt = parseFloat(cs.fontSize) * 72 / 96;
+              var hitS = "";
+              Array.prototype.forEach.call(sizeSel.options, function(o){
+                if(o.value && Math.abs(parseFloat(o.value) - pt) < 0.01) hitS = o.value;
+              });
+              sizeSel.value = hitS;
+            }
+          }
+          var blocks = leafBlocks();
+          var blk = blocks.length ? blocks[0] : null;
+          var align = "", listCmd = "", hang = false;
+          if(blk){
+            align = window.getComputedStyle(blk).textAlign || "";
+            var p = blk;
+            while(p && p !== ed){
+              if(p.tagName === "UL"){ listCmd = "insertUnorderedList"; break; }
+              if(p.tagName === "OL"){ listCmd = "insertOrderedList"; break; }
+              p = p.parentNode;
+            }
+            hang = !!blk.getAttribute("data-wied-hang");
+            var styleSel = bar.querySelector('[data-wied="style"]');
+            if(styleSel){
+              var map = { P: "P", H1: "H1", H2: "H2", H3: "H3", BLOCKQUOTE: "BLOCKQUOTE" };
+              styleSel.value = map[blk.tagName] || "";
+            }
+          }
+          var want = {
+            bold: on.bold, italic: on.italic, underline: on.underline,
+            strikeThrough: on.strikeThrough, subscript: on.subscript, superscript: on.superscript,
+            justifyLeft: align === "left" || align === "start",
+            justifyCenter: align === "center",
+            justifyRight: align === "right" || align === "end",
+            justifyFull: align === "justify",
+            insertUnorderedList: listCmd === "insertUnorderedList",
+            insertOrderedList: listCmd === "insertOrderedList",
+            hanging: hang
+          };
+          Object.keys(want).forEach(function(c){
+            var b = bar.querySelector('button[data-cmd="' + c + '"]');
+            if(!b) return;
+            b.classList.toggle("is-on", !!want[c]);
+            b.setAttribute("aria-pressed", want[c] ? "true" : "false");
+          });
+        } catch(e) {}
+      }
+      bar.addEventListener("click", function(){ queueReflect(); });
+      bar.addEventListener("change", function(){ queueReflect(); });
       /* ---------- "Lihat lokasi" (D5) di mode editor ----------
          Penangan lama tetap berjalan (gerbang kejujuran + catatan +
          kedip kartu); penangan ini menambahkan seleksi yang terlihat
@@ -13854,7 +14271,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         if(el && el.nodeType !== 1) el = el.parentNode;
         while(el && el !== ed && !(el.nodeType === 1 && WI_ED_BLOCK_TAGS[el.tagName])) el = el.parentNode;
         if(el && el.scrollIntoView) el.scrollIntoView({ block: "center" });
-        saveRange();
+        saveRange(); queueReflect();
       }
       var reportEl = $("wi-report");
       if(reportEl){
@@ -13873,6 +14290,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         var edOn = m === "editor";
         bar.hidden = !edOn;
         ed.hidden = !edOn;
+        syncUtilVis();
         ta.classList.toggle("wi-ed-off", edOn);
         modeBtns.forEach(function(b){
           var on = b.getAttribute("data-wied-mode") === m;
@@ -13967,20 +14385,20 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           <option value="24">24 pt</option>
         </select>
         <span class="wi-ed-sep"></span>
-        <button type="button" data-cmd="bold" title="Tebal"><b>B</b></button>
-        <button type="button" data-cmd="italic" title="Miring"><i>I</i></button>
-        <button type="button" data-cmd="underline" title="Garis bawah"><u>U</u></button>
-        <button type="button" data-cmd="strikeThrough" title="Coret"><s>S</s></button>
-        <button type="button" data-cmd="subscript" title="Subskrip (tulis kecil di bawah)">x<sub>2</sub></button>
-        <button type="button" data-cmd="superscript" title="Superskrip (tulis kecil di atas)">x<sup>2</sup></button>
+        <button type="button" data-cmd="bold" title="Tebal" aria-pressed="false"><b>B</b></button>
+        <button type="button" data-cmd="italic" title="Miring" aria-pressed="false"><i>I</i></button>
+        <button type="button" data-cmd="underline" title="Garis bawah" aria-pressed="false"><u>U</u></button>
+        <button type="button" data-cmd="strikeThrough" title="Coret" aria-pressed="false"><s>S</s></button>
+        <button type="button" data-cmd="subscript" title="Subskrip (tulis kecil di bawah)" aria-pressed="false">x<sub>2</sub></button>
+        <button type="button" data-cmd="superscript" title="Superskrip (tulis kecil di atas)" aria-pressed="false">x<sup>2</sup></button>
         <label class="wi-ed-color" title="Warna teks">A<input type="color" data-wied="fore" value="#14304f" aria-label="Warna teks"></label>
         <label class="wi-ed-color" title="Warna sorotan teks"><span class="wi-ed-hilite-mark">A</span><input type="color" data-wied="hilite" value="#fbeec3" aria-label="Warna sorotan teks"></label>
         <button type="button" data-cmd="removeFormat" title="Hapus format pada teks/blok terpilih">Hapus format</button>
         <span class="wi-ed-sep"></span>
-        <button type="button" data-cmd="justifyLeft" title="Rata kiri">Kiri</button>
-        <button type="button" data-cmd="justifyCenter" title="Rata tengah">Tengah</button>
-        <button type="button" data-cmd="justifyRight" title="Rata kanan">Kanan</button>
-        <button type="button" data-cmd="justifyFull" title="Rata kiri-kanan">Rata</button>
+        <button type="button" data-cmd="justifyLeft" title="Rata kiri" aria-pressed="false">Kiri</button>
+        <button type="button" data-cmd="justifyCenter" title="Rata tengah" aria-pressed="false">Tengah</button>
+        <button type="button" data-cmd="justifyRight" title="Rata kanan" aria-pressed="false">Kanan</button>
+        <button type="button" data-cmd="justifyFull" title="Rata kiri-kanan" aria-pressed="false">Rata</button>
         <span class="wi-ed-sep"></span>
         <select data-wied="leading" aria-label="Spasi baris" title="Spasi baris">
           <option value="" selected>Spasi baris</option>
@@ -14003,11 +14421,38 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         </select>
         <button type="button" data-cmd="indentOut" title="Kurangi indentasi">Geser kiri</button>
         <button type="button" data-cmd="indentIn" title="Tambah indentasi">Geser kanan</button>
-        <button type="button" data-cmd="hanging" title="Indentasi gantung (baris pertama menjorok keluar)">Indentasi gantung</button>
+        <button type="button" data-cmd="hanging" title="Indentasi gantung (baris pertama menjorok keluar)" aria-pressed="false">Indentasi gantung</button>
         <span class="wi-ed-sep"></span>
-        <button type="button" data-cmd="insertUnorderedList" title="Daftar berpoin">Poin</button>
-        <button type="button" data-cmd="insertOrderedList" title="Daftar bernomor">Nomor</button>
-      </div>`;
+        <button type="button" data-cmd="insertUnorderedList" title="Daftar berpoin" aria-pressed="false">Poin</button>
+        <button type="button" data-cmd="insertOrderedList" title="Daftar bernomor" aria-pressed="false">Nomor</button>
+        <span class="wi-ed-sep"></span>
+        <button type="button" data-wied-open="find" title="Cari dan ganti teks">Cari</button>
+        <button type="button" data-wied-open="link" title="Sisipkan tautan">Tautan</button>
+      </div>
+      <div class="wi-ed-util" data-wied-util hidden>
+        <div class="wi-ed-util-row" data-wied-panel="find" hidden>
+          <label class="wi-ed-util-f">Cari <input type="text" data-wied-find autocomplete="off" placeholder="Kata yang dicari"></label>
+          <label class="wi-ed-util-f">Ganti dengan <input type="text" data-wied-repl autocomplete="off" placeholder="Teks pengganti"></label>
+          <button type="button" data-wied-act="prev">Sebelumnya</button>
+          <button type="button" data-wied-act="next">Berikutnya</button>
+          <button type="button" data-wied-act="one">Ganti</button>
+          <button type="button" data-wied-act="all">Ganti Semua</button>
+          <label class="wi-ed-util-c"><input type="checkbox" data-wied-case> Samakan huruf besar/kecil</label>
+          <span class="wi-ed-util-count" data-wied-count role="status"></span>
+          <button type="button" data-wied-act="close" aria-label="Tutup panel">×</button>
+          <p class="wi-ed-util-note">Mengganti teks menggambar ulang isi editor tanpa format visual (tebal, warna, spasi). Teksnya sendiri tidak berubah selain pada bagian yang diganti.</p>
+        </div>
+        <div class="wi-ed-util-row" data-wied-panel="link" hidden>
+          <label class="wi-ed-util-f">Alamat tautan <input type="text" data-wied-url autocomplete="off" placeholder="https://contoh.com"></label>
+          <label class="wi-ed-util-f">Teks tautan <input type="text" data-wied-ltext autocomplete="off" placeholder="Teks yang ditampilkan"></label>
+          <button type="button" data-wied-act="insert">Sisipkan</button>
+          <button type="button" data-wied-act="close" aria-label="Tutup panel">×</button>
+          <span class="wi-ed-util-count" data-wied-lmsg role="alert"></span>
+          <p class="wi-ed-util-note">Tautan hanya tampil selama menyunting di editor. Teks yang dianalisis dan diekspor adalah teksnya saja, tanpa alamat tautan.</p>
+        </div>
+        <p class="wi-ed-hint" data-wied-hint hidden>Pilih dulu teksnya untuk mengubah ukuran huruf di kotak ini.</p>
+      </div>
+      `;
       function saksaraEdAttach(ta, opts){
         if(!ta || !ta.parentNode) return;
         var serialize = opts.serialize;
@@ -14127,22 +14572,66 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
            Beda dari Tahap 4: pada varian LITERAL tidak ada penanda
            U+200B untuk seleksi terlipat — penanda itu akan bocor ke
            tulang punggung (varian normalisasi membuangnya, varian
-           literal tidak), jadi ukuran huruf di permukaan ini hanya
-           berlaku pada teks yang sedang terpilih. */
+           literal tidak). Sebagai gantinya (G4, keputusan D-6), pada
+           seleksi terlipat disisipkan span bergaya yang BENAR-BENAR
+           KOSONG: serialisasi hanya membaca simpul teks, jadi span
+           kosong menyumbang string kosong dan huruf yang kemudian
+           diketik di dalamnya adalah teks biasa — identitas tulang
+           punggung terjaga. Bila peramban terbukti tidak menahan
+           karet di dalam span kosong itu, span dibuang dan baris
+           petunjuk ditampilkan — tidak ada lagi kegagalan diam-diam. */
         function applyFontSize(pt){
           restoreRange();
           var sel = window.getSelection();
           if(!sel || !sel.rangeCount) return;
           var range = sel.getRangeAt(0);
-          if(range.collapsed) return;
           var span = document.createElement("span");
           span.style.fontSize = pt + "pt";
           try {
-            span.appendChild(range.extractContents());
-            range.insertNode(span);
-            var r3 = document.createRange();
-            r3.selectNodeContents(span);
-            sel.removeAllRanges(); sel.addRange(r3);
+            if(range.collapsed){
+              /* Tepi blok (D-6): bila karet menempel pada spasi yang persis
+                 di awal/akhir teks sebuah blok, span kosong TIDAK aman —
+                 normalisasi peramban menghapus spasi tepi itu begitu
+                 pengguna mengetik (terbukti di QA), jadi teks akan berubah.
+                 Di posisi tepi ini paket tidak menyisipkan span sama
+                 sekali dan menampilkan petunjuk jujur; ukuran tetap bisa
+                 diterapkan dengan memilih teksnya (jalur seleksi aman).
+                 Di semua posisi lain span kosong dipakai seperti biasa. */
+              var atEdge = false;
+              try {
+                var sc = range.startContainer, so = range.startOffset;
+                if(sc && sc.nodeType === 3 && sc.nodeValue){
+                  var blk = sc.parentNode;
+                  while(blk && blk !== ed && !/^(P|DIV|H1|H2|H3|H4|H5|H6|LI|BLOCKQUOTE|PRE|TD|TH)$/.test(blk.tagName || "")) blk = blk.parentNode;
+                  if(blk && blk !== ed){
+                    var firstT = null, lastT = null;
+                    (function walkT(n){ for(var i = 0; i < n.childNodes.length; i++){ var c = n.childNodes[i]; if(c.nodeType === 3){ if(c.nodeValue){ if(!firstT) firstT = c; lastT = c; } } else if(c.nodeType === 1 && !/^(TABLE|UL|OL)$/.test(c.tagName)) walkT(c); } })(blk);
+                    if(lastT === sc && so === sc.nodeValue.length && so > 0 && sc.nodeValue.charAt(so - 1) === " ") atEdge = true;
+                    else if(firstT === sc && so === 0 && sc.nodeValue.charAt(0) === " ") atEdge = true;
+                  }
+                }
+              } catch(eC) { atEdge = false; }
+              if(atEdge){ showHint(); return; }
+              range.insertNode(span);
+              var r0 = document.createRange();
+              r0.setStart(span, 0); r0.collapse(true);
+              sel.removeAllRanges(); sel.addRange(r0);
+              var okSpan = !!(span.parentNode && ed.contains(span));
+              var chk = window.getSelection();
+              var okCaret = okSpan && !!(chk && chk.rangeCount && span.contains(chk.getRangeAt(0).startContainer));
+              if(!okSpan || !okCaret){
+                if(span.parentNode) span.parentNode.removeChild(span);
+                showHint();
+                return;
+              }
+              hideHint();
+            } else {
+              span.appendChild(range.extractContents());
+              range.insertNode(span);
+              var r3 = document.createRange();
+              r3.selectNodeContents(span);
+              sel.removeAllRanges(); sel.addRange(r3);
+            }
           } catch(e) { return; }
           syncFromEditor(); saveRange();
         }
@@ -14284,7 +14773,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         ed.addEventListener("input", function(){ syncFromEditor(); });
         document.addEventListener("selectionchange", function(){
           var sel = window.getSelection();
-          if(sel && sel.rangeCount && ed.contains(sel.getRangeAt(0).commonAncestorContainer)) saveRange();
+          if(sel && sel.rangeCount && ed.contains(sel.getRangeAt(0).commonAncestorContainer)){ saveRange(); queueReflect(); }
         });
         /* Bilah alat: mousedown tombol tidak boleh mencuri seleksi
            editor; seleksi selalu disnapshot agar perintah berlaku pada
@@ -14334,6 +14823,368 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           else if(k === "fore"){ cmdCss("foreColor", v); }
           else if(k === "hilite"){ cmdCss("hiliteColor", v); }
         });
+        /* ---------- Paket Toolbar: Cari & Ganti (G1), Tautan (G2), Refleksi (G3) ----------
+           Tulisan yang sama dengan lem Tahap 4 (pola duplikasi yang sudah
+           ada), disesuaikan untuk varian LITERAL: pencarian/penggantian
+           berjalan pada string tulang punggung permukaan ini, ditulis
+           kembali lewat setter bawaan + peristiwa "input" persis seperti
+           ketikan biasa. Navigasi menyeleksi lewat salinan pola slot
+           ED-CORE (edUnitNodes/edStreamSlots di bawah) yang menghitung
+           SETIAP karakter apa adanya — tanpa membuang U+200B/U+00A0 —
+           sesuai wiEdSerializeLiteral, dan digulir di dalam kotak
+           editor saja. */
+        var util = wrap.querySelector("[data-wied-util]");
+        var findPanel = wrap.querySelector('[data-wied-panel="find"]');
+        var linkPanel = wrap.querySelector('[data-wied-panel="link"]');
+        var findIn = wrap.querySelector("[data-wied-find]");
+        var replIn = wrap.querySelector("[data-wied-repl]");
+        var caseBox = wrap.querySelector("[data-wied-case]");
+        var countEl = wrap.querySelector("[data-wied-count]");
+        var urlIn = wrap.querySelector("[data-wied-url]");
+        var ltextIn = wrap.querySelector("[data-wied-ltext]");
+        var lmsgEl = wrap.querySelector("[data-wied-lmsg]");
+        var hintEl = wrap.querySelector("[data-wied-hint]");
+        var panelOpen = "";
+        var hintOn = false;
+        var findState = { offsets: [], idx: -1 };
+        function syncUtilVis(){
+          if(!util) return;
+          util.hidden = !(mode === "editor" && (panelOpen !== "" || hintOn));
+          if(findPanel) findPanel.hidden = panelOpen !== "find";
+          if(linkPanel) linkPanel.hidden = panelOpen !== "link";
+          if(hintEl) hintEl.hidden = !hintOn;
+        }
+        function showHint(){ hintOn = true; syncUtilVis(); }
+        function hideHint(){ if(hintOn){ hintOn = false; syncUtilVis(); } }
+        function needleNow(){ return ((findIn && findIn.value) || "").replace(/[\r\n]/g, ""); }
+        function replNow(){ return ((replIn && replIn.value) || "").replace(/[\r\n]/g, ""); }
+        function findRefresh(){
+          var n = needleNow();
+          findState.offsets = n ? wiEdFindOffsets(nativeGet.call(ta), n, !!(caseBox && caseBox.checked)) : [];
+          if(findState.idx >= findState.offsets.length) findState.idx = findState.offsets.length - 1;
+          var total = findState.offsets.length;
+          if(countEl){
+            countEl.textContent = !n ? "" :
+              (total === 0 ? "Tidak ditemukan" :
+                (findState.idx >= 0 ? (findState.idx + 1) + " dari " + total : total + " ditemukan"));
+          }
+          if(util){
+            Array.prototype.forEach.call(util.querySelectorAll("[data-wied-act]"), function(b){
+              var a = b.getAttribute("data-wied-act");
+              if(a === "next" || a === "prev" || a === "one" || a === "all") b.disabled = (!n || total === 0);
+            });
+          }
+        }
+        function writeBackbone(next){
+          ta.value = next;
+          ta.dispatchEvent(new Event("input", { bubbles: true }));
+        }
+        function edScrollToRange(range){
+          try {
+            var r = range.getBoundingClientRect();
+            var er = ed.getBoundingClientRect();
+            if(!r.height && !r.width) return;
+            ed.scrollTop += (r.top - er.top) - (ed.clientHeight / 2) + (r.height / 2);
+          } catch(e) {}
+        }
+        /* Salinan pola unit/slot Tahap 4 untuk varian literal. */
+        function edUnitNodes(){
+          var units = [];
+          var strayNodes = null;
+          function flushStray(){
+            if(strayNodes){
+              var lines = wiEdWalkInline(strayNodes, [""]);
+              if(/\S/.test(lines.join("\n"))) units.push({ nodes: strayNodes, phantomBr: null });
+              strayNodes = null;
+            }
+          }
+          function collect(node){
+            var kids = node.childNodes || [];
+            for(var i=0;i<kids.length;i++){
+              var k = kids[i];
+              if(wiEdIsBlock(k)){
+                flushStray();
+                if(WI_ED_CONTAINER_TAGS[k.tagName] && !WI_ED_BLOCK_TAGS[k.tagName]){ collect(k); continue; }
+                var sub = k.childNodes || [];
+                var hasBlock = false;
+                for(var j=0;j<sub.length;j++){ if(wiEdIsBlock(sub[j])){ hasBlock = true; break; } }
+                if(hasBlock){ collect(k); continue; }
+                var last = sub[sub.length-1];
+                units.push({ nodes: [k], phantomBr: (last && last.nodeType === 1 && last.tagName === "BR") ? last : null });
+              } else {
+                if(!strayNodes) strayNodes = [];
+                strayNodes.push(k);
+              }
+            }
+          }
+          collect(ed);
+          flushStray();
+          return units;
+        }
+        function edStreamSlots(){
+          var units = edUnitNodes();
+          var slots = [];
+          var endPoint = null;
+          function walkNode(n, phantom){
+            if(n.nodeType === 3){
+              var v = n.nodeValue || "";
+              for(var j=0;j<v.length;j++) slots.push({ node: n, off: j });
+              if(v.length) endPoint = { node: n, off: v.length };
+              return;
+            }
+            if(n.nodeType !== 1) return;
+            if(n.tagName === "BR"){
+              if(n === phantom) return;
+              var parent = n.parentNode;
+              if(!parent) return;
+              var idx = Array.prototype.indexOf.call(parent.childNodes, n);
+              slots.push({ node: parent, off: idx });
+              endPoint = { node: parent, off: idx + 1 };
+              return;
+            }
+            var kids = n.childNodes;
+            for(var i=0;i<kids.length;i++) walkNode(kids[i], phantom);
+          }
+          units.forEach(function(u, ui){
+            if(ui > 0 && endPoint) slots.push(endPoint, endPoint);
+            u.nodes.forEach(function(n){ walkNode(n, u.phantomBr); });
+            if(!endPoint && u.nodes.length) endPoint = { node: u.nodes[0], off: 0 };
+          });
+          slots.push(endPoint);
+          return slots;
+        }
+        function selectBackboneRange(start, end){
+          var slots = edStreamSlots();
+          var a = slots[start], b = slots[end];
+          if(!a || !b) return false;
+          var range = document.createRange();
+          try { range.setStart(a.node, a.off); range.setEnd(b.node, b.off); } catch(e) { return false; }
+          var sel = window.getSelection();
+          sel.removeAllRanges(); sel.addRange(range);
+          edScrollToRange(range);
+          saveRange();
+          return true;
+        }
+        function findGo(dir){
+          findRefresh();
+          var total = findState.offsets.length;
+          if(!total) return;
+          var i = findState.idx;
+          i = i < 0 ? (dir > 0 ? 0 : total - 1) : (i + dir + total) % total;
+          findState.idx = i;
+          var o = findState.offsets[i];
+          if(mode === "editor") selectBackboneRange(o[0], o[1]);
+          findRefresh();
+        }
+        function findReplaceOne(){
+          findRefresh();
+          var offs = findState.offsets;
+          if(!offs.length) return;
+          var i = findState.idx >= 0 ? findState.idx : 0;
+          var o = offs[i];
+          var text = nativeGet.call(ta);
+          writeBackbone(text.slice(0, o[0]) + replNow() + text.slice(o[1]));
+          findState.idx = i;
+          findRefresh();
+          var no = findState.offsets;
+          if(no.length){
+            var j = Math.min(i, no.length - 1);
+            findState.idx = j;
+            if(mode === "editor") selectBackboneRange(no[j][0], no[j][1]);
+            findRefresh();
+          } else savedRange = null;
+        }
+        function findReplaceAll(){
+          var n = needleNow();
+          if(!n) return;
+          var res = wiEdReplaceAll(nativeGet.call(ta), n, replNow(), !!(caseBox && caseBox.checked));
+          if(res.count) writeBackbone(res.text);
+          findState.idx = -1;
+          findRefresh();
+          if(countEl) countEl.textContent = res.count ? ("Diganti di " + res.count + " tempat.") : "Tidak ditemukan";
+        }
+        var findTimer = null;
+        if(findIn) findIn.addEventListener("input", function(){
+          if(findTimer) clearTimeout(findTimer);
+          findTimer = setTimeout(function(){ findState.idx = -1; findRefresh(); }, 200);
+        });
+        if(findIn) findIn.addEventListener("keydown", function(e){
+          if(e.key === "Enter"){ e.preventDefault(); findGo(1); }
+        });
+        if(caseBox) caseBox.addEventListener("change", function(){ findState.idx = -1; findRefresh(); });
+        function prepLinkPanel(){
+          if(lmsgEl) lmsgEl.textContent = "";
+          var txt = "";
+          try { if(savedRange && !savedRange.collapsed) txt = savedRange.toString(); } catch(e) {}
+          if(ltextIn) ltextIn.value = txt;
+        }
+        function linkInsert(){
+          var url = ((urlIn && urlIn.value) || "").trim();
+          if(!wiEdLinkSchemeOk(url)){
+            if(lmsgEl) lmsgEl.textContent = "Alamat harus diawali https://, http://, atau mailto:";
+            return;
+          }
+          if(lmsgEl) lmsgEl.textContent = "";
+          restoreRange();
+          var sel = window.getSelection();
+          if(!sel || !sel.rangeCount) return;
+          var range = sel.getRangeAt(0);
+          if(!ed.contains(range.commonAncestorContainer)) return;
+          var a = document.createElement("a");
+          a.setAttribute("href", url);
+          a.setAttribute("rel", "noopener");
+          var label = ((ltextIn && ltextIn.value) || "").trim();
+          try {
+            if(range.collapsed){
+              a.appendChild(document.createTextNode(label || url));
+              range.insertNode(a);
+            } else if(label && range.toString() !== label){
+              range.deleteContents();
+              a.appendChild(document.createTextNode(label));
+              range.insertNode(a);
+            } else {
+              a.appendChild(range.extractContents());
+              range.insertNode(a);
+            }
+            var r2 = document.createRange();
+            r2.setStartAfter(a); r2.collapse(true);
+            sel.removeAllRanges(); sel.addRange(r2);
+          } catch(e) { return; }
+          panelOpen = ""; syncUtilVis();
+          syncFromEditor(); saveRange();
+        }
+        function openPanel(which){
+          if(which === "link") prepLinkPanel();
+          panelOpen = (panelOpen === which) ? "" : which;
+          syncUtilVis();
+          if(panelOpen === "find"){ findRefresh(); if(findIn) try { findIn.focus(); } catch(e) {} }
+          if(panelOpen === "link" && urlIn) try { urlIn.focus(); } catch(e) {}
+        }
+        bar.addEventListener("click", function(e){
+          var t = e.target;
+          var b = (t && t.closest) ? t.closest("button[data-wied-open]") : null;
+          if(b) openPanel(b.getAttribute("data-wied-open"));
+        });
+        if(util) util.addEventListener("click", function(e){
+          var t = e.target;
+          var b = (t && t.closest) ? t.closest("button[data-wied-act]") : null;
+          if(!b || b.disabled) return;
+          var a = b.getAttribute("data-wied-act");
+          if(a === "close"){ panelOpen = ""; syncUtilVis(); }
+          else if(a === "next") findGo(1);
+          else if(a === "prev") findGo(-1);
+          else if(a === "one") findReplaceOne();
+          else if(a === "all") findReplaceAll();
+          else if(a === "insert") linkInsert();
+        });
+        if(util) util.addEventListener("keydown", function(e){
+          if(e.key === "Escape"){ panelOpen = ""; syncUtilVis(); }
+        });
+        /* ---------- G3: refleksi keadaan tombol (baca-murni, sama
+           seperti lem Tahap 4; hanya menulis ke bilah alat) ---------- */
+        var reflectQueued = false;
+        function queueReflect(){
+          if(reflectQueued) return;
+          reflectQueued = true;
+          if(window.requestAnimationFrame) window.requestAnimationFrame(function(){ edReflect(); });
+          else edReflect();
+        }
+        function edReflect(){
+          reflectQueued = false;
+          try {
+            var sel = window.getSelection();
+            if(!sel || !sel.rangeCount) return;
+            var range = sel.getRangeAt(0);
+            if(!ed.contains(range.startContainer)) return;
+            var anchor = range.startContainer;
+            var el = anchor.nodeType === 1 ? anchor : anchor.parentNode;
+            var on = { bold: false, italic: false, underline: false, strikeThrough: false, subscript: false, superscript: false };
+            var n = el;
+            while(n && n !== ed){
+              var tg = n.tagName;
+              if(tg === "B" || tg === "STRONG") on.bold = true;
+              else if(tg === "I" || tg === "EM") on.italic = true;
+              else if(tg === "U") on.underline = true;
+              else if(tg === "S" || tg === "STRIKE") on.strikeThrough = true;
+              else if(tg === "SUB") on.subscript = true;
+              else if(tg === "SUP") on.superscript = true;
+              n = n.parentNode;
+            }
+            if(el){
+              var cs = window.getComputedStyle(el);
+              if(cs.fontWeight === "bold" || parseInt(cs.fontWeight, 10) >= 600) on.bold = true;
+              if(cs.fontStyle === "italic" || cs.fontStyle === "oblique") on.italic = true;
+              var td = cs.textDecorationLine || cs.textDecoration || "";
+              if(td.indexOf("underline") >= 0) on.underline = true;
+              if(td.indexOf("line-through") >= 0) on.strikeThrough = true;
+              if(cs.verticalAlign === "sub") on.subscript = true;
+              if(cs.verticalAlign === "super") on.superscript = true;
+              /* D-5: warna teks hanya bila terbaca rgb() tunggal. */
+              var m = /^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/.exec(cs.color || "");
+              if(m){
+                var hex = "#" + [m[1], m[2], m[3]].map(function(x){ var h = Number(x).toString(16); return h.length < 2 ? "0" + h : h; }).join("");
+                var fore = bar.querySelector('[data-wied="fore"]');
+                if(fore) fore.value = hex;
+              }
+              var fontSel = bar.querySelector('[data-wied="font"]');
+              if(fontSel){
+                var fam = (cs.fontFamily || "").split(",")[0].trim().replace(/^["']|["']$/g, "").toLowerCase();
+                var hit = "";
+                Array.prototype.forEach.call(fontSel.options, function(o){
+                  if(!o.value) return;
+                  if(o.value.split(",")[0].trim().replace(/^["']|["']$/g, "").toLowerCase() === fam) hit = o.value;
+                });
+                fontSel.value = hit;
+              }
+              var sizeSel = bar.querySelector('[data-wied="size"]');
+              if(sizeSel){
+                var pt = parseFloat(cs.fontSize) * 72 / 96;
+                var hitS = "";
+                Array.prototype.forEach.call(sizeSel.options, function(o){
+                  if(o.value && Math.abs(parseFloat(o.value) - pt) < 0.01) hitS = o.value;
+                });
+                sizeSel.value = hitS;
+              }
+            }
+            var blocks = leafBlocks();
+            var blk = blocks.length ? blocks[0] : null;
+            var align = "", listCmd = "", hang = false;
+            if(blk){
+              align = window.getComputedStyle(blk).textAlign || "";
+              var p = blk;
+              while(p && p !== ed){
+                if(p.tagName === "UL"){ listCmd = "insertUnorderedList"; break; }
+                if(p.tagName === "OL"){ listCmd = "insertOrderedList"; break; }
+                p = p.parentNode;
+              }
+              hang = !!blk.getAttribute("data-wied-hang");
+              var styleSel = bar.querySelector('[data-wied="style"]');
+              if(styleSel){
+                var map = { P: "P", H1: "H1", H2: "H2", H3: "H3", BLOCKQUOTE: "BLOCKQUOTE" };
+                styleSel.value = map[blk.tagName] || "";
+              }
+            }
+            var want = {
+              bold: on.bold, italic: on.italic, underline: on.underline,
+              strikeThrough: on.strikeThrough, subscript: on.subscript, superscript: on.superscript,
+              justifyLeft: align === "left" || align === "start",
+              justifyCenter: align === "center",
+              justifyRight: align === "right" || align === "end",
+              justifyFull: align === "justify",
+              insertUnorderedList: listCmd === "insertUnorderedList",
+              insertOrderedList: listCmd === "insertOrderedList",
+              hanging: hang
+            };
+            Object.keys(want).forEach(function(c){
+              var b = bar.querySelector('button[data-cmd="' + c + '"]');
+              if(!b) return;
+              b.classList.toggle("is-on", !!want[c]);
+              b.setAttribute("aria-pressed", want[c] ? "true" : "false");
+            });
+          } catch(e) {}
+        }
+        bar.addEventListener("click", function(){ queueReflect(); });
+        bar.addEventListener("change", function(){ queueReflect(); });
         /* ---------- Mode Editor | Teks polos ---------- */
         var modeBtns = Array.prototype.slice.call(wrap.querySelectorAll("[data-wied-mode]"));
         function setMode(m){
@@ -14343,6 +15194,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           var edOn = m === "editor";
           bar.hidden = !edOn;
           ed.hidden = !edOn;
+          syncUtilVis();
           ta.classList.toggle("ed-backbone-off", edOn);
           modeBtns.forEach(function(b){
             var on = b.getAttribute("data-wied-mode") === m;
