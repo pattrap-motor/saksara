@@ -220,6 +220,24 @@
       .file-status.ok{ border-color:var(--grn-ink); }
       .file-status.err{ border-color:var(--warn-line); background:var(--warn-bg); color:var(--warn-ink); }
       .file-status .fname{ font-weight:700; word-break:break-all; }
+      /* ---------- keadaan kosong & penanda proses (paket teks sederhana) ---------- */
+      .empty-state{ margin-top:22px; border:1px dashed var(--line); border-radius:var(--r-lg); background:var(--surface);
+        padding:26px var(--pad-panel); text-align:center; box-shadow:var(--shadow-sm); }
+      .empty-state h3{ margin:0 0 6px; font-size:var(--fs-panel-title); }
+      .empty-state p{ margin:0 auto 14px; max-width:540px; color:var(--muted); font-size:14.5px; }
+      .proses{ display:none; margin-top:14px; border:1px solid var(--line); background:var(--surface2);
+        border-radius:var(--r-sm); padding:12px 15px; }
+      .proses.show{ display:block; }
+      .proses ol{ list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; gap:8px 22px; }
+      .proses li{ display:flex; align-items:center; gap:8px; font-size:14px; color:var(--muted); }
+      .proses li[hidden]{ display:none; }
+      .proses li .p-ic{ width:20px; height:20px; border-radius:50%; border:2px solid var(--line); display:inline-flex;
+        align-items:center; justify-content:center; font-size:12px; font-weight:800; background:var(--surface); color:var(--muted); flex:none; }
+      .proses li.aktif{ color:var(--ink); font-weight:700; }
+      .proses li.aktif .p-ic{ border-color:var(--gold-ink); color:var(--gold-ink); }
+      .proses li.selesai{ color:var(--ink); }
+      .proses li.selesai .p-ic{ border-color:var(--grn-ink); background:var(--grn-bg); color:var(--grn-ink); }
+      .proses .p-done{ margin:10px 0 0; font-size:13px; font-weight:700; color:var(--grn-ink); }
       button:disabled{ opacity:.55; cursor:wait; }
       /* ---------- classifier (model terlatih, opsional) ---------- */
       .clf-panel{ margin-top:18px; border:1px solid var(--line); border-left:4px solid var(--gold); border-radius:12px;
@@ -954,7 +972,7 @@
         <a href="#/posisi" data-route="posisi">Privasi &amp; Batasan</a>
       </nav>
       <a class="btn-primary side-cta" href="#analisis">Mulai Memeriksa</a>
-      <div class="side-foot">Beta Terbuka · v0.22.0-beta<br />Seluruh analisis berjalan lokal di peramban ini — teks Anda tidak dikirim ke mana pun.</div>
+      <div class="side-foot">Beta Terbuka · v0.23.0-beta<br />Seluruh analisis berjalan lokal di peramban ini — teks Anda tidak dikirim ke mana pun.</div>
     </aside>
     <div class="wrap page">
       <header class="hero" data-view="home">
@@ -1073,10 +1091,10 @@
         <div class="mode-toggle" role="group" aria-label="Tingkat tampilan"><span>Tampilan:</span><span class="seg"><button type="button" class="mt-btn" data-mode="simple" aria-pressed="true">Sederhana</button><button type="button" class="mt-btn" data-mode="deep" aria-pressed="false">Mendalam</button></span><span class="mt-note">Mode Mendalam menampilkan seluruh angka &amp; rincian teknis.</span></div>
         <div class="mode-toggle det-mode" role="group" aria-label="Mode pemeriksaan"><span>Mode:</span><span class="seg"><button type="button" class="dm-btn" data-dmode="single" aria-pressed="true">Satu Tulisan</button><button type="button" class="dm-btn" data-dmode="batch" aria-pressed="false">Banyak Berkas</button></span><span class="mt-note">Periksa satu tulisan, atau banyak berkas sekaligus.</span></div>
         <ol class="p7-steps" aria-label="Langkah pemeriksaan"><li><strong>1.</strong> Masukkan tulisan</li><li><strong>2.</strong> Tekan Periksa Tulisan</li><li><strong>3.</strong> Pahami hasilnya</li></ol>
-        <p class="sub">Tempel teks di bawah ini, unggah berkas .txt, .docx, atau .pdf (klik tombol Unggah, atau seret &amp; letakkan berkas ke panel ini), atau coba salah satu contoh uji.</p>
+        <p class="sub">Tempel teks di bawah, unggah berkas .txt, .docx, atau .pdf (bisa juga diseret ke panel ini), atau coba contoh siap pakai.</p>
         <div class="panel" id="panel-analisis">
           <label for="input-teks" style="font-weight:700; display:block; margin-bottom:8px;">Teks yang diperiksa</label>
-          <textarea id="input-teks" placeholder="Tempel teks di sini… (disarankan minimal 300 kata agar hasil lebih dapat dipegang)"></textarea>
+          <textarea id="input-teks" placeholder="Tempel teks di sini… (sebaiknya minimal 300 kata supaya hasilnya lebih bisa dipegang)"></textarea>
           <details class="examples" id="examples-fold">
             <summary class="lbl">Coba Contoh Teks — klik untuk mengisi &amp; menganalisis langsung</summary>
             <div class="row">
@@ -1094,10 +1112,10 @@
             <button type="button" id="btn-bersihkan">Bersihkan</button>
             <button type="button" class="primary" id="btn-analisis">Periksa Tulisan</button>
           </div>
-          <p class="det-note">Skor yang dihasilkan adalah <strong>indikasi statistik</strong> dari pola teks — <strong>bukan bukti mutlak kepengarangan</strong>. Gunakan sebagai bahan pemeriksaan dan klarifikasi, bukan vonis.</p>
+          <p class="det-note">Skor ini hanya <strong>indikasi</strong> dari pola teks — <strong>bukan bukti siapa penulisnya</strong>. Pakai sebagai bahan untuk memeriksa dan bertanya, bukan untuk memvonis.</p>
           <div class="clf-panel" id="clf-panel">
             <details class="clf-fold" id="clf-fold">
-            <summary>Penguat skor (opsional) — model pemeriksa kedua<span class="clf-fold-hint">Pemeriksa kedua yang berjalan lokal di peramban; klik untuk penjelasan dan tombol pengaktifan.</span></summary>
+            <summary>Penguat skor (opsional) — model pemeriksa kedua<span class="clf-fold-hint">Berjalan lokal di peramban; klik untuk penjelasan dan tombol pengaktifan.</span></summary>
             <div class="clf-head">
               <div class="clf-title">Penguat skor (model pemeriksa kedua) — berjalan lokal di peramban</div>
               <div class="clf-actions">
@@ -1106,18 +1124,32 @@
                 <button type="button" id="btn-clf">Aktifkan penguat skor (±280 MB, sekali unduh)</button>
               </div>
             </div>
-            <p class="clf-desc">Lapis kedua setelah pemeriksaan pola: sebuah <strong>model bahasa multibahasa</strong> yang sudah dilatih untuk membedakan teks manusia dan teks AI, berjalan <strong>sepenuhnya di peramban ini</strong> — tidak ada server yang menilai teks Anda. Berkas modelnya cukup besar (±280 MB) dan <strong>hanya diunduh bila Anda mengaktifkannya</strong> lewat tombol di panel ini.</p>
+            <p class="clf-desc">Pemeriksa kedua sesudah pemeriksaan pola: sebuah <strong>model bahasa multibahasa</strong> yang sudah dilatih membedakan teks manusia dan teks AI, berjalan <strong>sepenuhnya di peramban ini</strong> — tidak ada server yang menilai teks Anda. Berkas modelnya besar (±280 MB) dan <strong>hanya diunduh bila Anda mengaktifkannya</strong> lewat tombol di panel ini.</p>
             <details class="clf-more"><summary>Baca detail teknis &amp; batasan</summary><p>Halaman ini <strong>tidak mengunduh apa pun secara otomatis</strong> saat dibuka, agar kuota data dan ruang penyimpanan Anda tetap hemat. Sekali diunduh, model <strong>tersimpan di peramban</strong> untuk kunjungan berikutnya (pengaktifan berikutnya tanpa unduhan), dan bisa dihapus kapan saja lewat tombol “Hapus model tersimpan”. Satu-satunya lalu lintas jaringan hanyalah unduhan berkas model itu; teks yang dianalisis <strong>tidak pernah dikirim ke mana pun</strong>. Selagi model dimuat, halaman tetap berfungsi penuh dengan lapis pertama. Peran model ini adalah <strong>penguat</strong>: ia hanya boleh menaikkan skor bila lapis pertama sudah menemukan indikasi awal — bila tidak, skornya tidak dipakai sama sekali, karena model ini <strong>tidak pernah menuduh sendirian</strong>. Pada dokumen yang sangat panjang, model menilai paling banyak 100 bagian teks yang disebar merata dari seluruh dokumen (30 bagian pada perangkat seluler/hemat). Penanda warna per kalimat tetap berasal dari lapis pertama. <strong>Keterbatasannya, apa adanya:</strong> pada pengujian kami, model ini sangat yakin pada teks AI formal — tetapi sebagian tulisan manusia yang sangat formal dan bergaya ensiklopedis juga dinilainya mirip AI, dan teks AI yang ditulis ulang (parafrase) dengan rapi bisa lolos darinya. Karena bias itulah ia ditempatkan hanya sebagai penguat di belakang lapis pertama.</p></details>
             <p class="clf-mobile-note">Di HP, penguat skor berjalan memakai prosesor perangkat dan bisa terasa lambat — penilaian di perangkat seluler dibatasi 30 bagian yang disebar merata dari seluruh dokumen agar tetap ringan, dan Anda dapat membatalkannya kapan saja (skor pemeriksa pola tetap tampil). Untuk dokumen sangat panjang, desktop terasa jauh lebih cepat.</p>
             <div class="clf-progress" id="clf-progress" style="display:none;"><div class="clf-progress-fill" id="clf-progress-fill"></div></div>
             </details>
             <p class="clf-status" id="clf-status" role="status" aria-live="polite">Status penguat skor: belum diaktifkan — skor saat ini 100% pemeriksa pola (7 tanda).</p>
           </div>
-          <p class="file-note"><strong>Batas &amp; cakupan:</strong> Maks. 20 MB / 100.000 kata &middot; Disarankan min. &plusmn;300 kata agar hasil dapat dipegang.</p>
-          <details class="clf-more"><summary>Baca batas &amp; cakupan lengkap</summary><p>Ukuran berkas yang diunggah dibatasi maksimum 20 MB, dan analisis mencakup hingga 100.000 kata pertama dari teks — bila dokumen lebih panjang dari itu, yang dianalisis adalah 100.000 kata pertamanya dan laporan menampilkan catatan pemotongan tersebut secara terbuka (berapa kata total dokumen dan berapa yang dianalisis). Di dalam batas itu, seluruh teks yang terbaca dari berkas akan dianalisis. Di halaman ini, dari DOCX dibaca isi utama, tabel, kotak teks, catatan kaki/akhir, komentar, serta header dan footer — teks pendamping digabung sesudah isi utama; dari PDF dibaca lapisan teks dari semua halaman. Cakupan Asisten Menulis berbeda: di sana header, footer, catatan kaki/akhir, dan komentar tidak ikut dimuat, dan Anda diberi tahu saat dokumen dimuat bila bagian itu terdeteksi. Agar hasil dapat dipegang, teks disarankan minimal ±300 kata. PDF hasil pindai (gambar) tidak punya lapisan teks sehingga belum bisa dibaca — tempel teksnya langsung. Format .doc lama juga belum didukung; simpan ulang berkasnya sebagai .docx. Pemeriksaan lapis pertama memakai <strong>pemeriksa pola (Ensemble Heuristik v3)</strong> dengan 7 sinyal — termasuk sisa markdown, simetri paragraf, dan pengulangan frasa — yang disetel untuk pola tulisan Bahasa Indonesia, termasuk tulisan formal dan birokratis yang generik. <strong>Penguat skor lokal:</strong> model bahasa multibahasa hanya diunduh bila Anda mengaktifkan penguat skor di panel di atas (±280 MB, sekali saja, lalu tersimpan di peramban dan bisa dihapus dari panel yang sama) dan menilai teks sepenuhnya di perangkat ini — pada mode apa pun, tidak ada teks yang meninggalkan peramban ini. Pada pengujian kami model ini sangat kuat pada teks AI formal Bahasa Indonesia, tetapi juga menandai sebagian tulisan manusia yang sangat formal sebagai mirip AI — karena itu ia hanya dipakai sebagai penguat di atas lapis pertama (tidak pernah menaikkan skor bila lapis pertama tidak menemukan indikasi awal), dan teks AI yang diparafrase tetap bisa lolos dari keduanya. Apa pun hasilnya, skor tetap indikasi statistik, bukan bukti.</p></details>
+          <p class="file-note"><strong>Batas &amp; cakupan:</strong> Maks. 20 MB / 100.000 kata &middot; Sebaiknya min. &plusmn;300 kata agar hasil lebih bisa dipegang.</p>
+          <details class="clf-more"><summary>Baca batas &amp; cakupan lengkap</summary><p>Berkas yang diunggah maks. 20 MB, dan yang dianalisis paling banyak 100.000 kata pertama. Bila dokumen lebih panjang, laporan menampilkan catatan terbuka soal pemotongan itu (berapa kata seluruhnya dan berapa yang dianalisis). Dari DOCX dibaca isi utama, tabel, kotak teks, catatan kaki/akhir, komentar, serta header dan footer — teks pendamping digabung sesudah isi utama. Dari PDF dibaca lapisan teks semua halaman. Di Asisten Menulis cakupannya berbeda: header, footer, catatan kaki/akhir, dan komentar tidak ikut dimuat, dan Anda diberi tahu saat dokumen dimuat bila bagian itu ada. Agar hasilnya bisa dipegang, teks sebaiknya minimal ±300 kata. PDF hasil pindai (gambar) tidak punya lapisan teks, jadi belum bisa dibaca — tempel teksnya langsung. Format .doc lama juga belum didukung; simpan ulang sebagai .docx.</p><p>Pemeriksaan pertama memakai <strong>pemeriksa pola (Ensemble Heuristik v3)</strong> dengan 7 sinyal — antara lain sisa markdown, simetri paragraf, dan pengulangan frasa — yang disetel untuk pola tulisan Bahasa Indonesia, termasuk tulisan formal dan birokratis yang generik. <strong>Penguat skor</strong> (model bahasa multibahasa) hanya diunduh bila Anda mengaktifkannya di panel atas (±280 MB, sekali saja, lalu tersimpan di peramban dan bisa dihapus dari panel yang sama) dan menilai teks sepenuhnya di perangkat ini — teks Anda tidak pernah meninggalkan peramban. Pada pengujian kami, model ini kuat pada teks AI formal Bahasa Indonesia, tetapi juga menandai sebagian tulisan manusia yang sangat formal sebagai mirip AI. Karena itu ia hanya menjadi penguat di atas pemeriksa pola — tidak menaikkan skor bila pemeriksa pola tidak menemukan indikasi awal — dan teks AI yang diparafrase tetap bisa lolos dari keduanya. Apa pun hasilnya, skor tetap indikasi statistik, bukan bukti.</p></details>
           <div class="file-status" id="file-status" role="status" aria-live="polite"></div>
           <div class="banner" id="banner-pendek" role="alert"></div>
           <div class="banner" id="banner-sibuk" role="status" aria-live="polite"></div>
+          <div class="proses" id="proses-langkah" role="status" aria-live="polite">
+            <ol>
+              <li data-tahap="baca" hidden><span class="p-ic" aria-hidden="true"></span><span>Membaca berkas</span></li>
+              <li data-tahap="periksa"><span class="p-ic" aria-hidden="true"></span><span>Memeriksa tulisan</span></li>
+              <li data-tahap="susun"><span class="p-ic" aria-hidden="true"></span><span>Menyusun hasil</span></li>
+              <li data-tahap="penguat" hidden><span class="p-ic" aria-hidden="true"></span><span>Penguat skor menilai</span></li>
+            </ol>
+            <p class="p-done" hidden>Selesai — hasil tampil di bawah.</p>
+          </div>
+        </div>
+        <div class="empty-state" id="hasil-kosong">
+          <h3>Hasil pemeriksaan tampil di sini</h3>
+          <p>Tempel tulisan atau unggah berkas di panel atas, lalu tekan <strong>Periksa Tulisan</strong>. Belum punya tulisan? Coba contoh siap pakai dulu.</p>
+          <button type="button" class="primary" id="btn-kosong-contoh">Coba Contoh Teks</button>
         </div>
       </section>
 
@@ -1128,7 +1160,7 @@
         <div class="banner" id="banner-cakupan" style="margin:0 0 16px;" role="status"></div>
         <div class="banner" id="banner-eksklusi" style="margin:0 0 16px;" role="status"></div>
         <div class="banner" id="banner-waspada" style="margin:0 0 16px;" role="alert"></div>
-        <div class="human-card" id="human-card" hidden><h3 id="human-title"></h3><p id="human-explain"></p><p class="human-tip" id="human-tip"></p><p class="human-note">Ingat: skor ini <strong>indikasi statistik, bukan bukti</strong> siapa penulisnya. Persentase ringkasnya ada pada kartu skor; rincian teknis lengkapnya tampil di Mode Mendalam.</p></div>
+        <div class="human-card" id="human-card" hidden><h3 id="human-title"></h3><p id="human-explain"></p><p class="human-tip" id="human-tip"></p><p class="human-note">Ingat: skor ini <strong>hanya indikasi, bukan bukti</strong> siapa penulisnya. Angka ringkasnya ada di kartu skor; rincian lengkapnya tampil di Mode Mendalam.</p></div>
         <div class="report-grid">
           <div class="score-card">
             <div class="cap">Skor kemiripan pola AI (indikasi keseluruhan)</div>
@@ -1193,7 +1225,7 @@
           </div>
         </div>
 
-        <p class="deep-hint">Rincian per tanda dan statistik lengkap tampil di <strong>mode Mendalam</strong> — gunakan pengalih Tampilan di bagian atas halaman ini.</p>
+        <p class="deep-hint">Rincian per tanda dan statistik lengkap tampil di <strong>mode Mendalam</strong> — pakai pengalih Tampilan di bagian atas halaman ini.</p>
 
         <div class="stats">
           <div class="stat"><div class="v" id="st-kata">0</div><div class="k">Jumlah kata</div></div>
@@ -1208,7 +1240,7 @@
             <span><span class="sw r"></span>Merah — skor kalimat ≥ 65% (sangat mirip pola AI)</span>
             <span><span class="sw y"></span>Kuning — 35–65% (indikasi AI sedang)</span>
             <span><span class="sw g"></span>Hijau — &lt; 35% (indikasi AI rendah)</span>
-            <span>Klik kalimat mana pun untuk melihat bukti penandaannya beserta saran perbaikan.</span>
+            <span>Klik kalimat untuk melihat alasan penandaannya dan saran perbaikan.</span>
           </div>
           <div class="hl-tools" role="group" aria-label="Filter penanda kalimat">
             <span class="ft">Tampilkan:</span>
@@ -1224,14 +1256,14 @@
 
         <div class="honesty">
           <h3>Baca sebelum menyimpulkan</h3>
-          <p>Skor ini indikasi statistik, bukan bukti. Teks manusia bisa terindikasi AI dan teks AI yang diparafrase bisa lolos. Gunakan sebagai bahan pemeriksaan, bukan vonis — periksa juga isi, proses penulisan, dan pemahaman penulisnya terhadap apa yang ia tulis.</p>
+          <p>Skor ini hanya indikasi dari pola tulisan, bukan bukti. Tulisan manusia bisa terindikasi AI, dan teks AI yang ditulis ulang bisa lolos. Pakai hasil ini sebagai bahan untuk memeriksa — bukan untuk memvonis — dan periksa juga isi tulisan serta proses penulisannya.</p>
         </div>
 
         <div class="pdf-panel">
           <div class="pdf-head">
             <h3>Laporan PDF</h3>
           </div>
-          <p class="pdf-note">Unduh hasil pemeriksaan ini sebagai berkas PDF bergaya laporan: panel skor berwarna, rincian ketujuh tanda dengan warna berbeda per tanda, keterangan warna, teks lengkap dengan kalimat terindikasi diberi latar warna, serta skor dan alasan untuk setiap kalimat. Isinya adalah analisis <strong>indikasi AI per kalimat</strong>, bukan laporan kecocokan plagiarisme terhadap basis data. <span id="pdf-status" role="status" aria-live="polite"></span></p>
+          <p class="pdf-note">Unduh hasil ini sebagai PDF: ada panel skor berwarna, rincian 7 tanda dengan warna berbeda, keterangan warna, teks lengkap dengan kalimat terindikasi diberi latar warna, plus skor dan alasan tiap kalimat. Isinya analisis <strong>indikasi AI per kalimat</strong> — bukan laporan kecocokan plagiarisme terhadap basis data. <span id="pdf-status" role="status" aria-live="polite"></span></p>
           <details class="clf-more"><summary>Detail teknis laporan</summary><p>PDF dibuat langsung di peramban Anda; pustaka jsPDF dimuat dari CDN hanya saat tombol Unduh Laporan PDF ditekan. Laporan memuat pula bagian khusus hasil penguat skor (model pemeriksa kedua, Lapis 2) bila penguat itu aktif, dan menandai frasa khas AI dengan ungu tebal serta pola berulang dengan cokelat bergaris bawah pada teks berpenanda. Gaya panelnya terinspirasi laporan Turnitin, tetapi isinya berbeda: ini analisis indikasi AI per kalimat, bukan laporan kecocokan plagiarisme terhadap basis data.</p></details>
         </div>
 
@@ -1274,7 +1306,7 @@
         <h2 id="batch-judul">Periksa banyak dokumen</h2>
         <div class="mode-toggle det-mode" role="group" aria-label="Mode pemeriksaan"><span>Mode:</span><span class="seg"><button type="button" class="dm-btn" data-dmode="single" aria-pressed="false">Satu Tulisan</button><button type="button" class="dm-btn" data-dmode="batch" aria-pressed="true">Banyak Berkas</button></span><span class="mt-note">Periksa satu tulisan, atau banyak berkas sekaligus.</span></div>
           <ol class="p7-steps" aria-label="Langkah pemeriksaan banyak dokumen"><li><strong>1.</strong> Pilih dokumen</li><li><strong>2.</strong> Tekan Periksa Semua Berkas</li><li><strong>3.</strong> Lihat hasil</li><li><strong>4.</strong> Unduh laporan</li></ol>
-        <p class="sub">Pilih beberapa berkas .txt, .docx, atau .pdf untuk dinilai sekaligus dan diringkas dalam satu tabel. Setiap berkas dinilai dengan pemeriksa pola (7 tanda); bila penguat skor (model pemeriksa kedua) sudah aktif, penguat bersyarat yang sama ikut diterapkan — bila belum aktif, skornya murni pemeriksa pola. Hasil batch tampil di sini saja: ia tidak mengubah laporan utama di atas dan tidak disimpan ke arsip hasil.</p>
+        <p class="sub">Pilih beberapa berkas .txt, .docx, atau .pdf untuk dinilai sekaligus dan diringkas dalam satu tabel. Setiap berkas dinilai dengan pemeriksa pola (7 tanda); bila penguat skor (model pemeriksa kedua) sudah aktif, penguat yang sama ikut dipakai — bila belum, skornya murni pemeriksa pola. Hasil batch hanya tampil di sini: tidak mengubah laporan utama di atas dan tidak disimpan ke arsip hasil.</p>
         <div class="panel">
           <label for="batch-input" style="font-weight:700; display:block; margin-bottom:8px;">Berkas yang diperiksa</label>
           <input type="file" id="batch-input" multiple accept=".txt,.docx,.pdf,text/plain,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-label="Pilih banyak berkas .txt, .docx, atau .pdf" />
@@ -1793,12 +1825,22 @@
           <a href="#/posisi">Privasi &amp; Batasan</a>
         </nav>
         <p class="copy">© 2026 Saksara — Dikembangkan oleh Ciptanala Devs</p>
-        <p class="version-line">Versi <strong>v0.22.0-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
+        <p class="version-line">Versi <strong>v0.23.0-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
       </div>
     </footer>
 
     <dialog class="changelog" id="changelog-modal" aria-labelledby="changelog-title">
       <h2 id="changelog-title">Catatan Rilis — Saksara</h2>
+      <h3>v0.23.0-beta — 24 November 2026</h3>
+      <ul>
+        <li>Teks di seluruh halaman disederhanakan: lebih singkat, memakai bahasa sehari-hari, tapi tetap jelas dan lengkap isinya.</li>
+        <li>Sebelum pemeriksaan dijalankan, kini ada panduan singkat di area hasil lengkap dengan tombol "Coba Contoh Teks".</li>
+        <li>Selama pemeriksaan berjalan, ada penanda langkah yang mengikuti prosesnya: membaca berkas, memeriksa tulisan, lalu menyusun hasil.</li>
+        <li>Tombol salin kini berubah jadi "Tersalin ✓" sesudah menyalin, dan unduhan hasil massal (CSV/JSON/PDF) memberi tanda status yang jelas.</li>
+        <li>Pesan bila berkas tidak bisa dipakai kini ditulis lebih ramah dan memberi jalan keluar: format apa yang diterima dan apa yang bisa dicoba.</li>
+        <li>Catatan di hasil dipadatkan: hasil ini bersifat indikasi, bukan bukti.</li>
+        <li>Hasil analisis dan detektor tidak berubah.</li>
+      </ul>
       <h3>v0.22.0-beta — 24 November 2026</h3>
       <ul>
         <li>Tombol sakelar kini tampil sebagai pilihan yang jelas: Sederhana/Mendalam, Satu Tulisan/Banyak Berkas, dan Editor/Teks polos memakai pola rel pilihan yang sama — yang sedang aktif terangkat dan berwarna, jadi langsung ketahuan mana yang terpilih.</li>
@@ -2287,13 +2329,103 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           b.innerHTML = "<strong>Teks sangat pendek (" + w + " kata).</strong> Di bawah 100 kata, pola statistik belum terbentuk — hasil analisis tidak dapat dipegang. Tambahkan teks lagi.";
           b.classList.add("show");
         } else if(w >= 100 && w < 300){
-          b.innerHTML = "<strong>Teks pendek (" + w + " kata).</strong> Hasil kurang dapat dipegang untuk teks di bawah ±300 kata — perlakukan skor sebagai petunjuk awal saja.";
+          b.innerHTML = "<strong>Teks pendek (" + w + " kata).</strong> Untuk teks di bawah ±300 kata, hasil kurang bisa dipegang — pakai skor ini sebagai petunjuk awal saja.";
           b.classList.add("show");
         } else {
           b.classList.remove("show");
         }
       }
       ta.addEventListener("input", updateCounters);
+
+      /* ---------- Penanda proses bertahap & keadaan kosong (lapisan tampilan) ----------
+         Penanda mengikuti kejadian yang benar-benar terjadi: membaca berkas
+         (setFileBusy), memeriksa tulisan (setAnalysisBusy), menyusun hasil
+         (analisis selesai dan laporan terender), dan penguat skor hanya bila
+         classifier memang berjalan — tombol batal classifier tampil selama ia
+         bekerja, dan keadaan itu DIAMATI di sini, bukan diubah. Keadaan kosong
+         mengikuti tampil/tidaknya laporan lewat pengamat kelas yang sama
+         polanya dengan pengamat arsip hasil. Tidak ada logika analisis yang
+         disentuh blok ini. */
+      var prosesDariBerkas = false;
+      var prosesTimer = null;
+      var prosesClfWatch = false;
+      function prosesLi(tahap){
+        var el = $("proses-langkah");
+        return el ? el.querySelector("li[data-tahap=\"" + tahap + "\"]") : null;
+      }
+      function prosesTahap(tahap, keadaan){
+        var li = prosesLi(tahap); if(!li) return;
+        if(keadaan === "sembunyi"){ li.hidden = true; li.className = ""; return; }
+        li.hidden = false;
+        li.className = keadaan || "";
+        var ic = li.querySelector(".p-ic");
+        if(ic) ic.textContent = keadaan === "selesai" ? "✓" : "";
+      }
+      function prosesTampil(){
+        var el = $("proses-langkah"); if(!el) return;
+        if(prosesTimer){ clearTimeout(prosesTimer); prosesTimer = null; }
+        el.classList.add("show");
+        var d = el.querySelector(".p-done"); if(d) d.hidden = true;
+      }
+      function prosesSelesai(){
+        var el = $("proses-langkah"); if(!el) return;
+        var d = el.querySelector(".p-done"); if(d) d.hidden = false;
+        prosesTimer = setTimeout(function(){
+          el.classList.remove("show");
+          prosesTahap("baca", "sembunyi");
+          prosesTahap("penguat", "sembunyi");
+          prosesTahap("periksa", "");
+          prosesTahap("susun", "");
+        }, 1400);
+      }
+      function prosesMulaiBaca(){
+        prosesDariBerkas = true;
+        prosesTampil();
+        prosesTahap("baca", "aktif");
+        prosesTahap("periksa", "");
+        prosesTahap("susun", "");
+        prosesTahap("penguat", "sembunyi");
+      }
+      function prosesBacaSelesai(){ prosesTahap("baca", "selesai"); }
+      function prosesMulaiPeriksa(){
+        prosesTampil();
+        if(!prosesDariBerkas) prosesTahap("baca", "sembunyi");
+        prosesTahap("periksa", "aktif");
+        prosesTahap("susun", "");
+      }
+      function prosesPeriksaSelesai(){
+        prosesTahap("periksa", "selesai");
+        prosesTahap("susun", "selesai");
+        prosesDariBerkas = false;
+        if(typeof clfState !== "undefined" && clfState === "ready") prosesTahap("penguat", "aktif"), prosesAmatiPenguat();
+        else prosesSelesai();
+      }
+      function prosesAmatiPenguat(){
+        if(prosesClfWatch) return;
+        var b = $("btn-clf-cancel");
+        if(!b){ prosesSelesai(); return; }
+        prosesClfWatch = true;
+        var mo = new MutationObserver(function(){
+          if(b.style.display === "none"){
+            prosesTahap("penguat", "selesai");
+            prosesClfWatch = false;
+            mo.disconnect();
+            prosesSelesai();
+          }
+        });
+        mo.observe(b, { attributes: true, attributeFilter: ["style"] });
+        /* Pengaman: berhenti mengamati setelah 10 menit agar tidak menggantung. */
+        setTimeout(function(){ if(prosesClfWatch){ prosesClfWatch = false; mo.disconnect(); } }, 600000);
+      }
+      (function(){
+        var rep = $("report"), kos = $("hasil-kosong");
+        if(!rep || !kos) return;
+        function sync(){ kos.style.display = rep.classList.contains("show") ? "none" : ""; }
+        sync();
+        new MutationObserver(sync).observe(rep, { attributes: true, attributeFilter: ["class"] });
+        var bk = $("btn-kosong-contoh");
+        if(bk) bk.addEventListener("click", function(){ loadExample(CONTOH_MANUSIA); });
+      })();
 
       /* ---------- unggah berkas: .txt / .docx / .pdf (100% sisi klien, tanpa library eksternal) ---------- */
       function showFileStatus(html, kind){
@@ -2310,6 +2442,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
       }
       function setFileBusy(busy, fileName){
+        if(busy) prosesMulaiBaca(); else prosesBacaSelesai();
         $("btn-analisis").disabled = busy;
         $("btn-bersihkan").disabled = busy;
         $("file-input").disabled = busy;
@@ -2715,12 +2848,12 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
 
       function handleFile(f){
         if(f && typeof f.size === "number" && f.size > MAX_FILE_BYTES){
-          showFileStatus("<strong>Berkas terlalu besar</strong> (" + (f.size / 1048576).toFixed(1).replace(".", ",") + " MB) — batas ukuran berkas adalah 20 MB, agar halaman tidak berhenti merespons saat membacanya. Kecilkan dokumennya (misalnya pecah menjadi beberapa bagian), atau tempel bagian teks yang ingin diperiksa langsung ke kotak di atas.", "err");
+          showFileStatus("<strong>Berkas terlalu besar</strong> (" + (f.size / 1048576).toFixed(1).replace(".", ",") + " MB) — batasnya 20 MB supaya halaman tetap lancar. Pecah berkas jadi beberapa bagian, atau tempel teksnya langsung ke kotak di atas.", "err");
           return;
         }
         var lower = (f.name || "").toLowerCase();
         if(lower.endsWith(".doc") && !lower.endsWith(".docx")){
-          showFileStatus("<strong>Format .doc lama tidak didukung</strong> — simpan ulang sebagai .docx, lalu unggah lagi. Atau salin-tempel teksnya langsung ke kotak di atas.", "err");
+          showFileStatus("<strong>Format .doc lama belum bisa dibaca</strong> — simpan ulang berkas sebagai .docx, lalu unggah lagi. Atau tempel teksnya langsung ke kotak di atas.", "err");
           return;
         }
         var kind = null;
@@ -2728,7 +2861,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         else if(lower.endsWith(".pdf")) kind = "pdf";
         else if(lower.endsWith(".txt") || f.type === "text/plain") kind = "txt";
         else {
-          showFileStatus("<strong>Format berkas belum didukung.</strong> Yang bisa diunggah: .txt, .docx, dan .pdf. Atau salin-tempel teksnya langsung ke kotak di atas.", "err");
+          showFileStatus("<strong>Format berkas ini belum didukung.</strong> Yang bisa diunggah: .txt, .docx, dan .pdf. Atau tempel teksnya langsung ke kotak di atas.", "err");
           return;
         }
         setFileBusy(true, f.name);
@@ -2745,33 +2878,33 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           var wordCount = wordsOf(text).length;
           if(kind === "pdf" && (wordCount < 30 || looksGarbled(text))){
             ocrPendingFile = f;
-            showFileStatus("<strong>Teks dari PDF ini tidak terbaca</strong> — kemungkinan PDF hasil pindai/gambar (butuh OCR) atau font-nya tidak standar. Silakan salin-tempel teksnya langsung ke kotak di atas, atau coba baca sebagai gambar: <button type=\"button\" class=\"btn-ghost\" data-ocr-open=\"1\">Buka di OCR</button>", "err");
+            showFileStatus("<strong>Teks di PDF ini tidak terbaca</strong> — biasanya karena PDF hasil pindai/gambar atau hurufnya tidak standar. Tempel teksnya langsung ke kotak di atas, atau baca sebagai gambar: <button type=\"button\" class=\"btn-ghost\" data-ocr-open=\"1\">Buka di OCR</button>", "err");
             return;
           }
           if(!text.trim() || wordCount === 0){
             if(kind === "pdf"){
               ocrPendingFile = f;
-              showFileStatus("<strong>Tidak ada teks yang bisa dibaca dari berkas ini.</strong> Bila PDF ini hasil pindai/gambar, OCR dapat membacanya sebagai gambar: <button type=\"button\" class=\"btn-ghost\" data-ocr-open=\"1\">Buka di OCR</button>", "err");
+              showFileStatus("<strong>Berkas ini tidak memuat teks yang bisa dibaca.</strong> Bila PDF ini hasil pindai/gambar, OCR bisa membacanya sebagai gambar: <button type=\"button\" class=\"btn-ghost\" data-ocr-open=\"1\">Buka di OCR</button>", "err");
               return;
             }
-            showFileStatus("<strong>Tidak ada teks yang bisa dibaca dari berkas ini.</strong> Coba berkas lain, atau salin-tempel teksnya langsung ke kotak di atas.", "err");
+            showFileStatus("<strong>Berkas ini tidak memuat teks yang bisa dibaca.</strong> Coba berkas lain, atau tempel teksnya langsung ke kotak di atas.", "err");
             return;
           }
           ta.value = text;
           updateCounters();
           if(wordCount > MAX_ANALYZE_WORDS){
-            showFileStatus("Berkas dimuat: <span class=\"fname\">" + escapeHtml(f.name) + "</span> — " + fmtNumID(wordCount) + " kata terbaca; sesuai batas analisis per dokumen, yang dianalisis adalah " + fmtNumID(MAX_ANALYZE_WORDS) + " kata pertama (lihat catatan cakupan pada laporan).", "ok");
+            showFileStatus("Berkas dimuat: <span class=\"fname\">" + escapeHtml(f.name) + "</span> — " + fmtNumID(wordCount) + " kata terbaca; yang dianalisis " + fmtNumID(MAX_ANALYZE_WORDS) + " kata pertama (batas per dokumen — lihat catatan cakupan di laporan).", "ok");
           } else {
             showFileStatus("Berkas dimuat: <span class=\"fname\">" + escapeHtml(f.name) + "</span> — " + wordCount + " kata terbaca, seluruhnya dianalisis.", "ok");
           }
           runAnalysis();
         }).catch(function(err){
           if(kind === "docx"){
-            showFileStatus("<strong>Berkas Word ini tidak bisa dibaca.</strong> Pastikan formatnya .docx (bukan .doc lama) dan berkas tidak rusak, atau salin-tempel teksnya langsung ke kotak di atas.", "err");
+            showFileStatus("<strong>Berkas Word ini tidak bisa dibaca.</strong> Pastikan formatnya .docx (bukan .doc lama) dan berkasnya tidak rusak, atau tempel teksnya langsung ke kotak di atas.", "err");
           } else if(kind === "pdf"){
-            showFileStatus("<strong>Teks dari PDF ini tidak terbaca</strong> — kemungkinan PDF hasil pindai/gambar (butuh OCR) atau font-nya tidak standar. Silakan salin-tempel teksnya langsung ke kotak di atas.", "err");
+            showFileStatus("<strong>Teks di PDF ini tidak terbaca</strong> — biasanya karena PDF hasil pindai/gambar atau hurufnya tidak standar. Tempel teksnya langsung ke kotak di atas.", "err");
           } else {
-            showFileStatus("<strong>Berkas tidak bisa dibaca.</strong> Coba berkas lain, atau salin-tempel teksnya langsung ke kotak di atas.", "err");
+            showFileStatus("<strong>Berkas tidak bisa dibaca.</strong> Coba berkas lain, atau tempel teksnya langsung ke kotak di atas.", "err");
           }
         }).then(function(){
           // setFileBusy(false) hanya mengaktifkan kembali tombol; pesan hasil di atas tidak ditimpa
@@ -3395,12 +3528,13 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           bb.classList.remove("show");
           bb.innerHTML = "";
         }
+        if(busy) prosesMulaiPeriksa(); else prosesPeriksaSelesai();
       }
       function runAnalysis(){
         var text = ta.value;
         if(!text.trim() || wordsOf(text).length === 0){
           var b = $("banner-pendek");
-          b.innerHTML = "<strong>Belum ada teks.</strong> Tempel teks terlebih dahulu, atau klik salah satu contoh uji di bawah.";
+          b.innerHTML = "<strong>Belum ada teks.</strong> Tempel teks dulu, atau klik salah satu contoh di bawah.";
           b.classList.add("show");
           ta.focus();
           return;
@@ -3546,7 +3680,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         // banner teks pendek di laporan
         var rb = $("banner-report");
         if(res.words < 300){
-          rb.innerHTML = "<strong>Catatan reliabilitas:</strong> teks ini hanya " + res.words + " kata. Hasil kurang dapat dipegang untuk teks pendek (di bawah ±300 kata) — gunakan skor ini sebagai petunjuk awal, bukan kesimpulan.";
+          rb.innerHTML = "<strong>Teks ini pendek:</strong> hanya " + res.words + " kata. Untuk teks di bawah ±300 kata, hasil kurang bisa dipegang — pakai skor ini sebagai petunjuk awal saja, bukan kesimpulan.";
           rb.classList.add("show");
         } else {
           rb.classList.remove("show");
@@ -3555,7 +3689,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         // analisis; tidak pernah diam-diam (lihat capAnalysisText).
         var cb = $("banner-cakupan");
         if(cap.capped){
-          cb.innerHTML = "<strong>Cakupan analisis dibatasi:</strong> teks ini berisi " + fmtNumID(cap.totalWords) + " kata; yang dianalisis adalah " + fmtNumID(MAX_ANALYZE_WORDS) + " kata pertama (batas analisis per dokumen, agar halaman tetap responsif). Skor, rincian sinyal, penanda per kalimat, dan laporan PDF di bawah ini semuanya berlaku untuk " + fmtNumID(MAX_ANALYZE_WORDS) + " kata pertama tersebut — bukan untuk sisa teks setelahnya.";
+          cb.innerHTML = "<strong>Yang dianalisis hanya sebagian:</strong> teks ini berisi " + fmtNumID(cap.totalWords) + " kata; yang dianalisis " + fmtNumID(MAX_ANALYZE_WORDS) + " kata pertama (batas per dokumen agar halaman tetap lancar). Semua skor, rincian, penanda kalimat, dan laporan PDF di bawah berlaku untuk " + fmtNumID(MAX_ANALYZE_WORDS) + " kata pertama itu — bukan untuk sisanya.";
           cb.classList.add("show");
         } else {
           cb.classList.remove("show");
@@ -4183,7 +4317,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           doc.save("Laporan-Saksara-" + stamp + ".pdf");
           st.textContent = "Laporan PDF terunduh.";
         }catch(e){
-          st.textContent = "Gagal membuat PDF: " + (e && e.message ? e.message : e);
+          st.textContent = "PDF gagal dibuat — coba lagi sebentar lagi. Rinciannya: " + (e && e.message ? e.message : e);
         }
         btn.disabled = false;
       }
@@ -4704,13 +4838,13 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           indicatedPct: res.sents.length ? pct(res.flagCount / res.sents.length) : 0 };
       }
       async function extractBatchFileText(f){
-        if(f && typeof f.size === "number" && f.size > MAX_FILE_BYTES) throw new Error("Berkas terlalu besar — batas ukuran berkas adalah 20 MB.");
+        if(f && typeof f.size === "number" && f.size > MAX_FILE_BYTES) throw new Error("Berkas terlalu besar — batasnya 20 MB per berkas.");
         var lower = (f.name || "").toLowerCase();
-        if(lower.endsWith(".doc") && !lower.endsWith(".docx")) throw new Error("Format .doc lama tidak didukung — simpan ulang sebagai .docx.");
+        if(lower.endsWith(".doc") && !lower.endsWith(".docx")) throw new Error("Format .doc lama belum bisa dibaca — simpan ulang sebagai .docx.");
         if(lower.endsWith(".docx")) return String(await f.arrayBuffer().then(extractDocxText) || "");
         if(lower.endsWith(".pdf")) return String(await f.arrayBuffer().then(extractPdfText) || "");
         if(lower.endsWith(".txt") || f.type === "text/plain") return String(await f.text() || "");
-        throw new Error("Format berkas belum didukung (hanya .txt, .docx, dan .pdf).");
+        throw new Error("Format berkas belum didukung — yang bisa dibaca: .txt, .docx, dan .pdf.");
       }
       function setBatchProgress(msg){
         var el = $("batch-progress");
@@ -4758,8 +4892,8 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
           try{
             var text = await extractBatchFileText(q.file);
             var wc = wordsOf(text).length;
-            if(!text.trim() || wc === 0) throw new Error("Tidak ada teks yang bisa dibaca dari berkas ini.");
-            if((q.name || "").toLowerCase().endsWith(".pdf") && (wc < 30 || looksGarbled(text))) throw new Error("Teks dari PDF ini tidak terbaca — kemungkinan PDF hasil pindai/gambar (butuh OCR).");
+            if(!text.trim() || wc === 0) throw new Error("Berkas ini tidak memuat teks yang bisa dibaca.");
+            if((q.name || "").toLowerCase().endsWith(".pdf") && (wc < 30 || looksGarbled(text))) throw new Error("Teks di PDF ini tidak terbaca — biasanya karena hasil pindai/gambar (perlu OCR).");
             var scored = await scoreBatchText(text);
             q.status = "ok";
             q.reason = "";
@@ -4800,6 +4934,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         a.download = "saksara-batch.csv";
         document.body.appendChild(a);
         a.click();
+        setBatchProgress("Tabel hasil (CSV) sudah diunduh.");
         setTimeout(function(){ URL.revokeObjectURL(a.href); if(a.remove) a.remove(); }, 400);
       }
       $("btn-batch").addEventListener("click", processBatch);
@@ -5226,7 +5361,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
     function wfHandleFile(f){
       if(!f) return;
       if(typeof f.size === "number" && f.size > MAX_FILE_BYTES){
-        wfFileStatus("<strong>Berkas terlalu besar</strong> (" + (f.size/1048576).toFixed(1).replace(".", ",") + " MB) — batas ukuran berkas adalah 20 MB. Kecilkan dokumennya, atau tempel teksnya langsung.", "err");
+        wfFileStatus("<strong>Berkas terlalu besar</strong> (" + (f.size/1048576).toFixed(1).replace(".", ",") + " MB) — batasnya 20 MB. Kecilkan berkasnya, atau tempel teksnya langsung.", "err");
         return;
       }
       var lower = (f.name || "").toLowerCase();
@@ -10299,7 +10434,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         if(!f) return;
         if(typeof f.size === "number" && f.size > MAX_FILE_BYTES){
           statusEl.innerHTML = ""; statusEl.className = "file-status";
-          diShowBanner(errEl, "Berkas terlalu besar — batas ukuran berkas adalah 20 MB.");
+          diShowBanner(errEl, "Berkas terlalu besar — batasnya 20 MB.");
           return;
         }
         statusEl.className = "file-status show";
@@ -12224,7 +12359,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       if(!f) return;
       var ta = side === "a" ? cmpTaA : cmpTaB;
       if(typeof f.size === "number" && f.size > MAX_FILE_BYTES){
-        cmpFileStatus(side, "<strong>Berkas terlalu besar</strong> (" + (f.size / 1048576).toFixed(1).replace(".", ",") + " MB) — batas ukuran berkas adalah 20 MB.", "err");
+        cmpFileStatus(side, "<strong>Berkas terlalu besar</strong> (" + (f.size / 1048576).toFixed(1).replace(".", ",") + " MB) — batasnya 20 MB.", "err");
         return;
       }
       var lower = (f.name || "").toLowerCase();
@@ -12649,9 +12784,9 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       var accepted = [], rejected = [], total = 0;
       for(var i = 0; i < metas.length; i++){
         var m = metas[i];
-        if(i >= P6_BATCH_MAX_FILES){ rejected.push({ name: m.name, reason: "Melebihi batas " + P6_BATCH_MAX_FILES + " berkas per batch." }); continue; }
-        if(typeof m.size === "number" && m.size > P6_BATCH_MAX_FILE){ rejected.push({ name: m.name, reason: "Berkas melebihi batas 20 MB per berkas." }); continue; }
-        if(typeof m.size === "number" && total + m.size > P6_BATCH_MAX_TOTAL){ rejected.push({ name: m.name, reason: "Total batch melebihi batas 100 MB." }); continue; }
+        if(i >= P6_BATCH_MAX_FILES){ rejected.push({ name: m.name, reason: "Lewat dari batas " + P6_BATCH_MAX_FILES + " berkas per batch — berkas ini tidak ikut diproses." }); continue; }
+        if(typeof m.size === "number" && m.size > P6_BATCH_MAX_FILE){ rejected.push({ name: m.name, reason: "Ukuran berkas lewat dari batas 20 MB per berkas." }); continue; }
+        if(typeof m.size === "number" && total + m.size > P6_BATCH_MAX_TOTAL){ rejected.push({ name: m.name, reason: "Total ukuran batch lewat dari batas 100 MB." }); continue; }
         total += (typeof m.size === "number" ? m.size : 0);
         accepted.push({ name: m.name, size: m.size });
       }
@@ -13041,6 +13176,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         a.href = URL.createObjectURL(blob);
         a.download = "saksara-batch.json";
         document.body.appendChild(a); a.click();
+        setBatchProgress("Berkas JSON hasil batch sudah diunduh.");
         setTimeout(function(){ URL.revokeObjectURL(a.href); if(a.remove) a.remove(); }, 400);
       });
       var pb = $("btn-batch-pdf");
@@ -13107,6 +13243,7 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
         k.line("Setiap berkas dinilai dengan Ensemble Heuristik v3 yang sama dengan Detector (tujuh sinyal statistik); bila Penguat AI (classifier) sedang aktif di peramban, penguat bersyarat yang sama ikut diterapkan. Berkas diproses berurutan, sepenuhnya lokal. Skor adalah indikasi statistik atas pola tulisan — bukan bukti kepengarangan, bukan dasar vonis akademik. Teks pendek (di bawah ±300 kata) kurang dapat dipegang; parafrase AI dapat lolos dari kedua lapis.");
         k.stamp();
         k.doc.save("saksara-batch.pdf");
+        setBatchProgress("PDF ringkasan batch sudah diunduh.");
       } catch(e){
         setBatchProgress("Laporan PDF gagal dibuat: " + (e && e.message ? e.message : e));
       }
