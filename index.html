@@ -895,7 +895,7 @@
         <a href="#/posisi" data-route="posisi">Privasi &amp; Batasan</a>
       </nav>
       <a class="btn-primary side-cta" href="#analisis">Mulai Memeriksa</a>
-      <div class="side-foot">Beta Terbuka · v0.19.0-beta<br />Seluruh analisis berjalan lokal di peramban ini — teks Anda tidak dikirim ke mana pun.</div>
+      <div class="side-foot">Beta Terbuka · v0.19.1-beta<br />Seluruh analisis berjalan lokal di peramban ini — teks Anda tidak dikirim ke mana pun.</div>
     </aside>
     <div class="wrap page">
       <header class="hero" data-view="home">
@@ -1033,7 +1033,7 @@
             <p class="clf-status" id="clf-status" role="status" aria-live="polite">Status classifier: Penguat AI belum diaktifkan — skor saat ini 100% Ensemble Heuristik v3.</p>
           </div>
           <p class="file-note"><strong>Batas &amp; cakupan:</strong> Maks. 20 MB / 100.000 kata &middot; Disarankan min. &plusmn;300 kata agar hasil dapat dipegang.</p>
-          <details class="clf-more"><summary>Baca batas &amp; cakupan lengkap</summary><p>Ukuran berkas yang diunggah dibatasi maksimum 20 MB, dan analisis mencakup hingga 100.000 kata pertama dari teks — bila dokumen lebih panjang dari itu, yang dianalisis adalah 100.000 kata pertamanya dan laporan menampilkan catatan pemotongan tersebut secara terbuka (berapa kata total dokumen dan berapa yang dianalisis). Di dalam batas itu, seluruh teks yang terbaca dari berkas akan dianalisis. Dari DOCX dibaca isi utama, tabel, kotak teks, catatan kaki/akhir, komentar, serta header dan footer; dari PDF dibaca lapisan teks dari semua halaman. Agar hasil dapat dipegang, teks disarankan minimal ±300 kata. PDF hasil pindai (gambar) tidak punya lapisan teks sehingga belum bisa dibaca — tempel teksnya langsung. Format .doc lama juga belum didukung; simpan ulang berkasnya sebagai .docx. Pemeriksaan lapis pertama memakai <strong>Ensemble Heuristik v3</strong> dengan 7 sinyal — termasuk sisa markdown, simetri paragraf, dan pengulangan frasa — yang disetel untuk pola tulisan Bahasa Indonesia, termasuk tulisan formal dan birokratis yang generik. <strong>Classifier lokal:</strong> model bahasa multibahasa hanya diunduh bila Anda mengaktifkan Penguat AI di panel classifier (±280 MB, sekali saja, lalu tersimpan di cache peramban dan bisa dihapus dari panel yang sama) dan menilai teks sepenuhnya di perangkat ini — pada mode apa pun, tidak ada teks yang meninggalkan peramban ini. Pada pengujian kami model ini sangat kuat pada teks AI formal Bahasa Indonesia, tetapi juga menandai sebagian tulisan manusia yang sangat formal sebagai mirip AI — karena itu ia hanya dipakai sebagai penguat di atas lapis pertama (tidak pernah menaikkan skor bila lapis pertama tidak menemukan indikasi awal), dan teks AI yang diparafrase tetap bisa lolos dari keduanya. Apa pun hasilnya, skor tetap indikasi statistik, bukan bukti.</p></details>
+          <details class="clf-more"><summary>Baca batas &amp; cakupan lengkap</summary><p>Ukuran berkas yang diunggah dibatasi maksimum 20 MB, dan analisis mencakup hingga 100.000 kata pertama dari teks — bila dokumen lebih panjang dari itu, yang dianalisis adalah 100.000 kata pertamanya dan laporan menampilkan catatan pemotongan tersebut secara terbuka (berapa kata total dokumen dan berapa yang dianalisis). Di dalam batas itu, seluruh teks yang terbaca dari berkas akan dianalisis. Di halaman ini, dari DOCX dibaca isi utama, tabel, kotak teks, catatan kaki/akhir, komentar, serta header dan footer — teks pendamping digabung sesudah isi utama; dari PDF dibaca lapisan teks dari semua halaman. Cakupan Asisten Menulis berbeda: di sana header, footer, catatan kaki/akhir, dan komentar tidak ikut dimuat, dan Anda diberi tahu saat dokumen dimuat bila bagian itu terdeteksi. Agar hasil dapat dipegang, teks disarankan minimal ±300 kata. PDF hasil pindai (gambar) tidak punya lapisan teks sehingga belum bisa dibaca — tempel teksnya langsung. Format .doc lama juga belum didukung; simpan ulang berkasnya sebagai .docx. Pemeriksaan lapis pertama memakai <strong>Ensemble Heuristik v3</strong> dengan 7 sinyal — termasuk sisa markdown, simetri paragraf, dan pengulangan frasa — yang disetel untuk pola tulisan Bahasa Indonesia, termasuk tulisan formal dan birokratis yang generik. <strong>Classifier lokal:</strong> model bahasa multibahasa hanya diunduh bila Anda mengaktifkan Penguat AI di panel classifier (±280 MB, sekali saja, lalu tersimpan di cache peramban dan bisa dihapus dari panel yang sama) dan menilai teks sepenuhnya di perangkat ini — pada mode apa pun, tidak ada teks yang meninggalkan peramban ini. Pada pengujian kami model ini sangat kuat pada teks AI formal Bahasa Indonesia, tetapi juga menandai sebagian tulisan manusia yang sangat formal sebagai mirip AI — karena itu ia hanya dipakai sebagai penguat di atas lapis pertama (tidak pernah menaikkan skor bila lapis pertama tidak menemukan indikasi awal), dan teks AI yang diparafrase tetap bisa lolos dari keduanya. Apa pun hasilnya, skor tetap indikasi statistik, bukan bukti.</p></details>
           <div class="file-status" id="file-status" role="status" aria-live="polite"></div>
           <div class="banner" id="banner-pendek" role="alert"></div>
           <div class="banner" id="banner-sibuk" role="status" aria-live="polite"></div>
@@ -1223,7 +1223,7 @@
         <div class="panel" id="wi-panel-input">
           <div class="wi-doc" id="wi-doc">
             <div class="wi-doc-head">Impor dokumen Word (.docx) atau PDF (.pdf)</div>
-            <p class="wf-note">Muat berkas .docx atau .pdf dari perangkat Anda — berkas dibaca <strong>sepenuhnya di peramban ini</strong>, tidak diunggah ke server dan tidak disimpan — lalu teksnya ditempatkan di kotak teks di bawah untuk dianalisis seperti biasa. Untuk PDF, yang dibaca adalah <strong>lapisan teksnya</strong> dan formatnya hanya perkiraan dari posisi teks; PDF hasil pindaian (gambar) belum dapat dianalisis di sini karena Asisten Menulis <strong>belum mendukung OCR</strong> — gunakan halaman OCR untuk mengekstrak teks dari pindaian. Saran yang posisinya aman di dalam dokumen kini juga diterapkan ke salinan kerja dokumen dengan format dokumen yang terjaga (dokumen asli Anda tidak berubah). Dokumen kerja juga dapat disalin dengan format, dibandingkan dengan dokumen asli, dan diunduh kembali sebagai berkas .docx.</p>
+            <p class="wf-note">Muat berkas .docx atau .pdf dari perangkat Anda — berkas dibaca <strong>sepenuhnya di peramban ini</strong>, tidak diunggah ke server dan tidak disimpan — lalu teksnya ditempatkan di kotak teks di bawah untuk dianalisis seperti biasa. Untuk PDF, yang dibaca adalah <strong>lapisan teksnya</strong> dan formatnya hanya perkiraan dari posisi teks; PDF hasil pindaian (gambar) belum dapat dianalisis di sini karena Asisten Menulis <strong>belum mendukung OCR</strong> — gunakan halaman OCR untuk mengekstrak teks dari pindaian. Saran yang posisinya aman di dalam dokumen kini juga diterapkan ke salinan kerja dokumen dengan format dokumen yang terjaga (dokumen asli Anda tidak berubah). Dokumen kerja juga dapat disalin dengan format, dibandingkan dengan dokumen asli, dan diunduh kembali sebagai berkas .docx. Dari dokumen Word, yang dimuat adalah isi utama, tabel, dan kotak teks; header, footer, catatan kaki/akhir, dan komentar tidak ikut dimuat — bila bagian itu ada, Anda diberi tahu sesudah dokumen selesai dimuat.</p>
             <div class="wi-doc-drop">
               <span class="upload-wrap"><span class="upload-visual" aria-hidden="true">Pilih dokumen (.docx/.pdf)</span><input type="file" id="wi-doc-file" accept=".docx,.pdf,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-label="Pilih dokumen Word (.docx) atau PDF (.pdf)" /></span>
               <span class="wi-doc-hint">atau seret &amp; letakkan berkas .docx/.pdf ke kartu ini · batas 20 MB</span>
@@ -1709,12 +1709,19 @@
           <a href="#/posisi">Privasi &amp; Batasan</a>
         </nav>
         <p class="copy">© 2026 Saksara — Dikembangkan oleh Ciptanala Devs</p>
-        <p class="version-line">Versi <strong>v0.19.0-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
+        <p class="version-line">Versi <strong>v0.19.1-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
       </div>
     </footer>
 
     <dialog class="changelog" id="changelog-modal" aria-labelledby="changelog-title">
       <h2 id="changelog-title">Catatan Rilis — Saksara</h2>
+      <h3>v0.19.1-beta — 23 November 2026</h3>
+      <ul>
+        <li>PDF yang teksnya rusak total — misalnya berkas hasil konversi yang font-nya tidak menyertakan peta huruf, sehingga teksnya terbaca sebagai kode mentah — kini ditolak sejak impor di Asisten Menulis, dengan penjelasan dan tawaran membuka halaman OCR. Sebelumnya berkas seperti itu diam-diam diterima dan dianalisis apa adanya.</li>
+        <li>Dokumen yang blok teks pertamanya sendirian melebihi batas 50.000 karakter per analisis kini mendapat pesan khusus yang menjelaskan sebabnya, bukan lagi pesan umum yang dapat menyesatkan.</li>
+        <li>Kalimat cakupan berkas di halaman Detektor dan pada kartu impor Asisten Menulis diperjelas, agar tepat menggambarkan berkas apa saja yang terbaca di masing-masing halaman.</li>
+        <li>Hasil analisis dan detektor tidak berubah.</li>
+      </ul>
       <h3>v0.19.0-beta — 23 November 2026</h3>
       <ul>
         <li>Editor ala Word sekarang juga tersedia di Periksa Tulisan, Kenali Gaya Tulisan, Bandingkan Tulisan, hasil OCR, dan kotak periksa cepat di Beranda — lengkap dengan bilah alat format dan pilihan mode Teks polos.</li>
@@ -10105,6 +10112,8 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
               var tstats = diPdfTextStats(pagesData);
               diFaithfulNotePdfPages(pagesData);
               if(tstats.scanLike) return { ok: false, code: "pdf-scan", pdfStats: tstats };
+              var garble = diFaithfulPdfGarble(pagesData);
+              if(garble.bad >= 3 && garble.ratio > 0.02) return { ok: false, code: "pdf-garbled", pdfStats: tstats, garble: garble };
               return { ok: true, model: diPdfPagesToModel(pagesData), pdfStats: tstats };
             });
           });
@@ -10158,6 +10167,18 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
               fileIn.value = "";
               return;
             }
+            if(res && res.code === "pdf-garbled"){
+              /* PDF berfont CID tanpa peta huruf: yang terbaca adalah kode
+                 mentah (karakter kontrol), bukan huruf. Perlakuan sama
+                 seperti cabang pindaian — textarea TIDAK disentuh dan
+                 tidak ada model yang disimpan. */
+              var gst = res.pdfStats || { pages: 0, totalChars: 0 };
+              statusEl.className = "file-status show";
+              statusEl.innerHTML = "<span class=\"fname\">" + escapeHtml(f.name) + "</span> dimuat (" + fmtNumID(gst.pages) + " halaman), tetapi teks di dalamnya tidak dapat dibaca — yang terbaca hanya kode mentah, bukan huruf.";
+              diShowBanner(warnEl, "<strong>Teks PDF ini tidak terbaca.</strong> Font di dalam berkas ini tidak menyertakan peta huruf, sehingga teksnya terbaca sebagai kode mentah dan tidak dapat dianalisis dengan benar. Berkas seperti ini biasanya hasil konversi dari aplikasi lain. Coba simpan ulang PDF-nya dari aplikasi asalnya (misalnya Word atau Google Docs), atau gunakan <a href=\"#/ocr\">halaman OCR Saksara</a> untuk membaca tampilannya, lalu tempel teks hasilnya ke kotak di bawah.");
+              fileIn.value = "";
+              return;
+            }
             if(!res.ok){
               statusEl.innerHTML = ""; statusEl.className = "file-status";
               diShowBanner(errEl, escapeHtml(res.message));
@@ -10195,7 +10216,11 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
               diShowBanner(warnEl, "Header, footer, catatan kaki, dan komentar tidak ikut dimuat. Dokumen dengan track changes dimuat dalam tampilan perubahan yang diterima.");
             }
             if(!asm.text.replace(/\s+/g, "")){
-              diShowBanner(errEl, "Dokumen tidak memuat teks yang dapat dianalisis — mungkin isinya hanya gambar, tabel kosong, atau rumus.");
+              if(asm.truncated && asm.keptBlocks === 0 && asm.totalBlocks > 0){
+                diShowBanner(errEl, "Blok teks pertama dokumen ini sendirian melebihi batas 50.000 karakter per analisis, jadi belum ada teks yang dapat dimuat dari dokumen ini. Pecah dokumen menjadi beberapa berkas yang lebih kecil, lalu muat dan analisis satu per satu.");
+              } else {
+                diShowBanner(errEl, "Dokumen tidak memuat teks yang dapat dianalisis — mungkin isinya hanya gambar, tabel kosong, atau rumus.");
+              }
             }
           }).catch(function(){
             statusEl.innerHTML = ""; statusEl.className = "file-status";
