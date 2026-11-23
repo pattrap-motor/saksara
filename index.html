@@ -834,6 +834,8 @@
       .wi-ed-surface blockquote{ margin:0 0 10px; padding:4px 0 4px 14px; border-left:3px solid var(--line); color:var(--muted); }
       .wi-ed-surface ul, .wi-ed-surface ol{ margin:0 0 10px; padding-left:26px; }
       #wi-input.wi-ed-off{ display:none; }
+      /* ---------- Editor Kaya Semua Permukaan (D8 Tahap 5) ---------- */
+      textarea.ed-backbone-off{ display:none; }
       @media (max-width:640px){
         .wi-ed-surface{ min-height:200px; font-size:16px; }
         .wi-ed-bar select{ max-width:140px; }
@@ -893,7 +895,7 @@
         <a href="#/posisi" data-route="posisi">Privasi &amp; Batasan</a>
       </nav>
       <a class="btn-primary side-cta" href="#analisis">Mulai Memeriksa</a>
-      <div class="side-foot">Beta Terbuka · v0.18.1-beta<br />Seluruh analisis berjalan lokal di peramban ini — teks Anda tidak dikirim ke mana pun.</div>
+      <div class="side-foot">Beta Terbuka · v0.19.0-beta<br />Seluruh analisis berjalan lokal di peramban ini — teks Anda tidak dikirim ke mana pun.</div>
     </aside>
     <div class="wrap page">
       <header class="hero" data-view="home">
@@ -1707,12 +1709,17 @@
           <a href="#/posisi">Privasi &amp; Batasan</a>
         </nav>
         <p class="copy">© 2026 Saksara — Dikembangkan oleh Ciptanala Devs</p>
-        <p class="version-line">Versi <strong>v0.18.1-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
+        <p class="version-line">Versi <strong>v0.19.0-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
       </div>
     </footer>
 
     <dialog class="changelog" id="changelog-modal" aria-labelledby="changelog-title">
       <h2 id="changelog-title">Catatan Rilis — Saksara</h2>
+      <h3>v0.19.0-beta — 23 November 2026</h3>
+      <ul>
+        <li>Editor ala Word sekarang juga tersedia di Periksa Tulisan, Kenali Gaya Tulisan, Bandingkan Tulisan, hasil OCR, dan kotak periksa cepat di Beranda — lengkap dengan bilah alat format dan pilihan mode Teks polos.</li>
+        <li>Hasil analisis dari editor sama persis dengan hasil dari kotak polos di semua halaman, dan hasil analisis maupun detektor tidak berubah.</li>
+      </ul>
       <h3>v0.18.1-beta — 23 November 2026</h3>
       <ul>
         <li>Tombol Ekspor PDF (laporan ringkas) di Asisten Menulis dihilangkan agar pilihan ekspor lebih sederhana. Laporan beranotasi dan unduhan dokumen asli beranotasi tetap tersedia, hasil analisis tidak berubah.</li>
@@ -9650,6 +9657,19 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
     function wiEdSerialize(root){
       return wiEdUnits(root).join("\n\n").replace(/\u00A0/g, " ").replace(/\u200B/g, "");
     }
+    /* Varian LITERAL (D8 Tahap 5): unit digabung apa adanya, TANPA
+       normalisasi U+00A0/U+200B. Dipakai permukaan selain Asisten
+       Menulis (detektor, forensik, bandingkan, periksa cepat, OCR):
+       jalur polos permukaan-permukaan itu tidak menormalkan kedua
+       karakter tersebut, dan pembuangannya mengubah hasil analisis
+       (U+200B yang dibuang menggabungkan dua kata menjadi satu —
+       hitungan kata dan skor bergeser), sehingga hanya varian literal
+       yang lulus gerbang ekuivalensi identik JSON penuh
+       (editor-multi-test.cjs). Asisten Menulis tetap memakai
+       wiEdSerialize persis seperti Tahap 4. */
+    function wiEdSerializeLiteral(root){
+      return wiEdUnits(root).join('\n\n');
+    }
     /* Penyaring gaya tempel: hanya properti aman yang dipertahankan.
        kind "inline" untuk span/font; kind "block" untuk elemen blok. */
     var WI_ED_STYLE_INLINE = { "color":1, "background-color":1, "font-family":1, "font-size":1, "font-weight":1, "font-style":1, "text-decoration":1, "text-decoration-line":1, "vertical-align":1 };
@@ -13845,6 +13865,492 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       renderFromBackbone();
       ta.classList.add("wi-ed-off");
     })();
+    /* ================= Editor Kaya Semua Permukaan (D8 Tahap 5) =================
+       Pabrik editor yang digeneralisasi dari lem Asisten Menulis
+       (Tahap 4): permukaan tulis contenteditable bergaya pengolah kata
+       di atas tulang punggung teks polos, kini dipasang pada SETIAP
+       permukaan masukan teks lain — Periksa Tulisan (#input-teks),
+       Kenali Gaya Tulisan (#wf-input), Bandingkan Tulisan (#cmp-a dan
+       #cmp-b), periksa cepat beranda (#p7-quick-text), dan hasil OCR
+       (#ocr-out). Setiap textarea tulang punggung TETAP satu-satunya
+       sumber kebenaran di DOM: seluruh alur lama permukaan itu
+       (penghitung, unggah berkas, contoh uji, bersihkan, tukar,
+       serah-terima OCR, riwayat, analisis) membaca/menulis .value
+       persis seperti sebelumnya — tidak ada satu baris alur lama yang
+       diubah. Editor hanya permukaan: suntingannya diserialkan ke
+       teks polos oleh ED-CORE dan ditulis ke tulang punggung lewat
+       setter bawaan + peristiwa "input" (sinyal yang sama dengan
+       ketikan polos); sebaliknya penulisan programatis apa pun ke
+       .value ditangkap kait setter nilai instans dan digambar ulang
+       ke editor; fokus programatis dialihkan ke editor di mode
+       Editor. Mode "Teks polos" menyembunyikan editor dan menampilkan
+       textarea apa adanya: perilaku persis seperti sebelum tahap ini.
+       Varian serialisasi: semua permukaan ini memakai varian LITERAL
+       (wiEdSerializeLiteral) — jalur polos mereka tidak menormalkan
+       U+00A0/U+200B, dan pembuangan U+200B terbukti mengubah hasil
+       analisis (menggabungkan dua kata menjadi satu), sehingga hanya
+       varian literal yang lulus gerbang ekuivalensi identik JSON
+       penuh (editor-multi-test.cjs). Asisten Menulis TIDAK memakai
+       pabrik ini: instans Tahap 4-nya dibiarkan byte-identik agar
+       perilakunya persis seperti sebelumnya. Bila inisialisasi satu
+       permukaan gagal di tengah, tambahan permukaan itu dilepas dan
+       kotak teks lamanya tetap bekerja — kegagalan satu editor tidak
+       dapat mematahkan halaman maupun permukaan lain. */
+    (function(){
+      if(!window.getSelection || !document.createRange) return;
+      function edEscAttr(s){
+        return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+      }
+      var ED_CONTROLS_HTML = `
+      <div class="wi-ed-mode" role="group" aria-label="Mode kotak teks">
+        <button type="button" class="wi-ed-mode-btn is-on" data-wied-mode="editor" aria-pressed="true">Editor</button>
+        <button type="button" class="wi-ed-mode-btn" data-wied-mode="plain" aria-pressed="false">Teks polos</button>
+      </div>
+      <div class="wi-ed-bar" role="toolbar" aria-label="Bilah format teks">
+        <button type="button" data-cmd="undo" title="Urungkan">↩</button>
+        <button type="button" data-cmd="redo" title="Ulangi">↪</button>
+        <span class="wi-ed-sep"></span>
+        <select data-wied="style" aria-label="Gaya paragraf" title="Gaya paragraf">
+          <option value="" selected>Gaya</option>
+          <option value="P">Paragraf</option>
+          <option value="H1">Judul 1</option>
+          <option value="H2">Judul 2</option>
+          <option value="H3">Judul 3</option>
+          <option value="BLOCKQUOTE">Kutipan</option>
+        </select>
+        <select data-wied="font" aria-label="Jenis huruf" title="Jenis huruf">
+          <option value="" selected>Huruf</option>
+          <option value="'Plus Jakarta Sans', sans-serif">Bawaan (Plus Jakarta Sans)</option>
+          <option value="Arial, sans-serif">Arial</option>
+          <option value="Calibri, sans-serif">Calibri</option>
+          <option value="Georgia, serif">Georgia</option>
+          <option value="'Times New Roman', serif">Times New Roman</option>
+          <option value="Verdana, sans-serif">Verdana</option>
+          <option value="'Courier New', monospace">Courier New</option>
+        </select>
+        <select data-wied="size" aria-label="Ukuran huruf" title="Ukuran huruf">
+          <option value="" selected>Ukuran</option>
+          <option value="10">10 pt</option>
+          <option value="11">11 pt</option>
+          <option value="12">12 pt</option>
+          <option value="13">13 pt</option>
+          <option value="14">14 pt</option>
+          <option value="16">16 pt</option>
+          <option value="18">18 pt</option>
+          <option value="20">20 pt</option>
+          <option value="22">22 pt</option>
+          <option value="24">24 pt</option>
+        </select>
+        <span class="wi-ed-sep"></span>
+        <button type="button" data-cmd="bold" title="Tebal"><b>B</b></button>
+        <button type="button" data-cmd="italic" title="Miring"><i>I</i></button>
+        <button type="button" data-cmd="underline" title="Garis bawah"><u>U</u></button>
+        <button type="button" data-cmd="strikeThrough" title="Coret"><s>S</s></button>
+        <button type="button" data-cmd="subscript" title="Subskrip (tulis kecil di bawah)">x<sub>2</sub></button>
+        <button type="button" data-cmd="superscript" title="Superskrip (tulis kecil di atas)">x<sup>2</sup></button>
+        <label class="wi-ed-color" title="Warna teks">A<input type="color" data-wied="fore" value="#14304f" aria-label="Warna teks"></label>
+        <label class="wi-ed-color" title="Warna sorotan teks"><span class="wi-ed-hilite-mark">A</span><input type="color" data-wied="hilite" value="#fbeec3" aria-label="Warna sorotan teks"></label>
+        <button type="button" data-cmd="removeFormat" title="Hapus format pada teks/blok terpilih">Hapus format</button>
+        <span class="wi-ed-sep"></span>
+        <button type="button" data-cmd="justifyLeft" title="Rata kiri">Kiri</button>
+        <button type="button" data-cmd="justifyCenter" title="Rata tengah">Tengah</button>
+        <button type="button" data-cmd="justifyRight" title="Rata kanan">Kanan</button>
+        <button type="button" data-cmd="justifyFull" title="Rata kiri-kanan">Rata</button>
+        <span class="wi-ed-sep"></span>
+        <select data-wied="leading" aria-label="Spasi baris" title="Spasi baris">
+          <option value="" selected>Spasi baris</option>
+          <option value="1">1.0</option>
+          <option value="1.15">1.15</option>
+          <option value="1.5">1.5</option>
+          <option value="2">2.0</option>
+        </select>
+        <select data-wied="spaceBefore" aria-label="Spasi sebelum paragraf" title="Spasi sebelum paragraf">
+          <option value="" selected>Sebelum</option>
+          <option value="0">0 pt</option>
+          <option value="6">6 pt</option>
+          <option value="12">12 pt</option>
+        </select>
+        <select data-wied="spaceAfter" aria-label="Spasi sesudah paragraf" title="Spasi sesudah paragraf">
+          <option value="" selected>Sesudah</option>
+          <option value="0">0 pt</option>
+          <option value="6">6 pt</option>
+          <option value="12">12 pt</option>
+        </select>
+        <button type="button" data-cmd="indentOut" title="Kurangi indentasi">Geser kiri</button>
+        <button type="button" data-cmd="indentIn" title="Tambah indentasi">Geser kanan</button>
+        <button type="button" data-cmd="hanging" title="Indentasi gantung (baris pertama menjorok keluar)">Indentasi gantung</button>
+        <span class="wi-ed-sep"></span>
+        <button type="button" data-cmd="insertUnorderedList" title="Daftar berpoin">Poin</button>
+        <button type="button" data-cmd="insertOrderedList" title="Daftar bernomor">Nomor</button>
+      </div>`;
+      function saksaraEdAttach(ta, opts){
+        if(!ta || !ta.parentNode) return;
+        var serialize = opts.serialize;
+        var ED_HTML = ED_CONTROLS_HTML + `
+      <div class="wi-ed-surface" id="` + edEscAttr(opts.surfaceId) + `" contenteditable="true" role="textbox" aria-multiline="true" aria-label="` + edEscAttr(opts.ariaLabel) + `" data-placeholder="` + edEscAttr(ta.getAttribute("placeholder") || "Tempel atau ketik teks di sini…") + `"></div>`;
+        var wrap = null, ed = null, bar = null;
+        var mode = "editor";
+        var syncing = false;
+        var savedRange = null;
+        var nativeGet = null, nativeSet = null;
+        function edFail(){
+          try { if(wrap && wrap.parentNode) wrap.parentNode.removeChild(wrap); } catch(e) {}
+          try { ta.classList.remove("ed-backbone-off"); } catch(e) {}
+          if(window.console && console.warn) console.warn("Saksara: editor kaya gagal dimulai pada satu kotak teks; kotak teks polos tetap dipakai.");
+        }
+        try {
+          wrap = document.createElement("div");
+          wrap.className = "wi-ed-wrap";
+          wrap.innerHTML = ED_HTML;
+          ta.parentNode.insertBefore(wrap, ta);
+          ed = wrap.querySelector(".wi-ed-surface");
+          bar = wrap.querySelector(".wi-ed-bar");
+          if(!ed || !bar) throw new Error("ed-dom");
+          /* Kait nilai tulang punggung: penulisan programatis apa pun
+             ke .value (unggah, contoh, bersihkan, tukar, serah-terima)
+             digambar ulang ke editor; penulisan dari editor sendiri
+             ditandai syncing agar tidak menggambar ulang di tengah
+             mengetik. */
+          var proto = window.HTMLTextAreaElement && window.HTMLTextAreaElement.prototype;
+          var desc = proto ? Object.getOwnPropertyDescriptor(proto, "value") : null;
+          if(!desc || !desc.get || !desc.set) throw new Error("ed-desc");
+          nativeGet = desc.get; nativeSet = desc.set;
+          Object.defineProperty(ta, "value", {
+            configurable: true, enumerable: true,
+            get: function(){ return nativeGet.call(ta); },
+            set: function(v){
+              nativeSet.call(ta, v);
+              if(!syncing && mode === "editor"){ try { renderFromBackbone(); } catch(e) {} }
+            }
+          });
+          /* Fokus programatis ke textarea (alur lama: Bersihkan,
+             Analisis pada teks kosong, per-judul bandingkan) dialihkan
+             ke editor. */
+          var nativeFocus = ta.focus;
+          ta.focus = function(){
+            if(mode === "editor"){ try { ed.focus(); return; } catch(e) {} }
+            return nativeFocus.apply(ta, arguments);
+          };
+        } catch(e) { edFail(); return; }
+
+        function updateEmpty(){
+          wrap.classList.toggle("wi-ed-empty", serialize(ed) === "");
+        }
+        function renderFromBackbone(){
+          var text = nativeGet.call(ta);
+          ed.innerHTML = "";
+          wiEdSplitBlocks(text).forEach(function(lines){
+            var p = document.createElement("p");
+            lines.forEach(function(line, i){
+              if(i > 0) p.appendChild(document.createElement("br"));
+              /* Unit kosong tunggal dirender sebagai <p><br></p> —
+                 alasan sama seperti Tahap 4: paragraf tanpa anak
+                 membuat Firefox membuang ketikan ke luar paragraf,
+                 sedangkan <br> bantalan memberi paragraf tinggi baris;
+                 serialisasi ED-CORE membuang br bantalan itu kembali
+                 menjadi unit kosong. */
+              if(line === "" && lines.length === 1){
+                p.appendChild(document.createElement("br"));
+                return;
+              }
+              p.appendChild(document.createTextNode(line));
+            });
+            ed.appendChild(p);
+          });
+          updateEmpty();
+        }
+        function syncFromEditor(){
+          var text = serialize(ed);
+          if(text !== nativeGet.call(ta)){
+            syncing = true;
+            try { nativeSet.call(ta, text); } finally { syncing = false; }
+            ta.dispatchEvent(new Event("input", { bubbles: true }));
+          }
+          updateEmpty();
+        }
+        function saveRange(){
+          var sel = window.getSelection();
+          if(sel && sel.rangeCount){
+            var r = sel.getRangeAt(0);
+            if(ed.contains(r.commonAncestorContainer)) savedRange = r.cloneRange();
+          }
+        }
+        function restoreRange(){
+          ed.focus();
+          if(!savedRange) return;
+          try {
+            var sel = window.getSelection();
+            sel.removeAllRanges(); sel.addRange(savedRange);
+          } catch(e) {}
+        }
+        function cmd(name, val){
+          restoreRange();
+          try { document.execCommand(name, false, val == null ? null : val); } catch(e) {}
+          syncFromEditor(); saveRange();
+        }
+        function cmdCss(name, val){
+          restoreRange();
+          try {
+            document.execCommand("styleWithCSS", false, true);
+            document.execCommand(name, false, val);
+            document.execCommand("styleWithCSS", false, false);
+          } catch(e) {}
+          syncFromEditor(); saveRange();
+        }
+        /* Ukuran huruf memakai span bergaya sendiri: execCommand
+           fontSize Firefox hanya mengenal skala lama 1–7, bukan pt.
+           Beda dari Tahap 4: pada varian LITERAL tidak ada penanda
+           U+200B untuk seleksi terlipat — penanda itu akan bocor ke
+           tulang punggung (varian normalisasi membuangnya, varian
+           literal tidak), jadi ukuran huruf di permukaan ini hanya
+           berlaku pada teks yang sedang terpilih. */
+        function applyFontSize(pt){
+          restoreRange();
+          var sel = window.getSelection();
+          if(!sel || !sel.rangeCount) return;
+          var range = sel.getRangeAt(0);
+          if(range.collapsed) return;
+          var span = document.createElement("span");
+          span.style.fontSize = pt + "pt";
+          try {
+            span.appendChild(range.extractContents());
+            range.insertNode(span);
+            var r3 = document.createRange();
+            r3.selectNodeContents(span);
+            sel.removeAllRanges(); sel.addRange(r3);
+          } catch(e) { return; }
+          syncFromEditor(); saveRange();
+        }
+        function leafBlocks(){
+          var out = [];
+          var sel = window.getSelection();
+          if(!sel || !sel.rangeCount) return out;
+          var range = sel.getRangeAt(0);
+          var all = ed.querySelectorAll("p,div,h1,h2,h3,h4,h5,h6,li,blockquote,pre,td,th");
+          for(var i=0;i<all.length;i++){
+            var b = all[i];
+            var hit = false;
+            try { hit = range.intersectsNode(b); } catch(e) { hit = false; }
+            if(!hit) continue;
+            if(b.querySelector("p,div,h1,h2,h3,h4,h5,h6,li,blockquote,pre,td,th")) continue;
+            out.push(b);
+          }
+          return out;
+        }
+        function blockStyle(fn){
+          restoreRange();
+          leafBlocks().forEach(fn);
+          syncFromEditor(); saveRange();
+        }
+        function edIndent(delta){
+          blockStyle(function(b){
+            var ml = Math.max(0, wiEdPxLen(b.style.marginLeft) + delta);
+            b.style.marginLeft = ml ? ml + "px" : "";
+            if(ml === 0 && b.getAttribute("data-wied-hang")){
+              b.removeAttribute("data-wied-hang");
+              b.style.textIndent = "";
+            }
+          });
+        }
+        function edHangToggle(){
+          blockStyle(function(b){
+            var ml = wiEdPxLen(b.style.marginLeft);
+            if(b.getAttribute("data-wied-hang")){
+              b.removeAttribute("data-wied-hang");
+              b.style.textIndent = "";
+              ml = Math.max(0, ml - 24);
+              b.style.marginLeft = ml ? ml + "px" : "";
+            } else {
+              b.setAttribute("data-wied-hang", "1");
+              b.style.marginLeft = (ml + 24) + "px";
+              b.style.textIndent = "-24px";
+            }
+          });
+        }
+        function edRemoveFormat(){
+          var blocks = leafBlocks();
+          cmd("removeFormat");
+          blocks.forEach(function(b){
+            b.style.lineHeight = ""; b.style.marginTop = ""; b.style.marginBottom = "";
+            b.style.marginLeft = ""; b.style.textIndent = ""; b.style.textAlign = "";
+            b.removeAttribute("data-wied-hang");
+          });
+          syncFromEditor();
+        }
+        /* ---------- Pembersih tempelan (daftar putih) ----------
+           Salinan persis penyaring Tahap 4 (daftar tag/gaya yang sama). */
+        var ED_OK_TAGS = { P:1, DIV:1, BR:1, B:1, STRONG:1, I:1, EM:1, U:1, S:1, STRIKE:1, SUB:1, SUP:1, SPAN:1, UL:1, OL:1, LI:1, H1:1, H2:1, H3:1, H4:1, H5:1, H6:1, BLOCKQUOTE:1, PRE:1, A:1 };
+        var ED_DROP_TAGS = { SCRIPT:1, STYLE:1, IFRAME:1, OBJECT:1, EMBED:1, LINK:1, META:1, TITLE:1, IMG:1, VIDEO:1, AUDIO:1, SOURCE:1, TRACK:1, CANVAS:1, SVG:1, MATH:1, FORM:1, INPUT:1, BUTTON:1, TEXTAREA:1, SELECT:1, OPTION:1, HEAD:1, HR:1, AREA:1, BASE:1, PARAM:1 };
+        function edUnwrap(el){
+          var parent = el.parentNode;
+          if(!parent) return;
+          while(el.firstChild) parent.insertBefore(el.firstChild, el);
+          parent.removeChild(el);
+        }
+        function edCleanChildren(node){
+          Array.prototype.slice.call(node.childNodes).forEach(function(k){
+            if(k.nodeType === 8){ node.removeChild(k); return; }
+            if(k.nodeType !== 1) return;
+            var tag = k.tagName;
+            if(ED_DROP_TAGS[tag]){ node.removeChild(k); return; }
+            var styleAttr = k.getAttribute("style") || "";
+            var hrefAttr = k.getAttribute("href") || "";
+            var faceAttr = k.getAttribute("face") || "";
+            edCleanChildren(k);
+            if(tag === "FONT"){
+              var sp = document.createElement("span");
+              var st = wiEdFilterStyle(styleAttr, "inline");
+              if(faceAttr && /^[A-Za-z0-9 ,\-']+$/.test(faceAttr))
+                st = (st ? st + "; " : "") + "font-family: " + faceAttr;
+              if(st) sp.setAttribute("style", st);
+              while(k.firstChild) sp.appendChild(k.firstChild);
+              k.parentNode.replaceChild(sp, k);
+              return;
+            }
+            if(!ED_OK_TAGS[tag]){ edUnwrap(k); return; }
+            var keep = "";
+            if(tag === "SPAN") keep = wiEdFilterStyle(styleAttr, "inline");
+            else if(WI_ED_BLOCK_TAGS[tag]) keep = wiEdFilterStyle(styleAttr, "block");
+            while(k.attributes && k.attributes.length) k.removeAttribute(k.attributes[0].name);
+            if(keep) k.setAttribute("style", keep);
+            if(tag === "A"){
+              if(/^(https?:|mailto:)/i.test(hrefAttr)){
+                k.setAttribute("href", hrefAttr);
+                k.setAttribute("rel", "noopener");
+              } else edUnwrap(k);
+            }
+          });
+        }
+        function edCleanFragment(holder){
+          Array.prototype.slice.call(holder.querySelectorAll("table")).forEach(function(tbl){
+            Array.prototype.slice.call(tbl.querySelectorAll("td,th")).forEach(function(cell){
+              var p = document.createElement("p");
+              while(cell.firstChild) p.appendChild(cell.firstChild);
+              if(cell.parentNode) cell.parentNode.replaceChild(p, cell);
+            });
+            edUnwrap(tbl);
+          });
+          edCleanChildren(holder);
+        }
+        ed.addEventListener("paste", function(e){
+          e.preventDefault();
+          var cd = e.clipboardData || window.clipboardData;
+          var html = "", text = "";
+          try {
+            if(cd){ html = cd.getData("text/html") || ""; text = cd.getData("text/plain") || ""; }
+          } catch(err) {}
+          ed.focus();
+          if(html){
+            try {
+              var holder = document.createElement("div");
+              holder.innerHTML = html;
+              edCleanFragment(holder);
+              var clean = holder.innerHTML;
+              if(clean) document.execCommand("insertHTML", false, clean);
+              else if(text) document.execCommand("insertText", false, text);
+            } catch(err) {
+              if(text) document.execCommand("insertText", false, text);
+            }
+          } else if(text){
+            try { document.execCommand("insertText", false, text); } catch(err) {}
+          }
+          syncFromEditor(); saveRange();
+        });
+        ed.addEventListener("input", function(){ syncFromEditor(); });
+        document.addEventListener("selectionchange", function(){
+          var sel = window.getSelection();
+          if(sel && sel.rangeCount && ed.contains(sel.getRangeAt(0).commonAncestorContainer)) saveRange();
+        });
+        /* Bilah alat: mousedown tombol tidak boleh mencuri seleksi
+           editor; seleksi selalu disnapshot agar perintah berlaku pada
+           teks yang dipilih pengguna, termasuk sesudah fokus berpindah
+           ke select. */
+        bar.addEventListener("mousedown", function(e){
+          saveRange();
+          var t = e.target;
+          if(t && t.closest && t.closest("button")) e.preventDefault();
+        });
+        bar.addEventListener("click", function(e){
+          var t = e.target;
+          var b = (t && t.closest) ? t.closest("button[data-cmd]") : null;
+          if(!b) return;
+          var c = b.getAttribute("data-cmd");
+          if(c === "indentIn") edIndent(24);
+          else if(c === "indentOut") edIndent(-24);
+          else if(c === "hanging") edHangToggle();
+          else if(c === "removeFormat") edRemoveFormat();
+          else if(c.indexOf("justify") === 0){
+            /* Firefox (styleWithCSS mati) menulis perataan sebagai
+               atribut align=; normalkan ke style text-align agar
+               seragam dengan perintah blok lain dan dipertahankan
+               penyaring tempel (text-align ada di daftar putih blok). */
+            var blocks = leafBlocks();
+            cmd(c);
+            blocks.forEach(function(bl){
+              var al = bl.getAttribute("align");
+              if(al){ bl.style.textAlign = al; bl.removeAttribute("align"); }
+            });
+            syncFromEditor();
+          }
+          else cmd(c);
+        });
+        bar.addEventListener("change", function(e){
+          var t = e.target;
+          if(!t || !t.getAttribute) return;
+          var k = t.getAttribute("data-wied");
+          var v = t.value;
+          if(!k || !v) return;
+          if(k === "style"){ cmd("formatBlock", v); t.value = ""; }
+          else if(k === "font"){ cmdCss("fontName", v); }
+          else if(k === "size"){ applyFontSize(v); }
+          else if(k === "leading"){ blockStyle(function(b){ b.style.lineHeight = v; }); t.value = ""; }
+          else if(k === "spaceBefore"){ blockStyle(function(b){ b.style.marginTop = v + "pt"; }); t.value = ""; }
+          else if(k === "spaceAfter"){ blockStyle(function(b){ b.style.marginBottom = v + "pt"; }); t.value = ""; }
+          else if(k === "fore"){ cmdCss("foreColor", v); }
+          else if(k === "hilite"){ cmdCss("hiliteColor", v); }
+        });
+        /* ---------- Mode Editor | Teks polos ---------- */
+        var modeBtns = Array.prototype.slice.call(wrap.querySelectorAll("[data-wied-mode]"));
+        function setMode(m){
+          if(m === mode) return;
+          if(m === "plain") syncFromEditor();
+          mode = m;
+          var edOn = m === "editor";
+          bar.hidden = !edOn;
+          ed.hidden = !edOn;
+          ta.classList.toggle("ed-backbone-off", edOn);
+          modeBtns.forEach(function(b){
+            var on = b.getAttribute("data-wied-mode") === m;
+            b.classList.toggle("is-on", on);
+            b.setAttribute("aria-pressed", on ? "true" : "false");
+          });
+          if(edOn){ renderFromBackbone(); ed.focus(); }
+          else ta.focus();
+        }
+        modeBtns.forEach(function(b){
+          b.addEventListener("click", function(){ setMode(b.getAttribute("data-wied-mode")); });
+        });
+        /* ---------- Mulai ---------- */
+        try { document.execCommand("styleWithCSS", false, false); } catch(e) {}
+        renderFromBackbone();
+        ta.classList.add("ed-backbone-off");
+      }
+      var ED_LITERAL = (typeof wiEdSerializeLiteral === "function") ? wiEdSerializeLiteral : wiEdSerialize;
+      var ED_INSTANCES = [
+        ["input-teks", "ed-surface-input-teks", "Teks yang diperiksa"],
+        ["wf-input", "ed-surface-wf-input", "Teks yang dianalisis karakteristiknya"],
+        ["cmp-a", "ed-surface-cmp-a", "Teks Dokumen A"],
+        ["cmp-b", "ed-surface-cmp-b", "Teks Dokumen B"],
+        ["p7-quick-text", "ed-surface-p7-quick-text", "Teks yang ingin diperiksa"],
+        ["ocr-out", "ed-surface-ocr-out", "Hasil OCR (dapat disunting)"]
+      ];
+      ED_INSTANCES.forEach(function(cfg){
+        try {
+          saksaraEdAttach($(cfg[0]), { serialize: ED_LITERAL, surfaceId: cfg[1], ariaLabel: cfg[2] });
+        } catch(e) { /* satu permukaan gagal tidak boleh mematahkan yang lain */ }
+      });
+    })();
+
   </script>
   </body>
 </html>
