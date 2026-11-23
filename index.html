@@ -38,6 +38,7 @@
         --red-bg:#F8D7D2; --red-ink:#7C1D12; --yel-bg:#FBEEc3; --yel-ink:#6D5410;
         --grn-bg:#D5ECD9; --grn-ink:#14532D; --warn-bg:#FDF0D5; --warn-line:#E3B94E; --warn-ink:#6D5410;
         --bar-track:#E4E9F0;
+        --sent-r:#F9DEDA; --sent-y:#F9EFC6; --sent-g:#DDF0DF;
         --nav-bg:rgba(255,255,255,.9);
         --shadow-sm:0 1px 2px rgba(15,33,64,.05), 0 2px 8px rgba(15,33,64,.05);
         --shadow:0 1px 2px rgba(15,33,64,.05), 0 14px 34px rgba(15,33,64,.09);
@@ -54,6 +55,7 @@
           --red-bg:#5A231C; --red-ink:#FFB4A6; --yel-bg:#57471A; --yel-ink:#F5D97E;
           --grn-bg:#1D4530; --grn-ink:#9FE0B4; --warn-bg:#3D3417; --warn-line:#A8832F; --warn-ink:#F5D97E;
           --bar-track:#1C405F;
+          --sent-r:#66302A; --sent-y:#5F5226; --sent-g:#27513A;
           --nav-bg:rgba(8,28,48,.88);
           --shadow-sm:0 1px 2px rgba(0,0,0,.3);
           --shadow:0 1px 2px rgba(0,0,0,.3), 0 14px 34px rgba(0,0,0,.35);
@@ -91,7 +93,7 @@
       .nav-links a{ text-decoration:none; font-size:14px; font-weight:600; color:var(--muted);
         padding:11px 12px; border-radius:8px; transition:color .15s ease, background-color .15s ease; }
       .nav-links a:hover{ color:var(--ink); background:var(--surface2); }
-      .nav-links a.active{ color:var(--ink); background:var(--surface2); box-shadow:inset 0 -2px 0 var(--gold); }
+      .nav-links a.active{ color:var(--ink); background:var(--surface2); box-shadow:inset 0 -3px 0 var(--gold-ink); font-weight:800; }
       [data-view][hidden]{ display:none !important; }
       .nav-cta{ flex:none; text-decoration:none; font-size:14px; font-weight:700; color:#07304F;
         background:linear-gradient(180deg, #7DD3FC, var(--gold)); border:1px solid #0284C7;
@@ -334,16 +336,16 @@
       .hl-panel .legend{ margin-top:10px; }
       .legend{ display:flex; flex-wrap:wrap; gap:8px 16px; font-size:13px; color:var(--muted); margin-bottom:16px; line-height:1.55; }
       .legend .sw{ display:inline-block; width:13px; height:13px; border-radius:3px; vertical-align:-2px; margin-right:5px; }
-      .sw.r{ background:var(--red-bg); } .sw.y{ background:var(--yel-bg); } .sw.g{ background:var(--grn-bg); }
+      .sw.r{ background:var(--sent-r); } .sw.y{ background:var(--sent-y); } .sw.g{ background:var(--sent-g); }
       .hl-text{ font-size:16px; line-height:1.9; }
       .hl-text p{ margin:0 0 14px; }
       .hl-text p:last-child{ margin-bottom:0; }
-      .sent{ border-radius:4px; padding:1px 2px; cursor:pointer; transition:background-color .2s ease; }
+      .sent{ border-radius:4px; padding:1px 2px; cursor:pointer; transition:background-color .2s ease; scroll-margin-block:14px; }
       .sent:hover{ outline:2px solid var(--navy); outline-offset:0; }
       .sent.active{ outline:2px solid var(--navy); outline-offset:0; }
-      .sent.r{ background:var(--red-bg); color:var(--red-ink); }
-      .sent.y{ background:var(--yel-bg); color:var(--yel-ink); }
-      .sent.g{ background:var(--grn-bg); color:var(--grn-ink); }
+      .sent.r{ background:var(--sent-r); color:var(--ink); }
+      .sent.y{ background:var(--sent-y); color:var(--ink); }
+      .sent.g{ background:var(--sent-g); color:var(--ink); }
       .sent-detail{ display:none; margin-top:16px; border:1px solid var(--line); border-radius:12px; background:var(--surface2); padding:16px 18px; font-size:14px; }
       .sent-detail.show{ display:block; }
       .sent-detail .sd-score{ font-family:"IBM Plex Mono", monospace; font-weight:600; font-size:19px; }
@@ -443,7 +445,7 @@
       }
       .topbar{ border-bottom:1px solid rgba(56,189,248,.55); }
       /* Panggung hero: pola titik halus yang memudar + cahaya emas */
-      header.hero{ position:relative; }
+      header.hero{ position:relative; overflow-x:clip; }
       header.hero::before{ content:""; position:absolute; inset:-14px -8px 0; pointer-events:none;
         background-image:radial-gradient(rgba(15,33,64,.10) 1.1px, transparent 1.2px);
         background-size:22px 22px;
@@ -497,6 +499,9 @@
       .hl-tools .ft{ font-size:12.5px; font-weight:700; color:var(--muted); margin-right:2px; }
       .hl-tools button{ min-height:34px; padding:6px 13px; font-size:13px; border-radius:999px; }
       .hl-tools button.on{ background:var(--navy); color:#fff; border-color:var(--navy); }
+      .hl-tools .seg .hl-filter{ border-color:transparent; background:transparent; color:var(--muted); }
+      .hl-tools .seg .hl-filter:not(.on):hover{ background:var(--surface); color:var(--ink); }
+      .hl-tools .seg .hl-filter.on{ background:linear-gradient(90deg, var(--btn-top), var(--navy)); color:#fff; border-color:transparent; box-shadow:var(--shadow-sm); font-weight:800; }
       .hl-text .sent{ transition:opacity .2s ease, background-color .2s ease; }
       .hl-text[data-filter="r"] .sent:not(.r), .hl-text[data-filter="y"] .sent:not(.y), .hl-text[data-filter="ry"] .sent.g{ opacity:.25; }
       .pdf-actions{ display:flex; gap:8px; flex-wrap:wrap; }
@@ -542,7 +547,7 @@
       .side-nav{ display:flex; flex-direction:column; gap:2px; }
       .side-nav a{ display:flex; align-items:center; gap:10px; padding:11px 12px; border-radius:var(--r-sm); color:var(--ink); text-decoration:none; font-weight:600; font-size:14.5px; }
       .side-nav a:hover{ background:var(--surface2); }
-      .side-nav a.active{ background:var(--gold-soft); color:var(--gold-ink); }
+      .side-nav a.active{ background:var(--gold-soft); color:var(--gold-ink); box-shadow:inset 3px 0 0 var(--gold-ink); font-weight:800; }
       .side-nav a:focus-visible, .side-brand:focus-visible, .side-cta:focus-visible, .qa-card:focus-visible{ outline:3px solid var(--gold-ink); outline-offset:2px; }
       .side-cta{ margin-top:14px; text-align:center; }
       .side-foot{ margin-top:auto; font-size:12px; color:var(--muted); border-top:1px solid var(--line-soft); padding-top:12px; line-height:1.6; }
@@ -602,9 +607,10 @@
       .cmp-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
       @media (max-width:900px){ .cmp-grid{ grid-template-columns:1fr; } }
       .cmp-actions{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:14px; }
-      .cmp-tabs{ display:flex; flex-wrap:wrap; gap:8px; margin:4px 0 14px; }
-      .cmp-tab{ border:1.5px solid var(--line); background:var(--surface); color:var(--muted); border-radius:999px; padding:8px 16px; font:inherit; font-size:14px; font-weight:700; cursor:pointer; }
-      .cmp-tab[aria-pressed="true"]{ background:linear-gradient(120deg, var(--btn-top), var(--navy)); color:#fff; border-color:transparent; }
+      .cmp-tabs{ display:inline-flex; flex-wrap:wrap; gap:3px; padding:3px; background:var(--surface2); border:1px solid var(--line); border-radius:999px; margin:4px 0 14px; }
+      .cmp-tab{ border:1px solid transparent; background:transparent; color:var(--muted); border-radius:999px; padding:7px 16px; min-height:38px; font:inherit; font-size:14px; font-weight:700; cursor:pointer; }
+      .cmp-tab:not([aria-pressed="true"]):hover{ background:var(--surface); color:var(--ink); }
+      .cmp-tab[aria-pressed="true"]{ background:linear-gradient(120deg, var(--btn-top), var(--navy)); color:#fff; border-color:transparent; box-shadow:var(--shadow-sm); font-weight:800; }
       .d-add{ background:rgba(34,197,94,.16); }
       .d-del{ background:rgba(239,68,68,.14); }
       .d-chg{ background:rgba(59,130,246,.14); }
@@ -663,11 +669,13 @@
 
       /* ---------- Phase 7 (v0.15.0-beta): Human-Friendly Experience ---------- */
       .nav-group{ font-size:11px; font-weight:800; letter-spacing:.09em; text-transform:uppercase; color:var(--muted); }
-      .side-nav .nav-group{ display:block; padding:10px 12px 2px; }
-      .nav-links .nav-group{ display:inline-block; flex:none; align-self:center; padding:0 4px 0 10px; }
+      .side-nav .nav-group{ display:block; padding:16px 12px 4px; }
+      .nav-links .nav-group{ display:inline-block; flex:none; align-self:center; padding:2px 4px 2px 12px; margin-left:6px; border-left:1px solid var(--line); }
       .mode-toggle{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:0 0 14px; font-size:13.5px; color:var(--muted); }
-      .mode-toggle .mt-btn{ font:inherit; font-weight:700; font-size:13px; border:1px solid var(--line); background:var(--surface); color:var(--muted); border-radius:999px; padding:5px 14px; cursor:pointer; }
-      .mode-toggle .mt-btn[aria-pressed="true"]{ background:linear-gradient(90deg, var(--btn-top), var(--navy)); color:#fff; border-color:transparent; }
+      .seg{ display:inline-flex; align-items:center; gap:3px; padding:3px; background:var(--surface2); border:1px solid var(--line); border-radius:999px; }
+      .mode-toggle .mt-btn{ font:inherit; font-weight:700; font-size:13px; border:1px solid transparent; background:transparent; color:var(--muted); border-radius:999px; padding:6px 15px; min-height:36px; cursor:pointer; }
+      .mode-toggle .mt-btn:not([aria-pressed="true"]):hover{ background:var(--surface); color:var(--ink); }
+      .mode-toggle .mt-btn[aria-pressed="true"]{ background:linear-gradient(90deg, var(--btn-top), var(--navy)); color:#fff; border-color:transparent; box-shadow:var(--shadow-sm); font-weight:800; }
       .mode-toggle .mt-note{ font-size:12.5px; }
       body:not(.mode-deep) .signals{ display:none; }
       body:not(.mode-deep) .engine-line{ display:none; }
@@ -679,8 +687,9 @@
       body:not(.mode-deep) .stats{ display:none; }
       .deep-hint{ margin:14px 0 0; font-size:13.5px; color:var(--muted); }
       body.mode-deep .deep-hint{ display:none; }
-      .dm-btn{ font:inherit; font-weight:700; font-size:13px; border:1px solid var(--line); background:var(--surface); color:var(--muted); border-radius:999px; padding:5px 14px; cursor:pointer; }
-      .dm-btn[aria-pressed="true"]{ background:linear-gradient(90deg, var(--btn-top), var(--navy)); color:#fff; border-color:transparent; }
+      .dm-btn{ font:inherit; font-weight:700; font-size:13px; border:1px solid transparent; background:transparent; color:var(--muted); border-radius:999px; padding:6px 15px; min-height:36px; cursor:pointer; }
+      .dm-btn:not([aria-pressed="true"]):hover{ background:var(--surface); color:var(--ink); }
+      .dm-btn[aria-pressed="true"]{ background:linear-gradient(90deg, var(--btn-top), var(--navy)); color:#fff; border-color:transparent; box-shadow:var(--shadow-sm); font-weight:800; }
       body.det-batch #analisis, body.det-batch #report{ display:none !important; }
       body:not(.det-batch) #batch{ display:none; }
       .clf-fold > summary, .contrib-fold > summary, .examples > summary, .all-feats > summary, .wi-extra > summary{ cursor:pointer; }
@@ -829,10 +838,11 @@
       label:has(> #hist-c1), label:has(> #hist-c2){ padding-top:6px; padding-bottom:6px; }
       /* ---------- Editor Kaya Asisten Menulis (D8 Tahap 4) ---------- */
       .wi-ed-mode{ display:flex; justify-content:flex-end; margin:0 0 8px; }
-      .wi-ed-mode-btn{ min-height:30px; padding:3px 12px; font-size:13px; border-radius:0; background:var(--surface); }
-      .wi-ed-mode-btn:first-child{ border-radius:8px 0 0 8px; }
-      .wi-ed-mode-btn:last-child{ border-radius:0 8px 8px 0; margin-left:-1px; }
-      .wi-ed-mode-btn.is-on{ background:var(--navy); color:var(--navy-ink); border-color:var(--navy); }
+      .wi-ed-mode-btn{ min-height:32px; padding:5px 14px; font-size:13px; font-weight:700; border:1px solid var(--line); background:var(--surface2); color:var(--muted); border-radius:0; }
+      .wi-ed-mode-btn:first-child{ border-radius:999px 0 0 999px; }
+      .wi-ed-mode-btn:last-child{ border-radius:0 999px 999px 0; margin-left:-1px; }
+      .wi-ed-mode-btn:not(.is-on):hover{ background:var(--surface); color:var(--ink); }
+      .wi-ed-mode-btn.is-on{ background:linear-gradient(90deg, var(--btn-top), var(--navy)); color:#fff; border-color:transparent; box-shadow:var(--shadow-sm); font-weight:800; position:relative; z-index:1; }
       .wi-ed-bar{ display:flex; flex-wrap:wrap; gap:5px; align-items:center; padding:7px 8px;
         background:var(--surface2); border:1px solid var(--line); border-bottom:none; border-radius:12px 12px 0 0; }
       .wi-ed-bar[hidden], .wi-ed-surface[hidden]{ display:none; }
@@ -944,7 +954,7 @@
         <a href="#/posisi" data-route="posisi">Privasi &amp; Batasan</a>
       </nav>
       <a class="btn-primary side-cta" href="#analisis">Mulai Memeriksa</a>
-      <div class="side-foot">Beta Terbuka · v0.21.0-beta<br />Seluruh analisis berjalan lokal di peramban ini — teks Anda tidak dikirim ke mana pun.</div>
+      <div class="side-foot">Beta Terbuka · v0.22.0-beta<br />Seluruh analisis berjalan lokal di peramban ini — teks Anda tidak dikirim ke mana pun.</div>
     </aside>
     <div class="wrap page">
       <header class="hero" data-view="home">
@@ -1060,8 +1070,8 @@
       <section class="analyzer" id="analisis" data-view="detector" hidden aria-labelledby="analisis-judul">
         <div class="kicker">Analisis</div>
         <h2 id="analisis-judul">Periksa tulisan Anda</h2>
-        <div class="mode-toggle" role="group" aria-label="Tingkat tampilan"><span>Tampilan:</span><button type="button" class="mt-btn" data-mode="simple" aria-pressed="true">Sederhana</button><button type="button" class="mt-btn" data-mode="deep" aria-pressed="false">Mendalam</button><span class="mt-note">Mode Mendalam menampilkan seluruh angka &amp; rincian teknis.</span></div>
-        <div class="mode-toggle det-mode" role="group" aria-label="Mode pemeriksaan"><span>Mode:</span><button type="button" class="dm-btn" data-dmode="single" aria-pressed="true">Satu Tulisan</button><button type="button" class="dm-btn" data-dmode="batch" aria-pressed="false">Banyak Berkas</button><span class="mt-note">Periksa satu tulisan, atau banyak berkas sekaligus.</span></div>
+        <div class="mode-toggle" role="group" aria-label="Tingkat tampilan"><span>Tampilan:</span><span class="seg"><button type="button" class="mt-btn" data-mode="simple" aria-pressed="true">Sederhana</button><button type="button" class="mt-btn" data-mode="deep" aria-pressed="false">Mendalam</button></span><span class="mt-note">Mode Mendalam menampilkan seluruh angka &amp; rincian teknis.</span></div>
+        <div class="mode-toggle det-mode" role="group" aria-label="Mode pemeriksaan"><span>Mode:</span><span class="seg"><button type="button" class="dm-btn" data-dmode="single" aria-pressed="true">Satu Tulisan</button><button type="button" class="dm-btn" data-dmode="batch" aria-pressed="false">Banyak Berkas</button></span><span class="mt-note">Periksa satu tulisan, atau banyak berkas sekaligus.</span></div>
         <ol class="p7-steps" aria-label="Langkah pemeriksaan"><li><strong>1.</strong> Masukkan tulisan</li><li><strong>2.</strong> Tekan Periksa Tulisan</li><li><strong>3.</strong> Pahami hasilnya</li></ol>
         <p class="sub">Tempel teks di bawah ini, unggah berkas .txt, .docx, atau .pdf (klik tombol Unggah, atau seret &amp; letakkan berkas ke panel ini), atau coba salah satu contoh uji.</p>
         <div class="panel" id="panel-analisis">
@@ -1202,10 +1212,10 @@
           </div>
           <div class="hl-tools" role="group" aria-label="Filter penanda kalimat">
             <span class="ft">Tampilkan:</span>
-            <button type="button" class="hl-filter on" data-f="all">Semua</button>
+            <span class="seg"><button type="button" class="hl-filter on" data-f="all">Semua</button>
             <button type="button" class="hl-filter" data-f="ry">Terindikasi saja</button>
             <button type="button" class="hl-filter" data-f="r">Merah saja</button>
-            <button type="button" class="hl-filter" data-f="y">Kuning saja</button>
+            <button type="button" class="hl-filter" data-f="y">Kuning saja</button></span>
             <button type="button" id="btn-lompat">Lompat ke kalimat terindikasi ↓</button>
           </div>
           <div class="hl-text" id="hl-text"></div>
@@ -1262,7 +1272,7 @@
       <section class="batch" id="batch" data-view="detector" hidden aria-labelledby="batch-judul">
         <div class="kicker">Banyak Berkas</div>
         <h2 id="batch-judul">Periksa banyak dokumen</h2>
-        <div class="mode-toggle det-mode" role="group" aria-label="Mode pemeriksaan"><span>Mode:</span><button type="button" class="dm-btn" data-dmode="single" aria-pressed="false">Satu Tulisan</button><button type="button" class="dm-btn" data-dmode="batch" aria-pressed="true">Banyak Berkas</button><span class="mt-note">Periksa satu tulisan, atau banyak berkas sekaligus.</span></div>
+        <div class="mode-toggle det-mode" role="group" aria-label="Mode pemeriksaan"><span>Mode:</span><span class="seg"><button type="button" class="dm-btn" data-dmode="single" aria-pressed="false">Satu Tulisan</button><button type="button" class="dm-btn" data-dmode="batch" aria-pressed="true">Banyak Berkas</button></span><span class="mt-note">Periksa satu tulisan, atau banyak berkas sekaligus.</span></div>
           <ol class="p7-steps" aria-label="Langkah pemeriksaan banyak dokumen"><li><strong>1.</strong> Pilih dokumen</li><li><strong>2.</strong> Tekan Periksa Semua Berkas</li><li><strong>3.</strong> Lihat hasil</li><li><strong>4.</strong> Unduh laporan</li></ol>
         <p class="sub">Pilih beberapa berkas .txt, .docx, atau .pdf untuk dinilai sekaligus dan diringkas dalam satu tabel. Setiap berkas dinilai dengan pemeriksa pola (7 tanda); bila penguat skor (model pemeriksa kedua) sudah aktif, penguat bersyarat yang sama ikut diterapkan — bila belum aktif, skornya murni pemeriksa pola. Hasil batch tampil di sini saja: ia tidak mengubah laporan utama di atas dan tidak disimpan ke arsip hasil.</p>
         <div class="panel">
@@ -1408,7 +1418,7 @@
       <section class="forensik" id="forensik" data-view="forensik" hidden aria-labelledby="wf-judul">
         <div class="kicker">Kenali Gaya Tulisan</div>
         <h2 id="wf-judul">Kenali gaya tulisan Anda</h2>
-        <div class="mode-toggle" role="group" aria-label="Tingkat tampilan"><span>Tampilan:</span><button type="button" class="mt-btn" data-mode="simple" aria-pressed="true">Sederhana</button><button type="button" class="mt-btn" data-mode="deep" aria-pressed="false">Mendalam</button><span class="mt-note">Mode Mendalam menampilkan seluruh angka &amp; rincian teknis.</span></div>
+        <div class="mode-toggle" role="group" aria-label="Tingkat tampilan"><span>Tampilan:</span><span class="seg"><button type="button" class="mt-btn" data-mode="simple" aria-pressed="true">Sederhana</button><button type="button" class="mt-btn" data-mode="deep" aria-pressed="false">Mendalam</button></span><span class="mt-note">Mode Mendalam menampilkan seluruh angka &amp; rincian teknis.</span></div>
         <p class="sub">Ukur karakteristik gaya sebuah teks — keragaman kosakata, ritme kalimat, kompleksitas struktur, konsistensi paragraf, kata transisi, dan pengulangan — dihitung sepenuhnya di peramban ini. Modul ini <strong>bukan detektor AI</strong>: hasilnya adalah statistik deskriptif untuk penyuntingan dan pembelajaran menulis, <strong>bukan bukti siapa penulisnya</strong>, dan tidak memengaruhi skor Detector.</p>
         <div class="panel" id="wf-panel-input">
           <label for="wf-input" style="font-weight:700; display:block; margin-bottom:8px;">Teks yang dianalisis karakteristiknya</label>
@@ -1564,7 +1574,7 @@
         <p class="wf-kicker">Benchmark Center — dibuka untuk umum</p>
         <h2 id="bn-judul">Pengujian &amp; transparansi</h2>
         <p class="wf-lede">Halaman ini menerbitkan hasil evaluasi Saksara apa adanya — termasuk kelemahannya. Setiap angka dihitung dari data yang tercantum provenansnya, dengan definisi metrik yang terbuka. <strong>Akurasi bukan jaminan untuk satu dokumen</strong>: angka agregat tidak dapat memutuskan asal-usul sebuah teks, dan tidak ada kesimpulan kepengarangan yang ditarik dari skor mana pun di halaman ini.</p>
-        <div class="mode-toggle" role="group" aria-label="Tingkat tampilan"><span>Tampilan:</span><button type="button" class="mt-btn" data-mode="simple" aria-pressed="true">Sederhana</button><button type="button" class="mt-btn" data-mode="deep" aria-pressed="false">Mendalam</button><span class="mt-note">Mode Mendalam menampilkan seluruh angka &amp; rincian teknis.</span></div>
+        <div class="mode-toggle" role="group" aria-label="Tingkat tampilan"><span>Tampilan:</span><span class="seg"><button type="button" class="mt-btn" data-mode="simple" aria-pressed="true">Sederhana</button><button type="button" class="mt-btn" data-mode="deep" aria-pressed="false">Mendalam</button></span><span class="mt-note">Mode Mendalam menampilkan seluruh angka &amp; rincian teknis.</span></div>
         <p class="wf-note">Di halaman ini, <strong>Tampilan Sederhana = Ringkasan untuk umum</strong> dan <strong>Tampilan Mendalam = Detail Peneliti</strong> — semua angka, tabel, dataset, dan metodologi tetap tersedia di Mode Mendalam.</p>
         <div class="wf-cards" id="bn-cards"></div>
         <div class="wf-panel">
@@ -1783,12 +1793,20 @@
           <a href="#/posisi">Privasi &amp; Batasan</a>
         </nav>
         <p class="copy">© 2026 Saksara — Dikembangkan oleh Ciptanala Devs</p>
-        <p class="version-line">Versi <strong>v0.21.0-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
+        <p class="version-line">Versi <strong>v0.22.0-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
       </div>
     </footer>
 
     <dialog class="changelog" id="changelog-modal" aria-labelledby="changelog-title">
       <h2 id="changelog-title">Catatan Rilis — Saksara</h2>
+      <h3>v0.22.0-beta — 24 November 2026</h3>
+      <ul>
+        <li>Tombol sakelar kini tampil sebagai pilihan yang jelas: Sederhana/Mendalam, Satu Tulisan/Banyak Berkas, dan Editor/Teks polos memakai pola rel pilihan yang sama — yang sedang aktif terangkat dan berwarna, jadi langsung ketahuan mana yang terpilih.</li>
+        <li>Menu navigasi lebih terarah: halaman yang sedang dibuka kini ditandai garis emas dan huruf tebal, label kelompok menu lebih jelas, dan jarak antarmenu dirapikan.</li>
+        <li>Warna penanda kalimat dibuat lebih lembut dan tenang di mata, dengan teks yang tetap jelas terbaca, di tampilan terang maupun gelap.</li>
+        <li>Tata letak dirapikan: jarak antar-bagian lebih konsisten dan luapan tampilan di layar ponsel kecil sudah diperbaiki.</li>
+        <li>Hasil analisis dan detektor tidak berubah.</li>
+      </ul>
       <h3>v0.21.0-beta — 23 November 2026</h3>
       <ul>
         <li>Tampilan dirombak agar lebih sederhana dan ramah: Beranda kini menonjolkan satu kartu periksa cepat dengan tombol Coba Contoh Teks; fitur lainnya rapi dalam lipatan "Lihat semua fitur".</li>
