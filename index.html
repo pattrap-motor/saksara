@@ -611,6 +611,10 @@
       .wf-table{ width:100%; border-collapse:collapse; font-size:13.5px; }
       .wf-table td, .wf-table th{ padding:5px 8px; border-bottom:1px solid var(--line-soft); text-align:left; }
       .wf-table td:last-child, .wf-table th:last-child{ text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+      @media (max-width:720px){
+        .wf-table{ display:block; overflow-x:auto; }
+        .wf-table td, .wf-table th{ overflow-wrap:anywhere; }
+      }
       .wf-hl-text{ font-size:14.5px; line-height:1.75; white-space:pre-wrap; word-break:break-word; }
       mark.wf-w{ background:var(--gold-soft); color:inherit; border-radius:3px; padding:0 1px; }
       mark.wf-p{ background:var(--yel-bg); color:inherit; border-radius:3px; padding:0 1px; }
@@ -990,7 +994,7 @@
         <a href="#/posisi" data-route="posisi">Privasi &amp; Batasan</a>
       </nav>
       <a class="btn-primary side-cta" href="#analisis">Mulai Memeriksa</a>
-      <div class="side-foot">Beta Terbuka · v0.24.1-beta<br />Seluruh analisis berjalan lokal di peramban ini — teks Anda tidak dikirim ke mana pun.</div>
+      <div class="side-foot">Beta Terbuka · v0.24.2-beta<br />Seluruh analisis berjalan lokal di peramban ini — teks Anda tidak dikirim ke mana pun.</div>
     </aside>
     <div class="wrap page">
       <header class="hero" data-view="home">
@@ -1851,12 +1855,18 @@
           <a href="#/posisi">Privasi &amp; Batasan</a>
         </nav>
         <p class="copy">© 2026 Saksara — Dikembangkan oleh Ciptanala Devs</p>
-        <p class="version-line">Versi <strong>v0.24.1-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
+        <p class="version-line">Versi <strong>v0.24.2-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
       </div>
     </footer>
 
     <dialog class="changelog" id="changelog-modal" aria-labelledby="changelog-title">
       <h2 id="changelog-title">Catatan Rilis — Saksara</h2>
+      <h3>v0.24.2-beta — 24 November 2026</h3>
+      <ul>
+        <li>Tabel hasil di halaman Benchmark dan OCR tidak lagi bisa digeser menyamping di HP — tabel kini pas mengikuti lebar layar, dan bila isinya lebar tabelnya bisa digeser di dalam kotaknya sendiri.</li>
+        <li>Daftar Riwayat tidak lagi tampil kosong sesaat setelah analisis selesai — entri terbaru langsung muncul tanpa perlu menekan tombol muat ulang.</li>
+        <li>Hasil analisis dan detektor tidak berubah.</li>
+      </ul>
       <h3>v0.24.1-beta — 24 November 2026</h3>
       <ul>
         <li>Tulisan di panel pilihan halaman Periksa Tulisan dirapikan: judul pilihan (Tampilan dan Mode) kini lebih tegas dan mudah dibedakan dari teks penjelas di bawahnya, huruf pada tombol pilihan diperbesar, dan jarak antar-bagian dibuat lebih pas — semua teks jadi lebih nyaman dibaca.</li>
@@ -13025,13 +13035,25 @@ Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa ba
       }
       p6DashStorage();
     }
-    function histRenderList(){
+    function histRenderList(){ histRenderListRun(false); }
+    function histRenderListRun(isRetry){
       var box = $("hist-list"), status = $("hist-list-status");
       if(!box) return;
       if(!histEnabled()){ box.innerHTML = "<p class=\"wf-note\">Riwayat nonaktif. Aktifkan lewat persetujuan di atas untuk mulai menyimpan hasil analisis di perangkat ini.</p>"; if(status) status.textContent = ""; return; }
       histAll().then(function(entries){
         if(status) status.textContent = entries.length + " entri.";
-        if(!entries.length){ box.innerHTML = "<p class=\"wf-note\">Belum ada entri. Jalankan analisis apa pun — hasilnya akan tersimpan di sini selama riwayat aktif.</p>"; return; }
+        if(!entries.length){
+          box.innerHTML = "<p class=\"wf-note\">Belum ada entri. Jalankan analisis apa pun — hasilnya akan tersimpan di sini selama riwayat aktif.</p>";
+          if(!isRetry){
+            /* Simpanan detektor berjalan dengan jeda singkat (menunggu skor
+               akhir tergabung); bila daftar terbaca masih kosong, baca ulang
+               satu kali secara otomatis agar entri yang baru tersimpan tidak
+               terlewat tampil. */
+            var tunggu = histDetPending ? 3000 : 1200;
+            setTimeout(function(){ histRenderListRun(true); }, tunggu);
+          }
+          return;
+        }
         box.innerHTML = entries.map(function(e){
           var d = new Date(e.ts);
           return "<div class=\"hist-row\" data-hist-id=\"" + e.id + "\">" +
