@@ -695,14 +695,19 @@
       .mode-toggle .mt-btn:not([aria-pressed="true"]):hover{ background:var(--surface); color:var(--ink); }
       .mode-toggle .mt-btn[aria-pressed="true"]{ background:linear-gradient(90deg, var(--btn-top), var(--navy)); color:#fff; border-color:transparent; box-shadow:var(--shadow-sm); font-weight:800; }
       .mode-toggle .mt-note{ font-size:12.5px; }
-      .ctl-panel{ display:flex; background:var(--surface); border:1px solid var(--line); border-radius:var(--r-lg); padding:18px 20px; box-shadow:var(--shadow-sm); margin:0 0 16px; }
+      .ctl-panel{ display:flex; background:var(--surface); border:1px solid var(--line); border-radius:var(--r-lg); padding:20px; box-shadow:var(--shadow-sm); margin:0 0 16px; }
       .ctl-panel .ctl-group{ flex:1 1 0; flex-direction:column; align-items:stretch; gap:8px; margin:0; min-width:0; }
       .ctl-panel .ctl-group:only-child{ max-width:560px; }
       .ctl-panel .ctl-group + .ctl-group{ border-left:1px solid var(--line-soft); padding-left:20px; margin-left:20px; }
-      .ctl-panel .ctl-label{ font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+      .ctl-panel .ctl-label{ font-size:13px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--ink); }
       .ctl-panel .seg{ display:flex; width:100%; }
       .ctl-panel .seg > button{ flex:1; text-align:center; }
-      .ctl-panel .mt-note{ font-size:13px; line-height:1.45; }
+      .ctl-panel .mt-note{ font-size:13.5px; line-height:1.55; font-weight:400; color:var(--muted); }
+      .ctl-panel .mt-btn, .ctl-panel .dm-btn{ font-size:15px; font-weight:600; padding:6px 10px; }
+      .ctl-panel .mt-btn[aria-pressed="true"], .ctl-panel .dm-btn[aria-pressed="true"]{ font-weight:800; }
+      section[data-view="detector"] .p7-steps li{ color:var(--ink); font-size:13.5px; }
+      section[data-view="detector"] .p7-steps li strong{ font-weight:800; }
+      section.analyzer .sub{ font-size:15.5px; line-height:1.7; max-width:68ch; font-weight:400; }
       @media (max-width:720px){
         .ctl-panel{ flex-direction:column; }
         .ctl-panel .ctl-group:only-child{ max-width:none; }
@@ -985,7 +990,7 @@
         <a href="#/posisi" data-route="posisi">Privasi &amp; Batasan</a>
       </nav>
       <a class="btn-primary side-cta" href="#analisis">Mulai Memeriksa</a>
-      <div class="side-foot">Beta Terbuka · v0.24.0-beta<br />Seluruh analisis berjalan lokal di peramban ini — teks Anda tidak dikirim ke mana pun.</div>
+      <div class="side-foot">Beta Terbuka · v0.24.1-beta<br />Seluruh analisis berjalan lokal di peramban ini — teks Anda tidak dikirim ke mana pun.</div>
     </aside>
     <div class="wrap page">
       <header class="hero" data-view="home">
@@ -1846,12 +1851,17 @@
           <a href="#/posisi">Privasi &amp; Batasan</a>
         </nav>
         <p class="copy">© 2026 Saksara — Dikembangkan oleh Ciptanala Devs</p>
-        <p class="version-line">Versi <strong>v0.24.0-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
+        <p class="version-line">Versi <strong>v0.24.1-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
       </div>
     </footer>
 
     <dialog class="changelog" id="changelog-modal" aria-labelledby="changelog-title">
       <h2 id="changelog-title">Catatan Rilis — Saksara</h2>
+      <h3>v0.24.1-beta — 24 November 2026</h3>
+      <ul>
+        <li>Tulisan di panel pilihan halaman Periksa Tulisan dirapikan: judul pilihan (Tampilan dan Mode) kini lebih tegas dan mudah dibedakan dari teks penjelas di bawahnya, huruf pada tombol pilihan diperbesar, dan jarak antar-bagian dibuat lebih pas — semua teks jadi lebih nyaman dibaca.</li>
+        <li>Hasil analisis dan detektor tidak berubah.</li>
+      </ul>
       <h3>v0.24.0-beta — 24 November 2026</h3>
       <ul>
         <li>Menu pilihan di atas halaman Periksa Tulisan kini tampil dalam satu panel rapi: pilihan Tampilan (Sederhana/Mendalam) dan Mode (Satu Tulisan/Banyak Berkas) berdampingan, masing-masing dengan label jelas di atasnya dan penjelasan singkat di bawahnya. Panel yang sama juga dipakai di halaman periksa banyak berkas, gaya tulisan, dan pengujian &amp; transparansi.</li>
