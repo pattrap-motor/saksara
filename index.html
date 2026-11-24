@@ -695,6 +695,19 @@
       .mode-toggle .mt-btn:not([aria-pressed="true"]):hover{ background:var(--surface); color:var(--ink); }
       .mode-toggle .mt-btn[aria-pressed="true"]{ background:linear-gradient(90deg, var(--btn-top), var(--navy)); color:#fff; border-color:transparent; box-shadow:var(--shadow-sm); font-weight:800; }
       .mode-toggle .mt-note{ font-size:12.5px; }
+      .ctl-panel{ display:flex; background:var(--surface); border:1px solid var(--line); border-radius:var(--r-lg); padding:18px 20px; box-shadow:var(--shadow-sm); margin:0 0 16px; }
+      .ctl-panel .ctl-group{ flex:1 1 0; flex-direction:column; align-items:stretch; gap:8px; margin:0; min-width:0; }
+      .ctl-panel .ctl-group:only-child{ max-width:560px; }
+      .ctl-panel .ctl-group + .ctl-group{ border-left:1px solid var(--line-soft); padding-left:20px; margin-left:20px; }
+      .ctl-panel .ctl-label{ font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+      .ctl-panel .seg{ display:flex; width:100%; }
+      .ctl-panel .seg > button{ flex:1; text-align:center; }
+      .ctl-panel .mt-note{ font-size:13px; line-height:1.45; }
+      @media (max-width:720px){
+        .ctl-panel{ flex-direction:column; }
+        .ctl-panel .ctl-group:only-child{ max-width:none; }
+        .ctl-panel .ctl-group + .ctl-group{ border-left:none; padding-left:0; margin-left:0; border-top:1px solid var(--line-soft); padding-top:14px; margin-top:14px; }
+      }
       body:not(.mode-deep) .signals{ display:none; }
       body:not(.mode-deep) .engine-line{ display:none; }
       body:not(.mode-deep) #wf-results .wf-cards{ display:none; }
@@ -972,7 +985,7 @@
         <a href="#/posisi" data-route="posisi">Privasi &amp; Batasan</a>
       </nav>
       <a class="btn-primary side-cta" href="#analisis">Mulai Memeriksa</a>
-      <div class="side-foot">Beta Terbuka · v0.23.0-beta<br />Seluruh analisis berjalan lokal di peramban ini — teks Anda tidak dikirim ke mana pun.</div>
+      <div class="side-foot">Beta Terbuka · v0.24.0-beta<br />Seluruh analisis berjalan lokal di peramban ini — teks Anda tidak dikirim ke mana pun.</div>
     </aside>
     <div class="wrap page">
       <header class="hero" data-view="home">
@@ -1088,8 +1101,10 @@
       <section class="analyzer" id="analisis" data-view="detector" hidden aria-labelledby="analisis-judul">
         <div class="kicker">Analisis</div>
         <h2 id="analisis-judul">Periksa tulisan Anda</h2>
-        <div class="mode-toggle" role="group" aria-label="Tingkat tampilan"><span>Tampilan:</span><span class="seg"><button type="button" class="mt-btn" data-mode="simple" aria-pressed="true">Sederhana</button><button type="button" class="mt-btn" data-mode="deep" aria-pressed="false">Mendalam</button></span><span class="mt-note">Mode Mendalam menampilkan seluruh angka &amp; rincian teknis.</span></div>
-        <div class="mode-toggle det-mode" role="group" aria-label="Mode pemeriksaan"><span>Mode:</span><span class="seg"><button type="button" class="dm-btn" data-dmode="single" aria-pressed="true">Satu Tulisan</button><button type="button" class="dm-btn" data-dmode="batch" aria-pressed="false">Banyak Berkas</button></span><span class="mt-note">Periksa satu tulisan, atau banyak berkas sekaligus.</span></div>
+        <div class="ctl-panel">
+          <div class="mode-toggle ctl-group" role="group" aria-label="Tingkat tampilan"><span class="ctl-label">Tampilan:</span><span class="seg"><button type="button" class="mt-btn" data-mode="simple" aria-pressed="true">Sederhana</button><button type="button" class="mt-btn" data-mode="deep" aria-pressed="false">Mendalam</button></span><span class="mt-note">Mode Mendalam menampilkan seluruh angka &amp; rincian teknis.</span></div>
+          <div class="mode-toggle det-mode ctl-group" role="group" aria-label="Mode pemeriksaan"><span class="ctl-label">Mode:</span><span class="seg"><button type="button" class="dm-btn" data-dmode="single" aria-pressed="true">Satu Tulisan</button><button type="button" class="dm-btn" data-dmode="batch" aria-pressed="false">Banyak Berkas</button></span><span class="mt-note">Periksa satu tulisan, atau banyak berkas sekaligus.</span></div>
+        </div>
         <ol class="p7-steps" aria-label="Langkah pemeriksaan"><li><strong>1.</strong> Masukkan tulisan</li><li><strong>2.</strong> Tekan Periksa Tulisan</li><li><strong>3.</strong> Pahami hasilnya</li></ol>
         <p class="sub">Tempel teks di bawah, unggah berkas .txt, .docx, atau .pdf (bisa juga diseret ke panel ini), atau coba contoh siap pakai.</p>
         <div class="panel" id="panel-analisis">
@@ -1304,7 +1319,9 @@
       <section class="batch" id="batch" data-view="detector" hidden aria-labelledby="batch-judul">
         <div class="kicker">Banyak Berkas</div>
         <h2 id="batch-judul">Periksa banyak dokumen</h2>
-        <div class="mode-toggle det-mode" role="group" aria-label="Mode pemeriksaan"><span>Mode:</span><span class="seg"><button type="button" class="dm-btn" data-dmode="single" aria-pressed="false">Satu Tulisan</button><button type="button" class="dm-btn" data-dmode="batch" aria-pressed="true">Banyak Berkas</button></span><span class="mt-note">Periksa satu tulisan, atau banyak berkas sekaligus.</span></div>
+        <div class="ctl-panel">
+          <div class="mode-toggle det-mode ctl-group" role="group" aria-label="Mode pemeriksaan"><span class="ctl-label">Mode:</span><span class="seg"><button type="button" class="dm-btn" data-dmode="single" aria-pressed="false">Satu Tulisan</button><button type="button" class="dm-btn" data-dmode="batch" aria-pressed="true">Banyak Berkas</button></span><span class="mt-note">Periksa satu tulisan, atau banyak berkas sekaligus.</span></div>
+        </div>
           <ol class="p7-steps" aria-label="Langkah pemeriksaan banyak dokumen"><li><strong>1.</strong> Pilih dokumen</li><li><strong>2.</strong> Tekan Periksa Semua Berkas</li><li><strong>3.</strong> Lihat hasil</li><li><strong>4.</strong> Unduh laporan</li></ol>
         <p class="sub">Pilih beberapa berkas .txt, .docx, atau .pdf untuk dinilai sekaligus dan diringkas dalam satu tabel. Setiap berkas dinilai dengan pemeriksa pola (7 tanda); bila penguat skor (model pemeriksa kedua) sudah aktif, penguat yang sama ikut dipakai — bila belum, skornya murni pemeriksa pola. Hasil batch hanya tampil di sini: tidak mengubah laporan utama di atas dan tidak disimpan ke arsip hasil.</p>
         <div class="panel">
@@ -1450,7 +1467,9 @@
       <section class="forensik" id="forensik" data-view="forensik" hidden aria-labelledby="wf-judul">
         <div class="kicker">Kenali Gaya Tulisan</div>
         <h2 id="wf-judul">Kenali gaya tulisan Anda</h2>
-        <div class="mode-toggle" role="group" aria-label="Tingkat tampilan"><span>Tampilan:</span><span class="seg"><button type="button" class="mt-btn" data-mode="simple" aria-pressed="true">Sederhana</button><button type="button" class="mt-btn" data-mode="deep" aria-pressed="false">Mendalam</button></span><span class="mt-note">Mode Mendalam menampilkan seluruh angka &amp; rincian teknis.</span></div>
+        <div class="ctl-panel">
+          <div class="mode-toggle ctl-group" role="group" aria-label="Tingkat tampilan"><span class="ctl-label">Tampilan:</span><span class="seg"><button type="button" class="mt-btn" data-mode="simple" aria-pressed="true">Sederhana</button><button type="button" class="mt-btn" data-mode="deep" aria-pressed="false">Mendalam</button></span><span class="mt-note">Mode Mendalam menampilkan seluruh angka &amp; rincian teknis.</span></div>
+        </div>
         <p class="sub">Ukur karakteristik gaya sebuah teks — keragaman kosakata, ritme kalimat, kompleksitas struktur, konsistensi paragraf, kata transisi, dan pengulangan — dihitung sepenuhnya di peramban ini. Modul ini <strong>bukan detektor AI</strong>: hasilnya adalah statistik deskriptif untuk penyuntingan dan pembelajaran menulis, <strong>bukan bukti siapa penulisnya</strong>, dan tidak memengaruhi skor Detector.</p>
         <div class="panel" id="wf-panel-input">
           <label for="wf-input" style="font-weight:700; display:block; margin-bottom:8px;">Teks yang dianalisis karakteristiknya</label>
@@ -1606,7 +1625,9 @@
         <p class="wf-kicker">Benchmark Center — dibuka untuk umum</p>
         <h2 id="bn-judul">Pengujian &amp; transparansi</h2>
         <p class="wf-lede">Halaman ini menerbitkan hasil evaluasi Saksara apa adanya — termasuk kelemahannya. Setiap angka dihitung dari data yang tercantum provenansnya, dengan definisi metrik yang terbuka. <strong>Akurasi bukan jaminan untuk satu dokumen</strong>: angka agregat tidak dapat memutuskan asal-usul sebuah teks, dan tidak ada kesimpulan kepengarangan yang ditarik dari skor mana pun di halaman ini.</p>
-        <div class="mode-toggle" role="group" aria-label="Tingkat tampilan"><span>Tampilan:</span><span class="seg"><button type="button" class="mt-btn" data-mode="simple" aria-pressed="true">Sederhana</button><button type="button" class="mt-btn" data-mode="deep" aria-pressed="false">Mendalam</button></span><span class="mt-note">Mode Mendalam menampilkan seluruh angka &amp; rincian teknis.</span></div>
+        <div class="ctl-panel">
+          <div class="mode-toggle ctl-group" role="group" aria-label="Tingkat tampilan"><span class="ctl-label">Tampilan:</span><span class="seg"><button type="button" class="mt-btn" data-mode="simple" aria-pressed="true">Sederhana</button><button type="button" class="mt-btn" data-mode="deep" aria-pressed="false">Mendalam</button></span><span class="mt-note">Mode Mendalam menampilkan seluruh angka &amp; rincian teknis.</span></div>
+        </div>
         <p class="wf-note">Di halaman ini, <strong>Tampilan Sederhana = Ringkasan untuk umum</strong> dan <strong>Tampilan Mendalam = Detail Peneliti</strong> — semua angka, tabel, dataset, dan metodologi tetap tersedia di Mode Mendalam.</p>
         <div class="wf-cards" id="bn-cards"></div>
         <div class="wf-panel">
@@ -1825,12 +1846,17 @@
           <a href="#/posisi">Privasi &amp; Batasan</a>
         </nav>
         <p class="copy">© 2026 Saksara — Dikembangkan oleh Ciptanala Devs</p>
-        <p class="version-line">Versi <strong>v0.23.0-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
+        <p class="version-line">Versi <strong>v0.24.0-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
       </div>
     </footer>
 
     <dialog class="changelog" id="changelog-modal" aria-labelledby="changelog-title">
       <h2 id="changelog-title">Catatan Rilis — Saksara</h2>
+      <h3>v0.24.0-beta — 24 November 2026</h3>
+      <ul>
+        <li>Menu pilihan di atas halaman Periksa Tulisan kini tampil dalam satu panel rapi: pilihan Tampilan (Sederhana/Mendalam) dan Mode (Satu Tulisan/Banyak Berkas) berdampingan, masing-masing dengan label jelas di atasnya dan penjelasan singkat di bawahnya. Panel yang sama juga dipakai di halaman periksa banyak berkas, gaya tulisan, dan pengujian &amp; transparansi.</li>
+        <li>Hasil analisis dan detektor tidak berubah.</li>
+      </ul>
       <h3>v0.23.0-beta — 24 November 2026</h3>
       <ul>
         <li>Teks di seluruh halaman disederhanakan: lebih singkat, memakai bahasa sehari-hari, tapi tetap jelas dan lengkap isinya.</li>
