@@ -408,6 +408,8 @@
       .footer-links a:hover{ color:var(--gold); }
       .footer-links .nav-group{ color:#A9C6DE; align-self:center; }
       footer.site-footer .copy{ font-size:12.5px; color:#8FA1BC; margin:0; }
+      footer.site-footer .copy a{ color:inherit; text-decoration:underline; text-underline-offset:3px; }
+      footer.site-footer .copy a:hover{ color:var(--gold); }
       footer.site-footer .version-line{ font-size:12.5px; color:#8FA1BC; margin:6px 0 0; }
       .changelog-link{ background:none; border:none; padding:0; font:inherit; color:#38BDF8; cursor:pointer; text-decoration:underline; text-underline-offset:3px; }
       .changelog-link:hover{ color:#BAE6FD; }
@@ -994,7 +996,7 @@
         <a href="#/posisi" data-route="posisi">Privasi &amp; Batasan</a>
       </nav>
       <a class="btn-primary side-cta" href="#analisis">Mulai Memeriksa</a>
-      <div class="side-foot">Beta Terbuka · v0.24.2-beta<br />Seluruh analisis berjalan lokal di peramban ini — teks Anda tidak dikirim ke mana pun.</div>
+      <div class="side-foot">Beta Terbuka · v0.24.3-beta<br />Seluruh analisis berjalan lokal di peramban ini — teks Anda tidak dikirim ke mana pun.</div>
     </aside>
     <div class="wrap page">
       <header class="hero" data-view="home">
@@ -1854,13 +1856,18 @@
           <a href="#/metode">Metode &amp; Pengukuran</a>
           <a href="#/posisi">Privasi &amp; Batasan</a>
         </nav>
-        <p class="copy">© 2026 Saksara — Dikembangkan oleh Ciptanala Devs</p>
-        <p class="version-line">Versi <strong>v0.24.2-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
+        <p class="copy">© 2026 Saksara — Dikembangkan oleh <a href="https://x.com/ciptanaladevs" target="_blank" rel="noopener noreferrer">Ciptanala Devs</a></p>
+        <p class="version-line">Versi <strong>v0.24.3-beta</strong> · <button id="btn-changelog" class="changelog-link" type="button">Catatan Rilis</button></p>
       </div>
     </footer>
 
     <dialog class="changelog" id="changelog-modal" aria-labelledby="changelog-title">
       <h2 id="changelog-title">Catatan Rilis — Saksara</h2>
+      <h3>v0.24.3-beta — 24 November 2026</h3>
+      <ul>
+        <li>Nama Ciptanala Devs di bagian bawah halaman kini menjadi tautan ke akun X resmi Ciptanala Devs (x.com/ciptanaladevs) — klik untuk mengunjungi profil studio pengembang Saksara.</li>
+        <li>Hasil analisis dan detektor tidak berubah.</li>
+      </ul>
       <h3>v0.24.2-beta — 24 November 2026</h3>
       <ul>
         <li>Tabel hasil di halaman Benchmark dan OCR tidak lagi bisa digeser menyamping di HP — tabel kini pas mengikuti lebar layar, dan bila isinya lebar tabelnya bisa digeser di dalam kotaknya sendiri.</li>
