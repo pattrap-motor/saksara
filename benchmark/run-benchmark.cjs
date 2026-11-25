@@ -18,7 +18,7 @@ const fs = require("fs");
 const path = require("path");
 
 const projectDir = path.join(__dirname, "..");
-const html = fs.readFileSync(path.join(projectDir, "index.html"), "utf8");
+const html = fs.readFileSync(path.join(projectDir, "index.html"), "utf8").replace(/<(?:link|script)\b[^>]*\b(?:href|src)=["']([^"']+)["'][^>]*>(?:\s*<\/script>)?/gi, (tag, ref) => { const assetPath = ref.split(/[?#]/)[0].replace(/^\.?\//, ""); return assetPath.startsWith("assets/") ? fs.readFileSync(path.join(projectDir, assetPath), "utf8") : tag; });
 const start = html.indexOf("var PHRASES_OLD");
 const end = html.indexOf("var $ = function(id)");
 if (start < 0 || end < 0 || end <= start) {
