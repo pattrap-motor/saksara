@@ -1,0 +1,7 @@
+
+    .save-panel{ margin-top:18px; border:1px solid var(--line); border-radius:12px; padding:14px 16px; background:var(--surface2); }
+    .save-panel p{ margin:0 0 10px; font-size:13px; color:var(--muted); }
+    #btn-simpan-hasil{ background:#1D5FD1; color:#fff; border:1px solid #38BDF8; border-radius:10px; padding:10px 16px; font-weight:700; cursor:pointer; }
+    #btn-simpan-hasil:disabled{ opacity:.55; cursor:default; }
+    #simpan-status{ margin-left:10px; font-size:13px; }
+  
