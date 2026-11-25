@@ -1,0 +1,2924 @@
+
+      "use strict";
+      var PHRASES_OLD = ["selain itu","lebih lanjut","dengan demikian","kesimpulannya","dapat disimpulkan","penting untuk dicatat","perlu dicatat","tidak hanya","tetapi juga","di era digital","memainkan peran penting","peran penting","secara keseluruhan","di sisi lain","dalam hal ini","hal ini menunjukkan","oleh karena itu","dengan kata lain","pada akhirnya","tidak dapat dipungkiri","perkembangan teknologi yang pesat","tantangan dan peluang","furthermore","moreover","in conclusion","delve","it is important to note","plays a crucial role"];
+      var PHRASES_NEW = ["berikut adalah","berikut ini adalah","dalam artikel ini","pada tulisan ini","secara umum","dapat dikatakan bahwa","hal ini dikarenakan","dikarenakan oleh","merupakan salah satu","salah satu aspek","aspek penting","dalam konteks","konteks ini","perlu dipahami bahwa","perlu diketahui bahwa","dengan demikian dapat","berdasarkan penjelasan di atas","dari uraian di atas","dapat kita lihat bahwa","terdapat beberapa","antara lain sebagai berikut","sebagai berikut","kesimpulan yang dapat diambil","meningkatkan kualitas","di zaman modern ini","seiring dengan perkembangan","tidak bisa dipungkiri","berperan dalam","diharapkan dapat","diharapkan mampu"];
+      var PHRASES_REFL = ["menjaga integritas","fokus utamanya","saya berharap dapat","berorientasi pada","terbuka terhadap","tujuan organisasi","materi pembelajaran ini berfokus","peserta dibekali","memberikan kontribusi nyata","melalui modul ini","nilai dasar asn berakhlak","pelayanan publik yang berkualitas","pelayanan publik yang optimal","meningkatkan kualitas pelayanan publik","dalam melaksanakan tugas","kerja sama yang baik","beradaptasi terhadap perubahan","nama baik instansi","berikut adalah rangkuman"];
+
+      var CONTOH_MANUSIA = "Hari pertama magang, saya gemetar. Bukan karena takut dimarahi, tapi karena mesin fotokopi di kantor kelurahan itu bunyinya seperti mau meledak setiap kali saya menekan tombol hijau besar di pojok kanan atasnya.\n\nSaya ditempatkan di Kelurahan Cigadung, Bandung, mulai 3 Februari sampai 28 Maret 2025, dan tugas pertama saya ternyata bukan mengurus data penduduk seperti bayangan saya selama ini, melainkan membereskan tumpukan arsip surat masuk tahun 2019 yang tingginya hampir menyentuh lutut. Melelahkan. Debunya luar biasa. Bersin saya sampai dihitung Pak Dedi, staf paling senior di sana, katanya sembilan kali sebelum jam sepuluh pagi.\n\nDi minggu kedua barulah saya diajak turun ke lapangan mendata warga penerima bantuan di RW 07, dan di situlah saya pertama kali melihat sendiri bagaimana teori administrasi publik yang selama ini cuma berupa slide PowerPoint di kelas berubah jadi antrean panjang ibu-ibu yang membawa map plastik, sebagian sudah lecek, sebagian lagi masih baru mengkilap. Ada Bu Ratna. Beliau berusia 71 tahun, tinggal sendirian, dan setiap kali ditanya alamat beliau selalu menjawab dengan menyebutkan patokan warung nasi Bu Tini, bukan nama jalan, karena menurutnya semua orang di kampung itu memang lebih hafal warung daripada nama jalan resmi yang terpampang di papan biru di ujung gang.\n\nPengalaman paling berkesan justru datang dari hal sepele: printer macet di hari terakhir pengumpulan berkas, pukul 15.40, sepuluh menit sebelum kantor tutup, dan kami bertiga—saya, Pak Dedi, dan seorang warga bernama Kang Ujang—akhirnya membongkar printer itu di lantai dengan obeng pinjaman dari bengkel sebelah. Berhasil. Rasanya seperti menang lomba.\n\nKalau ditanya apa yang saya pelajari, jawabannya bukan rumus atau teori baru, melainkan kesadaran bahwa data yang rapi di layar komputer selalu punya wajah, punya rumah bercat hijau yang catnya mengelupas, dan punya cerita yang tidak akan pernah muat di kolom Excel mana pun.";
+
+      var CONTOH_AI = "Di era digital yang berkembang sangat pesat, teknologi memainkan peran penting dalam berbagai aspek kehidupan manusia modern. Selain itu, di era digital ini, teknologi juga memainkan peran penting dalam mengubah cara masyarakat bekerja dan belajar. Dengan demikian, penting untuk dicatat bahwa teknologi memberikan kemudahan akses informasi bagi masyarakat di berbagai daerah. Dalam hal ini, pendidikan merupakan bidang yang paling merasakan dampak positif dari perkembangan teknologi yang pesat tersebut.\n\nSelain itu, teknologi memungkinkan proses pembelajaran berlangsung secara fleksibel tanpa terikat oleh ruang dan waktu tertentu. Dengan demikian, siswa dapat mengakses berbagai materi pembelajaran kapan saja dan di mana saja sesuai dengan kebutuhannya. Selain itu, platform pembelajaran daring juga menyediakan sumber belajar yang interaktif bagi siswa di seluruh Indonesia. Hal ini menunjukkan bahwa teknologi mampu meningkatkan kualitas pembelajaran secara keseluruhan di berbagai jenjang pendidikan formal.\n\nDi sisi lain, teknologi juga menghadirkan tantangan dan peluang yang perlu diperhatikan oleh semua pihak terkait bersama. Tidak hanya memberikan kemudahan, tetapi juga menuntut kesiapan infrastruktur dan sumber daya manusia yang memadai. Dengan kata lain, guru dan siswa perlu memiliki literasi digital yang baik agar teknologi dapat dimanfaatkan secara optimal. Oleh karena itu, perlu dicatat bahwa kesenjangan akses masih menjadi kendala utama di berbagai daerah Indonesia.\n\nSecara keseluruhan, teknologi memainkan peran penting dalam meningkatkan mutu pendidikan apabila dimanfaatkan secara bijak dan tepat. Pada akhirnya, keberhasilan integrasi teknologi bergantung pada kerja sama pemerintah, sekolah, guru, siswa, dan juga masyarakat luas. Tidak dapat dipungkiri bahwa perkembangan teknologi yang pesat akan terus membawa perubahan besar bagi dunia pendidikan. Kesimpulannya, dapat disimpulkan bahwa teknologi merupakan faktor kunci dalam mewujudkan pendidikan berkualitas di masa depan.";
+
+      var CONTOH_PARAFRASE = "Teknologi sudah mengubah cara belajar di kelas maupun di rumah dalam beberapa tahun terakhir ini. Dulu siswa hanya mengandalkan buku paket. Catatan guru di papan tulis juga menjadi pegangan utama sebelum ada internet di sekolah. Sekarang materi bisa dibuka lewat ponsel, video penjelasan singkat, atau aplikasi belajar gratis. Perubahan ini membuat belajar terasa lebih fleksibel karena tidak harus selalu menunggu jam pelajaran di sekolah.\n\nNamun fleksibilitas itu datang bersama masalah baru yang cukup serius bagi banyak siswa. Sinyal internet di daerah terpencil masih sering putus. Kuota data pun harganya tidak selalu terjangkau bagi keluarga dengan penghasilan pas-pasan setiap bulannya. Guru dituntut menguasai perangkat baru padahal pelatihan yang diterima biasanya hanya satu dua hari saja, setelah itu mereka dilepas untuk mencoba sendiri di kelas masing-masing.\n\nBeberapa sekolah mencoba mengatasi masalah tersebut dengan cara yang cukup sederhana dan juga murah. Mereka membuat kelompok belajar kecil. Materi diunduh sekali di sekolah kemudian dibaca luring di rumah tanpa perlu koneksi internet lagi. Laboratorium komputer dipakai bergantian antar kelas supaya semua siswa kebagian kesempatan praktik secara langsung. Dengan demikian, kegiatan belajar tetap berjalan meskipun koneksi internet di sekolah mereka kurang stabil.\n\nSelain itu, ada sekolah yang menugaskan siswa senior mendampingi adik kelasnya saat praktik komputer. Siswa yang tadinya malu bertanya kepada guru menjadi lebih berani mencoba hal baru. Guru bisa lebih fokus menyiapkan materi berikutnya tanpa harus berkeliling kelas sendirian sepanjang jam pelajaran berlangsung di pagi itu. Cara sederhana seperti ini ternyata memberi hasil yang lumayan bagi semangat belajar siswa.\n\nSecara keseluruhan, pemanfaatan teknologi sebaiknya disesuaikan dengan kondisi nyata masing-masing sekolah di daerah. Sekolah yang fasilitasnya lengkap dapat bereksperimen lebih jauh dengan berbagai platform pembelajaran digital terbaru saat ini. Sekolah yang terbatas cukup memakai teknologi seperlunya saja sesuai kemampuan mereka. Yang terpenting, guru dan siswa benar-benar terbantu dalam proses belajar mengajar sehari-hari di kelas, bukan sekadar terlihat modern di atas kertas laporan tahunan sekolah saja.";
+
+      var CONTOH_GEMINI = `**Kecerdasan buatan** merupakan salah satu aspek penting dalam perkembangan pendidikan di zaman modern ini. Berikut adalah penjelasan mengenai bagaimana teknologi ini berperan dalam proses pembelajaran di kelas. Secara umum, dapat dikatakan bahwa kecerdasan buatan membantu guru dan siswa. Dalam konteks ini, teknologi tidak menggantikan peran guru, melainkan mendukung pekerjaan mereka setiap hari, mulai dari menyiapkan materi, memeriksa tugas, sampai memberikan perhatian yang lebih personal kepada setiap siswa di kelas.
+
+Selain itu, kecerdasan buatan dapat menyesuaikan materi dengan kebutuhan masing-masing siswa secara lebih personal dan terukur. Siswa yang lambat memahami satu topik akan mendapatkan latihan tambahan. Sebaliknya, siswa yang cepat dapat melanjutkan ke materi berikutnya tanpa harus menunggu teman sekelasnya menyelesaikan latihannya terlebih dahulu. Hal ini dikarenakan oleh sistem yang mampu membaca pola belajar dari data yang dikumpulkan selama proses pembelajaran berlangsung di sekolah.
+
+Dalam artikel ini, terdapat beberapa manfaat utama yang perlu dipahami bahwa teknologi ini membawa perubahan nyata, antara lain sebagai berikut:
+- Membantu guru menilai tugas siswa dengan lebih cepat dan juga lebih konsisten setiap waktu.
+- Memberikan umpan balik langsung kepada siswa setelah mereka selesai mengerjakan latihan soal di kelas.
+- Menyediakan rekomendasi materi tambahan yang sesuai dengan minat serta kebutuhan belajar masing-masing siswa.
+
+Kesimpulannya, kesimpulan yang dapat diambil adalah kecerdasan buatan membawa banyak manfaat bagi dunia pendidikan saat ini. Diharapkan dapat meningkatkan kualitas pembelajaran apabila digunakan secara bijak. Bijak dan bertanggung jawab. Oleh karena itu, sekolah perlu menyiapkan guru dan siswa agar siap memanfaatkan teknologi ini dengan sebaik-baiknya dalam kegiatan belajar sehari-hari.`;
+
+
+      function clamp(v, a, b){ if(a===undefined)a=0; if(b===undefined)b=1; return Math.max(a, Math.min(b, v)); }
+      function wordsOf(s){ return s.toLowerCase().match(/[\p{L}\p{N}']+/gu) || []; }
+      function splitSentences(text){
+        var clean = text.replace(/\s+/g, " ").trim();
+        var m = clean.match(/[^.!?…]+[.!?…]+["”']?|[^.!?…]+$/g) || [];
+        return m.map(function(s){ return s.trim(); }).filter(function(s){ return s.length > 0; });
+      }
+      function splitParagraphs(text){
+        return text.split(/\n\s*\n/).map(function(p){ return p.trim(); }).filter(function(p){ return p.length > 0; });
+      }
+      function allMatches(sent){
+        // Kumpulkan kemunculan dari 3 kelompok kamus, lalu pilih yang tidak tumpang tindih
+        // (frasa terpanjang didahulukan) supaya satu rangkaian kata tidak dihitung ganda.
+        var low = " " + sent.toLowerCase() + " ";
+        var raw = [];
+        var groups = [[PHRASES_OLD, 1.0], [PHRASES_NEW, 0.6], [PHRASES_REFL, 0.75]];
+        groups.forEach(function(g){
+          g[0].forEach(function(p){
+            var idx = 0;
+            while(true){
+              var i = low.indexOf(p, idx);
+              if(i < 0) break;
+              raw.push({ p: p, start: i, end: i + p.length, w: g[1] });
+              idx = i + 1;
+            }
+          });
+        });
+        raw.sort(function(a, b){ return (b.end - b.start) - (a.end - a.start) || a.start - b.start; });
+        var used = [], accepted = [];
+        raw.forEach(function(m){
+          var overlap = used.some(function(u){ return m.start < u.end && u.start < m.end; });
+          if(!overlap){ used.push(m); accepted.push(m); }
+        });
+        return accepted;
+      }
+      function phraseDetail(sent){
+        var acc = allMatches(sent);
+        var weighted = acc.reduce(function(a, m){ return a + m.w; }, 0);
+        var score = weighted === 0 ? 0 : Math.min(0.95, 0.40 + 0.32 * weighted);
+        return { score: score, weighted: weighted, hits: acc.length, found: acc.map(function(m){ return m.p; }) };
+      }
+      function phraseHits(sent){
+        var d = phraseDetail(sent);
+        return { hits: d.hits, found: d.found };
+      }
+      function cvOf(arr){
+        if(!arr.length) return 0;
+        var mean = arr.reduce(function(a,b){ return a+b; }, 0) / arr.length;
+        if(!mean) return 0;
+        var v = arr.reduce(function(a,b){ return a + (b-mean)*(b-mean); }, 0) / arr.length;
+        return Math.sqrt(v) / mean;
+      }
+      function mapCV(cv){ return clamp((0.85 - cv) / (0.85 - 0.35)); }
+
+      /* --- Sinyal 5: sisa format markdown (keluaran LLM yang disalin apa adanya) --- */
+      function markdownSignal(text){
+        var lines = text.split(/\n/);
+        var boldM = text.match(/\*\*[^*\n]+\*\*/g);
+        var bold = boldM ? boldM.length : 0;
+        var heading = 0, hr = 0, quote = 0, listLines = 0;
+        var listLens = [];
+        lines.forEach(function(ln){
+          var t = ln.trim();
+          if(/^#{1,6}\s/.test(t)) heading++;
+          else if(/^(-{3,}|_{3,}|\*{3,})\s*$/.test(t)) hr++;
+          else if(/^>\s/.test(t)) quote++;
+          else if(/^([-*•]|\d+[.)])\s+/.test(t)){ listLines++; listLens.push(wordsOf(t).length); }
+        });
+        var listRegular = 0;
+        if(listLines >= 3){ listRegular = cvOf(listLens) < 0.45 ? 1 : 0.4; }
+        var W = bold * 1.0 + heading * 1.4 + hr * 1.6 + quote * 1.0 + Math.max(0, listLines - 1) * 0.5 + listRegular * 0.8;
+        return { score: clamp(1 - Math.exp(-0.75 * W)), bold: bold, heading: heading, hr: hr, quote: quote, listLines: listLines, W: W };
+      }
+      /* --- Sinyal 6: simetri paragraf & pembuka generik --- */
+      var GENERIC_OPENERS = ["selain itu","di sisi lain","selanjutnya","kemudian","terakhir","kesimpulannya","dengan demikian","oleh karena itu","secara keseluruhan","pada akhirnya","lebih lanjut","dalam hal ini","berikut adalah","pertama","kedua","ketiga","sebagai kesimpulan","di era digital","dalam konteks ini","dalam artikel ini"];
+      function symmetrySignal(paras, paraSents){
+        var nP = paras.length;
+        if(nP < 2) return { score: 0.3, paraScore: 0.5, genericRatio: 0, uniform: 0, counts: [] };
+        var paraLens = paras.map(function(p){ return wordsOf(p).length; });
+        var paraScore = mapCV(cvOf(paraLens));
+        var generic = 0;
+        paras.forEach(function(p){
+          var low = p.trim().toLowerCase();
+          var hit = GENERIC_OPENERS.some(function(o){ return low.indexOf(o) === 0; });
+          if(hit) generic++;
+        });
+        var genericRatio = generic / nP;
+        var counts = paraSents.map(function(ps){ return ps.length; });
+        var freqC = {};
+        counts.forEach(function(c){ freqC[c] = (freqC[c] || 0) + 1; });
+        var modeFreq = 0;
+        Object.keys(freqC).forEach(function(k){ if(freqC[k] > modeFreq) modeFreq = freqC[k]; });
+        var uniform = clamp((modeFreq / nP - 0.34) / 0.66);
+        var countCVScore = clamp((0.55 - cvOf(counts)) / 0.55);
+        var uniformScore = 0.6 * uniform + 0.4 * countCVScore;
+        var score = clamp(0.40 * paraScore + 0.30 * clamp(genericRatio / 0.6) + 0.30 * uniformScore);
+        return { score: score, paraScore: paraScore, genericRatio: genericRatio, uniform: uniformScore, counts: counts };
+      }
+      /* --- Sinyal 7: pengulangan pola 4 kata (4-gram) di seluruh dokumen --- */
+      /* ===== Pengulangan sadar-istilah (v0.15.1) =====
+         Rangkaian 4 kata yang isinya didominasi istilah topik dokumen (kata
+         isi berfrekuensi tinggi + istilah judul) adalah terminologi yang
+         memang wajib diulang dalam tulisan ilmiah, bukan sidik jari templat;
+         rangkaian seperti itu dikeluarkan dari sinyal pengulangan global
+         maupun bukti per kalimat. Penjaga pengulangan panjang: rangkaian
+         yang berada di dalam rangkaian 7 kata yang juga berulang adalah
+         penyalinan templat dan tetap dihitung penuh. Dievaluasi pada
+         branch eksperimen saksara-exp-academic-repetition — semua gerbang
+         lulus dan baseline tidak berubah (benchmark/exp-academic-results.md). */
+      var EXP_FUNCW = {};
+      ("yang dan di ke dari untuk dengan pada adalah ini itu dalam secara serta atau juga oleh akan telah dapat tidak ada karena sehingga maka tersebut antara melalui terhadap tentang seperti saat ketika agar supaya bagi para setiap lebih sangat sudah belum bisa harus menjadi merupakan ialah yaitu yakni tanpa hingga sampai sejak selama sebelum sesudah setelah jika bila apabila namun tetapi sedangkan melainkan bahkan hanya saja kami kita saya anda dia mereka the of and to in a an is are for with on by this that it as at from or be was were has have had not but if then than so such into over under between through during before after").split(" ").forEach(function(w){ EXP_FUNCW[w] = 1; });
+      function expTopicTerms(allWords, freq, firstPara){
+        var terms = {};
+        var minF = Math.max(4, Math.round(allWords.length * 0.01));
+        Object.keys(freq).forEach(function(w){ if(freq[w] >= minF && !EXP_FUNCW[w] && w.length > 2) terms[w] = 1; });
+        if(firstPara && firstPara.length <= 25){ firstPara.forEach(function(w){ if(!EXP_FUNCW[w] && w.length > 2) terms[w] = 1; }); }
+        return terms;
+      }
+      function expTemplateGrams(allWords){
+        var set = {};
+        var map = {};
+        for(var i = 0; i + 7 <= allWords.length; i++){ var g7 = allWords.slice(i, i + 7).join(" "); map[g7] = (map[g7] || 0) + 1; }
+        Object.keys(map).forEach(function(g7){
+          if(map[g7] < 3) return;
+          var ws = g7.split(" ");
+          for(var k = 0; k + 4 <= ws.length; k++) set[ws.slice(k, k + 4).join(" ")] = 1;
+        });
+        return set;
+      }
+      function expIsTermGram(g, terms){
+        var ws = g.split(" "), c = 0;
+        for(var k = 0; k < ws.length; k++){ if(terms[ws[k]]) c++; }
+        return c >= 3;
+      }
+      function repetitionSignal(allWords, expTerms, expTempl){
+        var nW = allWords.length;
+        if(nW < 20) return { score: 0, patterns: 0, norm: 0 };
+        var map = new Map();
+        for(var i = 0; i + 4 <= nW; i++){
+          var g = allWords.slice(i, i + 4).join(" ");
+          map.set(g, (map.get(g) || 0) + 1);
+        }
+        var patterns = 0;
+        map.forEach(function(c, g){ if(c >= 3) patterns += (expTerms && !(expTempl && expTempl[g]) && expIsTermGram(g, expTerms)) ? 0 : 1; });
+        var norm = patterns * 2500 / nW;
+        var score = clamp(norm / 10);
+        if(patterns <= 1) score = Math.min(score, 0.3);
+        return { score: score, patterns: patterns, norm: norm };
+      }
+
+      function analyze(text){
+        var paras = splitParagraphs(text);
+        var paraSents = paras.map(function(p){ return splitSentences(p); });
+        var sents = [];
+        paraSents.forEach(function(ps){ ps.forEach(function(s){ sents.push(s); }); });
+        var lens = sents.map(function(s){ return wordsOf(s).length; });
+        var allWords = wordsOf(text);
+        var n = allWords.length;
+        var totalLen = lens.reduce(function(a,b){ return a+b; }, 0);
+        var mean = lens.length ? totalLen / lens.length : 0;
+        var cv = cvOf(lens);
+        var burst = mapCV(cv);
+        // Kosakata: TTR jendela bergerak 50 kata + hapax
+        var avgTTR;
+        if(n <= 50){ avgTTR = n ? (Object.keys(allWords.reduce(function(o,w){ o[w]=1; return o; }, {})).length / n) : 1; }
+        else{
+          var wins = [];
+          for(var i = 0; i + 50 <= n; i += 5){
+            var set = {};
+            for(var j = i; j < i + 50; j++) set[allWords[j]] = 1;
+            wins.push(Object.keys(set).length / 50);
+          }
+          avgTTR = wins.reduce(function(a,b){ return a+b; }, 0) / wins.length;
+        }
+        var freq = {};
+        allWords.forEach(function(w){ freq[w] = (freq[w] || 0) + 1; });
+        var hapaxCount = Object.keys(freq).filter(function(k){ return freq[k] === 1; }).length;
+        var hapax = n ? hapaxCount / n : 0;
+        var ttrScore = clamp((0.80 - avgTTR) / (0.80 - 0.55));
+        var hapaxScore = clamp((0.50 - hapax) / (0.50 - 0.25));
+        var vocab = 0.7 * ttrScore + 0.3 * hapaxScore;
+        var overallTTR = n ? Object.keys(freq).length / n : 0;
+        // Paragraf
+        var paraLens = paras.map(function(p){ return wordsOf(p).length; });
+        var paraScore = paraLens.length > 1 ? mapCV(cvOf(paraLens)) : 0.5;
+        // Awalan kalimat
+        var starters = sents.map(function(s){ return wordsOf(s).slice(0, 2).join(" "); });
+        var sf = {};
+        starters.forEach(function(s){ sf[s] = (sf[s] || 0) + 1; });
+        var repeated = starters.filter(function(s){ return sf[s] > 1; }).length / (starters.length || 1);
+        var starterGlobal = clamp(repeated / 0.6);
+        var lenRange = (mean >= 15 && mean <= 25) ? 1 : clamp(1 - Math.min(Math.abs(mean - 20) / 15, 1));
+        var stylo = clamp(0.5 * starterGlobal + 0.3 * paraScore + 0.2 * lenRange);
+        // Himpunan pola 4 kata yang berulang (>=3x) di seluruh dokumen — sidik jari templat.
+        // Dihitung sekali di sini karena dipakai per kalimat maupun oleh sinyal pengulangan global.
+        var gramCount = {};
+        for(var gi = 0; gi + 4 <= allWords.length; gi++){ var gg = allWords.slice(gi, gi + 4).join(" "); gramCount[gg] = (gramCount[gg] || 0) + 1; }
+        var expTerms = expTopicTerms(allWords, freq, paras.length ? wordsOf(paras[0]) : null);
+        var expTempl = expTemplateGrams(allWords);
+        // Per kalimat (frasa tiga kamus + bonus pengulangan pola & sisa markdown pada kalimat itu sendiri)
+        var per = sents.map(function(s, i){
+          var pd = phraseDetail(s);
+          var close = clamp(1 - Math.abs(lens[i] - mean) / ((mean * 0.9) || 1));
+          var f = sf[starters[i]];
+          var st = f <= 1 ? 0 : (f === 2 ? 0.7 : 1);
+          var sw = wordsOf(s); var rg = 0;
+          // Kumpulkan juga rangkaian 4 kata berulangnya (maks 4, tanpa duplikat) sebagai
+          // bukti yang bisa ditampilkan di panel rincian kalimat & laporan PDF.
+          // Penghitungan rg tidak berubah — skor kalimat identik dengan sebelumnya.
+          var repGrams = [];
+          for(var ri = 0; ri + 4 <= sw.length; ri++){
+            var g4 = sw.slice(ri, ri + 4).join(" ");
+            var gc = gramCount[g4] || 0;
+            if(gc >= 3){
+              var isTG = !expTempl[g4] && expIsTermGram(g4, expTerms);
+              rg += isTG ? 0 : 1;
+              if(!isTG){
+                var seenG = false;
+                for(var gk = 0; gk < repGrams.length; gk++){ if(repGrams[gk].text === g4){ seenG = true; break; } }
+                if(!seenG && repGrams.length < 4) repGrams.push({ text: g4, count: gc });
+              }
+            }
+          }
+          var repSent = clamp(rg / 2);
+          var sc = Math.min(0.95, 0.52 * pd.score + 0.32 * close + 0.16 * st + 0.18 * repSent);
+          var mdBonus = /\*\*[^*]+\*\*/.test(s) || /^\s*([-*•]|\d+[.)])\s+/.test(s);
+          if(mdBonus) sc = Math.min(0.95, sc + 0.35);
+          return { score: sc, phrase: pd.score, close: close, starter: st, repSent: repSent, repGrams: repGrams, mdBonus: mdBonus, hits: { hits: pd.hits, found: pd.found } };
+        });
+        var wAvg = totalLen ? per.reduce(function(a, p, i){ return a + p.score * lens[i]; }, 0) / totalLen : 0;
+        var phraseAvg = totalLen ? per.reduce(function(a, p, i){ return a + p.phrase * lens[i]; }, 0) / totalLen : 0;
+        var totalHits = per.reduce(function(a, p){ return a + p.hits.hits; }, 0);
+        var density = totalHits / (n || 1) * 100;
+        var densityScore = clamp((density - 0.2) / 1.8);
+        var phraseGlobal = clamp(0.30 * phraseAvg + 0.70 * densityScore);
+        var md = markdownSignal(text);
+        var sym = symmetrySignal(paras, paraSents);
+        var rep = repetitionSignal(allWords, expTerms, expTempl);
+        var globalSig = 0.16 * burst + 0.04 * vocab + 0.24 * phraseGlobal + 0.05 * stylo + 0.09 * md.score + 0.20 * sym.score + 0.22 * rep.score;
+        var final = 0.47 * wAvg + 0.53 * globalSig;
+        // Dorongan bukti gabungan: satu sinyal lemah bisa kebetulan, tetapi kepadatan frasa
+        // formulaik yang tinggi BERSAMA pengulangan pola templat (atau bersama sisa markdown
+        // mentah) adalah kombinasi yang sangat jarang muncul pada tulisan manusia.
+        final = final + 0.08 * md.score * (1 - final);
+        final = final + 0.22 * Math.min(densityScore, rep.score) * (1 - final);
+        final = final + 0.17 * Math.min(md.score, densityScore) * (1 - final);
+        // Ringkasan per kalimat (gaya Grammarly): jumlah kalimat yang skor per
+        // kalimatnya >= 0,50. Metrik tampilan tambahan dari skor per kalimat
+        // yang sudah ada — tidak mengubah skor, vonis, atau ambang apa pun.
+        var flagCount = 0;
+        for(var sfi = 0; sfi < per.length; sfi++){ if(per[sfi].score >= 0.5) flagCount++; }
+        return { final: final, burst: burst, vocab: vocab, phraseGlobal: phraseGlobal, phraseAvg: phraseAvg, density: density, totalHits: totalHits, stylo: stylo,
+          markdown: md.score, md: md, symmetry: sym.score, sym: sym, repetition: rep.score, rep: rep,
+          paraScore: paraScore, cv: cv, avgTTR: avgTTR, overallTTR: overallTTR, hapax: hapax,
+          mean: mean, words: n, sents: sents, lens: lens, per: per, paraSents: paraSents, globalSig: globalSig, wAvg: wAvg, flagCount: flagCount };
+      }
+
+      var $ = function(id){ return document.getElementById(id); };
+      var ta = $("input-teks");
+
+      function updateCounters(){
+        var t = ta.value;
+        var w = wordsOf(t).length;
+        var s = t.trim() ? splitSentences(t).length : 0;
+        $("cnt-kata").textContent = w;
+        $("cnt-kalimat").textContent = s;
+        var b = $("banner-pendek");
+        if(w > 0 && w < 100){
+          b.innerHTML = "<strong>Teks sangat pendek (" + w + " kata).</strong> Di bawah 100 kata, pola statistik belum terbentuk — hasil analisis tidak dapat dipegang. Tambahkan teks lagi.";
+          b.classList.add("show");
+        } else if(w >= 100 && w < 300){
+          b.innerHTML = "<strong>Teks pendek (" + w + " kata).</strong> Untuk teks di bawah ±300 kata, hasil kurang bisa dipegang — pakai skor ini sebagai petunjuk awal saja.";
+          b.classList.add("show");
+        } else {
+          b.classList.remove("show");
+        }
+      }
+      ta.addEventListener("input", updateCounters);
+
+      /* ---------- Penanda proses bertahap & keadaan kosong (lapisan tampilan) ----------
+         Penanda mengikuti kejadian yang benar-benar terjadi: membaca berkas
+         (setFileBusy), memeriksa tulisan (setAnalysisBusy), menyusun hasil
+         (analisis selesai dan laporan terender), dan penguat skor hanya bila
+         classifier memang berjalan — tombol batal classifier tampil selama ia
+         bekerja, dan keadaan itu DIAMATI di sini, bukan diubah. Keadaan kosong
+         mengikuti tampil/tidaknya laporan lewat pengamat kelas yang sama
+         polanya dengan pengamat arsip hasil. Tidak ada logika analisis yang
+         disentuh blok ini. */
+      var prosesDariBerkas = false;
+      var prosesTimer = null;
+      var prosesClfWatch = false;
+      function prosesLi(tahap){
+        var el = $("proses-langkah");
+        return el ? el.querySelector("li[data-tahap=\"" + tahap + "\"]") : null;
+      }
+      function prosesTahap(tahap, keadaan){
+        var li = prosesLi(tahap); if(!li) return;
+        if(keadaan === "sembunyi"){ li.hidden = true; li.className = ""; return; }
+        li.hidden = false;
+        li.className = keadaan || "";
+        var ic = li.querySelector(".p-ic");
+        if(ic) ic.textContent = keadaan === "selesai" ? "✓" : "";
+      }
+      function prosesTampil(){
+        var el = $("proses-langkah"); if(!el) return;
+        if(prosesTimer){ clearTimeout(prosesTimer); prosesTimer = null; }
+        el.classList.add("show");
+        var d = el.querySelector(".p-done"); if(d) d.hidden = true;
+      }
+      function prosesSelesai(){
+        var el = $("proses-langkah"); if(!el) return;
+        var d = el.querySelector(".p-done"); if(d) d.hidden = false;
+        prosesTimer = setTimeout(function(){
+          el.classList.remove("show");
+          prosesTahap("baca", "sembunyi");
+          prosesTahap("penguat", "sembunyi");
+          prosesTahap("periksa", "");
+          prosesTahap("susun", "");
+        }, 1400);
+      }
+      function prosesMulaiBaca(){
+        prosesDariBerkas = true;
+        prosesTampil();
+        prosesTahap("baca", "aktif");
+        prosesTahap("periksa", "");
+        prosesTahap("susun", "");
+        prosesTahap("penguat", "sembunyi");
+      }
+      function prosesBacaSelesai(){ prosesTahap("baca", "selesai"); }
+      function prosesMulaiPeriksa(){
+        prosesTampil();
+        if(!prosesDariBerkas) prosesTahap("baca", "sembunyi");
+        prosesTahap("periksa", "aktif");
+        prosesTahap("susun", "");
+      }
+      function prosesPeriksaSelesai(){
+        prosesTahap("periksa", "selesai");
+        prosesTahap("susun", "selesai");
+        prosesDariBerkas = false;
+        if(typeof clfState !== "undefined" && clfState === "ready") prosesTahap("penguat", "aktif"), prosesAmatiPenguat();
+        else prosesSelesai();
+      }
+      function prosesAmatiPenguat(){
+        if(prosesClfWatch) return;
+        var b = $("btn-clf-cancel");
+        if(!b){ prosesSelesai(); return; }
+        prosesClfWatch = true;
+        var mo = new MutationObserver(function(){
+          if(b.style.display === "none"){
+            prosesTahap("penguat", "selesai");
+            prosesClfWatch = false;
+            mo.disconnect();
+            prosesSelesai();
+          }
+        });
+        mo.observe(b, { attributes: true, attributeFilter: ["style"] });
+        /* Pengaman: berhenti mengamati setelah 10 menit agar tidak menggantung. */
+        setTimeout(function(){ if(prosesClfWatch){ prosesClfWatch = false; mo.disconnect(); } }, 600000);
+      }
+      (function(){
+        var rep = $("report"), kos = $("hasil-kosong");
+        if(!rep || !kos) return;
+        function sync(){ kos.style.display = rep.classList.contains("show") ? "none" : ""; }
+        sync();
+        new MutationObserver(sync).observe(rep, { attributes: true, attributeFilter: ["class"] });
+        var bk = $("btn-kosong-contoh");
+        if(bk) bk.addEventListener("click", function(){ loadExample(CONTOH_MANUSIA); });
+      })();
+
+      /* ---------- unggah berkas: .txt / .docx / .pdf (100% sisi klien, tanpa library eksternal) ---------- */
+      function showFileStatus(html, kind){
+        var el = $("file-status");
+        el.innerHTML = html;
+        el.className = "file-status show" + (kind ? " " + kind : "");
+      }
+      function hideFileStatus(){
+        var el = $("file-status");
+        el.innerHTML = "";
+        el.className = "file-status";
+      }
+      function escapeHtml(s){
+        return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+      }
+      function setFileBusy(busy, fileName){
+        if(busy) prosesMulaiBaca(); else prosesBacaSelesai();
+        $("btn-analisis").disabled = busy;
+        $("btn-bersihkan").disabled = busy;
+        $("file-input").disabled = busy;
+        $("btn-upload").classList.toggle("is-busy", busy);
+        $("btn-upload").setAttribute("aria-disabled", busy ? "true" : "false");
+        if(busy){
+          showFileStatus("Membaca berkas <span class=\"fname\">" + escapeHtml(fileName || "") + "</span>…", "");
+        }
+      }
+      function decompressBytes(bytes, format){
+        if(typeof DecompressionStream === "undefined"){
+          return Promise.reject(new Error("no-decompression"));
+        }
+        var ds = new DecompressionStream(format);
+        var stream = new Blob([bytes]).stream().pipeThrough(ds);
+        return new Response(stream).arrayBuffer().then(function(buf){ return new Uint8Array(buf); });
+      }
+      function decodeXmlEntities(s){
+        return s.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, "\"").replace(/&apos;/g, "'").replace(/&#(\d+);/g, function(m, n){ return String.fromCharCode(parseInt(n, 10)); }).replace(/&#x([0-9a-fA-F]+);/g, function(m, n){ return String.fromCharCode(parseInt(n, 16)); }).replace(/&amp;/g, "&");
+      }
+      /* --- DOCX: .docx adalah ZIP — parse manual, baca semua bagian yang memuat teks --- */
+      /* D7-A: paritas batas dekompresi dengan DI-CORE (D1). Nilai HARUS sama
+         dengan DI_CAPS di DI-CORE: maks 200 entri, maks 50 MB total hasil
+         dekompresi, maks 20 MB per entri. Ukuran diperiksa dari direktori
+         pusat SEBELUM inflasi, dan ditegakkan lagi secara kumulatif SELAMA
+         inflasi (direktori pusat bisa berbohong), jadi arsip bom tidak dapat
+         membekukan tab. Kesalahan keamanan membawa pesan Indonesia yang
+         jelas (message) + kode stabil (code) — rute Batch menampilkan
+         message apa adanya, rute lain menampilkan pesan generiknya. */
+      var LEGACY_ZIP_CAPS = { maxEntries: 200, maxTotalBytes: 50 * 1024 * 1024, maxEntryBytes: 20 * 1024 * 1024 };
+      function legacyZipError(code, message){ var e = new Error(message); e.code = code; return e; }
+      function listZipEntries(bytes){
+        var view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+        var len = bytes.length;
+        var eocd = -1;
+        var start = Math.max(0, len - 65557);
+        for(var i = len - 22; i >= start; i--){
+          if(view.getUint32(i, true) === 0x06054b50){ eocd = i; break; }
+        }
+        if(eocd < 0) throw new Error("zip-invalid");
+        if(eocd >= 20 && (view.getUint32(eocd - 20, true) === 0x07064b50 || view.getUint32(eocd - 20, true) === 0x06064b50))
+          throw legacyZipError("zip64", "Dokumen memakai format ZIP64 yang belum didukung. Simpan ulang dokumen sebagai .docx biasa, lalu coba lagi.");
+        var total = view.getUint16(eocd + 10, true);
+        var cdSize = view.getUint32(eocd + 12, true);
+        var cdOffset = view.getUint32(eocd + 16, true);
+        if(total === 0xFFFF || cdSize === 0xFFFFFFFF || cdOffset === 0xFFFFFFFF)
+          throw legacyZipError("zip64", "Dokumen memakai format ZIP64 yang belum didukung. Simpan ulang dokumen sebagai .docx biasa, lalu coba lagi.");
+        if(total > LEGACY_ZIP_CAPS.maxEntries)
+          throw legacyZipError("zip-too-many-entries", "Dokumen memuat terlalu banyak bagian internal (" + total + " entri; batas " + LEGACY_ZIP_CAPS.maxEntries + " entri).");
+        var pos = cdOffset;
+        var decoder = new TextDecoder("utf-8");
+        var entries = [];
+        var declaredTotal = 0;
+        for(var e = 0; e < total; e++){
+          if(pos + 46 > len || view.getUint32(pos, true) !== 0x02014b50) break;
+          var flags = view.getUint16(pos + 8, true);
+          if(flags & 0x0001)
+            throw legacyZipError("zip-encrypted", "Dokumen terenkripsi atau dilindungi kata sandi sehingga tidak dapat dibaca.");
+          var method = view.getUint16(pos + 10, true);
+          var compSize = view.getUint32(pos + 20, true);
+          var size = view.getUint32(pos + 24, true);
+          var nameLen = view.getUint16(pos + 28, true);
+          var extraLen = view.getUint16(pos + 30, true);
+          var commentLen = view.getUint16(pos + 32, true);
+          var localOffset = view.getUint32(pos + 42, true);
+          if(compSize === 0xFFFFFFFF || size === 0xFFFFFFFF || localOffset === 0xFFFFFFFF)
+            throw legacyZipError("zip64", "Dokumen memakai format ZIP64 yang belum didukung. Simpan ulang dokumen sebagai .docx biasa, lalu coba lagi.");
+          if(size > LEGACY_ZIP_CAPS.maxEntryBytes)
+            throw legacyZipError("zip-entry-too-large", "Satu bagian dokumen melebihi batas 20 MB setelah dibuka.");
+          declaredTotal += size;
+          if(declaredTotal > LEGACY_ZIP_CAPS.maxTotalBytes)
+            throw legacyZipError("zip-total-too-large", "Total isi dokumen setelah dibuka melebihi batas 50 MB.");
+          var name = decoder.decode(bytes.subarray(pos + 46, pos + 46 + nameLen));
+          if(localOffset + 30 <= len && view.getUint32(localOffset, true) === 0x04034b50){
+            var lNameLen = view.getUint16(localOffset + 26, true);
+            var lExtraLen = view.getUint16(localOffset + 28, true);
+            var dataStart = localOffset + 30 + lNameLen + lExtraLen;
+            entries.push({ name: name, method: method, size: size, data: bytes.subarray(dataStart, dataStart + compSize) });
+          }
+          pos += 46 + nameLen + extraLen + commentLen;
+        }
+        return entries;
+      }
+      /* Dekompresi beraliran dengan penghitung byte: berhenti (membatalkan
+         aliran) begitu keluaran melewati batas per-entri atau sisa anggaran
+         total — keluaran tidak pernah dibuffer melebihi batas. */
+      function decompressBytesCapped(bytes, format, maxBytes, budget){
+        if(typeof DecompressionStream === "undefined"){
+          return Promise.reject(new Error("no-decompression"));
+        }
+        var ds = new DecompressionStream(format);
+        var stream = new Blob([bytes]).stream().pipeThrough(ds);
+        var reader = stream.getReader();
+        var chunks = [], total = 0;
+        function step(){
+          return reader.read().then(function(r){
+            if(r.done){
+              var out = new Uint8Array(total), off = 0;
+              chunks.forEach(function(c){ out.set(c, off); off += c.length; });
+              if(budget) budget.total += total;
+              return out;
+            }
+            total += r.value.length;
+            if(total > maxBytes){
+              try { reader.cancel(); } catch(e) {}
+              throw legacyZipError("zip-entry-too-large", "Satu bagian dokumen melebihi batas 20 MB setelah dibuka.");
+            }
+            if(budget && budget.total + total > budget.maxTotal){
+              try { reader.cancel(); } catch(e) {}
+              throw legacyZipError("zip-total-too-large", "Total isi dokumen setelah dibuka melebihi batas 50 MB.");
+            }
+            chunks.push(r.value);
+            return step();
+          });
+        }
+        return step();
+      }
+      function zipEntryText(entry, budget){
+        if(entry.method === 0){
+          if(entry.data.length > LEGACY_ZIP_CAPS.maxEntryBytes)
+            return Promise.reject(legacyZipError("zip-entry-too-large", "Satu bagian dokumen melebihi batas 20 MB setelah dibuka."));
+          if(budget && budget.total + entry.data.length > budget.maxTotal)
+            return Promise.reject(legacyZipError("zip-total-too-large", "Total isi dokumen setelah dibuka melebihi batas 50 MB."));
+          if(budget) budget.total += entry.data.length;
+          return Promise.resolve(new TextDecoder("utf-8").decode(entry.data));
+        }
+        if(entry.method === 8){
+          return decompressBytesCapped(entry.data, "deflate-raw", LEGACY_ZIP_CAPS.maxEntryBytes, budget).then(function(raw){
+            return new TextDecoder("utf-8").decode(raw);
+          });
+        }
+        return Promise.reject(new Error("docx-method"));
+      }
+      function docxXmlToText(xml){
+        var parts = [];
+        var re = /<w:t(?:\s[^>]*)?>([\s\S]*?)<\/w:t>|<\/w:p\s*>|<w:tab[^>]*\/>|<w:br[^>]*\/?>/g;
+        var m;
+        while((m = re.exec(xml)) !== null){
+          if(m[1] !== undefined){ parts.push(decodeXmlEntities(m[1])); }
+          else if(m[0].charAt(1) === "/"){ parts.push("\n\n"); }
+          else if(m[0].indexOf("<w:tab") === 0){ parts.push("\t"); }
+          else { parts.push("\n"); }
+        }
+        return parts.join("").replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
+      }
+      function extractDocxText(arrayBuffer){
+        var bytes = new Uint8Array(arrayBuffer);
+        var entries = listZipEntries(bytes);
+        var byName = {};
+        entries.forEach(function(en){ byName[en.name] = en; });
+        if(!byName["word/document.xml"]) return Promise.reject(new Error("docx-no-document"));
+        // Urutan baca: isi utama dulu (termasuk tabel & kotak teks), lalu bagian pendamping
+        // yang juga memuat teks — header, footer, catatan kaki/akhir, komentar — supaya
+        // tidak ada teks di dalam berkas yang terlewat dari analisis.
+        var order = ["word/document.xml"];
+        entries.forEach(function(en){
+          if(/^word\/(header|footer)\d*\.xml$/.test(en.name) ||
+             en.name === "word/footnotes.xml" || en.name === "word/endnotes.xml" || en.name === "word/comments.xml"){
+            order.push(en.name);
+          }
+        });
+        /* D7-A: bagian dibaca berurutan dengan satu anggaran total bersama,
+           dan kegagalan bagian mana pun kini MENOLAK seluruh impor (paritas
+           DI-CORE) — sebelumnya kegagalan bagian ditelan diam-diam, yang
+           menyembunyikan penolakan metode/batas dan dapat menghilangkan
+           teks dari analisis tanpa pemberitahuan. */
+        var budget = { total: 0, maxTotal: LEGACY_ZIP_CAPS.maxTotalBytes };
+        var chain = Promise.resolve([]);
+        order.forEach(function(name){
+          chain = chain.then(function(texts){
+            return zipEntryText(byName[name], budget).then(function(xml){
+              texts.push(docxXmlToText(xml));
+              return texts;
+            });
+          });
+        });
+        return chain.then(function(texts){
+          return texts.filter(function(t){ return t && t.trim(); }).join("\n\n").trim();
+        });
+      }
+      /* --- PDF: ekstrak best-effort dari stream & operator teks Tj / TJ --- */
+      function bytesToLatin1(bytes){
+        var out = "";
+        var CHUNK = 8192;
+        for(var i = 0; i < bytes.length; i += CHUNK){
+          out += String.fromCharCode.apply(null, bytes.subarray(i, Math.min(i + CHUNK, bytes.length)));
+        }
+        return out;
+      }
+      function parsePdfLiteral(str, start){
+        // str[start] === "(" — kembalikan { text, end } dengan end tepat sesudah ")"
+        var out = "";
+        var depth = 1;
+        var i = start + 1;
+        while(i < str.length && depth > 0){
+          var c = str.charAt(i);
+          if(c === "\\"){
+            var n = str.charAt(i + 1);
+            if(n === "n"){ out += "\n"; i += 2; }
+            else if(n === "r"){ out += "\r"; i += 2; }
+            else if(n === "t"){ out += "\t"; i += 2; }
+            else if(n === "b"){ out += "\b"; i += 2; }
+            else if(n === "f"){ out += "\f"; i += 2; }
+            else if(n === "("){ out += "("; i += 2; }
+            else if(n === ")"){ out += ")"; i += 2; }
+            else if(n === "\\"){ out += "\\"; i += 2; }
+            else if(n === "\n"){ i += 2; }
+            else if(n === "\r"){ i += 2; if(str.charAt(i) === "\n") i++; }
+            else if(n >= "0" && n <= "7"){
+              var oct = n; var j = i + 2;
+              while(j < str.length && j < i + 4 && str.charAt(j) >= "0" && str.charAt(j) <= "7"){ oct += str.charAt(j); j++; }
+              out += String.fromCharCode(parseInt(oct, 8) & 0xff);
+              i = j;
+            }
+            else { out += n; i += 2; }
+          } else if(c === "("){ depth++; out += c; i++; }
+          else if(c === ")"){ depth--; if(depth > 0) out += c; i++; }
+          else { out += c; i++; }
+        }
+        return { text: out, end: i };
+      }
+      function parsePdfHex(str, start){
+        // str[start] === "<" (bukan "<<") — kembalikan { text, end }
+        var end = str.indexOf(">", start);
+        if(end < 0) return { text: "", end: str.length };
+        var hex = str.substring(start + 1, end).replace(/\s+/g, "");
+        if(hex.length % 2) hex += "0";
+        var out = "";
+        // UTF-16BE dengan BOM FE FF (umum pada font ToUnicode / teks hasil ekspor)
+        if(hex.length >= 4 && hex.substring(0, 4).toUpperCase() === "FEFF"){
+          for(var i = 4; i + 4 <= hex.length; i += 4){ out += String.fromCharCode(parseInt(hex.substring(i, i + 4), 16)); }
+        } else {
+          for(var k = 0; k + 2 <= hex.length; k += 2){ out += String.fromCharCode(parseInt(hex.substring(k, k + 2), 16)); }
+        }
+        return { text: out, end: end + 1 };
+      }
+      function pdfContentToText(content){
+        var pieces = [];
+        var i = 0;
+        var n = content.length;
+        function nextOperator(from){
+          var rest = content.substring(from, from + 12);
+          var mm = rest.match(/^\s*([A-Za-z'"*]+)/);
+          return mm ? mm[1] : "";
+        }
+        while(i < n){
+          var ch = content.charAt(i);
+          if(ch === "("){
+            var lit = parsePdfLiteral(content, i);
+            var op = nextOperator(lit.end);
+            if(op === "Tj" || op === "'" || op === "\""){ pieces.push(lit.text); }
+            i = lit.end;
+          } else if(ch === "<" && content.charAt(i + 1) !== "<"){
+            var hx = parsePdfHex(content, i);
+            var op2 = nextOperator(hx.end);
+            if(op2 === "Tj" || op2 === "'" || op2 === "\""){ pieces.push(hx.text); }
+            i = hx.end;
+          } else if(ch === "["){
+            // array TJ: kumpulkan string di dalamnya, beri spasi pada penyesuaian kerning besar
+            var arrPieces = [];
+            var j = i + 1;
+            while(j < n && content.charAt(j) !== "]"){
+              var cj = content.charAt(j);
+              if(cj === "("){
+                var lp = parsePdfLiteral(content, j);
+                arrPieces.push(lp.text);
+                j = lp.end;
+              } else if(cj === "<" && content.charAt(j + 1) !== "<"){
+                var hp = parsePdfHex(content, j);
+                arrPieces.push(hp.text);
+                j = hp.end;
+              } else if(cj === "-" || cj === "." || (cj >= "0" && cj <= "9")){
+                var numMatch = content.substring(j).match(/^-?\d+(?:\.\d+)?/);
+                if(numMatch){
+                  if(parseFloat(numMatch[0]) <= -120) arrPieces.push(" ");
+                  j += numMatch[0].length;
+                } else { j++; }
+              } else { j++; }
+            }
+            var opA = nextOperator(j + 1);
+            if(opA === "TJ"){ pieces.push(arrPieces.join("")); }
+            i = j + 1;
+          } else if((ch === "T" && (content.charAt(i + 1) === "d" || content.charAt(i + 1) === "D")) || ch === "*"){
+            pieces.push("\n");
+            i++;
+          } else { i++; }
+        }
+        return pieces.join(" ").replace(/[ \t]+/g, " ").replace(/ \n/g, "\n").replace(/\n{2,}/g, "\n").trim();
+      }
+      function findPdfStreams(bytes){
+        var streams = [];
+        var len = bytes.length;
+        function isWs(b){ return b === 32 || b === 9 || b === 10 || b === 13 || b === 0 || b === 12; }
+        function matchAt(pos, word){
+          if(pos + word.length > len) return false;
+          for(var k = 0; k < word.length; k++){ if(bytes[pos + k] !== word.charCodeAt(k)) return false; }
+          return true;
+        }
+        var i = 0;
+        while(i < len - 9){
+          // cari kata "stream" yang bukan bagian dari "endstream"
+          if(matchAt(i, "stream") && !matchAt(Math.max(0, i - 3), "endstream") && !(i >= 3 && matchAt(i - 3, "end"))){
+            var dataStart = i + 6;
+            if(bytes[dataStart] === 13 && bytes[dataStart + 1] === 10) dataStart += 2;
+            else if(bytes[dataStart] === 10 || bytes[dataStart] === 13) dataStart += 1;
+            var endIdx = -1;
+            for(var j = dataStart; j < len - 9; j++){
+              if(matchAt(j, "endstream")){ endIdx = j; break; }
+            }
+            if(endIdx < 0) break;
+            var dataEnd = endIdx;
+            while(dataEnd > dataStart && isWs(bytes[dataEnd - 1])) dataEnd--;
+            // jangan memangkas byte biner yang kebetulan tampak seperti whitespace di ujung stream terkompresi:
+            // ambil juga potongan mentah apa adanya sebagai kandidat cadangan
+            streams.push(bytes.subarray(dataStart, endIdx));
+            streams.push(bytes.subarray(dataStart, dataEnd));
+            i = endIdx + 9;
+          } else { i++; }
+        }
+        return streams;
+      }
+      function extractPdfText(arrayBuffer){
+        var bytes = new Uint8Array(arrayBuffer);
+        var streams = findPdfStreams(bytes);
+        var jobs = streams.map(function(data){
+          return decompressBytes(data, "deflate").then(function(raw){
+            return bytesToLatin1(raw);
+          }).catch(function(){
+            // stream mungkin memang tidak terkompresi (FlateDecode gagal) — pakai apa adanya
+            var rawStr = bytesToLatin1(data);
+            if(rawStr.indexOf("Tj") >= 0 || rawStr.indexOf("TJ") >= 0) return rawStr;
+            return "";
+          });
+        });
+        return Promise.all(jobs).then(function(contents){
+          var texts = [];
+          var seen = {};
+          contents.forEach(function(c){
+            if(!c) return;
+            if(c.indexOf("Tj") < 0 && c.indexOf("TJ") < 0 && c.indexOf("BT") < 0) return;
+            var t = pdfContentToText(c);
+            if(t && !seen[t]){ seen[t] = 1; texts.push(t); }
+          });
+          return texts.join("\n").trim();
+        });
+      }
+      function looksGarbled(text){
+        var nonSpace = text.replace(/\s+/g, "");
+        if(!nonSpace.length) return true;
+        var letters = (nonSpace.match(/[\p{L}\p{N}.,;:!?'"()\-–—%]/gu) || []).length;
+        return (letters / nonSpace.length) < 0.55;
+      }
+
+      /* Jalur utama unggah: input berkas menutupi seluruh tombol Unggah (lihat .upload-wrap),
+         jadi ketukan pengguna mendarat LANGSUNG pada elemen input itu sendiri — gestur asli
+         yang dihormati semua webview. Tidak ada klik terprogram (.click()) sebagai jalur utama,
+         karena pola itulah yang gagal membuka pemilih berkas di webview pengguna. */
+      $("file-input").addEventListener("change", function(e){
+        var f = e.target.files && e.target.files[0];
+        e.target.value = "";
+        if(f) handleFile(f);
+      });
+      /* Jalur cadangan: seret & letakkan berkas ke panel analisis */
+      var panelEl = $("panel-analisis");
+      ["dragenter", "dragover"].forEach(function(evName){
+        panelEl.addEventListener(evName, function(e){ e.preventDefault(); panelEl.classList.add("dragover"); });
+      });
+      ["dragleave", "drop"].forEach(function(evName){
+        panelEl.addEventListener(evName, function(e){ e.preventDefault(); panelEl.classList.remove("dragover"); });
+      });
+      panelEl.addEventListener("drop", function(e){
+        var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+        if(f) handleFile(f);
+      });
+      window.addEventListener("dragover", function(e){ e.preventDefault(); });
+      window.addEventListener("drop", function(e){ e.preventDefault(); });
+
+      /* ---------- batas ukuran berkas & cakupan analisis ----------
+         Tanpa batas, satu berkas .txt ±5 MB (±850 ribu kata) membuat analyze()
+         yang sepenuhnya sinkron memblokir utas utama sampai peramban menyatakan
+         halaman tidak merespons. Karena itu: berkas di atas 20 MB ditolak
+         SEBELUM diurai, dan analisis dibatasi pada 100.000 kata pertama
+         (dipotong tepat pada batas kata) dengan catatan yang tampil terbuka.
+         Teks di kotak teks TIDAK diubah — hanya porsi yang dianalisis yang
+         dibatasi, dan lastText/lastResult/classifier/laporan semuanya memakai
+         porsi yang sama persis. */
+      var MAX_FILE_BYTES = 20 * 1024 * 1024; /* 20 MB */
+      var MAX_ANALYZE_WORDS = 100000;
+      function fmtNumID(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
+      function capAnalysisText(text){
+        var re = /[\p{L}\p{N}']+/gu; /* pola kata yang sama dengan wordsOf() */
+        var m, count = 0, cutEnd = -1;
+        while((m = re.exec(text)) !== null){
+          count++;
+          if(count === MAX_ANALYZE_WORDS){ cutEnd = re.lastIndex; }
+          else if(count > MAX_ANALYZE_WORDS){ break; }
+        }
+        if(count <= MAX_ANALYZE_WORDS) return { text: text, totalWords: count, capped: false };
+        /* totalWords harus JUMLAH SEBENARNYA di seluruh dokumen (untuk catatan
+           yang jujur), bukan hitungan sampai titik potong — hitung penuh di sini. */
+        return { text: text.slice(0, cutEnd), totalWords: wordsOf(text).length, capped: true };
+      }
+
+      function handleFile(f){
+        if(f && typeof f.size === "number" && f.size > MAX_FILE_BYTES){
+          showFileStatus("<strong>Berkas terlalu besar</strong> (" + (f.size / 1048576).toFixed(1).replace(".", ",") + " MB) — batasnya 20 MB supaya halaman tetap lancar. Pecah berkas jadi beberapa bagian, atau tempel teksnya langsung ke kotak di atas.", "err");
+          return;
+        }
+        var lower = (f.name || "").toLowerCase();
+        if(lower.endsWith(".doc") && !lower.endsWith(".docx")){
+          showFileStatus("<strong>Format .doc lama belum bisa dibaca</strong> — simpan ulang berkas sebagai .docx, lalu unggah lagi. Atau tempel teksnya langsung ke kotak di atas.", "err");
+          return;
+        }
+        var kind = null;
+        if(lower.endsWith(".docx")) kind = "docx";
+        else if(lower.endsWith(".pdf")) kind = "pdf";
+        else if(lower.endsWith(".txt") || f.type === "text/plain") kind = "txt";
+        else {
+          showFileStatus("<strong>Format berkas ini belum didukung.</strong> Yang bisa diunggah: .txt, .docx, dan .pdf. Atau tempel teksnya langsung ke kotak di atas.", "err");
+          return;
+        }
+        setFileBusy(true, f.name);
+        var extractPromise;
+        if(kind === "txt"){
+          extractPromise = f.text();
+        } else if(kind === "docx"){
+          extractPromise = f.arrayBuffer().then(extractDocxText);
+        } else {
+          extractPromise = f.arrayBuffer().then(extractPdfText);
+        }
+        extractPromise.then(function(text){
+          text = String(text || "");
+          var wordCount = wordsOf(text).length;
+          if(kind === "pdf" && (wordCount < 30 || looksGarbled(text))){
+            ocrPendingFile = f;
+            showFileStatus("<strong>Teks di PDF ini tidak terbaca</strong> — biasanya karena PDF hasil pindai/gambar atau hurufnya tidak standar. Tempel teksnya langsung ke kotak di atas, atau baca sebagai gambar: <button type=\"button\" class=\"btn-ghost\" data-ocr-open=\"1\">Buka di OCR</button>", "err");
+            return;
+          }
+          if(!text.trim() || wordCount === 0){
+            if(kind === "pdf"){
+              ocrPendingFile = f;
+              showFileStatus("<strong>Berkas ini tidak memuat teks yang bisa dibaca.</strong> Bila PDF ini hasil pindai/gambar, OCR bisa membacanya sebagai gambar: <button type=\"button\" class=\"btn-ghost\" data-ocr-open=\"1\">Buka di OCR</button>", "err");
+              return;
+            }
+            showFileStatus("<strong>Berkas ini tidak memuat teks yang bisa dibaca.</strong> Coba berkas lain, atau tempel teksnya langsung ke kotak di atas.", "err");
+            return;
+          }
+          ta.value = text;
+          updateCounters();
+          if(wordCount > MAX_ANALYZE_WORDS){
+            showFileStatus("Berkas dimuat: <span class=\"fname\">" + escapeHtml(f.name) + "</span> — " + fmtNumID(wordCount) + " kata terbaca; yang dianalisis " + fmtNumID(MAX_ANALYZE_WORDS) + " kata pertama (batas per dokumen — lihat catatan cakupan di laporan).", "ok");
+          } else {
+            showFileStatus("Berkas dimuat: <span class=\"fname\">" + escapeHtml(f.name) + "</span> — " + wordCount + " kata terbaca, seluruhnya dianalisis.", "ok");
+          }
+          runAnalysis();
+        }).catch(function(err){
+          if(kind === "docx"){
+            showFileStatus("<strong>Berkas Word ini tidak bisa dibaca.</strong> Pastikan formatnya .docx (bukan .doc lama) dan berkasnya tidak rusak, atau tempel teksnya langsung ke kotak di atas.", "err");
+          } else if(kind === "pdf"){
+            showFileStatus("<strong>Teks di PDF ini tidak terbaca</strong> — biasanya karena PDF hasil pindai/gambar atau hurufnya tidak standar. Tempel teksnya langsung ke kotak di atas.", "err");
+          } else {
+            showFileStatus("<strong>Berkas tidak bisa dibaca.</strong> Coba berkas lain, atau tempel teksnya langsung ke kotak di atas.", "err");
+          }
+        }).then(function(){
+          // setFileBusy(false) hanya mengaktifkan kembali tombol; pesan hasil di atas tidak ditimpa
+          setFileBusy(false);
+        });
+      }
+
+      $("btn-bersihkan").addEventListener("click", function(){
+        ta.value = "";
+        updateCounters();
+        hideFileStatus();
+        $("report").classList.remove("show");
+        ta.focus();
+      });
+
+      function bandOf(score){
+        if(score >= 0.65) return "r";
+        if(score >= 0.35) return "y";
+        return "g";
+      }
+      function pct(x){ return Math.round(x * 100); }
+
+      /* ---------- Classifier terlatih (lokal, di peramban) — PENGUAT BERSYARAT ----------
+         Opsi A: classifier berjalan 100% di peramban pengunjung memakai
+         onnxruntime-web 1.31.1 mentah (dimuat dinamis dari CDN) — TIDAK ada
+         server classifier, dan TIDAK memakai pipeline @xenova/transformers:
+         pustaka itu tidak bisa memuat model data-eksternal ter-shard kami
+         (constructSession-nya hanya mengambil berkas grafiknya saja).
+         @xenova/transformers 2.17.2 tetap dipakai, khusus untuk AutoTokenizer.
+         Model: saksara/ai-text-detector-onnx —
+         model klasifikasi teks AI multibahasa (XLM-RoBERTa-base) yang kami
+         konversi ke ONNX (kuantisasi dinamis int8) dan kami hos di
+         Hugging Face. Berkas modelnya TER-SHARD sebagai data eksternal ONNX: grafik
+         onnx/model_quantized.onnx (438.536 B) + 5 shard
+         model_quantized.onnx_data-000 s.d. -004 (total keenamnya ±278,9 MB),
+         dimuat lewat opsi sesi externalData onnxruntime-web dengan path shard
+         persis sama dengan string `location` di dalam grafik; total unduhan
+         ±280 MB termasuk tokenizer (17,1 MB, dimuat AutoTokenizer dari repo
+         yang sama). Keenam berkas model disimpan best-effort di Cache API
+         (cache "saksara-clf-v1") agar kunjungan berikutnya tidak mengunduh
+         ulang. Konversi terverifikasi setia: logit ONNX sama persis dengan
+         logit PyTorch model aslinya, dan id2label dipertahankan:
+         {"0": "Human", "1": "ChatGPT"} — indeks kelas AI dibaca dari
+         config.json model saat pemuatan (bukan hard-code). PENTING:
+         tokenizer.json yang dihos adalah tokenizer.json ASLI repo sumber —
+         tokenizer.json hasil simpan-ulang pustaka tokenizers modern (skema
+         Metaspace baru) merusak tokenisasi pada @xenova/transformers 2.17.2
+         (spasi hilang, semua teks terbaca "Human" dengan skor ≈1,0).
+         Hasil uji nyata model terkuantisasi — diukur ulang pada runtime yang
+         benar-benar dipakai halaman ini (onnxruntime-web 1.31.1, backend wasm,
+         model ter-shard; teks dipotong per paragraf ±1.200 karakter lalu
+         dirata-rata): contoh AI halaman 1,0000; AI modern (Gemini) 1,0000;
+         refleksi 0,8069; parafrase 0,0280; manusia 0,0000; benchmark ai-formal
+         semua 1,0000; manusia personal ≈0,0000; AI parafrase ≈0,0000 — TETAPI
+         keempat teks manusia formal/ensiklopedis (gaya Wikipedia) dinilai
+         0,68–1,00 (1,0000; 0,7224; 1,0000; 0,6827). Catatan runtime: angka
+         refleksi & parafrase BERBEDA dari pengukuran lama di onnxruntime-node
+         (0,9977 & 0,3325) — beberapa potongan teks yang skornya di perbatasan
+         terbalik oleh perbedaan aritmetika int8 antara kernel wasm dan kernel
+         CPU natif (potongan ke-5 refleksi: 0,997 → 0,043). Bobot modelnya
+         identik; angka wasm inilah yang berlaku, karena wasm yang berjalan di
+         peramban pengunjung.
+         Karena bias "formal = AI" itulah classifier TIDAK dicampur datar:
+         ia PENGUAT BERSYARAT (aturan gerbang persisnya di applyClassifierToReport)
+         — heuristik v3 (Bahasa Indonesia) tetap penemu indikasi awal,
+         penyeimbang utama, dan rinciannya selalu ditampilkan penuh.
+         Unduhan model TIDAK otomatis (opt-in, demi hemat kuota pengunjung):
+         model hanya diunduh sesudah pengunjung menekan tombol "Aktifkan
+         Penguat AI". Saat halaman dibuka, halaman hanya memeriksa Cache API
+         (tanpa jaringan sama sekali) untuk tahu apakah model sudah tersimpan
+         dari kunjungan sebelumnya; status panel selalu jujur: belum aktif,
+         persen unduhan (batang + byte), memuat, siap, atau gagal + tombol
+         coba lagi. Sesudah unduhan pertama, model tersimpan di cache
+         peramban dan bisa dihapus lewat tombol "Hapus cache model".
+         Sesi inferensi mencoba WebGPU lebih dulu (bila peramban
+         mendukungnya) dan jatuh kembali ke WASM dengan opsi yang sama;
+         bila inferensi WebGPU gagal di tengah penilaian, sesi dibuat ulang
+         sebagai WASM dan penilaian diulang sekali dari awal. Teks TIDAK PERNAH dikirim ke mana pun — inferensi berjalan lokal;
+         satu-satunya lalu lintas jaringan adalah unduhan berkas model dari
+         Hugging Face dan pustaka onnxruntime-web + transformers.js dari CDN.
+         Label kelas AI ditentukan dari id2label model itu sendiri (bukan hard-code):
+         config model ini {"0": "Human", "1": "ChatGPT"} → label AI "ChatGPT".
+         Aturan gerbang (persis): tanpa skor classifier, skor akhir = heuristik.
+         Heuristik < 0,35 → skor akhir = heuristik (classifier tidak bisa
+         menaikkan). Heuristik ≥ 0,35 → skor akhir = heuristik + (1 − heuristik)
+         × classifier × 0,5, dan label mesin menjadi "Heuristik v3 + Penguat
+         Classifier". Bila model belum siap, laporan tampil 100% heuristik dulu
+         dan penguatan diterapkan ke laporan yang sama begitu model siap.
+         Semua kegagalan ditangkap try/catch dan hanya mengubah status classifier. */
+      var CLF_MODEL_ID = "saksara/ai-text-detector-onnx";
+      var CLF_ORT_URL = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.31.1/dist/ort.min.mjs";
+      var CLF_ORT_WASM = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.31.1/dist/";
+      var CLF_LIB_URL = "https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2/+esm";
+      var CLF_CACHE_NAME = "saksara-clf-v1";
+      var CLF_GRAPH = "model_quantized.onnx";
+      var CLF_SHARDS = ["model_quantized.onnx_data-000", "model_quantized.onnx_data-001", "model_quantized.onnx_data-002", "model_quantized.onnx_data-003", "model_quantized.onnx_data-004"];
+      /* Ukuran persis berkas di repo (bahan penyebut progres unduhan agregat). */
+      var CLF_FILE_SIZES = { "model_quantized.onnx": 438536, "model_quantized.onnx_data-000": 79922689, "model_quantized.onnx_data-001": 6489760, "model_quantized.onnx_data-002": 79999488, "model_quantized.onnx_data-003": 79999488, "model_quantized.onnx_data-004": 32002560 };
+      var CLF_TOTAL_BYTES = 0; /* 278.852.521 B — jumlah keenam berkas di atas */
+      for(var clfSizeKey in CLF_FILE_SIZES){ CLF_TOTAL_BYTES += CLF_FILE_SIZES[clfSizeKey]; }
+      var MAX_CLF_CHUNKS = 100; /* classifier menilai maks. 100 segmen (30 di perangkat seluler/hemat) yang disebar merata dari seluruh dokumen; diumumkan terbuka bila terpicu */
+      var MOBILE_CLF_CHUNKS = 30; /* batas segmen hemat untuk HP/perangkat lemah — prosesor ponsel jauh lebih lambat dari desktop */
+      var clfCancelRequested = false; /* diset tombol "Batalkan Penilaian"; diperiksa clfScorePass di antara segmen */
+      function clfChunkCap(){
+        try{
+          var coarse = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+          var cores = (typeof navigator !== "undefined" && navigator.hardwareConcurrency) || 8;
+          var mem = (typeof navigator !== "undefined" && navigator.deviceMemory) || 8;
+          if(coarse || cores <= 4 || mem <= 4) return MOBILE_CLF_CHUNKS;
+        }catch(e){ /* abaikan — pakai batas penuh */ }
+        return MAX_CLF_CHUNKS;
+      }
+      function showClfCancel(show){
+        var b = $("btn-clf-cancel");
+        if(!b) return;
+        b.style.display = show ? "" : "none";
+        b.disabled = false;
+        b.textContent = "Batalkan Penilaian Penguat Skor";
+      }
+      var clfState = "off"; /* off | loading | ready | error */
+      var clfOrt = null;       /* modul onnxruntime-web */
+      var clfSession = null;   /* ort.InferenceSession */
+      var clfTokenizer = null; /* AutoTokenizer (@xenova/transformers) */
+      var clfAiIndex = 1;      /* indeks kelas AI dari id2label config.json; bawaan 1 = "ChatGPT" */
+      var clfAiLabel = null;   /* nama label kelas AI, dari id2label model */
+      var clfModelId = CLF_MODEL_ID;
+      var lastText = "", analysisRunSeq = 0;
+      var lastClfScore = null; /* skor classifier (0..1) pada laporan yang tampil, atau null */
+      var lastClfApplied = false; /* true bila penguat bersyarat diterapkan pada laporan yang tampil (heuristik ≥ 0,35) */
+      var lastClfTruncated = false; /* true bila skor classifier hanya menilai sebagian segmen (dokumen sangat panjang) */
+      var lastClfSampled = false; /* true bila segmen classifier disebar merata dari seluruh dokumen (bukan hanya awal) */
+      var lastClfCapUsed = 0; /* batas segmen yang berlaku pada penilaian classifier laporan ini */
+      var lastWatchSignal = null; /* {heur, clf} bila sinyal waspada tampil pada laporan ini (heuristik < 0,35 tetapi classifier >= 0,85) */
+      var clfProvider = null; /* "WebGPU" | "WASM" — penyedia eksekusi sesi yang sedang aktif */
+      var clfBuffers = null; /* buffer grafik + shard; disimpan agar sesi bisa dibuat ulang sebagai WASM bila inferensi WebGPU gagal di tengah penilaian */
+      var clfCacheExists = false; /* true bila keenam berkas model ditemukan di Cache API (diperiksa saat halaman dibuka, tanpa jaringan) */
+      var clfServedFromNetwork = false; /* true bila pemuatan yang berjalan benar-benar mengunduh (bukan murni dari cache) */
+
+      function setClfStatus(msg){ var el = $("clf-status"); if(el) el.textContent = msg; }
+      function setClfButton(text, disabled){
+        var btn = $("btn-clf");
+        if(!btn) return;
+        btn.textContent = text;
+        btn.disabled = !!disabled;
+      }
+      function setClfProgress(pc){
+        var bar = $("clf-progress"), fill = $("clf-progress-fill");
+        if(!bar || !fill) return;
+        if(pc === null || pc === undefined){ bar.style.display = "none"; fill.style.width = "0%"; return; }
+        bar.style.display = "";
+        fill.style.width = pc + "%";
+      }
+      function refreshClfDeleteBtn(){
+        var del = $("btn-clf-del");
+        if(del) del.style.display = clfCacheExists ? "" : "none";
+      }
+      function updateClfPanelIdle(){
+        if(clfState !== "off") return;
+        if(clfCacheExists){
+          setClfButton("Aktifkan penguat skor", false);
+          setClfStatus("Status penguat skor: Penguat skor belum diaktifkan — model sudah tersimpan di peramban ini, jadi pengaktifan tidak perlu mengunduh apa pun. Skor saat ini 100% pemeriksa pola (7 tanda).");
+        } else {
+          setClfButton("Aktifkan penguat skor (±280 MB)", false);
+          setClfStatus("Status penguat skor: Penguat skor belum diaktifkan — skor saat ini 100% pemeriksa pola (7 tanda). Model hanya diunduh bila Anda menekan tombol aktifkan.");
+        }
+        refreshClfDeleteBtn();
+      }
+      async function checkClfCache(){
+        // Memeriksa Cache API saja — TANPA permintaan jaringan apa pun.
+        // Menentukan keadaan awal panel: model sudah tersimpan atau belum.
+        try{
+          if(typeof caches === "undefined"){ clfCacheExists = false; }
+          else {
+            var cache = await caches.open(CLF_CACHE_NAME);
+            var names = [CLF_GRAPH].concat(CLF_SHARDS);
+            clfCacheExists = true;
+            for(var i = 0; i < names.length; i++){
+              var hit = await cache.match(clfFileUrl(names[i]));
+              if(!hit){ clfCacheExists = false; break; }
+            }
+          }
+        }catch(e){ clfCacheExists = false; }
+        refreshClfDeleteBtn();
+        updateClfPanelIdle();
+      }
+      function resolveAiLabel(id2label){
+        // Tentukan label kelas AI dari id2label model itu sendiri, bukan hard-code.
+        var labels = [];
+        Object.keys(id2label || {}).forEach(function(k){ labels.push(String(id2label[k])); });
+        for(var i = 0; i < labels.length; i++){
+          if(/chatgpt|gpt|\bai\b|fake|generated|machine|llm|bot/i.test(labels[i])) return labels[i];
+        }
+        for(var j = 0; j < labels.length; j++){
+          if(labels[j].trim().toLowerCase() !== "human") return labels[j];
+        }
+        return labels.length > 1 ? labels[1] : labels[0];
+      }
+      function resolveAiIndex(id2label){
+        // Indeks numerik kelas AI yang labelnya dipilih resolveAiLabel.
+        var label = resolveAiLabel(id2label);
+        var keys = Object.keys(id2label || {});
+        for(var i = 0; i < keys.length; i++){
+          if(String(id2label[keys[i]]) === label) return Number(keys[i]);
+        }
+        return 1;
+      }
+      function clfFileUrl(name){
+        return "https://huggingface.co/" + CLF_MODEL_ID + "/resolve/main/onnx/" + name;
+      }
+      async function clfFetchBytes(name, onChunk){
+        // Ambil satu berkas model: utamakan Cache API (cache "saksara-clf-v1"),
+        // unduh lewat jaringan bila belum tersimpan, lalu simpan best-effort.
+        // onChunk(loadedBytes) dipanggil selama unduhan untuk progres agregat.
+        var url = clfFileUrl(name);
+        var cache = null;
+        try{ if(typeof caches !== "undefined") cache = await caches.open(CLF_CACHE_NAME); }catch(e){ cache = null; }
+        if(cache){
+          try{
+            var hit = await cache.match(url);
+            if(hit){
+              var cached = new Uint8Array(await hit.arrayBuffer());
+              if(onChunk) onChunk(cached.length);
+              return cached;
+            }
+          }catch(e){ /* cache tidak bisa dibaca — lanjut unduh */ }
+        }
+        clfServedFromNetwork = true;
+        var resp = await fetch(url);
+        if(!resp.ok) throw new Error("unduhan " + name + " gagal (HTTP " + resp.status + ")");
+        var buf = null;
+        if(resp.body && typeof resp.body.getReader === "function"){
+          var reader = resp.body.getReader();
+          var parts = [], loaded = 0;
+          for(;;){
+            var step = await reader.read();
+            if(step.done) break;
+            parts.push(step.value);
+            loaded += step.value.length;
+            if(onChunk) onChunk(loaded);
+          }
+          buf = new Uint8Array(loaded);
+          var off = 0;
+          for(var i = 0; i < parts.length; i++){ buf.set(parts[i], off); off += parts[i].length; }
+        } else {
+          buf = new Uint8Array(await resp.arrayBuffer());
+          if(onChunk) onChunk(buf.length);
+        }
+        if(cache){
+          try{ await cache.put(url, new Response(buf, { headers: { "Content-Type": "application/octet-stream" } })); }catch(e){ /* best-effort */ }
+        }
+        return buf;
+      }
+      async function loadClassifier(){
+        if(clfState === "loading" || clfState === "ready") return;
+        clfState = "loading";
+        clfServedFromNetwork = false;
+        setClfButton("Memuat model…", true);
+        setClfStatus("Status penguat skor: memuat model penguat skor ke peramban ini (±280 MB, sekali saja — sesudahnya tersimpan di peramban)…");
+        try{
+          // 1) Runtime inferensi: onnxruntime-web mentah — bukan pipeline
+          //    transformers.js, karena pustaka itu tidak bisa memuat model
+          //    data-eksternal ter-shard seperti model kami.
+          var ort = await import(/* webpackIgnore: true */ CLF_ORT_URL);
+          clfOrt = ort;
+          if(ort.env && ort.env.wasm && typeof location !== "undefined" && /^https?:$/.test(location.protocol)){
+            ort.env.wasm.wasmPaths = CLF_ORT_WASM;
+          }
+          // Multi-utas WASM: inferensi memakai beberapa inti prosesor sekaligus
+          // (percepatan besar di HP multicore) — hanya mungkin bila halaman
+          // terisolasi lintas-asal (header COOP/COEP pada vercel.json memberi
+          // SharedArrayBuffer). Tanpa isolasi, peramban membatasi ke 1 utas
+          // dan pengaturan ini tidak berdampak apa pun.
+          try{
+            if(ort.env && ort.env.wasm && typeof crossOriginIsolated !== "undefined" && crossOriginIsolated){
+              var th = (typeof navigator !== "undefined" && navigator.hardwareConcurrency) || 2;
+              ort.env.wasm.numThreads = Math.max(1, Math.min(4, th));
+            }
+          }catch(e){ /* abaikan — tetap 1 utas */ }
+          // 2) Unduh grafik + 5 shard dengan progres AGREGAT (total ±278,9 MB);
+          //    pada kunjungan berikutnya keenamnya dilayani Cache API.
+          var names = [CLF_GRAPH].concat(CLF_SHARDS);
+          var buffers = {};
+          var loadedBy = {}, totalLoaded = 0, lastPct = -1;
+          function noteProgress(name, loaded){
+            totalLoaded += loaded - (loadedBy[name] || 0);
+            loadedBy[name] = loaded;
+            if(clfState !== "loading") return;
+            var pc = Math.max(0, Math.min(99, Math.floor(totalLoaded / CLF_TOTAL_BYTES * 100)));
+            if(pc !== lastPct){
+              lastPct = pc;
+              setClfProgress(pc);
+              var mb = (totalLoaded / 1048576).toFixed(1).replace(".", ",");
+              if(clfServedFromNetwork){
+                setClfButton("Mengunduh model… " + pc + "%", true);
+                setClfStatus("Status penguat skor: Mengunduh model… " + pc + "% (" + mb + " dari ±280 MB). Unduhan ini hanya terjadi sekali; model lalu tersimpan di peramban dan teks Anda tetap di peramban ini.");
+              } else {
+                setClfButton("Memuat model… " + pc + "%", true);
+                setClfStatus("Status penguat skor: Memuat model tersimpan di peramban… " + pc + "% (" + mb + " dari ±280 MB) — tanpa unduhan jaringan.");
+              }
+            }
+          }
+          for(var fi = 0; fi < names.length; fi++){
+            var fname = names[fi];
+            buffers[fname] = await clfFetchBytes(fname, (function(nm){ return function(loaded){ noteProgress(nm, loaded); }; })(fname));
+          }
+          clfBuffers = buffers; /* disimpan untuk pembuatan ulang sesi (fallback WebGPU -> WASM) */
+          clfCacheExists = true;
+          refreshClfDeleteBtn();
+          // 3) id2label dari config.json model itu sendiri — label & indeks
+          //    kelas AI ditentukan dari model, bukan hard-code.
+          var id2 = { "0": "Human", "1": "ChatGPT" };
+          try{
+            var cfgResp = await fetch("https://huggingface.co/" + CLF_MODEL_ID + "/resolve/main/config.json");
+            if(cfgResp.ok){
+              var cfg = await cfgResp.json();
+              if(cfg && cfg.id2label) id2 = cfg.id2label;
+            }
+          }catch(e){ /* abaikan — pakai bawaan */ }
+          clfAiLabel = resolveAiLabel(id2);
+          clfAiIndex = resolveAiIndex(id2);
+          // 4) Buat sesi dengan data eksternal: path tiap shard harus persis
+          //    sama dengan string `location` yang tersimpan di dalam grafik.
+          //    WebGPU dicoba lebih dulu (hanya bila peramban memilikinya);
+          //    kegagalan apa pun jatuh kembali ke WASM dengan opsi sesi yang
+          //    sama persis — skor tidak berubah, hanya penyedia eksekusinya.
+          setClfStatus("Status penguat skor: unduhan selesai — membuat sesi model di peramban…");
+          var externalData = CLF_SHARDS.map(function(nm){ return { path: nm, data: buffers[nm] }; });
+          clfSession = null;
+          clfProvider = null;
+          if(typeof navigator !== "undefined" && navigator.gpu){
+            try{
+              clfSession = await ort.InferenceSession.create(buffers[CLF_GRAPH], { executionProviders: ["webgpu"], externalData: externalData });
+              clfProvider = "WebGPU";
+            }catch(eWebgpu){ clfSession = null; clfProvider = null; }
+          }
+          if(!clfSession){
+            clfSession = await ort.InferenceSession.create(buffers[CLF_GRAPH], { executionProviders: ["wasm"], externalData: externalData });
+            clfProvider = "WASM";
+          }
+          // 5) Tokenizer saja dari @xenova/transformers (tanpa pipeline).
+          setClfStatus("Status penguat skor: sesi siap — memuat tokenizer…");
+          var tf = await import(/* webpackIgnore: true */ CLF_LIB_URL);
+          clfTokenizer = await tf.AutoTokenizer.from_pretrained(CLF_MODEL_ID);
+          clfState = "ready";
+          setClfProgress(null);
+          setClfButton("Classifier lokal aktif", true);
+          setClfStatus("Status penguat skor: aktif — penguat skor Saksara berjalan lokal di peramban ini (" + (clfProvider === "WebGPU" ? "akselerasi WebGPU" : "WASM") + "). Saat Anda menekan “Periksa Tulisan”, penguat ini hanya menaikkan skor bila pemeriksa pola sudah menemukan indikasi awal. Teks tidak dikirim ke mana pun.");
+          // Bila laporan heuristik sudah tampil, gabungkan skor classifier ke laporan
+          // yang sama — tanpa meminta pengguna mengetik atau menganalisis ulang.
+          if(lastResult && lastText){ applyClassifierToReport(lastText, lastResult, analysisRunSeq); }
+        }catch(err){
+          clfState = "error";
+          clfSession = null;
+          clfTokenizer = null;
+          clfProvider = null;
+          setClfProgress(null);
+          setClfButton("Coba muat lagi classifier", false);
+          setClfStatus("Status penguat skor: model gagal dimuat" + (err && err.message ? " (" + err.message + ")" : "") + ". Halaman tetap memakai pemeriksa pola (7 tanda) saja. Periksa koneksi internet lalu coba lagi.");
+          checkClfCache(); /* sebagian berkas mungkin sudah tercache — tombol hapus cache mengikuti keadaan sebenarnya */
+        }
+      }
+      $("btn-clf").addEventListener("click", function(){ loadClassifier(); });
+      $("btn-clf-cancel").addEventListener("click", function(){
+        clfCancelRequested = true;
+        var b = $("btn-clf-cancel");
+        b.disabled = true;
+        b.textContent = "Membatalkan…";
+      });
+      async function deleteClfCache(){
+        // Hapus seluruh cache model dari peramban dan jatuhkan sesi yang
+        // aktif; panel kembali ke keadaan "belum diaktifkan". Laporan yang
+        // sudah tampil tidak diubah — angkanya sudah terhitung.
+        try{ if(typeof caches !== "undefined") await caches.delete(CLF_CACHE_NAME); }catch(e){ /* abaikan */ }
+        clfSession = null;
+        clfTokenizer = null;
+        clfBuffers = null;
+        clfProvider = null;
+        clfState = "off";
+        clfCacheExists = false;
+        setClfProgress(null);
+        refreshClfDeleteBtn();
+        setClfButton("Aktifkan penguat skor (±280 MB)", false);
+        setClfStatus("Status penguat skor: model tersimpan dihapus dari peramban ini. Penguat skor belum diaktifkan — skor saat ini 100% pemeriksa pola (7 tanda).");
+      }
+      $("btn-clf-del").addEventListener("click", function(){ deleteClfCache(); });
+      // OPT-IN: halaman TIDAK mengunduh model secara otomatis. Saat dibuka,
+      // halaman hanya memeriksa Cache API (tanpa jaringan) agar panel bisa
+      // menyatakan dengan jujur apakah model sudah tersimpan di peramban ini.
+      checkClfCache();
+
+      function clfChunkText(text, max){
+        // Pemotongan persis seperti skrip pembuktian kami: teks dipecah per
+        // paragraf, paragraf-paragraf digabung sampai ±1.200 karakter;
+        // paragraf yang lebih panjang dari itu dipotong lurus per 1.200.
+        max = max || 1200;
+        var paras = String(text || "").split(/\n\s*\n/).map(function(s){ return s.trim(); }).filter(Boolean);
+        var chunks = [];
+        var cur = "";
+        for(var i = 0; i < paras.length; i++){
+          var p = paras[i];
+          if(p.length > max){
+            if(cur){ chunks.push(cur); cur = ""; }
+            for(var j = 0; j < p.length; j += max) chunks.push(p.slice(j, j + max));
+            continue;
+          }
+          if((cur + "\n\n" + p).length > max && cur){ chunks.push(cur); cur = p; }
+          else cur = cur ? cur + "\n\n" + p : p;
+        }
+        if(cur) chunks.push(cur);
+        return chunks.length ? chunks : [String(text || "")];
+      }
+      function clfSoftmaxAI(logits){
+        // Softmax 2 kelas; yang dikembalikan probabilitas kelas AI, yang
+        // indeksnya dibaca dari id2label model (bawaan: 1 = "ChatGPT").
+        var m = Math.max(logits[0], logits[1]);
+        var e0 = Math.exp(logits[0] - m), e1 = Math.exp(logits[1] - m);
+        var s = e0 + e1;
+        return (clfAiIndex === 0 ? e0 : e1) / s;
+      }
+      async function clfScorePass(text, onProgress){
+        // Satu lintasan penilaian penuh. Kesalahan inferensi DIBIARKAN
+        // meledak ke pemanggil (runClassifierScore) agar jalur fallback
+        // WebGPU -> WASM bisa memutuskan; jalur WASM berperilaku persis
+        // seperti sebelumnya (kesalahan -> null di pembungkus).
+        var chunks = clfChunkText(text);
+        if(!chunks.length) return null;
+        // Batas segmen: dokumen raksasa yang lolos batas analisis heuristik
+        // (100 rb kata) tetap bisa berarti ±500 segmen — tanpa batas ini
+        // inferensi WASM berurutan menyandera tab ber menit-menit di CPU
+        // lambat. Classifier cukup menilai 100 segmen pertama (±120 rb
+        // karakter ≈ 20 rb kata, ±25× contoh bawaan terpanjang); rata-rata
+        // dihitung dari segmen yang dinilai, persis seperti sebelumnya, dan
+        // pemotongannya diumumkan terbuka (tanda truncated -> baris mesin).
+        var capUsed = clfChunkCap();
+        var clfTruncated = chunks.length > capUsed;
+        var sampledEvenly = false;
+        if(clfTruncated){
+          // Sebar merata ke SELURUH dokumen, bukan hanya awalnya: sampel
+          // tetap mewakili keseluruhan teks walau jumlah segmen dibatasi
+          // (di HP batasnya 30 agar penilaian tidak menyandera ponsel).
+          var picked = [];
+          var stepF = chunks.length / capUsed;
+          for(var si = 0; si < capUsed; si++) picked.push(chunks[Math.floor(si * stepF)]);
+          chunks = picked;
+          sampledEvenly = true;
+        }
+        var all = [];
+        for(var i = 0; i < chunks.length; i++){
+          if(clfCancelRequested){
+            clfCancelRequested = false;
+            return { cancelled: true, score: null, windows: all.length, truncated: clfTruncated, sampled: sampledEvenly, cap: capUsed };
+          }
+          // Umpan manual persis seperti pembuktian: tokenisasi tanpa tensor,
+          // tensor int64 [1, n] untuk setiap nama input sesi, lalu softmax.
+          var enc = clfTokenizer(chunks[i], { return_tensor: false, truncation: true });
+          var ids = enc.input_ids;
+          var mask = enc.attention_mask || ids.map(function(){ return 1; });
+          var n = ids.length;
+          var feeds = {};
+          for(var k = 0; k < clfSession.inputNames.length; k++){
+            var name = clfSession.inputNames[k];
+            var arr = name === "input_ids" ? ids : name === "attention_mask" ? mask : new Array(n).fill(0);
+            feeds[name] = new clfOrt.Tensor("int64", BigInt64Array.from(arr.map(BigInt)), [1, n]);
+          }
+          var out = await clfSession.run(feeds);
+          var logits = Array.from(out[clfSession.outputNames[0]].data);
+          var p = clfSoftmaxAI(logits);
+          if(p !== null && isFinite(p)) all.push(clamp(p));
+          if(onProgress) onProgress(i + 1, chunks.length);
+          // Jeda macrotask sungguhan sesudah SETIAP segmen: satu inferensi
+          // WASM memblokir utas utama selama hitungan detik, dan await pada
+          // promise yang terselesaikan tidak memberi peramban kesempatan
+          // menggambar — tanpa jeda ini tab tampak macet ("not responding")
+          // selama classifier menggerus segmen demi segmen. Skor tidak
+          // berubah: segmen yang dinilai dan rata-ratanya persis sama.
+          await new Promise(function(r){ setTimeout(r, 0); });
+        }
+        if(!all.length) return null;
+        var sum = all.reduce(function(a, x){ return a + x; }, 0);
+        return { score: sum / all.length, windows: all.length, truncated: clfTruncated, sampled: sampledEvenly, cap: capUsed };
+      }
+      async function runClassifierScore(text, onProgress){
+        if(clfState !== "ready" || !clfSession || !clfTokenizer) return null;
+        try{
+          return await clfScorePass(text, onProgress);
+        }catch(e){
+          // Sesi WebGPU kadang lolos dibuat tetapi gagal saat inferensi
+          // berjalan. Sekali saja: buat ulang sesi sebagai WASM dari buffer
+          // model yang masih disimpan, lalu ulangi SELURUH penilaian ini
+          // dari awal. Kegagalan sesudah itu (atau pada sesi WASM sejak
+          // awal) berperilaku seperti sebelumnya: null (heuristik saja).
+          if(clfProvider === "WebGPU" && clfOrt && clfBuffers){
+            try{
+              var externalDataW = CLF_SHARDS.map(function(nm){ return { path: nm, data: clfBuffers[nm] }; });
+              clfSession = await clfOrt.InferenceSession.create(clfBuffers[CLF_GRAPH], { executionProviders: ["wasm"], externalData: externalDataW });
+              clfProvider = "WASM";
+              setClfStatus("Status penguat skor: aktif — penguat skor Saksara berjalan lokal di peramban ini (WASM). Saat Anda menekan “Periksa Tulisan”, penguat ini hanya menaikkan skor bila pemeriksa pola sudah menemukan indikasi awal. Teks tidak dikirim ke mana pun.");
+              return await clfScorePass(text, onProgress);
+            }catch(e2){ return null; }
+          }
+          return null;
+        }
+      }
+      async function applyClassifierToReport(text, res, runId){
+        var sig = $("sig-clf");
+        sig.style.display = "";
+        $("pct-clf").textContent = "…";
+        $("fill-clf").style.width = "0%";
+        $("desc-clf").textContent = "Penguat skor lokal sedang menilai teks ini di peramban ini (teks dibagi per paragraf menjadi potongan-potongan ±1.200 karakter)…";
+        clfCancelRequested = false;
+        showClfCancel(true);
+        var r = await runClassifierScore(text, function(done, total){
+          if(runId !== analysisRunSeq || lastResult !== res) return; /* laporan sudah digantikan analisis lain */
+          $("engine-line").textContent = "Mesin skor: Ensemble Heuristik v3 — classifier sedang dihitung… (segmen " + done + "/" + total + ")";
+        });
+        if(runId !== analysisRunSeq || lastResult !== res) return; /* laporan sudah digantikan analisis lain */
+        if(!r){
+          lastClfScore = null;
+          lastClfApplied = false;
+          lastClfTruncated = false;
+          lastClfSampled = false;
+          lastClfCapUsed = 0;
+          $("pct-clf").textContent = "—";
+          $("fill-clf").style.width = "0%";
+          $("desc-clf").textContent = "Penguat skor lokal tidak menghasilkan skor untuk teks ini — skor yang tampil tetap 100% pemeriksa pola (7 tanda).";
+          $("engine-line").textContent = "Mesin skor: Ensemble Heuristik v3 (classifier tidak menghasilkan skor)";
+          showClfCancel(false);
+          return;
+        }
+        if(r.cancelled){
+          lastClfScore = null;
+          lastClfApplied = false;
+          lastClfTruncated = false;
+          lastClfSampled = false;
+          lastClfCapUsed = 0;
+          $("pct-clf").textContent = "—";
+          $("fill-clf").style.width = "0%";
+          $("desc-clf").textContent = "Penilaian penguat skor dibatalkan — skor yang tampil 100% pemeriksa pola (7 tanda).";
+          $("engine-line").textContent = "Mesin skor: Ensemble Heuristik v3 (penilaian classifier dibatalkan)";
+          showClfCancel(false);
+          return;
+        }
+        lastClfScore = r.score;
+        lastClfTruncated = !!r.truncated;
+        lastClfSampled = !!r.sampled;
+        lastClfCapUsed = r.cap || MAX_CLF_CHUNKS;
+        var clfTruncNote = r.truncated ? " (classifier menilai " + (r.cap || MAX_CLF_CHUNKS) + " segmen yang disebar merata dari seluruh dokumen)" : "";
+        $("pct-clf").textContent = pct(r.score) + "%";
+        $("fill-clf").style.width = pct(r.score) + "%";
+        // PENGUAT BERSYARAT — aturan gerbang persis: heuristik < 0,35 → skor
+        // akhir tetap heuristik (classifier tidak pernah bisa menaikkan);
+        // heuristik ≥ 0,35 → skor akhir = heuristik + (1 − heuristik) ×
+        // classifier × 0,5. Alasan gerbang: model ini terbukti memberi skor
+        // 0,68–1,00 pada keempat teks manusia formal/ensiklopedis (Wikipedia)
+        // di benchmark kami — tanpa gerbang, ia akan menuduh tulisan manusia
+        // yang formal.
+        var CLF_GATE = 0.35;
+        var CLF_WATCH = 0.85; /* ambang sinyal waspada: classifier >= ini saat heuristik di bawah gerbang */
+        if(res.final >= CLF_GATE){
+          lastClfApplied = true;
+          var boosted = res.final + (1 - res.final) * r.score * 0.5;
+          $("desc-clf").textContent = "Penguat skor berjalan lokal di peramban ini — menilai rata-rata " + r.windows + " jendela teks: probabilitas kelas AI " + pct(r.score) + "%. Heuristik v3 sudah menemukan indikasi awal (" + pct(res.final) + "% ≥ 35%), jadi classifier MEMPERKUAT skor akhir menjadi " + pct(boosted) + "%.";
+          applyScore(boosted, true);
+          $("engine-line").textContent = "Mesin skor: Heuristik v3 + Penguat Classifier (heuristik murni: " + pct(res.final) + "%, classifier: " + pct(r.score) + "%)" + clfTruncNote;
+        } else {
+          lastClfApplied = false;
+          $("desc-clf").textContent = "Penguat skor berjalan lokal di peramban ini — menilai rata-rata " + r.windows + " jendela teks: probabilitas kelas AI " + pct(r.score) + "%. Skor ini TIDAK menaikkan skor akhir: heuristik v3 hanya menemukan indikasi " + pct(res.final) + "% (di bawah ambang 35%), dan classifier di sini hanya boleh memperkuat indikasi yang sudah ditemukan heuristik — tidak pernah menuduh sendirian. (Terukur pada pengujian kami: model ini juga memberi skor tinggi pada sebagian tulisan manusia yang sangat formal — gerbang inilah yang menahannya.) Skor akhir tetap 100% heuristik v3.";
+          applyScore(res.final, false);
+          $("engine-line").textContent = "Mesin skor: Ensemble Heuristik v3 (classifier dinilai " + pct(r.score) + "%, ditahan — heuristik di bawah ambang 35%)" + clfTruncNote;
+          // SINYAL WASPADA — kedua lapis sangat tidak sepakat (heuristik di
+          // bawah gerbang, classifier sangat tinggi): skor akhir TIDAK
+          // diubah, tetapi ketidaksepakatan itu tidak boleh lolos diam-diam.
+          // Banner menjelaskan alasannya dan menyarankan tinjauan manual.
+          if(r.score >= CLF_WATCH){
+            lastWatchSignal = { heur: res.final, clf: r.score };
+            var bw = $("banner-waspada");
+            bw.innerHTML = "<strong>Sinyal waspada — disarankan ditinjau manual.</strong> Mengapa waspada? Kedua lapis pemeriksa tidak sepakat pada teks ini: lapis pertama (Ensemble Heuristik v3) menilai indikasi pola AI pada tulisan ini rendah (" + pct(res.final) + "%), tetapi lapis kedua (classifier) memberi probabilitas AI yang sangat tinggi (" + pct(r.score) + "%). Ketidaksepakatan seperti ini dapat muncul pada teks AI yang disunting atau diparafrase dengan baik, tetapi juga pada tulisan manusia yang sangat formal dan teratur — karena itu skor akhir tidak diubah dan sinyal ini bukan vonis. Gunakan sinyal ini sebagai alasan untuk meninjau isi teks secara manual dan, bila perlu, mengklarifikasi langsung kepada penulisnya.";
+            bw.classList.add("show");
+          }
+        }
+        if(p7LastFinal !== null){ p7Conclusion(p7LastFinal); }
+        showClfCancel(false);
+      }
+
+      function applyScore(score, blended){
+        var finalPct = pct(score);
+        $("score-num").textContent = finalPct;
+        dashTrackScore(finalPct);
+        histSaveDetector(finalPct, !!blended);
+        $("meter-pin").style.left = finalPct + "%";
+        var verdict = $("verdict"), note = $("score-note");
+        var suffix = blended ? " Skor akhir ini adalah skor pemeriksa pola (7 tanda) yang diperkuat penguat skor terlatih (penguat bersyarat: penguat hanya menaikkan skor bila pemeriksa pola sudah menemukan indikasi awal ≥35%)." : "";
+        if(score < 0.35){
+          verdict.textContent = "Indikasi AI rendah";
+          note.textContent = "Indikasi pola AI rendah: ritme kalimat bervariasi dan frasa formulaik sedikit. Tetap baca isinya — skor rendah bukan jaminan keaslian." + suffix;
+        } else if(score <= 0.65){
+          verdict.textContent = "Sebagian mirip pola AI — perlu diperiksa lebih lanjut";
+          note.textContent = "Sebagian pola menyerupai teks AI, sebagian lain tidak menunjukkan pola tersebut. Ini zona abu-abu: bisa jadi teks AI yang diparafrase, atau tulisan manusia yang sangat rapi. Periksa lebih lanjut sebelum menyimpulkan." + suffix;
+        } else {
+          verdict.textContent = "Indikasi AI tinggi";
+          note.textContent = "Pola tulisan sangat mirip keluaran AI: ritme seragam dan/atau banyak frasa formulaik. Jadikan ini alasan untuk mengklarifikasi ke penulisnya, bukan vonis langsung." + suffix;
+        }
+        p7Conclusion(score);
+      }
+
+      var lastResult = null;
+      var analysisBusy = false;
+      function setAnalysisBusy(busy){
+        analysisBusy = busy;
+        $("btn-analisis").disabled = busy;
+        $("btn-bersihkan").disabled = busy;
+        $("file-input").disabled = busy;
+        $("btn-upload").classList.toggle("is-busy", busy);
+        $("btn-upload").setAttribute("aria-disabled", busy ? "true" : "false");
+        $("btn-analisis").textContent = busy ? "Menganalisis…" : "Analisis teks";
+        var bb = $("banner-sibuk");
+        if(busy){
+          bb.innerHTML = "<strong>Menganalisis…</strong> Pemeriksa pola sedang menilai teks — mohon tunggu sebentar.";
+          bb.classList.add("show");
+        } else {
+          bb.classList.remove("show");
+          bb.innerHTML = "";
+        }
+        if(busy) prosesMulaiPeriksa(); else prosesPeriksaSelesai();
+      }
+      function runAnalysis(){
+        var text = ta.value;
+        if(!text.trim() || wordsOf(text).length === 0){
+          var b = $("banner-pendek");
+          b.innerHTML = "<strong>Belum ada teks.</strong> Tempel teks dulu, atau klik salah satu contoh di bawah.";
+          b.classList.add("show");
+          ta.focus();
+          return;
+        }
+        if(analysisBusy) return;
+        /* Keadaan sibuk dipasang dulu dan diberi kesempatan DILUKIS peramban
+           (requestAnimationFrame + setTimeout) sebelum analyze() yang sinkron
+           berjalan — pengguna melihat "Menganalisis…" dan kontrol yang
+           terkunci, bukan halaman yang membeku tanpa penjelasan. */
+        setAnalysisBusy(true);
+        requestAnimationFrame(function(){
+          setTimeout(function(){
+            /* Tegaskan lagi: pada jalur unggah, setFileBusy(false) bisa sempat
+               mengaktifkan kontrol kembali di antara kedua tahap ini. */
+            setAnalysisBusy(true);
+            try { runAnalysisBody(text); }
+            finally { setAnalysisBusy(false); }
+          }, 0);
+        });
+      }
+      function runAnalysisBody(text){
+        /* Zona eksklusi (opsional — kotak centang "Abaikan bagian baku"):
+           bila aktif, yang dianalisis adalah SALINAN tersaring dari teks
+           (kotak teks tidak pernah diubah) dan penyaringannya diumumkan di
+           laporan. Bila tidak aktif, jalur ini tidak mengubah apa pun —
+           perilaku identik byte dengan sebelumnya. Classifier menerima
+           teks tersaring yang sama dengan heuristik. */
+        lastExclusion = null;
+        lastHeadingsRemoved = null;
+        lastSectionsRemoved = null;
+        lastQuotesRemoved = null;
+        var exclBox = $("opt-exclude");
+        if(exclBox && exclBox.checked){
+          var excl = excludeStandardParts(text);
+          if(excl.excludedWords > 0 && wordsOf(excl.text).length > 0){
+            text = excl.text;
+            lastExclusion = excl;
+          }
+        }
+        /* Isi daftar isi/gambar/tabel/pustaka: SELALU dikeluarkan (dari
+           kode, tanpa kotak centang) — berjalan setelah zona eksklusi agar
+           tidak mengganggu jangkar pemotongannya. */
+        /* Kutipan bersitasi: SELALU dikeluarkan — berjalan
+           sebelum penyaringan daftar/judul; classifier menerima teks yang
+           sama dengan heuristik. */
+        var qs = stripQuotedCitations(text);
+        if(qs.words > 0 && wordsOf(qs.text).length > 0){
+          text = qs.text;
+          lastQuotesRemoved = qs;
+        }
+        var secs = stripListSections(text);
+        if(secs.words > 0 && wordsOf(secs.text).length > 0){
+          text = secs.text;
+          lastSectionsRemoved = secs;
+        }
+        /* Judul & kepala bab/subbab: SELALU dikeluarkan (dari kode, tanpa
+           kotak centang) — berjalan SETELAH zona eksklusi agar judul bagian
+           baku tetap menjadi jangkar pemotongan zona di atas. Classifier
+           menerima teks yang sama dengan heuristik. */
+        var heads = stripStructuralHeadings(text);
+        if(heads.lines > 0 && wordsOf(heads.text).length > 0){
+          text = heads.text;
+          lastHeadingsRemoved = heads;
+        }
+        /* Batas cakupan: hanya 100.000 kata pertama yang dianalisis (teks di
+           kotak teks tetap utuh). lastText, lastResult, classifier, dan
+           laporan semuanya memakai porsi terbatas yang sama. */
+        var cap = capAnalysisText(text);
+        text = cap.text;
+        var res = analyze(text);
+        lastResult = res;
+        lastText = text;
+        lastClfScore = null;
+        lastClfApplied = false;
+        lastClfTruncated = false;
+        lastWatchSignal = null;
+        $("banner-waspada").classList.remove("show");
+        $("banner-waspada").innerHTML = "";
+        var runId = ++analysisRunSeq;
+        // Perbandingan antar-analisis dalam sesi ini + telemetri kalibrasi:
+        // ringkasan analisis sebelumnya disimpan, yang baru menjadi acuan.
+        if(currentRunSummary) prevRunSummary = currentRunSummary;
+        currentRunSummary = { text: text, finalPct: pct(res.final), heurPct: pct(res.final), clfPct: null,
+          indicatedPct: res.sents.length ? pct(res.flagCount / res.sents.length) : 0, words: res.words };
+        renderCompareLine();
+        resetTelemetry();
+        resetDonasi();
+        var hlPanel = $("hl-panel"); if(hlPanel) hlPanel.open = true;
+        // Mode bawaan: skor 100% heuristik v3 — identik dengan sebelum classifier ada.
+        applyScore(res.final, false);
+        $("engine-line").textContent = "Mesin skor: Ensemble Heuristik v3" + (clfState === "ready" ? " — classifier sedang dihitung…" : (clfState === "loading" ? " (sementara — classifier sedang dimuat; penguatan menyusul otomatis begitu siap)" : " (100% heuristik)"));
+        if(clfState !== "ready"){ $("sig-clf").style.display = "none"; }
+        // sinyal
+        function setSig(key, val, desc){
+          $("pct-" + key).textContent = pct(val) + "%";
+          $("fill-" + key).style.width = pct(val) + "%";
+          $("desc-" + key).textContent = desc;
+        }
+        setSig("burst", res.burst,
+          res.burst >= 0.65 ? "Panjang kalimat sangat seragam (CV " + res.cv.toFixed(2) + ") — pola khas AI yang jarang memvariasikan ritme."
+          : res.burst >= 0.35 ? "Ritme kalimat cukup seragam (CV " + res.cv.toFixed(2) + "), walau masih ada variasi di beberapa bagian."
+          : "Panjang kalimat sangat bervariasi (CV " + res.cv.toFixed(2) + ") — campuran kalimat pendek dan panjang seperti tulisan manusia.");
+        setSig("vocab", res.vocab,
+          res.vocab >= 0.65 ? "Kosakata berputar pada kata yang sama (TTR jendela " + res.avgTTR.toFixed(2) + ", hapax " + Math.round(res.hapax * 100) + "%) — keragaman kata rendah."
+          : res.vocab >= 0.35 ? "Keragaman kosakata sedang (TTR jendela " + res.avgTTR.toFixed(2) + ", hapax " + Math.round(res.hapax * 100) + "%)."
+          : "Kosakata beragam (TTR jendela " + res.avgTTR.toFixed(2) + ", hapax " + Math.round(res.hapax * 100) + "%) — banyak kata unik yang hanya muncul sekali, ciri tulisan manusia.");
+        setSig("phrase", res.phraseGlobal,
+          res.totalHits === 0 ? "Tidak ditemukan frasa formulaik dari kamus AI (klasik, LLM modern, maupun refleksi generik) pada teks ini."
+          : "Ditemukan " + res.totalHits + " kemunculan frasa formulaik khas AI — kepadatan " + res.density.toFixed(1) + " per 100 kata (mis. “selain itu”, “merupakan salah satu”, “menjaga integritas”) yang tersebar di kalimat-kalimat berwarna.");
+        setSig("stylo", res.stylo,
+          res.stylo >= 0.65 ? "Gaya sangat terstruktur: awalan kalimat berulang dan/atau paragraf seragam, rata-rata " + res.mean.toFixed(1) + " kata per kalimat."
+          : res.stylo >= 0.35 ? "Struktur gaya campuran: ada pengulangan awalan atau keseragaman paragraf di beberapa bagian (rata-rata " + res.mean.toFixed(1) + " kata per kalimat)."
+          : "Gaya bebas dan tidak berpola kaku: awalan kalimat beragam dan struktur paragraf tidak seragam (rata-rata " + res.mean.toFixed(1) + " kata per kalimat).");
+        var mdParts = [];
+        if(res.md.bold) mdParts.push(res.md.bold + " teks tebal **…**");
+        if(res.md.heading) mdParts.push(res.md.heading + " judul ##");
+        if(res.md.hr) mdParts.push(res.md.hr + " garis ---");
+        if(res.md.quote) mdParts.push(res.md.quote + " baris kutip >");
+        if(res.md.listLines) mdParts.push(res.md.listLines + " baris daftar");
+        setSig("md", res.markdown,
+          res.markdown >= 0.35 ? "Ditemukan sisa format mentah khas keluaran AI yang disalin apa adanya: " + mdParts.join(", ") + ". Teks yang diketik manusia hampir tidak pernah memuat sintaks ini."
+          : "Tidak ditemukan sisa format markdown mentah (tebal **…**, judul ##, garis ---, kutip >, daftar mentah) pada teks ini.");
+        setSig("sym", res.symmetry,
+          res.symmetry >= 0.65 ? "Paragraf-paragraf sangat simetris: panjang dan jumlah kalimatnya mirip satu sama lain, dan " + Math.round(res.sym.genericRatio * 100) + "% diawali pembuka generik (“Selain itu,”, “Selanjutnya,”, “Kesimpulannya,”)."
+          : res.symmetry >= 0.35 ? "Struktur paragraf cukup teratur: ada keseragaman panjang/jumlah kalimat atau pembuka generik di sebagian paragraf (" + Math.round(res.sym.genericRatio * 100) + "% paragraf berpembuka generik)."
+          : "Struktur paragraf tidak simetris: panjang dan jumlah kalimat antarparagraf bervariasi, pembuka generik hanya " + Math.round(res.sym.genericRatio * 100) + "% paragraf.");
+        setSig("rep", res.repetition,
+          res.rep.patterns === 0 ? "Tidak ada pola 4 kata yang berulang 3 kali atau lebih — rangkaian kata tidak dipakai ulang secara mencolok."
+          : "Ditemukan " + res.rep.patterns + " pola 4 kata yang berulang ≥3 kali di seluruh dokumen — teks generik cenderung memakai ulang rangkaian kata yang sama.");
+        // statistik
+        $("st-kata").textContent = res.words;
+        $("st-kalimat").textContent = res.sents.length;
+        $("st-rata").textContent = res.mean.toFixed(1);
+        $("st-ttr").textContent = res.overallTTR.toFixed(2);
+        // ringkasan per kalimat (gaya Grammarly): proporsi kalimat terindikasi
+        var ssBox = $("sent-summary");
+        if(res.sents.length){
+          $("sent-summary-line").innerHTML = "<b>" + res.flagCount + " dari " + res.sents.length + " kalimat (" + pct(res.flagCount / res.sents.length) + "%)</b> memiliki skor per kalimat ≥ 50% (terindikasi)";
+          ssBox.style.display = "";
+        } else {
+          ssBox.style.display = "none";
+        }
+        // banner teks pendek di laporan
+        var rb = $("banner-report");
+        if(res.words < 300){
+          rb.innerHTML = "<strong>Teks ini pendek:</strong> hanya " + res.words + " kata. Untuk teks di bawah ±300 kata, hasil kurang bisa dipegang — pakai skor ini sebagai petunjuk awal saja, bukan kesimpulan.";
+          rb.classList.add("show");
+        } else {
+          rb.classList.remove("show");
+        }
+        // catatan pemotongan cakupan — hanya tampil bila teks melewati batas
+        // analisis; tidak pernah diam-diam (lihat capAnalysisText).
+        var cb = $("banner-cakupan");
+        if(cap.capped){
+          cb.innerHTML = "<strong>Yang dianalisis hanya sebagian:</strong> teks ini berisi " + fmtNumID(cap.totalWords) + " kata; yang dianalisis " + fmtNumID(MAX_ANALYZE_WORDS) + " kata pertama (batas per dokumen agar halaman tetap lancar). Semua skor, rincian, penanda kalimat, dan laporan PDF di bawah berlaku untuk " + fmtNumID(MAX_ANALYZE_WORDS) + " kata pertama itu — bukan untuk sisanya.";
+          cb.classList.add("show");
+        } else {
+          cb.classList.remove("show");
+          cb.innerHTML = "";
+        }
+        // catatan penyaringan — hanya tampil bila penyaringan benar-benar
+        // membuang sesuatu; tidak pernah diam-diam (lihat excludeStandardParts,
+        // stripListSections, dan stripStructuralHeadings).
+        var eb = $("banner-eksklusi");
+        var ebParts = [];
+        if(lastHeadingsRemoved) ebParts.push("judul dan kepala bab/subbab (" + lastHeadingsRemoved.lines + " baris, ±" + fmtNumID(lastHeadingsRemoved.words) + " kata)");
+        if(lastSectionsRemoved) ebParts.push("isi " + lastSectionsRemoved.sections.join(", ").toLowerCase() + " (±" + fmtNumID(lastSectionsRemoved.words) + " kata)");
+        if(lastExclusion) ebParts.push("bagian baku — daftar pustaka, kata pengantar, kutipan, baris tabel (±" + fmtNumID(lastExclusion.excludedWords) + " kata)");
+        if(lastQuotesRemoved) ebParts.push("kutipan bersitasi (±" + fmtNumID(lastQuotesRemoved.words) + " kata)");
+        if(ebParts.length){
+          eb.innerHTML = "<strong>Sebagian teks tidak ikut dinilai:</strong> " + ebParts.join("; ") + ". Yang dinilai hanya isi prosa.";
+          eb.classList.add("show");
+        } else {
+          eb.classList.remove("show");
+          eb.innerHTML = "";
+        }
+        // teks berwarna
+        var hl = $("hl-text");
+        hl.innerHTML = "";
+        var idx = 0;
+        res.paraSents.forEach(function(ps){
+          var p = document.createElement("p");
+          ps.forEach(function(s){
+            var i = idx++;
+            var span = document.createElement("span");
+            span.className = "sent " + bandOf(res.per[i].score);
+            span.textContent = s;
+            span.title = "Skor kalimat: " + pct(res.per[i].score) + "% — klik untuk rincian";
+            span.setAttribute("data-idx", i);
+            span.setAttribute("role", "button");
+            span.setAttribute("tabindex", "0");
+            span.setAttribute("aria-label", "Kalimat ke-" + (i + 1) + ", skor indikasi AI " + pct(res.per[i].score) + " persen. Aktifkan untuk rincian.");
+            span.addEventListener("click", function(){ showSentenceDetail(i, span); });
+            span.addEventListener("keydown", function(ev){ if(ev.key === "Enter" || ev.key === " "){ ev.preventDefault(); showSentenceDetail(i, span); } });
+            p.appendChild(span);
+            p.appendChild(document.createTextNode(" "));
+          });
+          hl.appendChild(p);
+        });
+        $("sent-detail").classList.remove("show");
+        $("report").classList.add("show");
+        $("report").scrollIntoView({ behavior: "smooth", block: "start" });
+        // Lapis classifier (hanya bila sudah diaktifkan): terapkan penguat bersyarat (gerbang heuristik 0,35).
+        if(clfState === "ready"){ applyClassifierToReport(text, res, runId); }
+      }
+
+      function showSentenceDetail(i, el){
+        var spans = document.querySelectorAll(".sent");
+        spans.forEach(function(sp){ sp.classList.remove("active"); });
+        el.classList.add("active");
+        if(!lastResult) return;
+        var res = lastResult;
+        var p = res.per[i];
+        var d = $("sent-detail");
+        var band = bandOf(p.score);
+        var bandName = band === "r" ? "Indikasi TINGGI" : (band === "y" ? "Indikasi SEDANG" : "Indikasi RENDAH");
+        function esc(s){ return escapeHtml(String(s)); }
+        function quoted(list){ return list.map(function(x){ return "“" + esc(x) + "”"; }).join(", "); }
+        /* --- bukti spesifik pada kalimat ini --- */
+        var items = "";
+        if(p.hits.hits){
+          items += "<li><strong>Frasa formulaik khas AI</strong> ditemukan pada kalimat ini: " + quoted(p.hits.found) + " (kontribusi sinyal frasa kalimat ini: " + pct(p.phrase) + "%).</li>";
+        } else {
+          items += "<li><strong>Frasa formulaik:</strong> tidak ada frasa dari kamus AI (klasik, LLM modern, maupun refleksi generik) pada kalimat ini.</li>";
+        }
+        if(p.repGrams && p.repGrams.length){
+          var gramTxt = p.repGrams.map(function(g){ return "“" + esc(g.text) + "” (muncul " + g.count + " kali)"; }).join(", ");
+          items += "<li><strong>Pola kata berulang:</strong> kalimat ini memuat rangkaian 4 kata yang dipakai berulang di seluruh dokumen: " + gramTxt + ". Teks generik cenderung memakai ulang rangkaian yang sama; tulisan yang konkret jarang melakukannya.</li>";
+        }
+        var cvWord = res.cv >= 0.85 ? "sangat bervariasi" : (res.cv >= 0.55 ? "bervariasi" : (res.cv >= 0.35 ? "cukup seragam" : "sangat seragam"));
+        items += "<li><strong>Ritme:</strong> kalimat ini " + res.lens[i] + " kata; rata-rata dokumen " + res.mean.toFixed(1) + " kata per kalimat, dengan ritme keseluruhan " + cvWord + " (CV " + res.cv.toFixed(2) + "). Kedekatan panjang kalimat ini ke rata-rata: " + pct(p.close) + "% — semakin dekat dan semakin seragam ritme dokumen, semakin besar kontribusinya.</li>";
+        if(p.starter > 0){
+          items += "<li><strong>Awalan berulang:</strong> dua kata pertama kalimat ini juga dipakai untuk mengawali kalimat lain di dokumen ini.</li>";
+        }
+        if(p.mdBonus){
+          items += "<li><strong>Sisa format markdown:</strong> kalimat ini memuat format mentah khas salinan keluaran AI (tebal **…** atau butir daftar mentah) — teks yang diketik langsung hampir tidak pernah memuat sintaks ini.</li>";
+        }
+        /* --- saran perbaikan: edukatif, terikat pada bukti di atas --- */
+        var tips = [];
+        if(p.hits.found.length){
+          tips.push("Ganti penghubung generik seperti " + "“" + esc(p.hits.found[0]) + "”" + " dengan transisi yang spesifik terhadap isi kalimat sebelumnya — atau tambahkan rincian konkret (nama, angka, tempat, pengalaman pribadi) yang tidak bisa dihasilkan oleh teks templat.");
+        }
+        if(p.repGrams && p.repGrams.length){
+          tips.push("Rangkaian " + "“" + esc(p.repGrams[0].text) + "”" + " dipakai berulang di dokumen ini. Variasikan redaksinya, atau ganti salah satu kemunculannya dengan penjelasan yang lebih spesifik.");
+        }
+        if(p.close >= 0.8 && res.burst >= 0.5){
+          tips.push("Panjang kalimat ini hampir sama dengan kebanyakan kalimat lain, sehingga ritme bacaan terasa datar. Coba pecah menjadi dua kalimat, atau sisipkan satu kalimat pendek yang menegaskan poin utamanya.");
+        }
+        if(p.starter > 0){
+          tips.push("Awali kalimat dari fokus yang berbeda — subjek, waktu, tempat, atau sebab — agar susunan kalimat tidak terasa seperti pola yang sama berulang.");
+        }
+        if(p.mdBonus){
+          tips.push("Hapus sisa format mentah (tebal **…** atau butir daftar) dan tulis ulang sebagai kalimat biasa, seperti teks yang diketik langsung.");
+        }
+        var suggestHtml;
+        if(tips.length){
+          suggestHtml = "<div class=\"sd-suggest\"><div class=\"sd-sec\">Saran perbaikan untuk kalimat ini</div><ul>" +
+            tips.map(function(t){ return "<li>" + t + "</li>"; }).join("") + "</ul></div>";
+        } else if(band === "g"){
+          suggestHtml = "<div class=\"sd-suggest\"><div class=\"sd-sec\">Catatan</div><p>Kalimat ini berindikasi AI rendah: pilihan kata dan ritmenya spesifik, tidak mengikuti templat. Pertahankan gaya penulisan seperti ini — rincian konkret dan ritme yang hidup adalah kekuatan tulisan Anda.</p></div>";
+        } else {
+          suggestHtml = "<div class=\"sd-suggest\"><div class=\"sd-sec\">Catatan</div><p>Tidak ada satu bukti tunggal yang kuat pada kalimat ini; skornya terutama mengikuti pola umum dokumen. Bila kalimat ini tulisan Anda sendiri, menambahkan rincian konkret biasanya membantu menurunkannya.</p></div>";
+        }
+        d.innerHTML =
+          "<div class=\"sd-head\"><span>Kalimat ke-" + (i + 1) + "</span><span class=\"sd-band " + band + "\">" + bandName + "</span></div>" +
+          "<div>Skor indikasi AI kalimat ini: <span class=\"sd-score\">" + pct(p.score) + "%</span></div>" +
+          "<p class=\"sd-quote\">“" + esc(res.sents[i]) + "”</p>" +
+          "<div class=\"sd-sec\">Bukti pada kalimat ini</div><ul>" + items + "</ul>" +
+          suggestHtml;
+        d.classList.add("show");
+      }
+
+      $("btn-analisis").addEventListener("click", runAnalysis);
+      function loadExample(text){
+        ta.value = text;
+        updateCounters();
+        runAnalysis();
+      }
+      $("ex1").addEventListener("click", function(){ loadExample(CONTOH_MANUSIA); });
+      $("ex2").addEventListener("click", function(){ loadExample(CONTOH_AI); });
+      $("ex3").addEventListener("click", function(){ loadExample(CONTOH_PARAFRASE); });
+      $("ex4").addEventListener("click", function(){ loadExample(CONTOH_GEMINI); });
+
+      /* ---------- Laporan PDF (jsPDF — dimuat HANYA saat tombol ditekan) ----------
+         Laporan berisi: ringkasan (skor akhir, vonis, jumlah kata/kalimat), rincian
+         mesin (heuristik v3, classifier bila dipakai, rumus gabungan), ketujuh sinyal,
+         rincian per kalimat (skor + alasan untuk yang terindikasi), dan teks lengkap
+         dengan kalimat terindikasi ditandai. Bekerja untuk teks tempel maupun berkas
+         .txt/.docx/.pdf — yang dilaporkan adalah teks hasil ekstraksi yang dianalisis.
+         Label jujur di kaki laporan: ini analisis INDIKASI AI per kalimat, BUKAN
+         laporan kecocokan plagiarisme terhadap basis data. */
+      /* D7-A: Subresource Integrity (SRI) untuk aset CDN ter-pin yang dimuat
+         lewat elemen <script>. Hash sha384 dihitung dari byte persis berkas
+         versi ter-pin (diambil dua kali dengan byte identik; untuk dua aset
+         cdnjs, hash sha512 byte yang sama cocok dengan yang diterbitkan
+         cdnjs). Aset yang dimuat sebagai modul ES (import()) atau sebagai
+         worker TIDAK dapat membawa SRI menurut spesifikasi — keduanya
+         didokumentasikan di laporan D7-A, tidak diberi proteksi palsu.
+         D7-B: entri pdf.js DIHAPUS dari tabel ini — sejak migrasi ke
+         PDF.js 4.10.38 (build legacy) pustaka itu dimuat lewat dynamic
+         import() sehingga SRI runtime tidak lagi dapat diterapkan pada
+         berkas utamanya. Hash sha384 berkas 4.10.38 dicatat sebagai
+         PROVENANCE saja di komentar pemuat bersama (saksaraLoadPdfJs),
+         BUKAN sebagai perlindungan SRI runtime. SRI jsPDF, docx, dan
+         Tesseract di bawah ini tetap berlaku penuh. */
+      var SAKSARA_SRI = {
+        "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js": "sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk",
+        "https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js": "sha384-4xaIisuLEy2lo2HkB2C4rEf7v8jbTb2kuogX6TkuEt9feTWKBSFSOzsqNNbV+sKh",
+        "https://cdn.jsdelivr.net/npm/tesseract.js@5.0.5/dist/tesseract.min.js": "sha384-sZlPHqJ8Pk1GMyFXfg9vOgDjyUZZe7wE2c0NoPg2z1vs2fmI4wOC0O1ONVyr73qa"
+      };
+      function saksaraSriApply(scriptEl, url){
+        var h = SAKSARA_SRI[url];
+        if(h){ scriptEl.integrity = h; scriptEl.crossOrigin = "anonymous"; }
+      }
+      var JSPDF_URL = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+      var jspdfPromise = null;
+      function loadJsPdf(){
+        if(window.jspdf && window.jspdf.jsPDF) return Promise.resolve(window.jspdf.jsPDF);
+        if(jspdfPromise) return jspdfPromise;
+        jspdfPromise = new Promise(function(resolve, reject){
+          var s = document.createElement("script");
+          s.src = JSPDF_URL;
+          saksaraSriApply(s, JSPDF_URL);
+          s.async = true;
+          s.onload = function(){
+            if(window.jspdf && window.jspdf.jsPDF) resolve(window.jspdf.jsPDF);
+            else reject(new Error("pustaka jsPDF tidak lengkap"));
+          };
+          s.onerror = function(){ reject(new Error("gagal memuat pustaka jsPDF dari CDN — periksa koneksi internet")); };
+          document.head.appendChild(s);
+        });
+        return jspdfPromise;
+      }
+      function pdfSafe(s){
+        // Font standar jsPDF (helvetica) hanya aman untuk Latin-1; ganti karakter
+        // tipografis umum dan buang sisanya agar tidak ada kotak/garble di PDF.
+        return String(s == null ? "" : s)
+          .replace(/[“”„«»]/g, '"')
+          .replace(/[‘’‚]/g, "'")
+          .replace(/[—–]/g, "-")
+          .replace(/…/g, "...")
+          .replace(/±/g, "+/-")
+          .replace(/×/g, "x")
+          .replace(/≥/g, ">=")
+          .replace(/≤/g, "<=")
+          .replace(/•/g, "-")
+          .replace(/[^\x20-\x7E\xA0-\xFF]/g, "");
+      }
+      /* ---------- Warna & metadata sinyal untuk laporan PDF ----------
+         Tiap sinyal Lapis 1 punya warna tetap (gaya laporan Turnitin):
+         warna yang sama dipakai pada batang nilai sinyal, kotak alasan di
+         rincian per kalimat, dan penanda di dalam teks berwarna. Pita skor
+         kalimat memakai warna latarnya sendiri (merah/kuning muda). */
+      var SIG_META = [
+        { key: "burst", name: "Burstiness (ritme kalimat)", color: [37, 99, 235], desc: "Keteraturan panjang kalimat — tulisan AI cenderung seragam; tulisan manusia lebih bervariasi." },
+        { key: "vocab", name: "Keragaman kosakata", color: [13, 148, 136], desc: "Keanekaragaman kata (type-token ratio) yang diukur per jendela teks." },
+        { key: "phrase", name: "Frasa khas AI", color: [124, 58, 237], desc: "Kepadatan frasa formulaik yang sangat sering muncul pada keluaran AI (kamus frasa dwibahasa)." },
+        { key: "stylo", name: "Stilometri (gaya & struktur)", color: [234, 88, 12], desc: "Pola awalan kalimat, struktur paragraf, dan rentang panjang kalimat." },
+        { key: "markdown", name: "Sisa Markdown", color: [219, 39, 119], desc: "Sisa format markdown mentah (mis. **tebal**) yang tertinggal dari keluaran AI." },
+        { key: "symmetry", name: "Simetri Paragraf", color: [22, 163, 74], desc: "Keseragaman panjang paragraf — paragraf keluaran AI cenderung simetris." },
+        { key: "repetition", name: "Pengulangan Frasa", color: [146, 64, 14], desc: "Rangkaian 4 kata yang berulang di seluruh dokumen — sidik jari templat." }
+      ];
+      function sigMetaOf(key){
+        for(var i = 0; i < SIG_META.length; i++){ if(SIG_META[i].key === key) return SIG_META[i]; }
+        return SIG_META[0];
+      }
+      function sentenceReasons(p){
+        var rs = [];
+        if(p.hits && p.hits.found && p.hits.found.length) rs.push({ sig: "phrase", text: "memuat frasa khas AI: \"" + p.hits.found.join("\", \"") + "\"" });
+        if(p.repGrams && p.repGrams.length) rs.push({ sig: "repetition", text: "memuat pola 4 kata yang berulang >= 3 kali di seluruh dokumen: \"" + p.repGrams.map(function(g){ return g.text; }).join("\", \"") + "\"" });
+        else if(p.repSent > 0) rs.push({ sig: "repetition", text: "memuat pola 4 kata yang berulang >= 3 kali di seluruh dokumen" });
+        if(p.mdBonus) rs.push({ sig: "markdown", text: "memuat sisa format markdown mentah khas keluaran AI" });
+        if(!rs.length && p.phrase >= 0.5) rs.push({ sig: "phrase", text: "skor frasa kalimat tinggi (" + pct(p.phrase) + "%)" });
+        if(!rs.length && p.close >= 0.8) rs.push({ sig: "burst", text: "panjang kalimat sangat dekat ke rata-rata dokumen — ritme seragam (" + pct(p.close) + "%)" });
+        if(!rs.length && p.starter >= 0.7) rs.push({ sig: "repetition", text: "awalan kalimat berulang seperti kalimat lain di dokumen" });
+        return rs;
+      }
+      async function downloadPdfReport(){
+        var st = $("pdf-status");
+        var btn = $("btn-pdf");
+        if(!lastResult){ st.textContent = "Jalankan analisis terlebih dahulu, lalu unduh laporannya."; return; }
+        btn.disabled = true;
+        st.textContent = "Menyiapkan laporan PDF...";
+        try{
+          var JsPDF = await loadJsPdf();
+          var res = lastResult;
+          var doc = new JsPDF({ unit: "pt", format: "a4" });
+          var W = doc.internal.pageSize.getWidth();
+          var H = doc.internal.pageSize.getHeight();
+          var M = 48, y = M, maxW = W - M * 2;
+          var NAVY = [15, 33, 64], GOLD = [201, 162, 39], INK = [26, 32, 44], MUT = [96, 108, 128], TRACK = [226, 232, 240], PANEL = [243, 246, 250], CLF_COLOR = [109, 40, 217];
+          var BANDC = { r: { solid: [176, 42, 32], bg: [250, 224, 219] }, y: { solid: [176, 116, 16], bg: [252, 240, 199] }, g: { solid: [22, 101, 52], bg: [220, 240, 224] } };
+          function setC(c){ doc.setTextColor(c[0], c[1], c[2]); }
+          function setF(c){ doc.setFillColor(c[0], c[1], c[2]); }
+          function ensure(h){ if(y + h > H - 58){ doc.addPage(); y = M; } }
+          function writeAt(text, size, style, gapAfter, x, color){
+            doc.setFont("helvetica", style || "normal");
+            doc.setFontSize(size);
+            setC(color || INK);
+            var lines = doc.splitTextToSize(pdfSafe(text), maxW - (x - M));
+            var lh = size * 1.5;
+            for(var i = 0; i < lines.length; i++){ ensure(lh); doc.text(lines[i], x, y); y += lh; }
+            if(gapAfter) y += gapAfter;
+            setC(INK);
+          }
+          function write(text, size, style, gapAfter, color){ writeAt(text, size, style, gapAfter, M, color); }
+          function h2(text){
+            ensure(48);
+            y += 8;
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(12.5);
+            setC(NAVY);
+            doc.text(pdfSafe(text), M, y);
+            y += 5;
+            setF(GOLD);
+            doc.rect(M, y, 34, 2.4, "F");
+            y += 13;
+            setC(INK);
+          }
+          function barRow(label, value, color, labelW){
+            ensure(20);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(9.5);
+            setC(NAVY);
+            doc.text(pdfSafe(label), M, y);
+            var bx = M + labelW, bw = maxW - labelW - 52;
+            setF(TRACK);
+            doc.rect(bx, y - 8, bw, 7, "F");
+            if(value > 0){ setF(color); doc.rect(bx, y - 8, Math.max(1.5, bw * Math.min(1, value)), 7, "F"); }
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(10.5);
+            setC(INK);
+            doc.text(pct(value) + "%", bx + bw + 10, y);
+            y += 19;
+          }
+          // --- data ringkasan ---
+          var fnameEl = document.querySelector("#file-status .fname");
+          var sumber = fnameEl && fnameEl.textContent.trim() ? fnameEl.textContent.trim() : "Teks tempel";
+          var waktu = new Date().toLocaleString("id-ID", { dateStyle: "full", timeStyle: "short" });
+          var shownPct = parseFloat(String($("score-num").textContent).replace(",", "."));
+          if(isNaN(shownPct)) shownPct = pct(res.final);
+          var shownBand = bandOf(shownPct / 100);
+          // --- kepala laporan: pita navy ala laporan resmi ---
+          setF(NAVY);
+          doc.rect(0, 0, W, 58, "F");
+          setF(GOLD);
+          doc.rect(0, 58, W, 3, "F");
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(17);
+          doc.setTextColor(255, 255, 255);
+          doc.text("Saksara", M, 27);
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(9);
+          doc.setTextColor(199, 210, 228);
+          doc.text("Gratis Deteksi Tulisan AI — Beta Terbuka", M, 43);
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(11.5);
+          doc.setTextColor(255, 255, 255);
+          doc.text("LAPORAN PEMERIKSAAN TEKS", W - M, 27, { align: "right" });
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(8.5);
+          doc.setTextColor(199, 210, 228);
+          doc.text(pdfSafe(waktu), W - M, 43, { align: "right" });
+          setC(INK);
+          y = 84;
+          write("Sumber: " + sumber, 10.5, "normal", 2, MUT);
+          // --- panel skor: angka besar berwarna + batang kedua lapis ---
+          ensure(118);
+          var pTop = y - 4;
+          setF(PANEL);
+          doc.rect(M, pTop, maxW, 102, "F");
+          setF(GOLD);
+          doc.rect(M, pTop, 4, 102, "F");
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(31);
+          setC(BANDC[shownBand].solid);
+          doc.text(shownPct + "%", M + 18, pTop + 46);
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(7.5);
+          setC(MUT);
+          doc.text("SKOR INDIKASI AI", M + 18, pTop + 62);
+          doc.text("KESELURUHAN", M + 18, pTop + 72);
+          doc.setFontSize(10);
+          setC(INK);
+          var vLines = doc.splitTextToSize(pdfSafe($("verdict").textContent), 168);
+          for(var vi = 0; vi < Math.min(2, vLines.length); vi++) doc.text(vLines[vi], M + 18, pTop + 88 + vi * 12);
+          var rx = M + 208;
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(9);
+          setC(NAVY);
+          doc.text("LAPIS 1 — HEURISTIK V3", rx, pTop + 26);
+          setF(TRACK);
+          doc.rect(rx, pTop + 32, 168, 7, "F");
+          setF(NAVY);
+          doc.rect(rx, pTop + 32, Math.max(1.5, 168 * res.final), 7, "F");
+          doc.setFontSize(10.5);
+          setC(INK);
+          doc.text(pct(res.final) + "%", rx + 178, pTop + 39);
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(9);
+          setC(NAVY);
+          doc.text("LAPIS 2 — CLASSIFIER", rx, pTop + 62);
+          if(lastClfScore !== null && lastClfScore !== undefined){
+            setF(TRACK);
+            doc.rect(rx, pTop + 68, 168, 7, "F");
+            setF(CLF_COLOR);
+            doc.rect(rx, pTop + 68, Math.max(1.5, 168 * lastClfScore), 7, "F");
+            doc.setFontSize(10.5);
+            setC(INK);
+            doc.text(pct(lastClfScore) + "%", rx + 178, pTop + 75);
+          } else {
+            doc.setFont("helvetica", "italic");
+            doc.setFontSize(9.5);
+            setC(MUT);
+            doc.text("tidak diaktifkan", rx, pTop + 75);
+          }
+          setC(INK);
+          y = pTop + 102 + 16;
+          write("Jumlah kata: " + res.words + " | Jumlah kalimat: " + res.sents.length +
+                " | Rata-rata kata per kalimat: " + res.mean.toFixed(1) +
+                " | Type-token ratio (TTR): " + res.overallTTR.toFixed(2), 10.5);
+          if(res.sents.length){
+            write("Ringkasan per kalimat: " + res.flagCount + " dari " + res.sents.length + " kalimat (" + pct(res.flagCount / res.sents.length) + "%) memiliki skor per kalimat >= 50% (terindikasi).", 10.5);
+          }
+          if(res.words < 300) write("Catatan reliabilitas: teks ini hanya " + res.words + " kata (di bawah +/-300 kata) — hasil kurang dapat dipegang; gunakan sebagai petunjuk awal, bukan kesimpulan.", 10, "italic");
+          if(lastExclusion) write("Catatan: Bagian baku dikecualikan: ±" + lastExclusion.excludedWords + " kata tidak dianalisis (daftar pustaka, kata pengantar, kutipan, baris tabel — sesuai yang ditemukan).", 10, "italic");
+          if(lastHeadingsRemoved) write("Catatan: Judul dan kepala bab/subbab dikeluarkan dari penilaian: " + lastHeadingsRemoved.lines + " baris (±" + lastHeadingsRemoved.words + " kata) tidak dianalisis - yang dinilai hanya isi prosa.", 10, "italic");
+          if(lastSectionsRemoved) write("Catatan: Isi " + lastSectionsRemoved.sections.join(", ") + " dikeluarkan dari penilaian: ±" + lastSectionsRemoved.words + " kata tidak dianalisis.", 10, "italic");
+          if(lastQuotesRemoved) write("Catatan: Kutipan bersitasi dikeluarkan dari penilaian: ±" + lastQuotesRemoved.words + " kata tidak dianalisis.", 10, "italic");
+          // --- Lapis 2: bagian khusus classifier ---
+          h2("Pemeriksaan Lapis 2 — Classifier");
+          if(lastClfScore !== null && lastClfScore !== undefined){
+            write("Model: XLM-RoBERTa multibahasa (xlm-roberta-base-finetuned-HC3-mix) — berjalan sepenuhnya lokal di peramban; teks tidak dikirim ke server mana pun.", 10, "normal", 3, MUT);
+            barRow("Probabilitas AI menurut classifier", lastClfScore, CLF_COLOR, 218);
+            if(lastClfTruncated) write("Catatan cakupan classifier: dokumen panjang — classifier menilai " + (lastClfCapUsed || MAX_CLF_CHUNKS) + " segmen yang disebar merata dari seluruh dokumen" + (lastClfCapUsed && lastClfCapUsed < MAX_CLF_CHUNKS ? " (batas hemat perangkat: " + lastClfCapUsed + " segmen)" : "") + ".", 10, "italic");
+            if(lastClfApplied){
+              var blended = res.final + (1 - res.final) * lastClfScore * 0.5;
+              write("Gerbang penguat TERBUKA — heuristik " + pct(res.final) + "% >= 35%, sehingga classifier ikut menaikkan skor akhir.", 10.5);
+              write("Rumus gabungan: skor akhir = heuristik + (1 - heuristik) x classifier x 0,5 = " + pct(res.final) + "% + (100% - " + pct(res.final) + "%) x " + pct(lastClfScore) + "% x 0,5 = " + pct(blended) + "%.", 10.5);
+            } else {
+              write("Gerbang penguat TERTUTUP — heuristik " + pct(res.final) + "% < 35%, sehingga skor classifier TIDAK dipakai; skor akhir 100% Lapis 1. Classifier tidak pernah menaikkan skor sendirian.", 10.5);
+            }
+            if(lastWatchSignal){
+              var wtxt = "SINYAL WASPADA: classifier memberi probabilitas AI sangat tinggi (" + pct(lastWatchSignal.clf) + "%) sementara heuristik rendah (" + pct(lastWatchSignal.heur) + "%) — kedua lapis tidak sepakat. Ketidaksepakatan ini dapat muncul pada teks AI yang disunting/diparafrase dengan baik, tetapi juga pada tulisan manusia yang sangat formal. Skor akhir tidak diubah; disarankan meninjau teks ini secara manual dan mengklarifikasi kepada penulisnya sebelum menyimpulkan.";
+              doc.setFont("helvetica", "normal");
+              doc.setFontSize(10);
+              var wl = doc.splitTextToSize(pdfSafe(wtxt), maxW - 20);
+              var wh = wl.length * 15 + 16;
+              ensure(wh + 6);
+              var wTop = y - 11;
+              setF([253, 240, 213]);
+              doc.rect(M, wTop, maxW, wh, "F");
+              doc.setDrawColor(201, 162, 39);
+              doc.rect(M, wTop, maxW, wh, "S");
+              doc.setFontSize(10);
+              setC([109, 84, 16]);
+              for(var wi = 0; wi < wl.length; wi++){ doc.text(wl[wi], M + 10, y); y += 15; }
+              y += 10;
+              setC(INK);
+            }
+          } else {
+            write("Classifier tidak diaktifkan pada pemeriksaan ini — skor akhir 100% Lapis 1 (Ensemble Heuristik v3). Untuk menyertakannya, aktifkan Penguat AI pada panel classifier di halaman sebelum mengunduh laporan.", 10.5, "normal", 0, MUT);
+          }
+          // --- rincian per sinyal: batang berwarna per sinyal ---
+          h2("Rincian per Sinyal — Lapis 1 (Ensemble Heuristik v3)");
+          var sigVals = { burst: res.burst, vocab: res.vocab, phrase: res.phraseGlobal, stylo: res.stylo, markdown: res.markdown, symmetry: res.symmetry, repetition: res.repetition };
+          SIG_META.forEach(function(sm){
+            var v = sigVals[sm.key];
+            ensure(32);
+            setF(sm.color);
+            doc.rect(M, y - 9, 8, 8, "F");
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(10.5);
+            setC(INK);
+            doc.text(pdfSafe(sm.name), M + 14, y);
+            var bx = M + 218, bw = maxW - 218 - 52;
+            setF(TRACK);
+            doc.rect(bx, y - 8, bw, 7, "F");
+            if(v > 0){ setF(sm.color); doc.rect(bx, y - 8, Math.max(1.5, bw * Math.min(1, v)), 7, "F"); }
+            doc.setFont("helvetica", "bold");
+            doc.text(pct(v) + "%", bx + bw + 10, y);
+            y += 12;
+            writeAt(sm.desc, 8.5, "normal", 5, M + 14, MUT);
+          });
+          write("Warna tiap sinyal dipakai secara konsisten pada keterangan warna, teks berwarna, dan rincian per kalimat di bawah ini.", 9.5, "italic", 2, MUT);
+          // --- keterangan warna ---
+          h2("Keterangan Warna");
+          function legendSwatch(bg, text){
+            ensure(16);
+            setF(bg);
+            doc.rect(M, y - 9, 22, 10, "F");
+            writeAt(text, 10, "normal", 1, M + 32);
+          }
+          legendSwatch(BANDC.r.bg, "Latar kalimat merah muda — kalimat indikasi TINGGI (skor per kalimat >= 65%)");
+          legendSwatch(BANDC.y.bg, "Latar kalimat kuning muda — kalimat indikasi SEDANG (skor per kalimat 35-65%)");
+          legendSwatch(BANDC.g.bg, "Hijau — kalimat indikasi RENDAH (< 35%): pada teks berwarna, kalimat ini tanpa latar");
+          ensure(16);
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(10.5);
+          setC(sigMetaOf("phrase").color);
+          var frasaSample = "frasa khas";
+          doc.text(frasaSample, M, y);
+          writeAt("Teks ungu tebal — frasa khas AI yang ditemukan di dalam kalimat (Sinyal: Frasa khas AI)", 10, "normal", 1, M + doc.getTextWidth(frasaSample) + 10);
+          ensure(16);
+          var repC = sigMetaOf("repetition").color;
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(10.5);
+          setC(repC);
+          var repSample = "pola berulang";
+          doc.text(repSample, M, y);
+          doc.setDrawColor(repC[0], repC[1], repC[2]);
+          doc.setLineWidth(0.7);
+          doc.line(M, y + 2.4, M + doc.getTextWidth(repSample), y + 2.4);
+          writeAt("Teks cokelat bergaris bawah — rangkaian 4 kata yang berulang >= 3 kali di dokumen (Sinyal: Pengulangan Frasa)", 10, "normal", 1, M + doc.getTextWidth(repSample) + 10);
+          setC(INK);
+          // --- teks berwarna penuh (gaya Turnitin) ---
+          h2("Teks yang Diperiksa — dengan Penanda Warna");
+          function sentenceRuns(text, p, band, sentId){
+            var marks = [];
+            function addMarks(str, kind){
+              if(!str) return;
+              var hay = text.toLowerCase(), needle = String(str).toLowerCase(), pos = 0;
+              while(true){
+                var k = hay.indexOf(needle, pos);
+                if(k < 0) break;
+                marks.push({ a: k, b: k + needle.length, kind: kind });
+                pos = k + needle.length;
+              }
+            }
+            if(p.hits && p.hits.found) p.hits.found.forEach(function(ph){ addMarks(ph, "frasa"); });
+            if(p.repGrams) p.repGrams.forEach(function(g){ addMarks(g.text, "ulang"); });
+            marks.sort(function(a, b){ return a.a - b.a; });
+            var runs = [], cur = 0;
+            marks.forEach(function(mk){
+              if(mk.a < cur) return;
+              if(mk.a > cur) runs.push({ t: text.slice(cur, mk.a) });
+              runs.push({ t: text.slice(mk.a, mk.b), kind: mk.kind });
+              cur = mk.b;
+            });
+            if(cur < text.length) runs.push({ t: text.slice(cur) });
+            var bg = band === "g" ? null : BANDC[band].bg;
+            return runs.map(function(rn){
+              return { t: pdfSafe(rn.t), bg: bg, sentId: sentId,
+                color: rn.kind === "frasa" ? sigMetaOf("phrase").color : (rn.kind === "ulang" ? sigMetaOf("repetition").color : INK),
+                bold: rn.kind === "frasa", underline: rn.kind === "ulang" };
+            });
+          }
+          function flowParagraph(runs, size){
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(size);
+            var lh = size * 1.5;
+            var spaceW = doc.getTextWidth(" ");
+            var words = [];
+            runs.forEach(function(rn){
+              if(!rn.t) return;
+              var pieces = rn.t.split(/(\s+)/);
+              for(var pi = 0; pi < pieces.length; pi++){
+                var pc = pieces[pi];
+                if(!pc) continue;
+                if(/^\s+$/.test(pc)){ words.push({ sp: true, rn: rn }); continue; }
+                doc.setFont("helvetica", rn.bold ? "bold" : "normal");
+                words.push({ w: pc, rn: rn, wd: doc.getTextWidth(pc) });
+              }
+            });
+            var lines = [], curL = [], curW = 0;
+            words.forEach(function(it){
+              var iw = it.sp ? spaceW : it.wd;
+              if(!it.sp && curW > 0 && curW + iw > maxW){ lines.push(curL); curL = []; curW = 0; }
+              if(it.sp && curW === 0) return;
+              curL.push(it); curW += iw;
+            });
+            if(curL.length) lines.push(curL);
+            lines.forEach(function(line){
+              ensure(lh);
+              var pos = [], x = M;
+              line.forEach(function(it){ pos.push(x); x += it.sp ? spaceW : it.wd; });
+              var runStart = -1, runKey = null;
+              function flushBg(endIdx){
+                if(runStart >= 0){
+                  var bgc = line[runStart].rn.bg;
+                  doc.setFillColor(bgc[0], bgc[1], bgc[2]);
+                  var x0 = pos[runStart];
+                  var lastIt = line[endIdx - 1];
+                  var x1 = pos[endIdx - 1] + (lastIt.sp ? spaceW : lastIt.wd);
+                  doc.rect(x0 - 1.5, y - size * 1.12, (x1 - x0) + 3, size * 1.44, "F");
+                }
+                runStart = -1; runKey = null;
+              }
+              line.forEach(function(it, ii){
+                var key = it.rn.bg ? (it.rn.sentId + "|" + it.rn.bg.join(",")) : null;
+                if(key !== runKey){ flushBg(ii); if(key){ runStart = ii; runKey = key; } }
+              });
+              flushBg(line.length);
+              line.forEach(function(it, ii){
+                if(it.sp) return;
+                doc.setFont("helvetica", it.rn.bold ? "bold" : "normal");
+                var c = it.rn.color || INK;
+                doc.setTextColor(c[0], c[1], c[2]);
+                doc.text(it.w, pos[ii], y);
+                if(it.rn.underline){
+                  doc.setDrawColor(c[0], c[1], c[2]);
+                  doc.setLineWidth(0.7);
+                  doc.line(pos[ii], y + 2.2, pos[ii] + it.wd, y + 2.2);
+                }
+              });
+              setC(INK);
+              y += lh;
+            });
+          }
+          var sIdx = 0;
+          if(res.words <= 30000){
+            res.paraSents.forEach(function(ps){
+              var runs = [];
+              ps.forEach(function(s, si){
+                var p = res.per[sIdx];
+                var band = bandOf(p.score);
+                if(si > 0) runs.push({ t: " ", bg: null, sentId: -1, color: INK });
+                runs = runs.concat(sentenceRuns(s, p, band, sIdx));
+                sIdx++;
+              });
+              flowParagraph(runs, 10.5);
+              y += 5;
+            });
+          } else {
+            write("(Dokumen sangat panjang — penanda warna penuh diganti penanda teks [TERINDIKASI ...] agar berkas tetap ringan.)", 9.5, "italic", 3, MUT);
+            res.paraSents.forEach(function(ps){
+              var parts = ps.map(function(s){
+                var p = res.per[sIdx++];
+                var band = bandOf(p.score);
+                if(band === "g") return s;
+                return "[TERINDIKASI " + (band === "r" ? "TINGGI" : "SEDANG") + " " + pct(p.score) + "%] " + s;
+              });
+              write(parts.join(" "), 10.5, "normal", 5);
+            });
+          }
+          // --- rincian per kalimat (berwarna) ---
+          h2("Rincian per Kalimat");
+          write("Warna judul tiap kalimat mengikuti pitanya: merah = TINGGI (>= 65%), kuning = SEDANG (35-65%), hijau = RENDAH (< 35%). Untuk kalimat SEDANG dan TINGGI, alasan ditampilkan dengan kotak warna sinyal yang menyebabkannya.", 9.5, "italic", 3, MUT);
+          res.sents.forEach(function(s, i){
+            var p = res.per[i];
+            var band = bandOf(p.score);
+            var bandName = band === "r" ? "TINGGI" : (band === "y" ? "SEDANG" : "RENDAH");
+            ensure(17);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(10.5);
+            setC(BANDC[band].solid);
+            doc.text(pdfSafe("Kalimat " + (i + 1) + " — " + pct(p.score) + "% — Indikasi " + bandName), M, y);
+            y += 16;
+            setC(INK);
+            write(s, 10.5);
+            if(band !== "g"){
+              sentenceReasons(p).forEach(function(r){
+                var sm = sigMetaOf(r.sig);
+                ensure(14);
+                setF(sm.color);
+                doc.rect(M + 1, y - 8, 7, 7, "F");
+                writeAt(sm.name + " — " + r.text, 9.5, "italic", 1, M + 13);
+              });
+            }
+            y += 3;
+          });
+          // --- kaki halaman di semua halaman ---
+          var footerText = "Catatan: laporan ini adalah analisis indikasi AI per kalimat berdasarkan pola statistik — BUKAN laporan kecocokan plagiarisme terhadap basis data. Skor adalah indikasi, bukan bukti. Saksara adalah versi beta terbuka; gunakan sebagai bahan pemeriksaan, bukan vonis. Dikembangkan oleh Ciptanala Devs.";
+          var total = doc.getNumberOfPages();
+          for(var pg = 1; pg <= total; pg++){
+            doc.setPage(pg);
+            doc.setDrawColor(201, 162, 39);
+            doc.setLineWidth(0.8);
+            doc.line(M, H - 48, W - M, H - 48);
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(8);
+            doc.setTextColor(110, 110, 110);
+            var fl = doc.splitTextToSize(pdfSafe(footerText), maxW - 70);
+            for(var fi = 0; fi < fl.length; fi++) doc.text(fl[fi], M, H - 40 + fi * 10);
+            doc.text("Halaman " + pg + " dari " + total, W - M, H - 40, { align: "right" });
+          }
+          var now = new Date();
+          function pad(n){ return String(n).padStart(2, "0"); }
+          var stamp = now.getFullYear() + pad(now.getMonth() + 1) + pad(now.getDate()) + "-" + pad(now.getHours()) + pad(now.getMinutes()) + pad(now.getSeconds());
+          doc.save("Laporan-Saksara-" + stamp + ".pdf");
+          st.textContent = "Laporan PDF terunduh.";
+        }catch(e){
+          st.textContent = "PDF gagal dibuat — coba lagi sebentar lagi. Rinciannya: " + (e && e.message ? e.message : e);
+        }
+        btn.disabled = false;
+      }
+
+      $("btn-pdf").addEventListener("click", function(){ downloadPdfReport(); });
+      /* ---------- filter & lompat penanda kalimat (v0.9.13) ---------- */
+      (function(){
+        var hlText = $("hl-text"); if(!hlText) return;
+        var btns = document.querySelectorAll(".hl-filter");
+        function setFilter(f){
+          if(f === "all") hlText.removeAttribute("data-filter"); else hlText.setAttribute("data-filter", f);
+          for(var i = 0; i < btns.length; i++) btns[i].classList.toggle("on", btns[i].getAttribute("data-f") === f);
+        }
+        for(var i = 0; i < btns.length; i++){
+          (function(b){ b.addEventListener("click", function(){ setFilter(b.getAttribute("data-f")); }); })(btns[i]);
+        }
+        var jumpIdx = -1;
+        var jumpBtn = $("btn-lompat");
+        if(jumpBtn) jumpBtn.addEventListener("click", function(){
+          var targets = hlText.querySelectorAll(".sent.r, .sent.y");
+          if(!targets.length) return;
+          jumpIdx = (jumpIdx + 1) % targets.length;
+          var el = targets[jumpIdx];
+          el.scrollIntoView({ block: "center", behavior: "smooth" });
+          el.click();
+        });
+      })();
+      /* ---------- salin ringkasan hasil (v0.9.13) ---------- */
+      (function(){
+        var btn = $("btn-salin"); if(!btn) return;
+        btn.addEventListener("click", function(){
+          if(!lastResult) return;
+          var lines = [];
+          lines.push("SAKSARA — Ringkasan Hasil Analisis");
+          lines.push("Waktu: " + new Date().toLocaleString("id-ID"));
+          var scoreTxt = $("score-num") ? $("score-num").textContent.trim() : "";
+          var verdictTxt = $("verdict") ? $("verdict").textContent.trim() : "";
+          lines.push("Skor indikasi AI: " + scoreTxt + " (" + verdictTxt + ")");
+          lines.push("Jumlah kata: " + ($("st-kata") ? $("st-kata").textContent.trim() : String(lastResult.words)));
+          lines.push("Lapis 1 — Ensemble Heuristik v3: " + Math.round(lastResult.final * 100) + "%");
+          if(lastClfScore !== null && lastClfScore !== undefined){
+            lines.push("Lapis 2 — Classifier: " + Math.round(lastClfScore * 100) + "%" + (lastClfApplied ? " (diterapkan sebagai penguat bersyarat)" : " (tidak diterapkan — gerbang heuristik belum terbuka)"));
+          } else {
+            lines.push("Lapis 2 — Classifier: tidak diaktifkan");
+          }
+          if(lastWatchSignal) lines.push("SINYAL WASPADA: heuristik rendah tetapi classifier sangat yakin — periksa manual.");
+          lines.push("Rincian 7 sinyal:");
+          var sigs = document.querySelectorAll(".signals .sig");
+          for(var i = 0; i < sigs.length; i++){
+            var n = sigs[i].querySelector(".sig-name"), p = sigs[i].querySelector(".sig-pct");
+            if(n && p) lines.push("- " + n.textContent.trim() + ": " + p.textContent.trim());
+          }
+          lines.push("Catatan: skor ini indikasi statistik, bukan bukti. https://saksara.vercel.app");
+          var text = lines.join("\n");
+          function done(){ btn.textContent = "Tersalin ✓"; setTimeout(function(){ btn.textContent = "Salin Ringkasan"; }, 2200); }
+          function fallback(){
+            var ta = document.createElement("textarea");
+            ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+            document.body.appendChild(ta); ta.select();
+            try { if(document.execCommand("copy")) done(); } catch(e){ /* abaikan */ }
+            document.body.removeChild(ta);
+          }
+          if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fallback);
+          else fallback();
+        });
+      })();
+
+      /* ---------- Zona eksklusi: bagian baku yang tidak ikut dinilai ----------
+         Menyaring SALINAN teks (kotak teks tidak pernah diubah) dari bagian
+         yang memang wajib formulaik pada dokumen formal Indonesia:
+         (a) daftar pustaka — dipotong dari baris judulnya sampai akhir;
+         (b) kata pengantar — dari judulnya sampai judul berikutnya, baris
+             tanda tangan (Penulis/Penyusun), atau 800 kata, mana yang dulu;
+         (c) kutipan panjang (>= 25 kata) di dalam tanda kutip lurus/lengkung;
+         (d) baris tabel/angka — >= 70% karakternya digit atau pemisah.
+         Mengembalikan teks tersaring + jumlah kata yang dibuang + daftar
+         bagian yang ditemukan. Pengumuman ke pengguna ada di laporan
+         (banner-eksklusi) dan laporan PDF — tidak pernah diam-diam. */
+      var lastExclusion = null; /* { excludedWords, parts } milik laporan yang tampil, atau null */
+      var lastHeadingsRemoved = null; /* { lines, words } penyaringan judul/kepala bab pada laporan yang tampil, atau null */
+      var lastSectionsRemoved = null; /* { sections, words } penyaringan isi daftar isi/gambar/tabel/pustaka pada laporan yang tampil, atau null */
+      var lastQuotesRemoved = null; /* { words } penyaringan kutipan bersitasi pada laporan yang tampil, atau null */
+      /* ---------- Isi daftar isi/gambar/tabel/pustaka: SELALU dikeluarkan ----------
+         Baris-baris entri daftar isi, daftar gambar, dan daftar tabel (judul
+         entri + nomor halaman) serta seluruh entri daftar pustaka bukanlah
+         prosa dan tidak boleh ikut dinilai. Berjalan selalu, dari kode, tanpa
+         kotak centang. Daftar isi/gambar/tabel dipotong dari baris judulnya
+         sampai baris prosa pertama (baris panjang atau berakhir tanda akhir
+         kalimat); daftar pustaka dipotong sampai akhir dokumen (berhenti
+         sebelum LAMPIRAN bila ada). Pengaman: baris judul seksi harus pendek
+         (maks 5 kata) dan tanpa tanda kalimat, jadi kalimat prosa yang
+         menyebut "daftar isi" tidak pernah memicu pemotongan. Hasilnya
+         diumumkan di laporan (banner) dan laporan PDF. */
+      /* ---------- Kutipan bersitasi: SELALU dikeluarkan (v0.15.1) ----------
+         Kutipan langsung panjang (>= 8 kata) yang melekat pada sitasi
+         "(... tahun ...)" — sebelum atau sesudah tanda kutip — adalah tulisan
+         orang lain dan tidak boleh dinilai sebagai tulisan pengguna. Pola
+         sitasi wajib memuat tahun 4 digit agar kutipan biasa tanpa sitasi
+         tidak ikut terbuang. Pengeluaran selalu diumumkan di laporan. */
+      function stripQuotedCitations(text){
+        var removed = 0;
+        var out = String(text || "").replace(/\(\s*[^)\n]{0,40}?\d{4}[^)\n]{0,20}\)\s*,?\s*["\u201C]([^"\u201D]{60,}?)["\u201D]|["\u201C]([^"\u201D]{60,}?)["\u201D]\s*\(\s*[^)\n]{0,40}?\d{4}[^)\n]{0,20}\)/g, function(m, innerA, innerB){
+          var inner = innerA || innerB;
+          var w = inner.trim().split(/\s+/).length;
+          if(w >= 8){ removed += w; return " "; }
+          return m;
+        });
+        return { text: out, words: removed };
+      }
+      function stripListSections(text){
+        var lines = String(text || "").split("\n");
+        function sectionKind(line){
+          var t = String(line || "").trim().replace(/:+$/, "");
+          if(t.length > 40 || wordsOf(t).length > 5 || /[.!?;,]/.test(t)) return null;
+          if(/^daftar\s+isi\b/i.test(t) || /^table\s+of\s+contents\b/i.test(t)) return "Daftar isi";
+          if(/^daftar\s+gambar\b/i.test(t)) return "Daftar gambar";
+          if(/^daftar\s+tabel\b/i.test(t)) return "Daftar tabel";
+          if(/^daftar\s+pustaka\b/i.test(t) || /^referensi\b/i.test(t) || /^bibliografi\b/i.test(t) || /^bibliography\b/i.test(t) || /^references\b/i.test(t)) return "Daftar pustaka";
+          return null;
+        }
+        function isBareSectionHeading(line){
+          /* Judul seksi daftar yang berdiri sendiri (tanpa titik penuntun /
+             nomor halaman) menandai awal seksi berikutnya, bukan entri —
+             sedangkan baris "DAFTAR PUSTAKA ............ 11" di dalam daftar
+             isi adalah entri dan tetap terpotong bersama daftar induknya. */
+          var t = String(line || "").trim();
+          if(!sectionKind(t)) return false;
+          if(/…/.test(t) || /\.{3,}/.test(t) || /\d\s*$/.test(t)) return false;
+          return true;
+        }
+        function isEntryLine(line){
+          var t = String(line || "").trim();
+          if(!t) return true; /* baris kosong di dalam daftar ikut terpotong */
+          if(/…/.test(t) || /\.{3,}/.test(t)) return true; /* titik-titik penuntun */
+          if(/\d\s*$/.test(t) && wordsOf(t).length <= 14) return true; /* berakhir nomor halaman */
+          if(t.length <= 90 && wordsOf(t).length <= 10 && !/[.!?;,]$/.test(t)) return true; /* entri pendek tanpa nomor */
+          return false;
+        }
+        var out = [], removedWords = 0, found = [], i = 0;
+        while(i < lines.length){
+          var kind = sectionKind(lines[i]);
+          if(!kind){ out.push(lines[i]); i++; continue; }
+          var cut = wordsOf(lines[i]).length, j = i + 1;
+          if(kind === "Daftar pustaka"){
+            while(j < lines.length){
+              var lt = lines[j].trim();
+              if(/^lampiran\b/i.test(lt) && isHeadingLikeLine(lt)) break;
+              cut += wordsOf(lines[j]).length; j++;
+            }
+          } else {
+            var nCut = 0;
+            while(j < lines.length && nCut <= 400 && isEntryLine(lines[j]) && !isBareSectionHeading(lines[j])){
+              cut += wordsOf(lines[j]).length; j++; nCut++;
+            }
+          }
+          if(cut > 0){ removedWords += cut; if(found.indexOf(kind) < 0) found.push(kind); }
+          i = j;
+        }
+        return { text: out.join("\n"), words: removedWords, sections: found };
+      }
+      /* ---------- Judul & kepala bab/subbab: SELALU dikeluarkan ----------
+         Baris judul dokumen, kepala "BAB I/II/…", dan kepala subbab bernomor
+         ("1.1 Latar Belakang") bukanlah prosa — bila ikut dinilai, ritme dan
+         kosakata mereka mengotori skor. Penyaringan ini berjalan dari kode,
+         selalu, tanpa kotak centang; yang dibuang hanya BARIS kepalanya,
+         isi prosa tidak disentuh. Hasilnya diumumkan di laporan
+         (banner-eksklusi) dan laporan PDF — tidak pernah diam-diam.
+         Pengaman: baris kalimat biasa tidak boleh ikut terbuang — kepala
+         bab tidak memuat tanda akhir kalimat, pendek, dan untuk nomor satu
+         tingkat judulnya harus berbentuk Judul (Title Case); daftar bernomor
+         dalam isi (kalimat perintah berhuruf kecil) lolos. */
+      function isTitleCasePhrase(s){
+        var small = { "dan": 1, "di": 1, "ke": 1, "dari": 1, "yang": 1, "untuk": 1, "dalam": 1, "pada": 1, "atau": 1, "sebagai": 1, "dengan": 1, "the": 1, "of": 1, "and": 1, "in": 1, "on": 1 };
+        var ws = String(s || "").trim().split(/\s+/);
+        for(var i = 0; i < ws.length; i++){
+          var w = ws[i];
+          if(!w) continue;
+          if(small[w.toLowerCase()]) continue;
+          if(/^[A-ZÀ-Þ0-9]/.test(w)) continue;
+          return false;
+        }
+        return true;
+      }
+      function stripStructuralHeadings(text){
+        var src = String(text || "");
+        var lines = src.split("\n");
+        function isStructuralHeading(line){
+          var t = String(line || "").trim();
+          if(!t) return false;
+          // (1) kepala BAB: "BAB I", "BAB 1 PENDAHULUAN" — tanpa tanda kalimat
+          if(/^bab\s+([ivxlcdm]{1,6}|\d{1,3})\b/i.test(t) && t.length <= 90 && wordsOf(t).length <= 10 && !/[.!?]/.test(t)) return true;
+          // (2) kepala bernomor: "1.1 Latar Belakang", "2.3.1 Metode Penelitian"
+          var m = t.match(/^(\d+(?:\.\d+){0,3})\.?\s+(\S.*)$/);
+          if(m && t.length <= 80 && wordsOf(t).length <= 10 && !/[.!?,;:]/.test(m[2])){
+            if(m[1].indexOf(".") >= 0) return true; // bertingkat: hampir pasti kepala subbab
+            if(isTitleCasePhrase(m[2])) return true; // satu tingkat: hanya bila berbentuk judul
+          }
+          // (3) kata kunci kepala bab / huruf besar dominan (pola zona eksklusi)
+          return isHeadingLikeLine(t);
+        }
+        var removedLines = 0, removedWords = 0, startIdx = 0;
+        // Blok judul di awal dokumen: sampai 4 baris pendek tanpa tanda baca
+        // kalimat berturut-turut, dan sesudahnya masih ada isi sungguhan.
+        if(lines.length >= 3){
+          var block = [];
+          for(var i = 0; i < lines.length && block.length < 4; i++){
+            var lt = lines[i].trim();
+            if(!lt){ if(block.length) break; continue; }
+            var colonAt = lt.indexOf(":");
+            var punctFree = !/[.!?;,]/.test(lt) && (colonAt < 0 || colonAt <= 14); // "Oleh: …", "NIM: …" tetap baris judul
+            if(lt.length <= 90 && wordsOf(lt).length <= 12 && punctFree) block.push(i);
+            else break;
+          }
+          if(block.length){
+            var restWords = 0;
+            for(var r = block[block.length - 1] + 1; r < lines.length; r++) restWords += wordsOf(lines[r]).length;
+            if(restWords >= 40){
+              block.forEach(function(bi){ removedLines++; removedWords += wordsOf(lines[bi]).length; });
+              startIdx = block[block.length - 1] + 1;
+            }
+          }
+        }
+        var kept = [];
+        for(var n = startIdx; n < lines.length; n++){
+          var ln = lines[n];
+          if(ln.trim() && isStructuralHeading(ln)){ removedLines++; removedWords += wordsOf(ln).length; continue; }
+          kept.push(ln);
+        }
+        return { text: kept.join("\n"), lines: removedLines, words: removedWords };
+      }
+      function isHeadingLikeLine(line){
+        var t = String(line || "").trim();
+        if(!t || t.length > 60) return false;
+        if(/[.!?,;:]$/.test(t)) return false;
+        if(wordsOf(t).length > 7) return false;
+        if(/^(bab\s+\w+|pendahuluan|penutup|kesimpulan|saran|abstrak|daftar\s+\w+|kata pengantar|referensi|daftar pustaka|bibliografi|bibliography|references|metodologi|metode penelitian|hasil dan pembahasan|pembahasan|tinjauan pustaka|landasan teori|lampiran)/i.test(t)) return true;
+        var letters = t.replace(/[^A-Za-zÀ-ÿ]/g, "");
+        if(letters.length >= 3){
+          var upper = t.replace(/[^A-ZÀ-Þ]/g, "").length;
+          if(upper / letters.length >= 0.8) return true;
+        }
+        return false;
+      }
+      function excludeStandardParts(text){
+        var src = String(text || "");
+        var parts = [];
+        var lines = src.split("\n");
+        function isRefHeading(line){
+          return /^(\d+[\.\)]\s*)?(daftar pustaka|referensi|bibliografi|bibliography|references)\s*[:.]?\s*$/i.test(String(line || "").trim());
+        }
+        function isKpHeading(line){
+          return /^(\d+[\.\)]\s*)?kata pengantar\s*[:.]?\s*$/i.test(String(line || "").trim());
+        }
+        // (a) daftar pustaka: potong dari baris judulnya sampai akhir dokumen
+        var refIdx = -1;
+        for(var i = 0; i < lines.length; i++){ if(isRefHeading(lines[i])){ refIdx = i; break; } }
+        if(refIdx >= 0){
+          if(wordsOf(lines.slice(refIdx).join("\n")).length > 0) parts.push("daftar pustaka");
+          lines = lines.slice(0, refIdx);
+        }
+        // (b) kata pengantar: dari judulnya sampai judul berikutnya / baris
+        //     tanda tangan / anggaran 800 kata — mana yang tercapai dulu
+        var kpIdx = -1;
+        for(var j = 0; j < lines.length; j++){ if(isKpHeading(lines[j])){ kpIdx = j; break; } }
+        if(kpIdx >= 0){
+          var end = lines.length, budget = 0;
+          for(var k = kpIdx + 1; k < lines.length; k++){
+            var trimmed = lines[k].trim();
+            if(/^(penulis|penyusun)\b/i.test(trimmed)){ end = k + 1; break; }
+            if(isRefHeading(lines[k]) || isKpHeading(lines[k]) || isHeadingLikeLine(lines[k])){ end = k; break; }
+            budget += wordsOf(lines[k]).length;
+            if(budget >= 800){ end = k + 1; break; }
+          }
+          if(wordsOf(lines.slice(kpIdx, end).join("\n")).length > 0) parts.push("kata pengantar");
+          lines = lines.slice(0, kpIdx).concat(lines.slice(end));
+        }
+        var work = lines.join("\n");
+        // (c) kutipan panjang: rentang bertanda kutip yang isinya >= 25 kata
+        var quoteRemoved = false;
+        function dropLongQuotes(s, open, close){
+          var out = "", idx = 0;
+          for(;;){
+            var a = s.indexOf(open, idx);
+            if(a < 0){ out += s.slice(idx); break; }
+            var b = s.indexOf(close, a + open.length);
+            if(b < 0){ out += s.slice(idx); break; }
+            var inner = s.slice(a + open.length, b);
+            if(wordsOf(inner).length >= 25){
+              out += s.slice(idx, a);
+              quoteRemoved = true;
+              idx = b + close.length;
+            } else {
+              out += s.slice(idx, a + open.length);
+              idx = a + open.length;
+            }
+          }
+          return out;
+        }
+        work = dropLongQuotes(work, "“", "”");
+        work = dropLongQuotes(work, "\"", "\"");
+        work = dropLongQuotes(work, "‘", "’");
+        if(quoteRemoved) parts.push("kutipan");
+        // (d) baris tabel/angka: >= 70% karakter digit/pemisah (dan memuat digit)
+        var keptLines = [], tableDropped = false;
+        work.split("\n").forEach(function(ln){
+          var t = ln.trim();
+          if(t.length >= 5 && /\d/.test(t)){
+            var numChars = (t.match(/[0-9\s.,;:|\/\\\-+()%]/g) || []).length;
+            if(numChars / t.length >= 0.7){ tableDropped = true; return; }
+          }
+          keptLines.push(ln);
+        });
+        if(tableDropped) parts.push("baris tabel");
+        var filtered = keptLines.join("\n");
+        var excludedWords = wordsOf(src).length - wordsOf(filtered).length;
+        if(excludedWords < 0) excludedWords = 0;
+        return { text: filtered, excludedWords: excludedWords, parts: parts };
+      }
+
+      /* ---------- Perbandingan antar-analisis (sebelumnya vs sekarang) ----------
+         Hanya di halaman (tidak masuk PDF / arsip hasil). Ringkasan analisis
+         sebelumnya disimpan di memori sesi; baris perbandingan hanya tampil
+         bila teksnya BERBEDA. Skor akhir mengikuti angka yang benar-benar
+         tampil di kartu skor (diamati lewat MutationObserver, sama seperti
+         panel arsip hasil) — jadi penguatan classifier yang menyusul ikut
+         tercermin tanpa mengubah jalur classifier sama sekali. */
+      var prevRunSummary = null;
+      var currentRunSummary = null;
+      function compareLineText(prev, cur){
+        if(!prev || !cur) return null;
+        if(prev.text === cur.text) return null;
+        var delta = cur.finalPct - prev.finalPct;
+        var dStr = (delta > 0 ? "+" : "") + delta.toFixed(1).replace(".", ",");
+        return "Analisis sebelumnya pada sesi ini: " + prev.finalPct + "% — sekarang " + cur.finalPct + "% (selisih " + dStr + " poin).";
+      }
+      function renderCompareLine(){
+        var el = $("compare-line");
+        if(!el) return;
+        var line = compareLineText(prevRunSummary, currentRunSummary);
+        if(line){ el.textContent = line; el.style.display = ""; }
+        else { el.style.display = "none"; el.textContent = ""; }
+      }
+      (function(){
+        var scoreEl = $("score-num");
+        if(!scoreEl || typeof MutationObserver === "undefined") return;
+        var mo = new MutationObserver(function(){
+          if(!currentRunSummary || !lastResult) return;
+          var v = parseInt(scoreEl.textContent, 10);
+          if(!isNaN(v) && v !== currentRunSummary.finalPct){
+            currentRunSummary.finalPct = v;
+            currentRunSummary.clfPct = (lastClfScore !== null && lastClfScore !== undefined) ? pct(lastClfScore) : null;
+            renderCompareLine();
+          }
+        });
+        mo.observe(scoreEl, { childList: true, characterData: true, subtree: true });
+      })();
+
+      /* ---------- Telemetri kalibrasi (sukarela, TANPA teks) ----------
+         Yang dikirim ke /api/kalibrasi HANYA angka: skor heuristik, skor
+         classifier (atau null), skor akhir yang tampil, ketujuh nilai sinyal
+         (kunci persis keluaran analyze()), jumlah kata/kalimat, persen
+         kalimat terindikasi, label penilaian pengguna, dan nama mesin.
+         Teks, nama berkas, dan kutipan TIDAK pernah ikut — sesuai janji
+         privasi halaman ini. */
+      var telemetrySentFor = null;
+      function buildTelemetryPayload(res, userLabel){
+        var scoreEl = $("score-num");
+        var shown = scoreEl ? parseFloat(String(scoreEl.textContent).replace(",", ".")) : NaN;
+        return {
+          heur: res.final,
+          clf: (lastClfScore === undefined ? null : lastClfScore),
+          final: isNaN(shown) ? res.final : shown / 100,
+          signals: {
+            burstiness: res.burst,
+            kosakata: res.vocab,
+            frasa: res.phraseGlobal,
+            stilometri: res.stylo,
+            markdown: res.markdown,
+            simetri: res.symmetry,
+            pengulangan: res.repetition
+          },
+          words: res.words,
+          sentences: res.sents.length,
+          sentPct: res.sents.length ? res.flagCount / res.sents.length : 0,
+          userLabel: userLabel,
+          engine: "heuristik-v3"
+        };
+      }
+      function refreshTelemetryButtons(){
+        var dis = !lastResult || telemetrySentFor === lastResult;
+        ["tel-manusia", "tel-ai", "tel-ragu"].forEach(function(id){
+          var b = $(id);
+          if(b) b.disabled = dis;
+        });
+      }
+      function resetTelemetry(){
+        telemetrySentFor = null;
+        var st = $("telemetry-status");
+        if(st) st.textContent = "";
+        refreshTelemetryButtons();
+      }
+      function sendTelemetry(userLabel){
+        if(!lastResult || telemetrySentFor === lastResult) return;
+        var res = lastResult;
+        var payload = buildTelemetryPayload(res, userLabel);
+        ["tel-manusia", "tel-ai", "tel-ragu"].forEach(function(id){ var b = $(id); if(b) b.disabled = true; });
+        var st = $("telemetry-status");
+        if(st) st.textContent = "Mengirim…";
+        fetch("/api/kalibrasi", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
+          .then(function(r){
+            if(!r.ok) throw new Error("HTTP " + r.status);
+            telemetrySentFor = res;
+            if(st) st.textContent = "Terima kasih — metrik terkirim (tanpa teks).";
+          })
+          .catch(function(){
+            if(st) st.textContent = "Gagal mengirim metrik — periksa koneksi, lalu coba lagi.";
+            refreshTelemetryButtons();
+          });
+      }
+      $("tel-manusia").addEventListener("click", function(){ sendTelemetry("manusia"); });
+      $("tel-ai").addEventListener("click", function(){ sendTelemetry("ai"); });
+      $("tel-ragu").addEventListener("click", function(){ sendTelemetry("ragu"); });
+
+      /* ---------- Donasi teks (sukarela, DENGAN teks — pengecualian eksplisit) ----------
+         Berbeda dari telemetri di atas: inilah SATU-SATUNYA jalur halaman ini
+         yang mengirim isi teks ke server — dan hanya bila pengunjung memilih
+         label, mencentang persetujuan, lalu menekan tombol sumbang. Teks yang
+         dikirim adalah teks yang dinilai laporan ini (lastText — sudah
+         termasuk penyaringan zona eksklusi dan batas cakupan, BUKAN isi
+         kotak teks yang mungkin sudah diubah sesudahnya), dipotong maks
+         45.000 karakter. Skor mengikuti angka laporan saat tombol ditekan:
+         skor akhir yang tampil, skor heuristik, dan skor classifier (atau
+         null) — semantik yang sama seperti payload telemetri. */
+      var donasiSentFor = null;
+      function resetDonasi(){
+        donasiSentFor = null;
+        var st = $("donasi-status");
+        if(st) st.textContent = "";
+        var btn = $("btn-donasi");
+        if(btn) btn.disabled = false;
+        var consent = $("donasi-consent");
+        if(consent) consent.checked = false;
+        var radios = document.querySelectorAll('input[name="donasi-label"]');
+        for(var i = 0; i < radios.length; i++) radios[i].checked = false;
+      }
+      function sendDonasi(){
+        if(!lastResult || !lastText) return;
+        if(donasiSentFor === lastResult) return;
+        var st = $("donasi-status");
+        var label = null;
+        var radios = document.querySelectorAll('input[name="donasi-label"]');
+        for(var i = 0; i < radios.length; i++){ if(radios[i].checked) label = radios[i].value; }
+        if(!label){ if(st) st.textContent = "Pilih dulu label teksnya."; return; }
+        var consent = $("donasi-consent");
+        if(!consent || !consent.checked){
+          if(st) st.textContent = "Centang dulu persetujuannya — tanpa itu teks tidak dikirim.";
+          return;
+        }
+        var text = lastText.slice(0, 45000);
+        if(text.length < 200){
+          if(st) st.textContent = "Teks ini terlalu pendek untuk disumbangkan (min. 200 karakter).";
+          return;
+        }
+        var scoreEl = $("score-num");
+        var shown = scoreEl ? parseFloat(String(scoreEl.textContent).replace(",", ".")) : NaN;
+        var payload = {
+          label: label,
+          consent: true,
+          text: text,
+          words: lastResult.words,
+          final: isNaN(shown) ? lastResult.final : shown / 100,
+          heur: lastResult.final,
+          clf: (lastClfScore === undefined ? null : lastClfScore)
+        };
+        var btn = $("btn-donasi");
+        if(btn) btn.disabled = true;
+        if(st) st.textContent = "Mengirim…";
+        fetch("/api/donasi", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
+          .then(function(r){
+            if(!r.ok) throw new Error("HTTP " + r.status);
+            donasiSentFor = lastResult;
+            if(st) st.textContent = "Terima kasih — teks tersimpan untuk pelatihan.";
+          })
+          .catch(function(){
+            if(st) st.textContent = "Gagal mengirim sumbangan — periksa koneksi, lalu coba lagi.";
+            if(btn) btn.disabled = false;
+          });
+      }
+      $("btn-donasi").addEventListener("click", sendDonasi);
+
+      /* ---------- Periksa Banyak Berkas (batch) ----------
+         Memakai ulang ekstraktor + batas kata + analyze() yang sama dengan
+         analisis tunggal; classifier (bila aktif) menerapkan penguat
+         bersyarat yang sama (gerbang heuristik 0,35, batas 100 segmen,
+         jeda per segmen di dalam runClassifierScore menjaga tab tetap
+         hidup). Batch TIDAK menyentuh laporan utama (lastResult/lastText)
+         dan TIDAK menulis ke arsip hasil. */
+      var batchRows = [];
+      var batchBusy = false;
+      function bandLabelID(score){
+        if(score >= 0.65) return "TINGGI";
+        if(score >= 0.35) return "SEDANG";
+        return "RENDAH";
+      }
+      async function scoreBatchText(text){
+        text = stripListSections(text).text;
+        text = stripStructuralHeadings(text).text;
+        var capped = capAnalysisText(text);
+        var res = analyze(capped.text);
+        var finalScore = res.final;
+        if(clfState === "ready"){
+          var r = await runClassifierScore(capped.text, null);
+          if(r && typeof r.score === "number" && res.final >= 0.35){
+            finalScore = res.final + (1 - res.final) * r.score * 0.5;
+          }
+        }
+        return { words: res.words, score: finalScore,
+          indicatedPct: res.sents.length ? pct(res.flagCount / res.sents.length) : 0 };
+      }
+      async function extractBatchFileText(f){
+        if(f && typeof f.size === "number" && f.size > MAX_FILE_BYTES) throw new Error("Berkas terlalu besar — batasnya 20 MB per berkas.");
+        var lower = (f.name || "").toLowerCase();
+        if(lower.endsWith(".doc") && !lower.endsWith(".docx")) throw new Error("Format .doc lama belum bisa dibaca — simpan ulang sebagai .docx.");
+        if(lower.endsWith(".docx")) return String(await f.arrayBuffer().then(extractDocxText) || "");
+        if(lower.endsWith(".pdf")) return String(await f.arrayBuffer().then(extractPdfText) || "");
+        if(lower.endsWith(".txt") || f.type === "text/plain") return String(await f.text() || "");
+        throw new Error("Format berkas belum didukung — yang bisa dibaca: .txt, .docx, dan .pdf.");
+      }
+      function setBatchProgress(msg){
+        var el = $("batch-progress");
+        if(el) el.textContent = msg;
+      }
+      function renderBatchTable(){
+        var box = $("batch-results");
+        if(!box) return;
+        var csvBtn = $("btn-batch-csv");
+        if(csvBtn) csvBtn.style.display = batchRows.length ? "" : "none";
+        if(!batchRows.length){ box.innerHTML = ""; return; }
+        var html = "<table class=\"batch-table\"><thead><tr><th>Nama berkas</th><th>Kata</th><th>Skor akhir</th><th>Pita</th><th>Kalimat terindikasi %</th></tr></thead><tbody>";
+        batchRows.forEach(function(r){
+          html += "<tr><td>" + escapeHtml(r.name) + "</td>";
+          if(r.error){
+            html += "<td class=\"num\">—</td><td class=\"batch-err\" colspan=\"3\">" + escapeHtml(r.error) + "</td>";
+          } else {
+            html += "<td class=\"num\">" + fmtNumID(r.words) + "</td><td class=\"num\">" + pct(r.score) + "%</td><td>" + bandLabelID(r.score) + "</td><td class=\"num\">" + r.indicatedPct + "%</td>";
+          }
+          html += "</tr>";
+        });
+        html += "</tbody></table>";
+        box.innerHTML = html;
+      }
+      async function processBatch(fromRetry){
+        if(batchBusy) return;
+        if(!batchQueue.length) buildBatchQueue();
+        var hasTodo = batchQueue.some(function(q){ return q.status === "wait" || q.status === "cancel" || (fromRetry && q.status === "err"); });
+        if(!hasTodo){ setBatchProgress("Tidak ada berkas yang menunggu diproses. Pilih berkas terlebih dahulu."); return; }
+        if(!fromRetry){ batchRows = []; }
+        batchBusy = true;
+        batchCancel = false;
+        $("btn-batch").disabled = true;
+        $("btn-batch-cancel").style.display = "";
+        renderBatchTable();
+        for(var i = 0; i < batchQueue.length; i++){
+          var q = batchQueue[i];
+          if(q.status !== "wait" && q.status !== "cancel" && !(fromRetry && q.status === "err")) continue;
+          if(batchCancel){ if(q.status !== "err") q.status = "cancel"; renderBatchQueue(); continue; }
+          q.status = "run";
+          renderBatchQueue();
+          setBatchProgress("Memproses berkas " + (i + 1) + " dari " + batchQueue.length + ": " + q.name + "…");
+          // Beri peramban kesempatan menggambar garis kemajuan antarberkas.
+          await new Promise(function(r){ setTimeout(r, 0); });
+          try{
+            var text = await extractBatchFileText(q.file);
+            var wc = wordsOf(text).length;
+            if(!text.trim() || wc === 0) throw new Error("Berkas ini tidak memuat teks yang bisa dibaca.");
+            if((q.name || "").toLowerCase().endsWith(".pdf") && (wc < 30 || looksGarbled(text))) throw new Error("Teks di PDF ini tidak terbaca — biasanya karena hasil pindai/gambar (perlu OCR).");
+            var scored = await scoreBatchText(text);
+            q.status = "ok";
+            q.reason = "";
+            batchRows.push({ name: q.name, words: scored.words, score: scored.score, indicatedPct: scored.indicatedPct, error: null });
+          }catch(e){
+            q.status = "err";
+            q.reason = (e && e.message) ? e.message : String(e);
+            batchRows.push({ name: q.name, words: null, score: null, indicatedPct: null, error: q.reason });
+          }
+          renderBatchQueue();
+          renderBatchTable();
+        }
+        var doneCount = batchQueue.filter(function(x){ return x.status === "ok" || x.status === "err"; }).length;
+        setBatchProgress(batchCancel ? "Dibatalkan — " + doneCount + " berkas sempat diproses." : "Selesai — " + batchQueue.length + " berkas dalam antrean diproses.");
+        renderBatchSummary();
+        noteDashBatch(batchQueue.length);
+        histSave("batch", batchQueue.length + " berkas", p6BatchSummary(batchRows), null);
+        batchBusy = false;
+        $("btn-batch").disabled = false;
+        $("btn-batch-cancel").style.display = "none";
+        $("btn-batch-retry").style.display = batchQueue.some(function(x){ return x.status === "err"; }) ? "" : "none";
+        var hasRows = batchRows.length > 0;
+        $("btn-batch-csv").style.display = hasRows ? "" : "none";
+        $("btn-batch-json").style.display = hasRows ? "" : "none";
+        $("btn-batch-pdf").style.display = hasRows ? "" : "none";
+      }
+      function downloadBatchCsv(){
+        if(!batchRows.length) return;
+        function q(v){ return "\"" + String(v === null || v === undefined ? "" : v).replace(/"/g, "\"\"") + "\""; }
+        var lines = ["Nama berkas,Kata,Skor akhir (%),Pita,Kalimat terindikasi (%)"];
+        batchRows.forEach(function(r){
+          if(r.error) lines.push([q(r.name), "", q(r.error), "", ""].join(","));
+          else lines.push([q(r.name), r.words, pct(r.score), bandLabelID(r.score), r.indicatedPct].join(","));
+        });
+        var blob = new Blob(["\ufeff" + lines.join("\r\n")], { type: "text/csv;charset=utf-8" });
+        var a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "saksara-batch.csv";
+        document.body.appendChild(a);
+        a.click();
+        setBatchProgress("Tabel hasil (CSV) sudah diunduh.");
+        setTimeout(function(){ URL.revokeObjectURL(a.href); if(a.remove) a.remove(); }, 400);
+      }
+      $("btn-batch").addEventListener("click", processBatch);
+      $("btn-batch-csv").addEventListener("click", downloadBatchCsv);
+
+      /* ---------- Pengungkapan progresif: jangkar membuka <details> tujuannya ---------- */
+      function openDetailsForHash(){
+        var h = (window.location.hash || "").replace(/^#/, "");
+        if(!h) return;
+        var target = document.getElementById(h);
+        if(!target) return;
+        var d = target.closest ? target.closest("details") : null;
+        if(d) d.open = true;
+        if(target.querySelectorAll){
+          var inners = target.querySelectorAll("details");
+          for(var i = 0; i < inners.length; i++) inners[i].open = true;
+        }
+      }
+      window.addEventListener("hashchange", openDetailsForHash);
+      openDetailsForHash();
+
+      updateCounters();
+    
