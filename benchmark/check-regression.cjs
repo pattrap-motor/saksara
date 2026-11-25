@@ -20,7 +20,15 @@ const fs = require("fs");
 const path = require("path");
 
 const projectDir = path.join(__dirname, "..");
-const html = fs.readFileSync(path.join(projectDir, "index.html"), "utf8");
+const indexHtml = fs.readFileSync(path.join(projectDir, "index.html"), "utf8");
+/* Modular layout: inline the local assets referenced by index.html, in
+ * document order, so extraction sees the same source the single-file
+ * build shipped. */
+const html = indexHtml.replace(/<(?:link|script)\b[^>]*\b(?:href|src)=["']([^"']+)["'][^>]*>(?:\s*<\/script>)?/gi, (tag, ref) => {
+  const assetPath = ref.split(/[?#]/)[0].replace(/^\.?\//, "");
+  if (!assetPath.startsWith("assets/")) return tag;
+  return fs.readFileSync(path.join(projectDir, assetPath), "utf8");
+});
 const start = html.indexOf("var PHRASES_OLD");
 const end = html.indexOf("var $ = function(id)");
 if (start < 0 || end < 0 || end <= start) {
